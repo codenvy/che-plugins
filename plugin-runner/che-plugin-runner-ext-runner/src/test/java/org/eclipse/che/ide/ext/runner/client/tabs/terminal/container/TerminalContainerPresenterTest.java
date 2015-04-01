@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.terminal.container;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
@@ -51,6 +53,8 @@ import static org.mockito.Mockito.when;
 public class TerminalContainerPresenterTest {
     @Captor
     private ArgumentCaptor<RunnerApplicationStatusEventHandler> statusEventHandlerArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<ScheduledCommand>                    scheduledCommandArgumentCaptor;
 
     //variables for constructor
     @Mock
@@ -136,6 +140,11 @@ public class TerminalContainerPresenterTest {
 
         verify(terminal).setVisible(true);
         verify(terminal).setUnavailableLabelVisible(false);
+
+        verify(Scheduler.get()).scheduleDeferred(scheduledCommandArgumentCaptor.capture());
+        ScheduledCommand schedulerValue = scheduledCommandArgumentCaptor.getValue();
+        schedulerValue.execute();
+
         verify(terminal).setUrl(runner);
     }
 
