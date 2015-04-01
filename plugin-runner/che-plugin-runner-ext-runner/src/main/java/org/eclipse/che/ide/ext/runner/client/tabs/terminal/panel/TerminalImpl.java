@@ -24,6 +24,7 @@ import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.models.Runner.Status;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
@@ -67,6 +68,8 @@ public class TerminalImpl extends Composite implements Terminal {
             return;
         }
 
+        terminal.getElement().focus();
+
         String newTerminalUrl = runner.getTerminalURL();
         if (LAUNCHING_STATUS.contains(runner.getStatus()) || url != null && url.equals(newTerminalUrl)) {
             return;
@@ -82,7 +85,7 @@ public class TerminalImpl extends Composite implements Terminal {
         if (isVisible) {
             terminal.setUrl(url);
         } else {
-            terminal.getElement().removeAttribute("src");
+            removeUrl();
         }
     }
 
@@ -96,6 +99,23 @@ public class TerminalImpl extends Composite implements Terminal {
     @Override
     public void setUnavailableLabelVisible(boolean isVisible) {
         unavailableLabel.setVisible(isVisible);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setUrl(@Nonnull Runner runner) {
+        String terminalUrl = runner.getTerminalURL();
+        if (terminalUrl != null && terminalUrl.equals(url)) {
+            return;
+        }
+        url = terminalUrl;
+        terminal.setUrl(terminalUrl);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void removeUrl() {
+        terminal.getElement().removeAttribute("src");
     }
 
 }

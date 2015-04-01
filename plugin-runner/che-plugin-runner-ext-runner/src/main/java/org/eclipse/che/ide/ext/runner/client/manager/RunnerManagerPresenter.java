@@ -246,7 +246,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     private void initializeRightPanel(@Nonnull TabContainer container,
                                       @Nonnull Provider<TabBuilder> tabBuilderProvider,
                                       @Nonnull ConsoleContainer consoleContainer,
-                                      @Nonnull TerminalContainer terminalContainer,
+                                      @Nonnull final TerminalContainer terminalContainer,
                                       @Nonnull final PropertiesContainer propertiesContainer) {
 
         final TabSelectHandler consoleHandler = new TabSelectHandler() {
@@ -274,6 +274,8 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
             public void onTabSelected() {
                 if (selectedRunner != null) {
                     selectedRunner.setActiveTab(locale.runnerTabTerminal());
+
+                    terminalContainer.update(selectedRunner);
                 }
             }
         };
@@ -330,7 +332,6 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
      */
     public void update(@Nonnull Runner runner) {
         history.update(runner);
-        terminalContainer.update(runner);
 
         view.update(runner);
 
@@ -394,6 +395,8 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     /** {@inheritDoc} */
     @Override
     public void onStopButtonClicked() {
+        terminalContainer.removeTerminalUrl(selectedRunner);
+
         stopRunner(selectedRunner);
 
         view.updateMoreInfoPopup(selectedRunner);

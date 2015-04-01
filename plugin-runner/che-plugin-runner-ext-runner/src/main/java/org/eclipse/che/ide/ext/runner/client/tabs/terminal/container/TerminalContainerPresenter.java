@@ -10,20 +10,25 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.terminal.container;
 
-import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
-import org.eclipse.che.ide.ext.runner.client.models.Runner;
-import org.eclipse.che.ide.ext.runner.client.selection.Selection;
-import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
-import org.eclipse.che.ide.ext.runner.client.tabs.terminal.panel.Terminal;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+
+import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
+import org.eclipse.che.ide.ext.runner.client.models.Runner;
+import org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.common.RunnerApplicationStatusEventHandler;
+import org.eclipse.che.ide.ext.runner.client.selection.Selection;
+import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
+import org.eclipse.che.ide.ext.runner.client.tabs.terminal.panel.Terminal;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.RUNNING;
+import static org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.common.RunnerApplicationStatusEvent.TYPE;
 import static org.eclipse.che.ide.ext.runner.client.selection.Selection.ENVIRONMENT;
 
 /**
@@ -40,10 +45,15 @@ public class TerminalContainerPresenter implements TerminalContainer,
     private final SelectionManager      selectionManager;
     private final Map<Runner, Terminal> terminals;
     private final WidgetFactory         widgetFactory;
+    private final EventBus              eventBus;
 
     @Inject
-    public TerminalContainerPresenter(TerminalContainerView view, WidgetFactory widgetFactory, SelectionManager selectionManager) {
+    public TerminalContainerPresenter(TerminalContainerView view,
+                                      WidgetFactory widgetFactory,
+                                      EventBus eventBus,
+                                      final SelectionManager selectionManager) {
         this.view = view;
+        this.eventBus = eventBus;
         this.view.setDelegate(this);
         this.widgetFactory = widgetFactory;
 
@@ -51,6 +61,35 @@ public class TerminalContainerPresenter implements TerminalContainer,
         this.selectionManager.addListener(this);
 
         terminals = new HashMap<>();
+
+        configureStatusRunEventHandler();
+    }
+
+    private void configureStatusRunEventHandler() {
+        eventBus.addHandler(TYPE, new RunnerApplicationStatusEventHandler() {
+                                @Override
+                                public void onRunnerStatusChanged(@Nonnull Runner runner) {
+                                    final Terminal terminal = terminals.get(runner);
+                                    if (terminal == null) {
+                                        return;
+                                    }
+
+                                    Runner selectedRunner = selectionManager.getRunner();
+                                    if (selectedRunner == null || !selectedRunner.equals(runner)) {
+                                        return;
+                                    }
+
+                                    final boolean isRunner = RUNNING.equals(runner.getStatus());
+
+                                    terminal.setVisible(isRunner);
+                                    terminal.setUnavailableLabelVisible(!isRunner);
+
+                                    if (isRunner) {
+                                        terminal.setUrl(runner);
+                                    }
+                                }
+                            }
+                           );
     }
 
     /** {@inheritDoc} */
@@ -76,7 +115,6 @@ public class TerminalContainerPresenter implements TerminalContainer,
         Terminal terminal = terminals.get(runner);
         if (terminal == null) {
             terminal = widgetFactory.createTerminal();
-            terminal.update(runner);
 
             terminals.put(runner, terminal);
 
@@ -125,5 +163,17 @@ public class TerminalContainerPresenter implements TerminalContainer,
         }
 
         terminals.clear();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void removeTerminalUrl(@Nonnull Runner runner) {
+        Terminal terminal = terminals.get(runner);
+        if (terminal != null) {
+            terminal.removeUrl();
+
+            terminal.setVisible(false);
+            terminal.setUnavailableLabelVisible(true);
+        }
     }
 }

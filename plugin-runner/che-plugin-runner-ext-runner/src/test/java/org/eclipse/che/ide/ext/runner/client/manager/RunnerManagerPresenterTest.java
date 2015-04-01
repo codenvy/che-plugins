@@ -468,6 +468,7 @@ public class RunnerManagerPresenterTest {
         verifyTabSelectHandler(tabBuilderTerminal);
         verify(locale, times(2)).runnerTabTerminal();
         verify(runner).setActiveTab(TERMINAL);
+        verify(terminalContainer).update(runner);
     }
 
     @Test
@@ -577,7 +578,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
     }
 
@@ -589,7 +589,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
         verify(view).setApplicationURl(TEXT);
     }
@@ -603,8 +602,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
-        verify(view).update(runner);
         verify(view).setApplicationURl(TEXT);
     }
 
@@ -617,7 +614,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
         verify(view).setApplicationURl(STOPPED_RUNNER);
     }
@@ -631,8 +627,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
-        verify(view).update(runner);
         verify(view).setApplicationURl(null);
     }
 
@@ -645,8 +639,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
-        verify(view).update(runner);
         verify(view).setApplicationURl(APP_URL);
     }
 
@@ -660,8 +652,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
-        verify(view).update(runner);
         verify(view).setApplicationURl(APP_URL);
     }
 
@@ -674,7 +664,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
         verify(view).setApplicationURl(APP_URL);
     }
@@ -773,7 +762,6 @@ public class RunnerManagerPresenterTest {
         verify(runner).setStatus(Runner.Status.IN_QUEUE);
         verify(runner, times(2)).getStatus();
         verify(history).update(runner);
-        verify(terminalContainer, times(2)).update(runner);
         verify(view).update(runner);
         verify(view).setApplicationURl(TEXT);
 
@@ -848,6 +836,7 @@ public class RunnerManagerPresenterTest {
         presenter.onStopButtonClicked();
 
         verify(launchAction).stop();
+        verify(terminalContainer).removeTerminalUrl(runner);
         verify(actionFactory).createStop();
         verify(stopAction).perform(runner);
         verify(view).updateMoreInfoPopup(runner);
@@ -1097,7 +1086,6 @@ public class RunnerManagerPresenterTest {
 
         //update
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
         verify(runner).getStatus();
         verify(view).setApplicationURl(TEXT);

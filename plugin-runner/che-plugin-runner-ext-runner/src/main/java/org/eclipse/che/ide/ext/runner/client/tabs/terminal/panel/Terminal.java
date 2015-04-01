@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.terminal.panel;
 
-import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import com.google.gwt.user.client.ui.IsWidget;
 
+import org.eclipse.che.ide.ext.runner.client.models.Runner;
+
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -45,4 +47,17 @@ public interface Terminal extends IsWidget {
      *         <code>true</code> label is visible,<code>false</code> label isn't visible
      */
     void setUnavailableLabelVisible(boolean isVisible);
+
+    /**
+     * Sets terminal url.
+     *
+     * @param runner
+     *         which contains current terminal
+     */
+    void setUrl(@Nonnull Runner runner);
+
+    /**
+     * Removes url from terminal.
+     */
+    void removeUrl();
 }

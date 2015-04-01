@@ -24,7 +24,9 @@ import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.DONE;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.IN_PROGRESS;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.IN_QUEUE;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +68,7 @@ public class TerminalImplTest {
         terminal.update(runner);
 
         verify(terminal.unavailableLabel).setVisible(false);
+        verify(element).focus();
 
         when(runner.getTerminalURL()).thenReturn(SOME_TEXT + SOME_TEXT);
 
@@ -82,6 +85,7 @@ public class TerminalImplTest {
 
         terminal.update(runner);
 
+        verify(element).focus();
         verify(element).removeAttribute("src");
         verify(terminal.unavailableLabel).setVisible(true);
 
@@ -100,6 +104,7 @@ public class TerminalImplTest {
 
         terminal.update(runner);
 
+        verify(element).focus();
         verify(terminal.terminal).setUrl(anyString());
         verify(element, never()).removeAttribute("src");
     }
@@ -112,6 +117,7 @@ public class TerminalImplTest {
 
         terminal.update(runner);
 
+        verify(element).focus();
         verify(terminal.unavailableLabel, never()).setVisible(true);
         verify(terminal.terminal, never()).setUrl(anyString());
         verify(element, never()).removeAttribute("src");
@@ -125,6 +131,7 @@ public class TerminalImplTest {
 
         terminal.update(runner);
 
+        verify(element).focus();
         verify(terminal.unavailableLabel, never()).setVisible(true);
         verify(terminal.terminal, never()).setUrl(anyString());
         verify(element, never()).removeAttribute("src");
@@ -144,4 +151,25 @@ public class TerminalImplTest {
         verify(terminal.unavailableLabel).setVisible(true);
     }
 
+    @Test
+    public void urlShouldBeSet() throws Exception {
+        when(runner.getTerminalURL()).thenReturn(SOME_TEXT);
+
+        terminal.setUrl(runner);
+
+        verify(terminal.terminal).setUrl(eq(SOME_TEXT));
+    }
+
+    @Test
+    public void urlShouldNotBeSet() throws Exception {
+        when(runner.getTerminalURL()).thenReturn(SOME_TEXT);
+
+        terminal.setUrl(runner);
+
+        when(runner.getTerminalURL()).thenReturn(SOME_TEXT);
+
+        terminal.setUrl(runner);
+
+        verify(terminal.terminal, times(1)).setUrl(anyString());
+    }
 }
