@@ -100,20 +100,20 @@ public class GitHubService {
     @Path("list/account")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositoriesByAccount(@QueryParam("account") String account)
-            throws IOException {
+    public GitHubRepositoryList listRepositoriesByAccount(@QueryParam("account") String account) throws IOException {
         GitHub gitHub = gitHubFactory.connect();
+
+        GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
         try {
             //First, try to retrieve organization repositories:
-            GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
             gitHubRepositoryList.getRepositories().addAll(getDTORepositorieslist(gitHub.getOrganization(account).listRepositories()));
-            return gitHubRepositoryList;
         } catch (IOException ioException) {
             //If account is not organization, then try by user name:
-            GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
-            gitHubRepositoryList.getRepositories().addAll(getDTORepositorieslist(gitHub.getUser(account).listRepositories()));
-            return gitHubRepositoryList;
+            try {
+                gitHubRepositoryList.getRepositories().addAll(getDTORepositorieslist(gitHub.getUser(account).listRepositories()));
+            } catch (IOException exception) {}
         }
+        return gitHubRepositoryList;
     }
 
     @Path("list")
@@ -169,9 +169,6 @@ public class GitHubService {
 
         gitHubPullRequestList.getPullRequests().addAll(getDTOPullRequestList(
                 gitHub.getUser(user).getRepository(repository).listPullRequests(GHIssueState.OPEN)));
-
-        gitHubPullRequestList.getPullRequests().addAll(getDTOPullRequestList(
-                gitHub.getUser(user).getRepository(repository).listPullRequests(GHIssueState.CLOSED)));
 
         return gitHubPullRequestList;
     }
