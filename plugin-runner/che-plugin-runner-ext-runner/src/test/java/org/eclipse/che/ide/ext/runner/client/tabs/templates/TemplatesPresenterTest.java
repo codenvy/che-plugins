@@ -147,6 +147,16 @@ public class TemplatesPresenterTest {
 
         when(panelState.getState()).thenReturn(TEMPLATE);
         when(runnerUtil.hasRunPermission()).thenReturn(true);
+
+        when(systemEnvironment1.getName()).thenReturn("systemEnvironment1");
+        when(systemEnvironment1.getScope()).thenReturn(SYSTEM);
+        when(systemEnvironment2.getName()).thenReturn("systemEnvironment2");
+        when(systemEnvironment2.getScope()).thenReturn(SYSTEM);
+        when(projectEnvironment1.getName()).thenReturn("projectEnvironment1");
+        when(projectEnvironment1.getScope()).thenReturn(PROJECT);
+        when(projectEnvironment2.getName()).thenReturn("projectEnvironment2");
+        when(projectEnvironment2.getScope()).thenReturn(PROJECT);
+
     }
 
     @Test
