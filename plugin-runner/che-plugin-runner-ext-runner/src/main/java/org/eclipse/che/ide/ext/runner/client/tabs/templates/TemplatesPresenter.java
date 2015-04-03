@@ -70,9 +70,11 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     private final RunnerUtil                    runnerUtil;
     private final PanelState panelState;
 
+
     private RunnerEnvironmentTree tree;
     private String                currentType;
     private Scope                 currentScope;
+    private Environment selectedEnvironment;
 
     @Inject
     public TemplatesPresenter(TemplatesView view,
@@ -117,6 +119,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     /** {@inheritDoc} */
     @Override
     public void select(@Nullable Environment environment) {
+        this.selectedEnvironment = environment;
         propertiesContainer.show(environment);
         view.selectEnvironment(environment);
     }
@@ -161,22 +164,38 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         environmentMap.put(scope, sourceList);
         view.addEnvironment(environmentMap);
 
-        selectFirstEnvironment();
+        selectPreviousOrFirstEnvironment();
 
         if (!(RUNNERS).equals(panelState.getState())) {
             changeEnableStateRunButton();
         }
     }
 
-    private void selectFirstEnvironment() {
+    private void selectPreviousOrFirstEnvironment() {
         propertiesContainer.setVisible(true);
         Environment environment = null;
 
-        for (Map.Entry<Scope, List<Environment>> entry : environmentMap.entrySet()) {
-            List<Environment> value = entry.getValue();
-            if (!value.isEmpty()) {
-                environment = value.get(0);
-                break;
+        // try to select the previous element if it still exists
+        if (this.selectedEnvironment != null) {
+            for (Map.Entry<Scope, List<Environment>> entry : environmentMap.entrySet()) {
+                List<Environment> value = entry.getValue();
+                for (Environment env : value) {
+                    if (env.getName().equals(selectedEnvironment.getName()) && env.getScope().equals(selectedEnvironment.getScope())) {
+                        environment = env;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // else we take the first element
+        if (environment == null) {
+            for (Map.Entry<Scope, List<Environment>> entry : environmentMap.entrySet()) {
+                List<Environment> value = entry.getValue();
+                if (!value.isEmpty()) {
+                    environment = value.get(0);
+                    break;
+                }
             }
         }
 
@@ -213,7 +232,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     public void selectEnvironment() {
         Environment selectedEnvironment = selectionManager.getEnvironment();
         if (selectedEnvironment == null) {
-            selectFirstEnvironment();
+            selectPreviousOrFirstEnvironment();
         } else {
             selectionManager.setEnvironment(selectedEnvironment);
         }
