@@ -580,10 +580,11 @@ public class RunnerManagerPresenterTest {
 
     @Test
     public void runnerShouldBeUpdated() {
+        presenter.onSelectionChanged(RUNNER);
         presenter.update(runner);
 
-        verify(history).update(runner);
-        verify(view).update(runner);
+        verify(history, times(2)).update(runner);
+        verify(view, times(2)).update(runner);
     }
 
     @Test

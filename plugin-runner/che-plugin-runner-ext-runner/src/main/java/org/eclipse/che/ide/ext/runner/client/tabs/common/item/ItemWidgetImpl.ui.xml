@@ -45,13 +45,11 @@
         }
 
         .svgImage {
-            position: absolute;
             z-index: 0;
         }
 
         .imagePanel {
             position: absolute;
-            z-index: 1;
             width: 20px;
             height: 35px;
         }

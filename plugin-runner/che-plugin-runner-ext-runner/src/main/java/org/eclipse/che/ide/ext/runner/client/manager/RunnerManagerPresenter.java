@@ -335,10 +335,9 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     public void update(@Nonnull Runner runner) {
         history.update(runner);
 
-        view.update(runner);
-
         if (runner.equals(selectedRunner)) {
-            changeURLDependingOnState(selectedRunner);
+            view.update(runner);
+            changeURLDependingOnState(runner);
         }
     }
 
