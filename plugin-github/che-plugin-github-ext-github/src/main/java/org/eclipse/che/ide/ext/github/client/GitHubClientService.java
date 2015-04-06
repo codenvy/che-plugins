@@ -145,16 +145,6 @@ public interface GitHubClientService {
     void getRepositoriesByUser(String userName, @Nonnull AsyncRequestCallback<GitHubRepositoryList> callback);
 
     /**
-     * Get the page with GitHub repositories.
-     *
-     * @param pageLocation
-     *         page location
-     * @param callback
-     *         callback called when operation is done.
-     */
-    void getPage(String pageLocation, @Nonnull AsyncRequestCallback<GitHubRepositoryList> callback);
-
-    /**
      * Get the list of available repositories by GitHub organization.
      *
      * @param organization
