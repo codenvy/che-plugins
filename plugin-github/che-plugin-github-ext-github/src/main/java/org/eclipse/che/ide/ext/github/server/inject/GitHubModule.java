@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.github.server.inject;
 
 import org.eclipse.che.api.project.server.ProjectImporter;
 import org.eclipse.che.ide.ext.git.server.nativegit.SshKeyUploader;
+import org.eclipse.che.ide.ext.github.server.DTOFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubKeyUploader;
 import org.eclipse.che.ide.ext.github.server.GitHubProjectImporter;
@@ -32,6 +33,7 @@ public class GitHubModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(GitHubFactory.class);
+        bind(DTOFactory.class);
 
         Multibinder<ProjectImporter> projectImporterMultibinder = Multibinder.newSetBinder(binder(), ProjectImporter.class);
         projectImporterMultibinder.addBinding().to(GitHubProjectImporter.class);

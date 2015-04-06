@@ -10,15 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.server.rest;
 
-import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
+import org.eclipse.che.ide.ext.github.server.DTOFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubKeyUploader;
 import org.eclipse.che.ide.ext.github.shared.Collaborators;
 import org.eclipse.che.ide.ext.github.shared.GitHubIssueCommentInput;
 import org.eclipse.che.ide.ext.github.shared.GitHubPullRequest;
 import org.eclipse.che.ide.ext.github.shared.GitHubPullRequestCreationInput;
-import org.eclipse.che.ide.ext.github.shared.GitHubPullRequestHead;
 import org.eclipse.che.ide.ext.github.shared.GitHubPullRequestList;
 import org.eclipse.che.ide.ext.github.shared.GitHubRepository;
 import org.eclipse.che.ide.ext.github.shared.GitHubRepositoryList;
@@ -27,14 +26,11 @@ import org.eclipse.che.ide.ext.ssh.server.SshKey;
 import org.eclipse.che.ide.ext.ssh.server.SshKeyStore;
 import org.eclipse.che.ide.ext.ssh.server.SshKeyStoreException;
 
-import org.kohsuke.github.GHCommitPointer;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHOrganization;
-import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
-import org.kohsuke.github.PagedIterable;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -63,6 +59,9 @@ public class GitHubService {
     private GitHubFactory gitHubFactory;
 
     @Inject
+    private DTOFactory dtoFactory;
+
+    @Inject
     private GitHubKeyUploader githubKeyUploader;
 
     @Inject
@@ -73,28 +72,21 @@ public class GitHubService {
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubRepository getUserRepository(@PathParam("user") String user, @PathParam("repository") String repository)
             throws IOException {
-        return getDTORepository(gitHubFactory.connect().getUser(user).getRepository(repository));
+        return dtoFactory.getRepository(gitHubFactory.connect().getUser(user).getRepository(repository));
     }
 
     @Path("list/user")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubRepositoryList listRepositoriesByUser(@QueryParam("username") String userName) throws IOException {
-        GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
-        gitHubRepositoryList.getRepositories().addAll(getDTORepositorieslist(gitHubFactory.connect().getUser(userName).listRepositories()));
-
-        return gitHubRepositoryList;
+        return dtoFactory.getRepositoriesList(gitHubFactory.connect().getUser(userName).listRepositories());
     }
 
     @Path("list/org")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubRepositoryList listRepositoriesByOrganization(@QueryParam("organization") String organization) throws IOException {
-        GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
-        gitHubRepositoryList.getRepositories()
-                            .addAll(getDTORepositorieslist(gitHubFactory.connect().getOrganization(organization).listRepositories()));
-
-        return gitHubRepositoryList;
+        return dtoFactory.getRepositoriesList(gitHubFactory.connect().getOrganization(organization).listRepositories());
     }
 
     @Path("list/account")
@@ -102,39 +94,35 @@ public class GitHubService {
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubRepositoryList listRepositoriesByAccount(@QueryParam("account") String account) throws IOException {
         GitHub gitHub = gitHubFactory.connect();
-
-        GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
         try {
             //First, try to retrieve organization repositories:
-            gitHubRepositoryList.getRepositories().addAll(getDTORepositorieslist(gitHub.getOrganization(account).listRepositories()));
+            return dtoFactory.getRepositoriesList(gitHub.getOrganization(account).listRepositories());
         } catch (IOException ioException) {
             //If account is not organization, then try by user name:
             try {
-                gitHubRepositoryList.getRepositories().addAll(getDTORepositorieslist(gitHub.getUser(account).listRepositories()));
-            } catch (IOException exception) {}
+                return dtoFactory.getRepositoriesList(gitHub.getUser(account).listRepositories());
+            } catch (IOException exception) {
+                throw ioException;
+            }
         }
-        return gitHubRepositoryList;
     }
 
     @Path("list")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubRepositoryList listRepositories() throws IOException {
-        GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
-        gitHubRepositoryList.getRepositories().addAll(getDTORepositorieslist(gitHubFactory.connect().getMyself().listRepositories()));
-
-        return gitHubRepositoryList;
+        return dtoFactory.getRepositoriesList(gitHubFactory.connect().getMyself().listRepositories());
     }
 
     @Path("forks/{user}/{repository}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubRepositoryList forks(@PathParam("user") String user, @PathParam("repository") String repository) throws IOException {
-        GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
+        GitHubRepositoryList gitHubRepositoryList = dtoFactory.createDTORepositoriesList();
 
         for (GHRepository ghRepository : gitHubFactory.connect().getMyself().listRepositories()) {
             if (ghRepository.isFork() && ghRepository.getName().equals(repository)) {
-                gitHubRepositoryList.getRepositories().add(getDTORepository(ghRepository));
+                gitHubRepositoryList.getRepositories().add(dtoFactory.getRepository(ghRepository));
             }
         }
 
@@ -145,7 +133,7 @@ public class GitHubService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubRepository fork(@PathParam("user") String user, @PathParam("repository") String repository) throws IOException {
-        return getDTORepository(gitHubFactory.connect().getUser(user).getRepository(repository).fork());
+        return dtoFactory.getRepository(gitHubFactory.connect().getUser(user).getRepository(repository).fork());
     }
 
     @Path("issuecomments/{user}/{repository}/{issue}")
@@ -163,14 +151,8 @@ public class GitHubService {
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequestList listPullRequestsByRepository(@PathParam("user") String user, @PathParam("repository") String repository)
             throws IOException {
-        GitHub gitHub = gitHubFactory.connect();
-
-        GitHubPullRequestList gitHubPullRequestList = DtoFactory.getInstance().createDto(GitHubPullRequestList.class);
-
-        gitHubPullRequestList.getPullRequests().addAll(getDTOPullRequestList(
-                gitHub.getUser(user).getRepository(repository).listPullRequests(GHIssueState.OPEN)));
-
-        return gitHubPullRequestList;
+        return dtoFactory
+                .getPullRequestsList(gitHubFactory.connect().getUser(user).getRepository(repository).listPullRequests(GHIssueState.OPEN));
     }
 
     @Path("pullrequests/{user}/{repository}/{pullRequestId}")
@@ -178,9 +160,9 @@ public class GitHubService {
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequestList getPullRequestsById(@PathParam("user") String user, @PathParam("repository") String repository, @PathParam("pullRequestId") String pullRequestId)
             throws IOException {
-        GitHubPullRequestList gitHubPullRequestList = DtoFactory.getInstance().createDto(GitHubPullRequestList.class);
+        GitHubPullRequestList gitHubPullRequestList = dtoFactory.createDTOPullRequestsList();
 
-        gitHubPullRequestList.getPullRequests().add(getDTOPullRequest(
+        gitHubPullRequestList.getPullRequests().add(dtoFactory.getPullRequest(
                 gitHubFactory.connect().getUser(user).getRepository(repository).getPullRequest(Integer.valueOf(pullRequestId))));
 
         return gitHubPullRequestList;
@@ -191,9 +173,9 @@ public class GitHubService {
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequest createPullRequest(@PathParam("user") String user, @PathParam("repository") String repository, GitHubPullRequestCreationInput input)
             throws IOException {
-        GitHubPullRequest pullRequest = getDTOPullRequest(gitHubFactory.connect().getUser(user).getRepository(repository)
-                                                                       .createPullRequest(input.getTitle(), input.getHead(),
-                                                                                          input.getBase(), input.getBody()));
+        GitHubPullRequest pullRequest =
+                dtoFactory.getPullRequest(gitHubFactory.connect().getUser(user).getRepository(repository).createPullRequest(
+                        input.getTitle(), input.getHead(), input.getBase(), input.getBody()));
 
         return pullRequest;
     }
@@ -205,8 +187,7 @@ public class GitHubService {
         GitHub gitHub = gitHubFactory.connect();
 
         //Get users' repositories
-        GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
-        gitHubRepositoryList.getRepositories().addAll(getDTORepositorieslist(gitHub.getMyself().listRepositories()));
+        GitHubRepositoryList gitHubRepositoryList = dtoFactory.getRepositoriesList(gitHub.getMyself().listRepositories());
 
         Map<String, List<GitHubRepository>> repoList = new HashMap<>();
         repoList.put(getUserInfo().getLogin(), gitHubRepositoryList.getRepositories());
@@ -214,7 +195,8 @@ public class GitHubService {
         //Get other repositories from all organizations that user's belong to
         for (GHOrganization ghOrganization : gitHub.getMyself().getAllOrganizations()) {
             String organizationName = ghOrganization.getLogin();
-            repoList.put(organizationName, getDTORepositorieslist(gitHub.getOrganization(organizationName).listRepositories()));
+            repoList.put(organizationName,
+                         dtoFactory.getRepositoriesList(gitHub.getOrganization(organizationName).listRepositories()).getRepositories());
         }
 
         return repoList;
@@ -224,19 +206,17 @@ public class GitHubService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubRepositoryList getPage(@QueryParam("url") String url) throws IOException {
-        GitHubRepositoryList gitHubRepositoryList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
-
-        return gitHubRepositoryList;
+        return dtoFactory.createDTORepositoriesList();
     }
 
     @Path("orgs")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<String> listOrganizations() throws IOException {
-        ArrayList<String> organizations = new ArrayList<>();
+        List<String> organizations = new ArrayList<>();
 
-        for (GHOrganization organization : gitHubFactory.connect().getMyself().getAllOrganizations()) {
-            organizations.add(organization.getLogin());
+        for (GHOrganization ghOrganization : gitHubFactory.connect().getMyself().getAllOrganizations()) {
+            organizations.add(ghOrganization.getLogin());
         }
 
         return organizations;
@@ -246,17 +226,17 @@ public class GitHubService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubUser getUserInfo() throws IOException {
-        return getDTOUser(gitHubFactory.connect().getMyself());
+        return dtoFactory.getUser(gitHubFactory.connect().getMyself());
     }
 
     @GET
     @Path("collaborators/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
     public Collaborators collaborators(@PathParam("user") String user, @PathParam("repository") String repository) throws IOException {
-        Collaborators collaborators = DtoFactory.getInstance().createDto(Collaborators.class);
+        Collaborators collaborators = dtoFactory.createDTOCollaborators();
 
         for (GHUser colaborator : gitHubFactory.connect().getUser(user).getRepository(repository).getCollaborators()) {
-            collaborators.getCollaborators().add(getDTOUser(colaborator));
+            collaborators.getCollaborators().add(dtoFactory.getUser(colaborator));
         }
 
         return collaborators;
@@ -295,104 +275,5 @@ public class GitHubService {
         } catch (IOException e) {
             throw new GitException(e.getMessage(), e);
         }
-    }
-
-    private ArrayList<GitHubRepository> getDTORepositorieslist(PagedIterable<GHRepository> repositories) throws IOException {
-        ArrayList<GitHubRepository> dtoRepositories = new ArrayList<>();
-
-        for (GHRepository repository : repositories) {
-            dtoRepositories.add(getDTORepository(repository));
-        }
-
-        return dtoRepositories;
-    }
-
-    private GitHubRepository getDTORepository(GHRepository repository) throws IOException {
-        GitHubRepository dtoRepository = DtoFactory.getInstance().createDto(GitHubRepository.class);
-
-        dtoRepository.setName(repository.getName());
-        dtoRepository.setUrl(String.valueOf(repository.getUrl()));
-        dtoRepository.setHomepage(repository.getHomepage());
-        dtoRepository.setForks(repository.getForks());
-        dtoRepository.setLanguage(repository.getLanguage());
-        dtoRepository.setFork(repository.isFork());
-        dtoRepository.setWatchers(repository.getWatchers());
-        dtoRepository.setPrivateRepo(repository.isPrivate());
-        dtoRepository.setSize(repository.getSize());
-        dtoRepository.setDescription(repository.getDescription());
-        dtoRepository.setSshUrl(repository.getSshUrl());
-        dtoRepository.setHtmlUrl(repository.gitHttpTransportUrl());
-        dtoRepository.setUpdatedAt(String.valueOf(repository.getUpdatedAt()));
-        dtoRepository.setGitUrl(repository.getGitTransportUrl());
-        dtoRepository.setHasWiki(repository.hasWiki());
-        dtoRepository.setCloneUrl(String.valueOf(repository.getUrl()));
-        dtoRepository.setSvnUrl(repository.getSvnUrl());
-        dtoRepository.setOpenedIssues(repository.getOpenIssueCount());
-        dtoRepository.setCreatedAt(String.valueOf(repository.getCreatedAt()));
-        dtoRepository.setPushedAt(String.valueOf(repository.getPushedAt()));
-        dtoRepository.setHasDownloads(repository.hasDownloads());
-        dtoRepository.setHasIssues(repository.hasIssues());
-
-        return dtoRepository;
-    }
-
-    private ArrayList<GitHubPullRequest> getDTOPullRequestList(PagedIterable<GHPullRequest> pullRequests) throws IOException {
-        ArrayList<GitHubPullRequest> dtoPullRequestList = new ArrayList<>();
-
-        for (GHPullRequest pullRequest : pullRequests) {
-            dtoPullRequestList.add(getDTOPullRequest(pullRequest));
-        }
-
-        return dtoPullRequestList;
-    }
-
-    private GitHubPullRequest getDTOPullRequest(GHPullRequest pullRequest) throws IOException {
-        GitHubPullRequest dtoPullRequest = DtoFactory.getInstance().createDto(GitHubPullRequest.class);
-
-        dtoPullRequest.setId(String.valueOf(pullRequest.getId()));
-        dtoPullRequest.setUrl(String.valueOf(pullRequest.getUrl()));
-        dtoPullRequest.setHtmlUrl(String.valueOf(pullRequest.getHtmlUrl()));
-        dtoPullRequest.setNumber(String.valueOf(pullRequest.getNumber()));
-        dtoPullRequest.setState(pullRequest.getState().toString());
-        dtoPullRequest.setHead(getDTOPullRequestHead(pullRequest.getHead()));
-        dtoPullRequest.setMerged(pullRequest.isMerged());
-        if (pullRequest.getMergedBy() != null) {
-            dtoPullRequest.setMergedBy(getDTOUser(pullRequest.getMergedBy()));
-        }
-        dtoPullRequest.setMergeable(pullRequest.getMergeable());
-
-        return dtoPullRequest;
-    }
-
-    private GitHubPullRequestHead getDTOPullRequestHead(GHCommitPointer pullRequestHead){
-        GitHubPullRequestHead dtoPullRequestHead = DtoFactory.getInstance().createDto(GitHubPullRequestHead.class);
-
-        dtoPullRequestHead.setLabel(pullRequestHead.getLabel());
-        dtoPullRequestHead.setRef(pullRequestHead.getRef());
-        dtoPullRequestHead.setSha(pullRequestHead.getSha());
-
-        return dtoPullRequestHead;
-    }
-
-    private GitHubUser getDTOUser(GHUser user) throws IOException {
-        GitHubUser dtoUser = DtoFactory.getInstance().createDto(GitHubUser.class);
-
-        dtoUser.setId(String.valueOf(user.getId()));
-        dtoUser.setHtmlUrl(user.getHtmlUrl());
-        dtoUser.setAvatarUrl(user.getAvatarUrl());
-        dtoUser.setBio(user.getBlog());
-        dtoUser.setCompany(user.getCompany());
-        dtoUser.setEmail(user.getEmail());
-        dtoUser.setFollowers(user.getFollowersCount());
-        dtoUser.setFollowing(user.getFollowingCount());
-        dtoUser.setLocation(user.getLocation());
-        dtoUser.setLogin(user.getLogin());
-        dtoUser.setName(user.getName());
-        dtoUser.setPublicGists(user.getPublicGistCount());
-        dtoUser.setPublicRepos(user.getPublicRepoCount());
-        dtoUser.setUrl(String.valueOf(user.getUrl()));
-        dtoUser.setGravatarId(user.getGravatarId());
-
-        return dtoUser;
     }
 }

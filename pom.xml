@@ -58,7 +58,6 @@
     <properties>
         <dto-generator-out-directory>${project.build.directory}/generated-sources/dto/</dto-generator-out-directory>
         <maven.model.version>3.0.5</maven.model.version>
-        <org.kohsuke.github-api.version>1.66</org.kohsuke.github-api.version>
         <specification.version>1.0-beta2</specification.version>
     </properties>
     <repositories>
