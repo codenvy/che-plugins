@@ -10,17 +10,28 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.server;
 
-import org.eclipse.che.api.core.ForbiddenException;
-import org.eclipse.che.api.core.ServerException;
+import com.google.inject.Inject;
+
+import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.project.server.FolderEntry;
 import org.eclipse.che.api.project.server.InvalidValueException;
 import org.eclipse.che.api.project.server.ValueProvider;
 import org.eclipse.che.api.project.server.ValueProviderFactory;
 import org.eclipse.che.api.project.server.ValueStorageException;
+import org.eclipse.che.api.vfs.server.MountPoint;
+import org.eclipse.che.api.vfs.server.VirtualFile;
+import org.eclipse.che.api.vfs.server.VirtualFileSystem;
+import org.eclipse.che.api.vfs.server.VirtualFileSystemRegistry;
+import org.eclipse.che.api.vfs.shared.PropertyFilter;
+import org.eclipse.che.api.vfs.shared.dto.Item;
+import org.eclipse.che.vfs.impl.fs.LocalPathResolver;
+import org.eclipse.che.vfs.impl.fs.VirtualFileImpl;
 
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.eclipse.che.ide.ext.git.shared.StatusFormat.LONG;
 
 /**
  * @author Roman Nikitenko
@@ -28,20 +39,26 @@ import java.util.List;
 @Singleton
 public class GitValueProviderFactory implements ValueProviderFactory {
 
+    @Inject
+    private GitConnectionFactory      gitConnectionFactory;
+    @Inject
+    private VirtualFileSystemRegistry vfsRegistry;
+    @Inject
+    private LocalPathResolver         localPathResolver;
+
 
     @Override
-    public ValueProvider newInstance(final FolderEntry project) {
+    public ValueProvider newInstance(final FolderEntry folder) {
         return new ValueProvider() {
             @Override
             public List<String> getValues(String attributeName) throws ValueStorageException {
-                try {
-                    final FolderEntry git = (FolderEntry)project.getChild(".git");
-                    if (git != null) {
-                        return Arrays.asList("git");
-                    } else {
-                        throw new ValueStorageException(String.format("Folder .git not found in %s", project.getPath()));
-                    }
-                } catch (ForbiddenException | ServerException e) {
+                try (GitConnection gitConnection =
+                             gitConnectionFactory.getConnection(resolveLocalPathByPath(folder.getPath(), folder.getWorkspace()))) {
+
+                    //check whether the project git repository by performing git status(throw Exception if the project is not git repository)
+                    gitConnection.status(LONG);
+                    return Arrays.asList("git");
+                } catch (ApiException e) {
                     throw new ValueStorageException(e.getMessage());
                 }
             }
@@ -50,8 +67,16 @@ public class GitValueProviderFactory implements ValueProviderFactory {
             public void setValues(String attributeName, List<String> value) throws InvalidValueException {
                 throw new InvalidValueException(
                         String.format("It is not possible to set value for attribute %s on project %s .git project values are read only",
-                                      attributeName, project.getPath()));
+                                      attributeName, folder.getPath()));
             }
         };
+    }
+
+    private String resolveLocalPathByPath(String folderPath, String wsId) throws ApiException {
+        VirtualFileSystem vfs = vfsRegistry.getProvider(wsId).newInstance(null);
+        Item gitProject = vfs.getItemByPath(folderPath, null, false, PropertyFilter.ALL_FILTER);
+        final MountPoint mountPoint = vfs.getMountPoint();
+        final VirtualFile virtualFile = mountPoint.getVirtualFile(gitProject.getPath());
+        return localPathResolver.resolve((VirtualFileImpl)virtualFile);
     }
 }

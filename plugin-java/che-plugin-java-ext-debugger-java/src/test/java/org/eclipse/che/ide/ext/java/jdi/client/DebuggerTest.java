@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.jdi.client;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.web.bindery.event.shared.Event;
+import com.googlecode.gwt.test.utils.GwtReflectionUtils;
+
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
@@ -36,10 +40,6 @@ import org.eclipse.che.ide.ext.runner.client.manager.RunnerManager;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.common.RunnerApplicationStatusEventHandler;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.web.bindery.event.shared.Event;
-import com.googlecode.gwt.test.utils.GwtReflectionUtils;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -287,6 +287,7 @@ public class DebuggerTest extends BaseTest {
 
         when(runner.getProcessId()).thenReturn(1L);
         when(runner2.getProcessId()).thenReturn(1L);
+        when(runner2.getDescriptor()).thenReturn(applicationProcessDescriptor);
     }
 
     @Test

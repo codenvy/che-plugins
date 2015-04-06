@@ -265,7 +265,6 @@ public class StatusActionTest {
         verify(notification).update(FailedMessage, Notification.Type.INFO, Notification.Status.FINISHED, null, true);
 
         verify(consoleContainer).printInfo(runner, FailedMessage);
-        verify(presenter).stopRunner(runner);
 
         verify(webSocketUtil).unSubscribeHandler(WEB_SOCKET_CHANNEL, processStartedHandler);
         verify(checkHealthStatusAction).stop();

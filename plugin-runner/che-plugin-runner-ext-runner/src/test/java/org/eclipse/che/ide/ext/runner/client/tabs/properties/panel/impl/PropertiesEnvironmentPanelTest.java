@@ -68,6 +68,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -77,6 +79,7 @@ import static org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl.ROOT_
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_512;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.impl.PropertiesEnvironmentPanel.ENVIRONMENT_ID_PREFIX;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -85,6 +88,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -245,6 +249,7 @@ public class PropertiesEnvironmentPanelTest {
         when(environment.getName()).thenReturn(TEXT);
         when(environment.getType()).thenReturn(TEXT);
         when(environment.getRam()).thenReturn(MB_512.getValue());
+        when(environment.getId()).thenReturn(TEXT);
 
         when(dtoFactory.createDto(RunnerConfiguration.class)).thenReturn(runnerConfiguration);
         when(runnerConfiguration.withRam(anyInt())).thenReturn(runnerConfiguration);
@@ -320,7 +325,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view, times(2)).setEnableSaveButton(false);
         verify(view, times(2)).setEnableDeleteButton(false);
 
-        verify(environment, times(2)).getName();
+        verify(environment, times(3)).getId();
         verify(environment).getScope();
         verify(environment).setRam(MB_512.getValue());
         verify(view).selectMemory(MB_512);
@@ -340,8 +345,8 @@ public class PropertiesEnvironmentPanelTest {
 
         verify(projectService).createFolder(anyString(), eq(asyncRequestCallback));
 
-        assertThat(runnerConfigs.containsKey(newName), is(true));
-        assertThat(runnerConfigs.get(newName), equalTo(runnerConfiguration));
+        assertThat(runnerConfigs.containsKey(ENVIRONMENT_ID_PREFIX + newName), is(true));
+        assertThat(runnerConfigs.get(ENVIRONMENT_ID_PREFIX + newName), equalTo(runnerConfiguration));
     }
 
     private void callOnSuccessCreateFile() {
@@ -473,7 +478,8 @@ public class PropertiesEnvironmentPanelTest {
         verify(projectDescriptor, times(2)).getPath();
         verify(environment).getRam();
         verify(currentProject).getProjectDescription();
-        verify(environment, times(2)).getName();
+        verify(environment).getName();
+        verify(environment, times(2)).getId();
 
         verify(view).getName();
 
@@ -497,7 +503,7 @@ public class PropertiesEnvironmentPanelTest {
 
         verify(projectEnvironmentsAction).perform();
 
-        assertThat(runnerConfigs.containsKey(TEXT), CoreMatchers.is(true));
+        assertThat(runnerConfigs.containsKey(ENVIRONMENT_ID_PREFIX + TEXT), CoreMatchers.is(true));
     }
 
     @Test
@@ -513,7 +519,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(environment).getRam();
         verify(currentProject).getProjectDescription();
         verify(projectDescriptor, times(2)).getPath();
-        verify(environment, times(2)).getName();
+        verify(environment, times(2)).getId();
 
         verify(view).getName();
 
@@ -533,13 +539,20 @@ public class PropertiesEnvironmentPanelTest {
         when(view.getName()).thenReturn(TEXT);
         when(environment.getName()).thenReturn(TEXT2);
         when(editor.isDirty()).thenReturn(true);
-
+        doAnswer(new Answer() {
+            public Object answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                AsyncCallback callback = (AsyncCallback)args[0];
+                callback.onSuccess(editorInput);
+                return null;
+            }
+        }).when(editor).doSave(any(AsyncCallback.class));
         presenter.onSaveButtonClicked();
 
         verify(environment).getRam();
         verify(currentProject).getProjectDescription();
         verify(projectDescriptor, times(2)).getPath();
-        verify(environment, times(2)).getName();
+        verify(environment, times(2)).getId();
 
         verify(view).getName();
 
@@ -572,7 +585,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(dtoFactory).createDto(RunnerConfiguration.class);
         verify(runnerConfiguration).withRam(MB_512.getValue());
 
-        assertThat(runnerConfigs.containsKey(TEXT), is(true));
+        assertThat(runnerConfigs.containsKey(ENVIRONMENT_ID_PREFIX + TEXT), is(true));
     }
 
     @Test
@@ -601,13 +614,21 @@ public class PropertiesEnvironmentPanelTest {
         when(view.getName()).thenReturn(TEXT);
         when(environment.getName()).thenReturn(TEXT2);
         when(editor.isDirty()).thenReturn(true);
+        doAnswer(new Answer() {
+            public Object answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                AsyncCallback callback = (AsyncCallback)args[0];
+                callback.onSuccess(editorInput);
+                return null;
+            }
+        }).when(editor).doSave(any(AsyncCallback.class));
 
         presenter.onSaveButtonClicked();
 
         verify(environment).getRam();
         verify(currentProject).getProjectDescription();
         verify(projectDescriptor, times(2)).getPath();
-        verify(environment, times(2)).getName();
+        verify(environment, times(2)).getId();
 
         verify(view).getName();
 
@@ -737,7 +758,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableCancelButton(false);
         verify(view).setEnableDeleteButton(false);
 
-        verify(environment, times(2)).getName();
+        verify(environment).getId();
         verify(environment).setRam(MB_512.getValue());
         verify(view).setName(TEXT);
         verify(view).selectMemory(MB_512);
@@ -756,7 +777,8 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableCancelButton(false);
         verify(view).setEnableDeleteButton(true);
 
-        verify(environment, times(2)).getName();
+        verify(environment).getName();
+        verify(environment).getId();
         verify(environment).setRam(MB_512.getValue());
         verify(view).setName(TEXT);
         verify(view).selectMemory(MB_512);
@@ -820,7 +842,8 @@ public class PropertiesEnvironmentPanelTest {
         verify(currentProject, times(2)).getCurrentTree();
         verify(projectDescriptor, times(2)).getRunners();
         verify(runnersDescriptor, times(2)).getConfigs();
-        verify(environment, times(4)).getName();
+        verify(environment, times(2)).getName();
+        verify(environment, times(2)).getId();
 
         verify(environment, times(2)).getPath();
         //we can't use mock for fileType that why we have null FileType
@@ -851,7 +874,7 @@ public class PropertiesEnvironmentPanelTest {
 
         verify(projectDescriptor).getRunners();
         verify(runnersDescriptor).getConfigs();
-        verify(environment).getName();
+        verify(environment).getId();
 
         verify(environment).getPath();
         verify(dockerFileFactory).newInstance(TEXT);
@@ -912,7 +935,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(editor2, times(3)).isDirty();
         verify(handlesUndoRedo, times(3)).undoable();
 
-        verify(environment, times(2)).getName();
+        verify(environment).getId();
         verify(environment).setRam(MB_512.getValue());
         verify(view).setName(TEXT);
         verify(view).selectMemory(MB_512);
@@ -938,13 +961,15 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableSaveButton(false);
         verify(view).setEnableDeleteButton(false);
 
-        verify(environment, times(2)).getName();
+        verify(environment, times(3)).getId();
+        verify(environment).getName();
         verify(environment).setRam(MB_512.getValue());
 
         verify(view).selectMemory(MB_512);
         verify(view).setName(TEXT);
         verify(view).setType(TEXT);
         verify(view).selectScope(SYSTEM);
+        verify(runnerConfiguration).getRam();
     }
 
     @Test
@@ -958,7 +983,18 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableSaveButton(false);
         verify(view).setEnableDeleteButton(false);
 
-        verifyUpdateEnvironment();
+        verify(view).setEnableCancelButton(false);
+        verify(view).setEnableSaveButton(false);
+        verify(view).setEnableDeleteButton(false);
+
+        verify(environment, times(2)).getId();
+        verify(environment).getName();
+        verify(environment).setRam(MB_512.getValue());
+
+        verify(view).selectMemory(MB_512);
+        verify(view).setName(TEXT);
+        verify(view).setType(TEXT);
+        verify(view).selectScope(SYSTEM);
         verify(runnerConfiguration, never()).getRam();
         verify(environment).getRam();
     }

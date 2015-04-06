@@ -10,11 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.console.panel;
 
-import org.eclipse.che.api.core.rest.shared.dto.Link;
-import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
-import org.eclipse.che.ide.ext.runner.client.models.Runner;
-import org.eclipse.che.ide.ext.runner.client.RunnerResources;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -28,6 +23,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
+
+import org.eclipse.che.api.core.rest.shared.dto.Link;
+import org.eclipse.che.ide.ext.runner.client.RunnerResources;
+import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
+import org.eclipse.che.ide.ext.runner.client.models.Runner;
 
 import javax.annotation.Nonnull;
 
@@ -83,14 +83,21 @@ public class ConsoleImpl extends Composite implements Console {
     /** {@inheritDoc} */
     @Override
     public void print(@Nonnull String text) {
+        // nothing to display
+        if (text.isEmpty()) {
+            return;
+        }
+
         //The message from server can be include a few lines of console
+        // We detect type from the full message which can be multiline
+        MessageType messageType = MessageType.detect(text);
+
         for (String message : text.split("\n")) {
             if (message.isEmpty()) {
                 // don't print empty message
                 continue;
             }
 
-            MessageType messageType = MessageType.detect(message);
             MessageBuilder messageBuilder = messageBuilderProvider.get()
                                                                   .message(message)
                                                                   .type(messageType);

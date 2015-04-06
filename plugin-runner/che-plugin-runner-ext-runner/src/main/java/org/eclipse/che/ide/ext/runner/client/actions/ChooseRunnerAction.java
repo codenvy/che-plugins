@@ -178,6 +178,12 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
             }
         }
 
+        for (Environment e : projectRunners) {
+            if (e.getId().equals(currentProject.getRunner())) {
+                return e.getName();
+            }
+        }
+
         return null;
     }
 }

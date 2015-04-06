@@ -162,14 +162,8 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("tooltip.runner.panel")
     String tooltipRunnerPanel();
 
-    @Key("template.scope")
-    String configsScope();
-
-    @Key("template.type")
-    String configsType();
-
-    @Key("template.type.all")
-    String configsTypeAll();
+    @Key("template.match.project.type")
+    String matchProjectType();
 
     @Key("properties.name")
     String propertiesName();

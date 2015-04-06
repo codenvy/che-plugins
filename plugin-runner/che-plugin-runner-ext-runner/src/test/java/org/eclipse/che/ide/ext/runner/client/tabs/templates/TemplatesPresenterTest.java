@@ -65,7 +65,6 @@ import static org.eclipse.che.ide.ext.runner.client.state.State.TEMPLATE;
 public class TemplatesPresenterTest {
 
     private static final String SOME_TEXT = "someText";
-    private static final String TYPE_ALL  = "All";
 
     //constructor mocks
     @Mock
@@ -119,8 +118,6 @@ public class TemplatesPresenterTest {
 
     @Before
     public void setUp() throws Exception {
-        when(locale.configsTypeAll()).thenReturn(TYPE_ALL);
-
         presenter = new TemplatesPresenter(view,
                                            filter,
                                            locale,
@@ -147,12 +144,21 @@ public class TemplatesPresenterTest {
 
         when(panelState.getState()).thenReturn(TEMPLATE);
         when(runnerUtil.hasRunPermission()).thenReturn(true);
+
+        when(systemEnvironment1.getName()).thenReturn("systemEnvironment1");
+        when(systemEnvironment1.getScope()).thenReturn(SYSTEM);
+        when(systemEnvironment2.getName()).thenReturn("systemEnvironment2");
+        when(systemEnvironment2.getScope()).thenReturn(SYSTEM);
+        when(projectEnvironment1.getName()).thenReturn("projectEnvironment1");
+        when(projectEnvironment1.getScope()).thenReturn(PROJECT);
+        when(projectEnvironment2.getName()).thenReturn("projectEnvironment2");
+        when(projectEnvironment2.getScope()).thenReturn(PROJECT);
+
     }
 
     @Test
     public void constructorShouldBeVerified() throws Exception {
         verify(view).setFilterWidget(filter);
-        verify(locale).configsTypeAll();
     }
 
     @Test
@@ -172,26 +178,6 @@ public class TemplatesPresenterTest {
         verify(currentProject, never()).getProjectDescription();
     }
 
-    @Test
-    public void environmentWithScopeSystemShouldBeAdded() throws Exception {
-        when(filter.getScope()).thenReturn(SYSTEM);
-        when(filter.getType()).thenReturn(TYPE_ALL);
-        presenter.onValueChanged();
-        reset(view, propertiesContainer);
-
-        presenter.addEnvironments(tree, SYSTEM);
-
-        getProjectDescriptorShouldBeVerified();
-
-        verify(environmentUtil).getEnvironmentsByProjectType(tree, SOME_TEXT, SYSTEM);
-        verify(view).addEnvironment(Matchers.<Map<Scope, List<Environment>>>anyObject());
-
-        verify(propertiesContainer).setVisible(true);
-        verify(propertiesContainer).show(systemEnvironment1);
-        verify(view).selectEnvironment(systemEnvironment1);
-        verify(selectionManager).setEnvironment(systemEnvironment1);
-    }
-
     private void getProjectDescriptorShouldBeVerified() {
         verify(appContext).getCurrentProject();
         verify(currentProject).getProjectDescription();
@@ -200,8 +186,7 @@ public class TemplatesPresenterTest {
     @Test
     public void environmentShouldNotBeSelectedWhenEnvironmentListIsEmpty() throws Exception {
         when(environmentUtil.getEnvironmentsByProjectType(tree, SOME_TEXT, SYSTEM)).thenReturn(Collections.<Environment>emptyList());
-        when(filter.getScope()).thenReturn(SYSTEM);
-        when(filter.getType()).thenReturn(TYPE_ALL);
+        when(filter.getMatchesProjectType()).thenReturn(true);
         presenter.onValueChanged();
         reset(view, propertiesContainer, selectionManager);
 
@@ -232,13 +217,6 @@ public class TemplatesPresenterTest {
     }
 
     @Test
-    public void typeItemShouldBeSet() throws Exception {
-        presenter.setTypeItem(SOME_TEXT);
-
-        verify(filter).addType(SOME_TEXT);
-    }
-
-    @Test
     public void environmentsShouldBeShown() throws Exception {
         presenter.setTypeItem(SOME_TEXT);
 
@@ -247,8 +225,7 @@ public class TemplatesPresenterTest {
 
         verify(view).clearEnvironmentsPanel();
         verify(projectEnvironmentsAction).perform();
-        verify(filter).selectScope(PROJECT);
-        verify(filter).selectType(SOME_TEXT);
+        verify(filter).setMatchesProjectType(true);
 
         verify(propertiesContainer).show(projectEnvironment1);
         verify(view).selectEnvironment(projectEnvironment1);
@@ -266,8 +243,7 @@ public class TemplatesPresenterTest {
 
         verify(view).clearEnvironmentsPanel();
         verify(projectEnvironmentsAction).perform();
-        verify(filter).selectScope(PROJECT);
-        verify(filter).selectType(SOME_TEXT);
+        verify(filter).setMatchesProjectType(true);
 
         verify(propertiesContainer).show(projectEnvironment1);
         verify(view).selectEnvironment(projectEnvironment1);
@@ -285,16 +261,14 @@ public class TemplatesPresenterTest {
 
         verify(view).clearEnvironmentsPanel();
         verify(projectEnvironmentsAction).perform();
-        verify(filter).selectScope(PROJECT);
-        verify(filter).selectType(SOME_TEXT);
+        verify(filter).setMatchesProjectType(true);
 
         verify(selectionManager).setEnvironment(environment);
     }
 
     @Test
     public void systemEnvironmentsShouldBePerformedWhenTypeAll() throws Exception {
-        when(filter.getScope()).thenReturn(SYSTEM);
-        when(filter.getType()).thenReturn(TYPE_ALL);
+        when(filter.getMatchesProjectType()).thenReturn(false);
         presenter.onValueChanged();
 
         presenter.addEnvironments(tree, SYSTEM);
@@ -314,27 +288,15 @@ public class TemplatesPresenterTest {
 
     @Test
     public void systemEnvironmentsShouldBePerformedWhenTypeIsNotAll() throws Exception {
-        when(filter.getScope()).thenReturn(SYSTEM);
-        when(filter.getType()).thenReturn(SOME_TEXT);
-
+        when(filter.getMatchesProjectType()).thenReturn(true);
         presenter.onValueChanged();
 
         verify(systemEnvironmentsAction).perform();
     }
 
     @Test
-    public void projectEnvironmentsShouldBePerformed() throws Exception {
-        when(filter.getScope()).thenReturn(PROJECT);
-
-        presenter.onValueChanged();
-
-        verify(projectEnvironmentsAction).perform();
-    }
-
-    @Test
     public void allEnvironmentShouldBeSelectedWhenScopeIsAllAndTypeIsNotAll() throws Exception {
-        when(filter.getScope()).thenReturn(ALL);
-        when(filter.getType()).thenReturn(SOME_TEXT);
+        when(filter.getMatchesProjectType()).thenReturn(true);
 
         presenter.onValueChanged();
 
@@ -344,8 +306,7 @@ public class TemplatesPresenterTest {
 
     @Test
     public void allEnvironmentShouldBeSelectedWhenScopeIsAllAndTypeIsAll() throws Exception {
-        when(filter.getScope()).thenReturn(ALL);
-        when(filter.getType()).thenReturn(TYPE_ALL);
+        when(filter.getMatchesProjectType()).thenReturn(false);
         presenter.onValueChanged();
         reset(projectEnvironmentsAction);
 
@@ -370,8 +331,7 @@ public class TemplatesPresenterTest {
     }
 
     private void prepareMocks() {
-        when(filter.getScope()).thenReturn(SYSTEM);
-        when(filter.getType()).thenReturn(TYPE_ALL);
+        when(filter.getMatchesProjectType()).thenReturn(true);
 
         presenter.onValueChanged();
         presenter.addEnvironments(tree, SYSTEM);
@@ -388,16 +348,6 @@ public class TemplatesPresenterTest {
 
         verify(selectionManager).setEnvironment(environment);
         verify(selectionManager, never()).setEnvironment(systemEnvironment1);
-    }
-
-    @Test
-    public void systemEnvironmentsShouldNotBeAddedWhenSelectedScopeIsProject() throws Exception {
-        when(filter.getScope()).thenReturn(PROJECT);
-        presenter.onValueChanged();
-
-        presenter.addEnvironments(tree, SYSTEM);
-
-        verify(view, never()).addEnvironment(Matchers.<Map<Scope, List<Environment>>>anyObject());
     }
 
     @Test
@@ -433,15 +383,6 @@ public class TemplatesPresenterTest {
     }
 
     @Test
-    public void runButtonShouldBeDisableBecauseEnvironmentListIsEmpty() {
-        presenter.changeEnableStateRunButton();
-
-        verify(runnerUtil).hasRunPermission();
-
-        verify(runnerManagerView).setEnableRunButton(false);
-    }
-
-    @Test
     public void runButtonShouldBeDisableBecauseUserHasNotPermission() {
         when(runnerUtil.hasRunPermission()).thenReturn(false);
 
@@ -471,49 +412,5 @@ public class TemplatesPresenterTest {
         verify(panelState).getState();
 
         verifyNoMoreInteractions(panelState, runnerUtil, runnerManagerView);
-    }
-
-    @Test
-    public void runnerStateShouldNotBeChangedIfOpenRunnerPropertiesPanel2() throws Exception {
-        when(panelState.getState()).thenReturn(RUNNERS);
-
-        presenter.addEnvironments(tree, SYSTEM);
-
-        getProjectDescriptorShouldBeVerified();
-
-        verifyNoMoreInteractions(environmentUtil, panelState, runnerUtil, runnerManagerView);
-    }
-
-    @Test
-    public void runEnableStatusShouldBeChangedAfterChangeScopeFromProjectToAll() {
-        presenter.addEnvironments(tree, SYSTEM);
-        presenter.addEnvironments(tree, PROJECT);
-
-        when(filter.getScope()).thenReturn(ALL);
-        when(filter.getType()).thenReturn(TYPE_ALL);
-        presenter.onValueChanged();
-        reset(runnerManagerView, view, panelState);
-
-        presenter.addEnvironments(tree, ALL);
-
-        verify(appContext, times(3)).getCurrentProject();
-        verify(currentProject, times(3)).getProjectDescription();
-        verify(environmentUtil).getEnvironmentsByProjectType(tree, SOME_TEXT, ALL);
-        verify(view).addEnvironment(Matchers.<Map<Scope, List<Environment>>>anyObject());
-        verify(descriptor, times(2)).getType();
-
-        verify(view).addEnvironment(Matchers.<Map<Scope, List<Environment>>>anyObject());
-        verify(propertiesContainer, times(3)).setVisible(true);
-
-        verify(propertiesContainer, times(2)).show(systemEnvironment1);
-        verify(view).selectEnvironment(systemEnvironment1);
-        verify(selectionManager, times(2)).setEnvironment(systemEnvironment1);
-
-        verify(panelState).getState();
-
-        verify(runnerUtil, times(3)).hasRunPermission();
-
-        //run button should be visible
-        verify(runnerManagerView).setEnableRunButton(true);
     }
 }

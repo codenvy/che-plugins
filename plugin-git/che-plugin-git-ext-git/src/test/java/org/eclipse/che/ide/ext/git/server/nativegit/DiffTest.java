@@ -16,13 +16,15 @@ import org.eclipse.che.ide.ext.git.shared.DiffRequest.DiffType;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -34,9 +36,9 @@ public class DiffTest extends BaseTest {
     @BeforeMethod
     protected void setUp() throws Exception {
         addFile(getRepository(), "aaa", "AAA\n");
-        new File(getRepository().toFile(), "README.txt").delete();
         nativeGit = new NativeGit(getRepository().toFile());
         nativeGit.createAddCommand().setFilePattern(Arrays.asList(".")).execute();
+        addFile(getRepository(), "aaa", "BBB\n");
     }
 
     @Test
@@ -45,7 +47,7 @@ public class DiffTest extends BaseTest {
                 .withType(DiffType.NAME_STATUS)
                 .withRenameLimit(0));
         assertEquals(diff.size(), 1);
-        assertTrue(diff.contains("D\tREADME.txt"));
+        assertTrue(diff.contains("M\taaa"));
     }
 
     @Test
@@ -90,7 +92,7 @@ public class DiffTest extends BaseTest {
                 .withNoRenames(false)
                 .withRenameLimit(0));
         assertEquals(diff.size(), 1);
-        assertTrue(diff.contains("README.txt"));
+        assertTrue(diff.contains("aaa"));
     }
 
     @Test
@@ -148,8 +150,7 @@ public class DiffTest extends BaseTest {
                 .withRenameLimit(0)
                 .withCommitA("HEAD")
                 .withCached(false));
-        assertEquals(diff.size(), 2);
-        assertTrue(diff.contains("README.txt"));
+        assertEquals(diff.size(), 1);
         assertTrue(diff.contains("aaa"));
     }
 
@@ -160,8 +161,19 @@ public class DiffTest extends BaseTest {
                 .withType(DiffType.NAME_ONLY)
                 .withNoRenames(false)
                 .withRenameLimit(0));
+        assertEquals(diff.size(), 1);
+        assertTrue(diff.contains("aaa"));
+    }
+
+
+    @Test
+    public void testDiffNameOnlyNotMatchingWithFileFilter() throws Exception {
+        List<String> diff = readDiff(newDTO(DiffRequest.class)
+                                             .withFileFilter(Arrays.asList("anotherFile"))
+                                             .withType(DiffType.NAME_ONLY)
+                                             .withNoRenames(false)
+                                             .withRenameLimit(0));
         assertEquals(diff.size(), 0);
-        assertFalse(diff.contains("aaa"));
     }
 
     @Test

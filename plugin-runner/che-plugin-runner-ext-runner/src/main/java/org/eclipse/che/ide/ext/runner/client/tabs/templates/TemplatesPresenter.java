@@ -65,14 +65,16 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     private final Map<Scope, List<Environment>> environmentMap;
     private final PropertiesContainer           propertiesContainer;
     private final AppContext                    appContext;
-    private final String                        typeAll;
     private final RunnerManagerView             runnerManagerView;
     private final RunnerUtil                    runnerUtil;
     private final PanelState panelState;
 
+
     private RunnerEnvironmentTree tree;
     private String                currentType;
     private Scope                 currentScope;
+    private boolean               matchProjectType;
+    private Environment           selectedEnvironment;
 
     @Inject
     public TemplatesPresenter(TemplatesView view,
@@ -110,13 +112,13 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         this.environmentMap.put(PROJECT, projectEnvironments);
         this.environmentMap.put(SYSTEM, systemEnvironments);
 
-        this.currentScope = PROJECT;
-        this.typeAll = locale.configsTypeAll();
+        this.currentScope = ALL;
     }
 
     /** {@inheritDoc} */
     @Override
     public void select(@Nullable Environment environment) {
+        this.selectedEnvironment = environment;
         propertiesContainer.show(environment);
         view.selectEnvironment(environment);
     }
@@ -161,22 +163,38 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         environmentMap.put(scope, sourceList);
         view.addEnvironment(environmentMap);
 
-        selectFirstEnvironment();
+        selectPreviousOrFirstEnvironment();
 
         if (!(RUNNERS).equals(panelState.getState())) {
             changeEnableStateRunButton();
         }
     }
 
-    private void selectFirstEnvironment() {
+    private void selectPreviousOrFirstEnvironment() {
         propertiesContainer.setVisible(true);
         Environment environment = null;
 
-        for (Map.Entry<Scope, List<Environment>> entry : environmentMap.entrySet()) {
-            List<Environment> value = entry.getValue();
-            if (!value.isEmpty()) {
-                environment = value.get(0);
-                break;
+        // try to select the previous element if it still exists
+        if (this.selectedEnvironment != null) {
+            for (Map.Entry<Scope, List<Environment>> entry : environmentMap.entrySet()) {
+                List<Environment> value = entry.getValue();
+                for (Environment env : value) {
+                    if (env.getName().equals(selectedEnvironment.getName()) && env.getScope().equals(selectedEnvironment.getScope())) {
+                        environment = env;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // else we take the first element
+        if (environment == null) {
+            for (Map.Entry<Scope, List<Environment>> entry : environmentMap.entrySet()) {
+                List<Environment> value = entry.getValue();
+                if (!value.isEmpty()) {
+                    environment = value.get(0);
+                    break;
+                }
             }
         }
 
@@ -188,8 +206,6 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     @Override
     public void setTypeItem(@Nonnull String item) {
         currentType = item;
-
-        filter.addType(currentType);
     }
 
     /** {@inheritDoc} */
@@ -200,10 +216,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
 
         projectEnvironmentsAction.perform();
 
-        currentScope = PROJECT;
-
-        filter.selectScope(currentScope);
-        filter.selectType(currentType);
+        filter.setMatchesProjectType(true);
 
         selectEnvironment();
     }
@@ -213,7 +226,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     public void selectEnvironment() {
         Environment selectedEnvironment = selectionManager.getEnvironment();
         if (selectedEnvironment == null) {
-            selectFirstEnvironment();
+            selectPreviousOrFirstEnvironment();
         } else {
             selectionManager.setEnvironment(selectedEnvironment);
         }
@@ -224,8 +237,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     public void onValueChanged() {
         view.clearEnvironmentsPanel();
 
-        currentType = filter.getType();
-        currentScope = filter.getScope();
+        matchProjectType = filter.getMatchesProjectType();
 
         switch (currentScope) {
             case SYSTEM:
@@ -258,10 +270,10 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     private void selectSystemScope() {
         projectEnvironments.clear();
 
-        if (currentType.equals(typeAll)) {
-            performSystemEnvironments();
-        } else {
+        if (matchProjectType) {
             systemEnvironmentsAction.perform();
+        } else {
+            performSystemEnvironments();
         }
     }
 
@@ -273,12 +285,12 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     }
 
     private void selectAllScope() {
-        if (currentType.equals(typeAll)) {
-            performProjectEnvironments();
-            performSystemEnvironments();
-        } else {
+        if (matchProjectType) {
             projectEnvironmentsAction.perform();
             systemEnvironmentsAction.perform();
+        } else {
+            performProjectEnvironments();
+            performSystemEnvironments();
         }
     }
 

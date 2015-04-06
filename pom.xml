@@ -47,6 +47,7 @@
         <module>plugin-go</module>
         <module>plugin-python</module>
         <module>plugin-tour</module>
+        <module>plugin-svn</module>
     </modules>
     <scm>
         <connection>scm:git:git@github.com:codenvy/che-plugin.git</connection>

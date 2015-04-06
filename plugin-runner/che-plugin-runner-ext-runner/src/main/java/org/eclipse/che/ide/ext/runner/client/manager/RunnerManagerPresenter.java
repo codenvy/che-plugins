@@ -19,6 +19,8 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.core.rest.shared.dto.Link;
+import org.eclipse.che.api.project.shared.dto.RunnerConfiguration;
+import org.eclipse.che.api.project.shared.dto.RunnersDescriptor;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -246,7 +248,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     private void initializeRightPanel(@Nonnull TabContainer container,
                                       @Nonnull Provider<TabBuilder> tabBuilderProvider,
                                       @Nonnull ConsoleContainer consoleContainer,
-                                      @Nonnull TerminalContainer terminalContainer,
+                                      @Nonnull final TerminalContainer terminalContainer,
                                       @Nonnull final PropertiesContainer propertiesContainer) {
 
         final TabSelectHandler consoleHandler = new TabSelectHandler() {
@@ -274,6 +276,8 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
             public void onTabSelected() {
                 if (selectedRunner != null) {
                     selectedRunner.setActiveTab(locale.runnerTabTerminal());
+
+                    terminalContainer.update(selectedRunner);
                 }
             }
         };
@@ -330,7 +334,6 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
      */
     public void update(@Nonnull Runner runner) {
         history.update(runner);
-        terminalContainer.update(runner);
 
         view.update(runner);
 
@@ -394,6 +397,8 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     /** {@inheritDoc} */
     @Override
     public void onStopButtonClicked() {
+        terminalContainer.removeTerminalUrl(selectedRunner);
+
         stopRunner(selectedRunner);
 
         view.updateMoreInfoPopup(selectedRunner);
@@ -436,9 +441,19 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
             throw new IllegalStateException("Can't launch runner for current project. Current project is absent...");
         }
 
+        int ram = MB_512.getValue();
+
+        RunnersDescriptor runnersDescriptor = currentProject.getProjectDescription().getRunners();
+        String defaultRunner = runnersDescriptor.getDefault();
+        RunnerConfiguration defaultConfigs = runnersDescriptor.getConfigs().get(defaultRunner);
+
+        if (defaultRunner != null && defaultConfigs != null) {
+            ram = defaultConfigs.getRam();
+        }
+
         RunOptions runOptions = dtoFactory.createDto(RunOptions.class)
                                           .withSkipBuild(Boolean.valueOf(currentProject.getAttributeValue("runner:skipBuild")))
-                                          .withMemorySize(MB_512.getValue());
+                                          .withMemorySize(ram);
 
         return launchRunner(modelsFactory.createRunner(runOptions));
     }

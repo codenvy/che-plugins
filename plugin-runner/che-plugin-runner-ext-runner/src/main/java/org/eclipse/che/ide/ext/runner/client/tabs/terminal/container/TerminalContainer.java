@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.terminal.container;
 
+import com.google.inject.ImplementedBy;
+
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.tabs.common.TabPresenter;
-import com.google.inject.ImplementedBy;
 
 import javax.annotation.Nonnull;
 
@@ -34,4 +35,12 @@ public interface TerminalContainer extends TabPresenter {
 
     /** Cleans the data of console widgets. */
     void reset();
+
+    /**
+     * Removes url from terminal.
+     *
+     * @param runner
+     *         instance of Runner which contains iframe with terminal
+     */
+    void removeTerminalUrl(@Nonnull Runner runner);
 }

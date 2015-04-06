@@ -246,18 +246,22 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             @Override
             public void onRunnerStatusChanged(@Nonnull Runner changedRunner) {
                 CurrentProject currentProject = appContext.getCurrentProject();
-                ApplicationProcessDescriptor descriptor = changedRunner.getDescriptor();
-                if (descriptor == null || runner == null || runner.getProcessId() != changedRunner.getProcessId() ||
+                ApplicationProcessDescriptor changedDescriptor = changedRunner.getDescriptor();
+                ApplicationProcessDescriptor existingDescriptor = null;
+                if (runner != null) {
+                    existingDescriptor = runner.getDescriptor();
+                }
+                if (changedDescriptor == null || runner == null || existingDescriptor == null || runner.getProcessId() != changedRunner.getProcessId() ||
                     currentProject == null) {
                     return;
                 }
 
                 runner = changedRunner;
-                if (RUNNING.equals(descriptor.getStatus())) {
-                    attachDebugger(descriptor, currentProject.getProjectDescription());
+                if (RUNNING.equals(changedDescriptor.getStatus())) {
+                    attachDebugger(changedDescriptor, currentProject.getProjectDescription());
                 }
 
-                if (STOPPED.equals(descriptor.getStatus()) || CANCELLED.equals(descriptor.getStatus())) {
+                if (STOPPED.equals(changedDescriptor.getStatus()) || CANCELLED.equals(changedDescriptor.getStatus())) {
                     onDebuggerDisconnected();
                     closeView();
                 }
@@ -731,10 +735,15 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
         debuggerInfo = null;
         breakpointManager.unmarkCurrentBreakpoint();
         breakpointManager.removeAllBreakpoints();
-        Notification notification =
-                new Notification(constant.debuggerDisconnected(appDescriptor.getDebugHost() + ':' + appDescriptor.getDebugPort()), INFO);
-        notificationManager.showNotification(notification);
-        appDescriptor = null;
+
+        // appDescriptor can be null after reopening a project
+        if (appDescriptor != null) {
+            Notification notification =
+                    new Notification(constant.debuggerDisconnected(appDescriptor.getDebugHost() + ':' + appDescriptor.getDebugPort()),
+                                     INFO);
+            notificationManager.showNotification(notification);
+            appDescriptor = null;
+        }
     }
 
     private void updateBreakPoints() {

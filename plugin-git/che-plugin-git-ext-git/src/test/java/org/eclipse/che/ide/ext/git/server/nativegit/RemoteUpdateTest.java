@@ -103,7 +103,9 @@ public class RemoteUpdateTest extends BaseTest {
             if (list == null) {
                 list = new LinkedList<>();
             }
-            list.add(pair[1]);
+            if (pair.length == 2) {
+                list.add(pair[1]);
+            }
             config.put(pair[0], list);
         }
         return config;

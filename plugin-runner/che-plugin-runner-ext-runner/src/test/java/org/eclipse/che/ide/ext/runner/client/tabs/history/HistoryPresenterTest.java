@@ -17,6 +17,7 @@ import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
+import org.eclipse.che.ide.ext.runner.client.tabs.console.container.ConsoleContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.history.runner.RunnerWidget;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -46,6 +47,8 @@ public class HistoryPresenterTest {
     private WidgetFactory    widgetFactory;
     @Mock
     private SelectionManager selectionManager;
+    @Mock
+    private ConsoleContainer consolePresenter;
 
     @Mock
     private RunnerWidget runnerWidget;
@@ -170,6 +173,8 @@ public class HistoryPresenterTest {
         historyPresenter.onRunnerCleanBtnClicked(runner);
 
         verify(view).removeRunner(runnerWidget);
+        verify(consolePresenter).deleteSelectedConsole();
+        verify(selectionManager).getRunner();
     }
 
     @Test
@@ -180,7 +185,12 @@ public class HistoryPresenterTest {
 
         historyPresenter.onRunnerCleanBtnClicked(runner2);
 
+        verify(view).removeRunner(runnerWidget2);
+        verify(consolePresenter).deleteSelectedConsole();
+        verify(selectionManager).getRunner();
+
         verify(selectionManager, times(2)).setRunner(runner);
+        verify(runnerWidget, times(3)).unSelect();
         verify(runnerWidget, times(2)).select();
     }
 
@@ -193,7 +203,12 @@ public class HistoryPresenterTest {
 
         historyPresenter.onRunnerCleanBtnClicked(runner2);
 
+        verify(view).removeRunner(runnerWidget2);
+        verify(consolePresenter).deleteSelectedConsole();
+        verify(selectionManager).getRunner();
+
         verify(selectionManager, never()).setRunner(runner);
+
         verify(runnerWidget, never()).select();
     }
 }

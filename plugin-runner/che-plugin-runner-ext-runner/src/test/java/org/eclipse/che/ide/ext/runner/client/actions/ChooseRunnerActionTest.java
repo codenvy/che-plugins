@@ -95,12 +95,14 @@ public class ChooseRunnerActionTest {
         CurrentProject currentProject = mock(CurrentProject.class);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(currentProject.getRunner()).thenReturn(TEXT);
+        when(projectEnv1.getId()).thenReturn(TEXT);
 
         action.addProjectRunners(projectEnvList);
 
         verify(appContext).getCurrentProject();
 
-        verify(projectEnv1).getName();
+        verify(projectEnv1).getId();
+        verify(projectEnv1, times(2)).getName();
         verify(projectEnv2).getName();
     }
 
@@ -176,5 +178,20 @@ public class ChooseRunnerActionTest {
         verify(systemEnv1, times(2)).getId();
         verify(systemEnv2, times(2)).getId();
         verify(systemEnv2, times(4)).getName();
+    }
+
+    @Test
+    public void defaultRunnerShouldBeNull() throws Exception {
+        CurrentProject currentProject = mock(CurrentProject.class);
+        when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(currentProject.getRunner()).thenReturn(TEXT);
+        when(projectEnv1.getId()).thenReturn(TEXT + TEXT);
+        when(projectEnv2.getId()).thenReturn(TEXT + TEXT);
+
+        action.addProjectRunners(projectEnvList);
+
+        verify(appContext).getCurrentProject();
+        verify(projectEnv1).getId();
+        verify(projectEnv2).getId();
     }
 }

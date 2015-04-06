@@ -19,6 +19,7 @@ import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
 import org.eclipse.che.ide.ext.runner.client.tabs.common.item.RunnerItems;
+import org.eclipse.che.ide.ext.runner.client.tabs.console.container.ConsoleContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.history.runner.RunnerWidget;
 
 import javax.annotation.Nonnull;
@@ -38,10 +39,15 @@ public class HistoryPresenter implements HistoryPanel, RunnerWidget.ActionDelega
     private final WidgetFactory             widgetFactory;
     private final Map<Runner, RunnerWidget> runnerWidgets;
     private final SelectionManager          selectionManager;
+    private final ConsoleContainer consolePresenter;
 
     @Inject
-    public HistoryPresenter(HistoryView view, WidgetFactory widgetFactory, SelectionManager selectionManager) {
+    public HistoryPresenter(HistoryView view,
+                            WidgetFactory widgetFactory,
+                            SelectionManager selectionManager,
+                            ConsoleContainer consolePresenter) {
         this.view = view;
+        this.consolePresenter = consolePresenter;
 
         this.selectionManager = selectionManager;
         this.widgetFactory = widgetFactory;
@@ -124,6 +130,7 @@ public class HistoryPresenter implements HistoryPanel, RunnerWidget.ActionDelega
 
         view.removeRunner(widget);
         runnerWidgets.remove(runner);
+        consolePresenter.deleteSelectedConsole();
 
         if (runner.equals(selectionManager.getRunner())) {
             selectFirst();

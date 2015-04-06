@@ -64,7 +64,7 @@
 
         .editor {
             border: 1px solid #191c1e;
-            width: calc(100% - 20px);
+            width: literal("calc(100% - 20px)");
             margin-bottom: 15px;
         }
 

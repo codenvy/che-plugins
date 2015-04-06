@@ -193,7 +193,6 @@ public class StatusAction extends AbstractRunnerAction {
 
         consoleContainer.printInfo(runner, message);
 
-        presenter.stopRunner(runner);
         stop();
     }
 

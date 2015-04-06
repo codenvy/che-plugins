@@ -167,4 +167,13 @@ public class ConsoleContainerPresenter implements ConsoleContainer,
         selectedConsole.clear();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void deleteSelectedConsole() {
+        Runner runner = selectionManager.getRunner();
+        Console selectedConsole = consoles.get(runner);
+
+        view.removeWidget(selectedConsole);
+        consoles.remove(runner);
+    }
 }

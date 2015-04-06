@@ -19,6 +19,8 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.core.rest.shared.dto.Link;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.project.shared.dto.ProjectTypeDefinition;
+import org.eclipse.che.api.project.shared.dto.RunnerConfiguration;
+import org.eclipse.che.api.project.shared.dto.RunnersDescriptor;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -209,6 +211,8 @@ public class RunnerManagerPresenterTest {
     private Timer                     timer;
     @Mock
     private ProjectTypeDefinition     definition;
+    @Mock
+    private RunnersDescriptor         runnersDescriptor;
 
     private RunnerManagerPresenter presenter;
 
@@ -288,6 +292,7 @@ public class RunnerManagerPresenterTest {
         //init run options
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(currentProject.getProjectDescription()).thenReturn(descriptor);
+        when(descriptor.getRunners()).thenReturn(runnersDescriptor);
         when(descriptor.getType()).thenReturn(TEXT);
         when(definition.getRunnerCategories()).thenReturn(Arrays.asList(TEXT));
         when(currentProject.getAttributeValue("runner:skipBuild")).thenReturn("true");
@@ -468,6 +473,7 @@ public class RunnerManagerPresenterTest {
         verifyTabSelectHandler(tabBuilderTerminal);
         verify(locale, times(2)).runnerTabTerminal();
         verify(runner).setActiveTab(TERMINAL);
+        verify(terminalContainer).update(runner);
     }
 
     @Test
@@ -577,7 +583,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
     }
 
@@ -589,7 +594,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
         verify(view).setApplicationURl(TEXT);
     }
@@ -603,8 +607,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
-        verify(view).update(runner);
         verify(view).setApplicationURl(TEXT);
     }
 
@@ -617,7 +619,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
         verify(view).setApplicationURl(STOPPED_RUNNER);
     }
@@ -631,8 +632,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
-        verify(view).update(runner);
         verify(view).setApplicationURl(null);
     }
 
@@ -645,8 +644,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
-        verify(view).update(runner);
         verify(view).setApplicationURl(APP_URL);
     }
 
@@ -660,8 +657,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
-        verify(view).update(runner);
         verify(view).setApplicationURl(APP_URL);
     }
 
@@ -674,7 +669,6 @@ public class RunnerManagerPresenterTest {
         presenter.update(runner);
 
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
         verify(view).setApplicationURl(APP_URL);
     }
@@ -694,11 +688,57 @@ public class RunnerManagerPresenterTest {
 
         presenter.onRunButtonClicked();
 
+        verify(panelState).getState();
+
         verify(appContext, times(2)).getCurrentProject();
+        verify(currentProject).getProjectDescription();
+        verify(descriptor).getRunners();
+        verify(runnersDescriptor).getDefault();
+
         verify(dtoFactory, times(2)).createDto(RunOptions.class);
         verify(runOptions).withSkipBuild(true);
         verify(runOptions).withMemorySize(MB_512.getValue());
         verify(modelsFactory, times(2)).createRunner(runOptions);
+
+        //verify launch runner
+        verify(panelState, times(2)).setState(RUNNERS);
+        verify(view).showOtherButtons();
+        verify(history).addRunner(runner);
+        verify(actionFactory).createCheckRamAndRun();
+        verify(checkRamAndRunAction).perform(runner);
+        verify(runner, times(2)).resetCreationTime();
+    }
+
+    @Test
+    public void defaultRunnerShouldBeLaunchedButWithCustomOptions() {
+        RunOptions defaultRunOptions = mock(RunOptions.class);
+        RunnerConfiguration runnerConfiguration = mock(RunnerConfiguration.class);
+        Map<String, RunnerConfiguration> configs = new HashMap<>();
+        configs.put(TEXT, runnerConfiguration);
+
+        when(runner.getStatus()).thenReturn(Runner.Status.IN_PROGRESS);
+        when(runnersDescriptor.getDefault()).thenReturn(TEXT);
+        when(runnersDescriptor.getConfigs()).thenReturn(configs);
+        when(runnerConfiguration.getRam()).thenReturn(RAM_SIZE);
+        when(runOptions.withMemorySize(RAM_SIZE)).thenReturn(defaultRunOptions);
+        when(modelsFactory.createRunner(defaultRunOptions)).thenReturn(runner);
+
+        presenter.addRunner(processDescriptor);
+        reset(view, history);
+
+        presenter.launchRunner();
+
+        verify(appContext, times(2)).getCurrentProject();
+        verify(currentProject).getProjectDescription();
+        verify(descriptor).getRunners();
+        verify(runnersDescriptor).getDefault();
+
+        verify(runnersDescriptor).getConfigs();
+
+        verify(dtoFactory, times(2)).createDto(RunOptions.class);
+        verify(runOptions).withSkipBuild(true);
+        verify(runOptions).withMemorySize(RAM_SIZE);
+        verify(modelsFactory).createRunner(runOptions);
 
         //verify launch runner
         verify(panelState, times(2)).setState(RUNNERS);
@@ -773,7 +813,6 @@ public class RunnerManagerPresenterTest {
         verify(runner).setStatus(Runner.Status.IN_QUEUE);
         verify(runner, times(2)).getStatus();
         verify(history).update(runner);
-        verify(terminalContainer, times(2)).update(runner);
         verify(view).update(runner);
         verify(view).setApplicationURl(TEXT);
 
@@ -848,6 +887,7 @@ public class RunnerManagerPresenterTest {
         presenter.onStopButtonClicked();
 
         verify(launchAction).stop();
+        verify(terminalContainer).removeTerminalUrl(runner);
         verify(actionFactory).createStop();
         verify(stopAction).perform(runner);
         verify(view).updateMoreInfoPopup(runner);
@@ -1069,6 +1109,9 @@ public class RunnerManagerPresenterTest {
 
     private void verifyLaunchRunnerWithNotNullCurrentProject() {
         verify(appContext, times(2)).getCurrentProject();
+        verify(currentProject).getProjectDescription();
+        verify(descriptor).getRunners();
+        verify(runnersDescriptor).getDefault();
 
         verify(dtoFactory).createDto(RunOptions.class);
         verify(runOptions).withSkipBuild(true);
@@ -1097,7 +1140,6 @@ public class RunnerManagerPresenterTest {
 
         //update
         verify(history).update(runner);
-        verify(terminalContainer).update(runner);
         verify(view).update(runner);
         verify(runner).getStatus();
         verify(view).setApplicationURl(TEXT);

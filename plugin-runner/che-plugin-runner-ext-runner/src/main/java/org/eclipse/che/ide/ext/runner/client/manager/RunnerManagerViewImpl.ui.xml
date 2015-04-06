@@ -64,7 +64,7 @@
         .textArea {
             background: #303030;
             width: 100%;
-            height: calc(100% - 1px);
+            height: literal("calc(100% - 1px)");
         }
 
         .moreIcon {

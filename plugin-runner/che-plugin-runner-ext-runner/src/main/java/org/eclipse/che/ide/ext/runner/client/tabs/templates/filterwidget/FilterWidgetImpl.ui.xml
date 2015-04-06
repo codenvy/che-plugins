@@ -19,58 +19,28 @@
     <ui:style>
         .main {
             width: 180px;
+            padding: 10px;
         }
 
-        .typePanel {
+        .floatLeft {
             float: left;
-            width: 100%;
-            margin-top: 6px;
-        }
-
-        .scopePanel {
-            float: left;
-            margin-top: 6px;
-            width: 100%;
         }
 
         .label {
             float: left;
-            margin-top: 2px;
-            margin-left: 4px;
+            margin-top: -1px;
         }
 
-        .marginType {
+        .margin {
             margin-left: 20px;
         }
 
-        .marginScope {
-            margin-left: 12px;
-        }
-
-        .listBox {
-            float: right;
-            width: 120px;
-            margin-right: 6px;
-            font-weight: inherit;
-            border: 1px solid #191c1e;
-            border-radius: 2px;
-            padding-left: 5px;
-            background-color: #373737;
-            box-shadow: 0 1px 0 0 rgba(223, 223, 223, 0.4);
-        }
     </ui:style>
 
     <g:FlowPanel addStyleNames="{style.main}">
-        <g:FlowPanel addStyleNames="{style.typePanel}">
-            <g:Label text="{locale.configsType}" addStyleNames="{resources.runnerCss.propertiesFont} {style.label}"/>
-
-            <g:ListBox ui:field="types" addStyleNames="{style.listBox} {style.marginType} {resources.runnerCss.propertiesFont}"/>
-        </g:FlowPanel>
-
-        <g:FlowPanel addStyleNames="{style.scopePanel}">
-            <g:Label text="{locale.configsScope}" addStyleNames="{resources.runnerCss.propertiesFont} {style.label}"/>
-
-            <g:ListBox ui:field="scopes" addStyleNames="{style.listBox} {style.marginScope} {resources.runnerCss.propertiesFont}"/>
+        <g:FlowPanel addStyleNames="{style.floatLeft} ">
+            <g:Label text="{locale.matchProjectType}" addStyleNames="{style.label}"/>
+            <g:CheckBox ui:field="filter" addStyleNames="{style.margin} {style.floatLeft}"/>
         </g:FlowPanel>
     </g:FlowPanel>
 </ui:UiBinder>

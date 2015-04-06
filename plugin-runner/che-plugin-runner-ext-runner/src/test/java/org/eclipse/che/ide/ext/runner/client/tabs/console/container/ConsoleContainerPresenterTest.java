@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.runner.client.tabs.console.container;
 
 import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
-import org.eclipse.che.ide.ext.runner.client.selection.Selection;
 import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
 import org.eclipse.che.ide.ext.runner.client.tabs.console.panel.Console;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -34,6 +33,8 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static org.eclipse.che.ide.ext.runner.client.selection.Selection.ENVIRONMENT;
+import static org.eclipse.che.ide.ext.runner.client.selection.Selection.RUNNER;
 
 /**
  * @author Andrienko Alexander
@@ -161,7 +162,7 @@ public class ConsoleContainerPresenterTest {
 
     @Test
     public void selectionShouldBeOnChangedWhenSelectionIsEnvironment() {
-        presenter.onSelectionChanged(Selection.ENVIRONMENT);
+        presenter.onSelectionChanged(ENVIRONMENT);
 
         verify(selectionManager, never()).getRunner();
         verify(view, never()).showWidget(any(IsWidget.class));
@@ -169,7 +170,7 @@ public class ConsoleContainerPresenterTest {
 
     @Test
     public void selectionShouldBeOnChangedWhenSelectionIsRunnerIsNull() {
-        presenter.onSelectionChanged(Selection.RUNNER);
+        presenter.onSelectionChanged(RUNNER);
 
         verify(selectionManager).getRunner();
         verify(view, never()).showWidget(any(IsWidget.class));
@@ -179,7 +180,7 @@ public class ConsoleContainerPresenterTest {
     public void selectionShouldBeOnChangedWhenSelectionIsRunner() {
         when(selectionManager.getRunner()).thenReturn(runner);
 
-        presenter.onSelectionChanged(Selection.RUNNER);
+        presenter.onSelectionChanged(RUNNER);
 
         verify(selectionManager).getRunner();
         verify(view).showWidget(console);
@@ -221,7 +222,7 @@ public class ConsoleContainerPresenterTest {
     @Test
     public void scrollToBottomShouldBePerformed() throws Exception {
         when(selectionManager.getRunner()).thenReturn(runner);
-        presenter.onSelectionChanged(Selection.RUNNER);
+        presenter.onSelectionChanged(RUNNER);
 
         presenter.onScrollBottomClicked();
 
@@ -239,7 +240,7 @@ public class ConsoleContainerPresenterTest {
     public void shouldOnWrapTextClickedWhenIsWrapTextTrue() {
         when(console.isWrapText()).thenReturn(true);
         when(selectionManager.getRunner()).thenReturn(runner);
-        presenter.onSelectionChanged(Selection.RUNNER);
+        presenter.onSelectionChanged(RUNNER);
 
         presenter.onWrapTextClicked();
 
@@ -252,7 +253,7 @@ public class ConsoleContainerPresenterTest {
     public void shouldOnWrapTextClickedWhenIsWrapTextFalse() {
         when(console.isWrapText()).thenReturn(false);
         when(selectionManager.getRunner()).thenReturn(runner);
-        presenter.onSelectionChanged(Selection.RUNNER);
+        presenter.onSelectionChanged(RUNNER);
 
         presenter.onWrapTextClicked();
 
@@ -271,11 +272,23 @@ public class ConsoleContainerPresenterTest {
     @Test
     public void cleanSelectedConsoleShouldBePerformed() throws Exception {
         when(selectionManager.getRunner()).thenReturn(runner);
-        presenter.onSelectionChanged(Selection.RUNNER);
+        presenter.onSelectionChanged(RUNNER);
 
         presenter.onCleanClicked();
 
         verify(console).clear();
     }
 
+    @Test
+    public void selectedConsoleShouldBeDeleted() {
+        presenter.deleteSelectedConsole();
+
+        verify(selectionManager).getRunner();
+
+        when(selectionManager.getRunner()).thenReturn(runner);
+        presenter.onSelectionChanged(RUNNER);
+
+        verify(widgetFactory).createConsole(runner);
+        verify(view).showWidget(console);
+    }
 }
