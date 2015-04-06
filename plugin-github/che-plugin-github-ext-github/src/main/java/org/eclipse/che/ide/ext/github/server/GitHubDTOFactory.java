@@ -19,6 +19,7 @@ import org.eclipse.che.ide.ext.github.shared.GitHubRepository;
 import org.eclipse.che.ide.ext.github.shared.GitHubRepositoryList;
 import org.eclipse.che.ide.ext.github.shared.GitHubUser;
 import org.kohsuke.github.GHCommitPointer;
+import org.kohsuke.github.GHPersonSet;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
@@ -28,20 +29,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DTOFactory {
+/**
+ * Factory class used for converting kohsuke GitHub instances to DTO objects
+ *
+ * @author Igor Vinokur
+ */
+public class GitHubDTOFactory {
 
-    public GitHubRepositoryList createDTORepositoriesList () {
-        return DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
-    }
-
-    public GitHubPullRequestList createDTOPullRequestsList () {
-        return DtoFactory.getInstance().createDto(GitHubPullRequestList.class);
-    }
-
-    public Collaborators createDTOCollaborators () {
-        return DtoFactory.getInstance().createDto(Collaborators.class);
-    }
-
+    /**
+     * Get DTO object of GitHub repositories collection from given repositories list
+     * @param ghRepositoriesList collection of repositories from kohsuke GitHub library
+     * @return DTO object
+     * @throws IOException
+     */
     public GitHubRepositoryList getRepositoriesList(PagedIterable<GHRepository> ghRepositoriesList) throws IOException {
         GitHubRepositoryList dtoRepositoriesList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
 
@@ -56,6 +56,40 @@ public class DTOFactory {
         return dtoRepositoriesList;
     }
 
+    /**
+     * Get DTO object of GitHub repositories collection from given repository
+     * @param ghRepository repository from kohsuke GitHub library
+     * @return DTO object
+     * @throws IOException
+     */
+    public GitHubRepositoryList getRepositoriesList(GHRepository ghRepository) throws IOException {
+        GitHubRepositoryList dtoRepositoriesList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
+
+        List<GitHubRepository> dtoRepositories = new ArrayList<>();
+        dtoRepositories.add(getRepository(ghRepository));
+
+        dtoRepositoriesList.setRepositories(dtoRepositories);
+
+        return dtoRepositoriesList;
+    }
+
+    /**
+     * Get DTO object of GitHub repositories without repositories
+     * @return DTO object
+     * @throws IOException
+     */
+    public GitHubRepositoryList getRepositoriesList() throws IOException {
+        GitHubRepositoryList dtoRepositoriesList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
+
+        return dtoRepositoriesList;
+    }
+
+    /**
+     * Get DTO object of GitHub repository from given repository
+     * @param ghRepository repository from kohsuke GitHub library
+     * @return DTO object
+     * @throws IOException
+     */
     public GitHubRepository getRepository(GHRepository ghRepository) throws IOException {
         GitHubRepository dtoRepository = DtoFactory.getInstance().createDto(GitHubRepository.class);
 
@@ -85,6 +119,12 @@ public class DTOFactory {
         return dtoRepository;
     }
 
+    /**
+     * Get DTO object of GitHub pull-requests collection from given pull-requests
+     * @param ghPullRequestsList collection of pull-requests from kohsuke GitHub library
+     * @return DTO object
+     * @throws IOException
+     */
     public GitHubPullRequestList getPullRequestsList(PagedIterable<GHPullRequest> ghPullRequestsList) throws IOException {
         GitHubPullRequestList gitHubPullRequestList = DtoFactory.getInstance().createDto(GitHubPullRequestList.class);
 
@@ -99,6 +139,30 @@ public class DTOFactory {
         return gitHubPullRequestList;
     }
 
+    /**
+     * Get DTO object of GitHub pull-requests collection from given pull-request
+     * @param ghPullRequest pull-request from kohsuke GitHub library
+     * @return DTO object
+     * @throws IOException
+     */
+    public GitHubPullRequestList getPullRequestsList(GHPullRequest ghPullRequest) throws IOException {
+        GitHubPullRequestList gitHubPullRequestList = DtoFactory.getInstance().createDto(GitHubPullRequestList.class);
+
+        List<GitHubPullRequest> dtoPullRequestsList = new ArrayList<>();
+        dtoPullRequestsList.add(getPullRequest(ghPullRequest));
+
+
+        gitHubPullRequestList.setPullRequests(dtoPullRequestsList);
+
+        return gitHubPullRequestList;
+    }
+
+    /**
+     * Get DTO object of GitHub pull-request from given pull-request
+     * @param ghPullRequest pull-request from kohsuke GitHub library
+     * @return DTO object
+     * @throws IOException
+     */
     public GitHubPullRequest getPullRequest(GHPullRequest ghPullRequest) throws IOException {
         GitHubPullRequest dtoPullRequest = DtoFactory.getInstance().createDto(GitHubPullRequest.class);
 
@@ -117,16 +181,28 @@ public class DTOFactory {
         return dtoPullRequest;
     }
 
-    private GitHubPullRequestHead getPullRequestHead(GHCommitPointer ghPullRequestHead){
-        GitHubPullRequestHead dtoPullRequestHead = DtoFactory.getInstance().createDto(GitHubPullRequestHead.class);
+    /**
+     * Get DTO object of GitHub collaborators collection from given users
+     * @param ghCollaborators collection of users from kohsuke GitHub library
+     * @return DTO object
+     * @throws IOException
+     */
+    public Collaborators getCollaborators(GHPersonSet<GHUser> ghCollaborators) throws IOException {
+        Collaborators collaborators = DtoFactory.getInstance().createDto(Collaborators.class);
 
-        dtoPullRequestHead.setLabel(ghPullRequestHead.getLabel());
-        dtoPullRequestHead.setRef(ghPullRequestHead.getRef());
-        dtoPullRequestHead.setSha(ghPullRequestHead.getSha());
+        for (GHUser collaborator : ghCollaborators) {
+            collaborators.getCollaborators().add(getUser(collaborator));
+        }
 
-        return dtoPullRequestHead;
+        return collaborators;
     }
 
+    /**
+     * Get DTO object of GitHub user from given user
+     * @param ghUser user from kohsuke GitHub library
+     * @return DTO object
+     * @throws IOException
+     */
     public GitHubUser getUser(GHUser ghUser) throws IOException {
         GitHubUser dtoUser = DtoFactory.getInstance().createDto(GitHubUser.class);
 
@@ -147,6 +223,21 @@ public class DTOFactory {
         dtoUser.setGravatarId(ghUser.getGravatarId());
 
         return dtoUser;
+    }
+
+    /**
+     * Get DTO object of GitHub pull-request head from given pull-request head
+     * @param ghPullRequestHead pull-request head from kohsuke GitHub library
+     * @return DTO object
+     */
+    public GitHubPullRequestHead getPullRequestHead(GHCommitPointer ghPullRequestHead){
+        GitHubPullRequestHead dtoPullRequestHead = DtoFactory.getInstance().createDto(GitHubPullRequestHead.class);
+
+        dtoPullRequestHead.setLabel(ghPullRequestHead.getLabel());
+        dtoPullRequestHead.setRef(ghPullRequestHead.getRef());
+        dtoPullRequestHead.setSha(ghPullRequestHead.getSha());
+
+        return dtoPullRequestHead;
     }
 
 }
