@@ -11,10 +11,17 @@
 package org.eclipse.che.ide.ext.runner.client.tabs.templates;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,6 +33,7 @@ import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
 import org.eclipse.che.ide.ext.runner.client.tabs.common.item.RunnerItems;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.defaultrunnerinfo.DefaultRunnerInfo;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.environment.EnvironmentWidget;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.filterwidget.FilterWidget;
 
@@ -47,16 +55,22 @@ import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common
  */
 @Singleton
 public class TemplatesViewImpl extends Composite implements TemplatesView {
-
     interface TemplatesViewImplUiBinder extends UiBinder<Widget, TemplatesViewImpl> {
     }
 
     private static final TemplatesViewImplUiBinder UI_BINDER = GWT.create(TemplatesViewImplUiBinder.class);
 
+    private static final String GWT_POPUP_STANDARD_STYLE = "gwt-PopupPanel";
+
+    private static final int TOP_SHIFT  = 90;
+    private static final int LEFT_SHIFT = 175;
+
     @UiField
-    FlowPanel   environmentsPanel;
+    FlowPanel         environmentsPanel;
     @UiField
-    SimplePanel filterPanel;
+    SimplePanel       filterPanel;
+    @UiField
+    SimpleLayoutPanel defaultRunner;
 
     @UiField(provided = true)
     final RunnerResources            resources;
@@ -66,19 +80,54 @@ public class TemplatesViewImpl extends Composite implements TemplatesView {
     private final Map<Environment, EnvironmentWidget> environmentWidgets;
     private final WidgetFactory                       widgetFactory;
     private final List<EnvironmentWidget>             cacheWidgets;
+    private final Label                               defaultRunnerStub;
+    private final DefaultRunnerInfo                   defaultRunnerInfo;
+    private final PopupPanel                          popupPanel;
+
+    private ActionDelegate delegate;
 
     @Inject
     public TemplatesViewImpl(RunnerResources resources,
                              RunnerLocalizationConstant locale,
-                             WidgetFactory widgetFactory) {
+                             WidgetFactory widgetFactory,
+                             DefaultRunnerInfo defaultRunnerInfo,
+                             PopupPanel popupPanel) {
         this.resources = resources;
         this.locale = locale;
         this.widgetFactory = widgetFactory;
+        this.defaultRunnerInfo = defaultRunnerInfo;
+
+        this.popupPanel = popupPanel;
+        this.popupPanel.removeStyleName(GWT_POPUP_STANDARD_STYLE);
+        this.popupPanel.add(defaultRunnerInfo);
 
         initWidget(UI_BINDER.createAndBindUi(this));
 
         this.environmentWidgets = new HashMap<>();
         this.cacheWidgets = new ArrayList<>();
+
+        this.defaultRunnerStub = new Label(locale.templatesDefaultRunnerStub());
+        this.defaultRunnerStub.addStyleName(resources.runnerCss().fullSize());
+        this.defaultRunnerStub.addStyleName(resources.runnerCss().defaultRunnerStub());
+        this.defaultRunnerStub.addStyleName(resources.runnerCss().fontSizeTen());
+
+        addDefaultRunnerInfoHandler();
+    }
+
+    private void addDefaultRunnerInfoHandler() {
+        defaultRunner.addDomHandler(new MouseOverHandler() {
+            @Override
+            public void onMouseOver(MouseOverEvent event) {
+                delegate.onDefaultRunnerMouseOver();
+            }
+        }, MouseOverEvent.getType());
+
+        defaultRunner.addDomHandler(new MouseOutHandler() {
+            @Override
+            public void onMouseOut(MouseOutEvent event) {
+                popupPanel.hide();
+            }
+        }, MouseOutEvent.getType());
     }
 
     /** {@inheritDoc} */
@@ -144,7 +193,31 @@ public class TemplatesViewImpl extends Composite implements TemplatesView {
 
     /** {@inheritDoc} */
     @Override
+    public void setDefaultProjectWidget(@Nullable EnvironmentWidget widget) {
+        defaultRunner.setWidget(widget == null ? defaultRunnerStub : widget);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void showDefaultEnvironmentInfo(@Nonnull Environment defaultEnvironment) {
+        defaultRunnerInfo.update(defaultEnvironment);
+
+        int x = defaultRunner.getAbsoluteLeft() + LEFT_SHIFT;
+        int y = defaultRunner.getAbsoluteTop() - TOP_SHIFT;
+
+        popupPanel.setPopupPosition(x, y);
+        popupPanel.show();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void clearEnvironmentsPanel() {
         environmentsPanel.clear();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setDelegate(@Nonnull ActionDelegate delegate) {
+        this.delegate = delegate;
     }
 }

@@ -10,11 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.templates;
 
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.ImplementedBy;
 
+import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.environment.EnvironmentWidget;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.filterwidget.FilterWidget;
 
 import javax.annotation.Nonnull;
@@ -28,7 +29,7 @@ import java.util.Map;
  * @author Dmitry Shnurenko
  */
 @ImplementedBy(TemplatesViewImpl.class)
-public interface TemplatesView extends IsWidget {
+public interface TemplatesView extends View<TemplatesView.ActionDelegate> {
 
     /**
      * Adds environment on templates panel and.
@@ -65,4 +66,25 @@ public interface TemplatesView extends IsWidget {
      */
     void setFilterWidget(@Nonnull FilterWidget filterWidget);
 
+    /**
+     * Sets default project widget to special place on view.
+     *
+     * @param widget
+     *         widget which need set
+     */
+    void setDefaultProjectWidget(@Nullable EnvironmentWidget widget);
+
+    /**
+     * Shows special popup which contains information about default environment.
+     *
+     * @param defaultEnvironment
+     *         environment for which need display info
+     */
+    void showDefaultEnvironmentInfo(@Nonnull Environment defaultEnvironment);
+
+    public interface ActionDelegate {
+
+        /** Performs some actions when user over mouse on default runner. */
+        void onDefaultRunnerMouseOver();
+    }
 }

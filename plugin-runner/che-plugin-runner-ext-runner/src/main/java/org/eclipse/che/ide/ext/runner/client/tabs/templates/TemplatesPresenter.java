@@ -15,12 +15,16 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.project.shared.dto.RunnerEnvironmentLeaf;
 import org.eclipse.che.api.project.shared.dto.RunnerEnvironmentTree;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
+import org.eclipse.che.ide.ext.runner.client.actions.ChooseRunnerAction;
+import org.eclipse.che.ide.ext.runner.client.callbacks.AsyncCallbackBuilder;
+import org.eclipse.che.ide.ext.runner.client.callbacks.FailureCallback;
+import org.eclipse.che.ide.ext.runner.client.callbacks.SuccessCallback;
 import org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerView;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
 import org.eclipse.che.ide.ext.runner.client.runneractions.impl.environments.GetProjectEnvironmentsAction;
@@ -29,9 +33,12 @@ import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
 import org.eclipse.che.ide.ext.runner.client.state.PanelState;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.container.PropertiesContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.environment.EnvironmentWidget;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.filterwidget.FilterWidget;
 import org.eclipse.che.ide.ext.runner.client.util.GetEnvironmentsUtil;
 import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
+import org.eclipse.che.ide.rest.AsyncRequestCallback;
+import org.eclipse.che.ide.util.loging.Log;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,10 +47,10 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.eclipse.che.ide.ext.runner.client.state.State.RUNNERS;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.ALL;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
-import static org.eclipse.che.ide.ext.runner.client.state.State.RUNNERS;
 
 /**
  * The class contains business logic to change displaying of environments depending on scope or type.
@@ -52,34 +59,37 @@ import static org.eclipse.che.ide.ext.runner.client.state.State.RUNNERS;
  * @author Valeriy Svydenko
  */
 @Singleton
-public class TemplatesPresenter implements TemplatesContainer, FilterWidget.ActionDelegate {
+public class TemplatesPresenter implements TemplatesContainer, FilterWidget.ActionDelegate, TemplatesView.ActionDelegate {
 
-    private final TemplatesView                 view;
-    private final FilterWidget                  filter;
-    private final SelectionManager              selectionManager;
-    private final GetProjectEnvironmentsAction  projectEnvironmentsAction;
-    private final GetSystemEnvironmentsAction   systemEnvironmentsAction;
-    private final GetEnvironmentsUtil           environmentUtil;
-    private final List<Environment>             systemEnvironments;
-    private final List<Environment>             projectEnvironments;
-    private final Map<Scope, List<Environment>> environmentMap;
-    private final PropertiesContainer           propertiesContainer;
-    private final AppContext                    appContext;
-    private final RunnerManagerView             runnerManagerView;
-    private final RunnerUtil                    runnerUtil;
-    private final PanelState panelState;
-
+    private final TemplatesView                           view;
+    private final FilterWidget                            filter;
+    private final EnvironmentWidget                       defaultEnvWidget;
+    private final SelectionManager                        selectionManager;
+    private final GetProjectEnvironmentsAction            projectEnvironmentsAction;
+    private final GetSystemEnvironmentsAction             systemEnvironmentsAction;
+    private final GetEnvironmentsUtil                     environmentUtil;
+    private final List<Environment>                       systemEnvironments;
+    private final List<Environment>                       projectEnvironments;
+    private final Map<Scope, List<Environment>>           environmentMap;
+    private final PropertiesContainer                     propertiesContainer;
+    private final AppContext                              appContext;
+    private final ProjectServiceClient                    projectService;
+    private final AsyncCallbackBuilder<ProjectDescriptor> asyncDescriptorCallbackBuilder;
+    private final ChooseRunnerAction                      chooseRunnerAction;
+    private final RunnerManagerView                       runnerManagerView;
+    private final RunnerUtil                              runnerUtil;
+    private final PanelState                              panelState;
 
     private RunnerEnvironmentTree tree;
-    private String                currentType;
     private Scope                 currentScope;
+    private Environment           defaultEnvironment;
     private boolean               matchProjectType;
     private Environment           selectedEnvironment;
 
     @Inject
     public TemplatesPresenter(TemplatesView view,
                               FilterWidget filter,
-                              RunnerLocalizationConstant locale,
+                              EnvironmentWidget defaultEnvWidget,
                               AppContext appContext,
                               GetProjectEnvironmentsAction projectEnvironmentsAction,
                               GetSystemEnvironmentsAction systemEnvironmentsAction,
@@ -88,13 +98,19 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
                               SelectionManager selectionManager,
                               RunnerManagerView runnerManagerView,
                               RunnerUtil runnerUtil,
-                              PanelState panelState) {
+                              PanelState panelState,
+                              ProjectServiceClient projectService,
+                              AsyncCallbackBuilder<ProjectDescriptor> asyncDescriptorCallbackBuilder,
+                              ChooseRunnerAction chooseRunnerAction) {
         this.filter = filter;
         this.selectionManager = selectionManager;
         this.filter.setDelegate(this);
 
         this.view = view;
+        this.view.setDelegate(this);
         this.view.setFilterWidget(filter);
+
+        this.defaultEnvWidget = defaultEnvWidget;
 
         this.projectEnvironmentsAction = projectEnvironmentsAction;
         this.systemEnvironmentsAction = systemEnvironmentsAction;
@@ -104,6 +120,9 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         this.runnerManagerView = runnerManagerView;
         this.runnerUtil = runnerUtil;
         this.panelState = panelState;
+        this.projectService = projectService;
+        this.asyncDescriptorCallbackBuilder = asyncDescriptorCallbackBuilder;
+        this.chooseRunnerAction = chooseRunnerAction;
 
         this.projectEnvironments = new ArrayList<>();
         this.systemEnvironments = new ArrayList<>();
@@ -126,7 +145,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     /** {@inheritDoc} */
     @Override
     public void addEnvironments(@Nonnull RunnerEnvironmentTree tree, @Nonnull Scope scope) {
-        ProjectDescriptor descriptor = getProjectDescriptor();
+        ProjectDescriptor descriptor = getCurrentProject().getProjectDescription();
 
         List<Environment> list;
 
@@ -144,14 +163,14 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     }
 
     @Nonnull
-    private ProjectDescriptor getProjectDescriptor() {
+    private CurrentProject getCurrentProject() {
         CurrentProject currentProject = appContext.getCurrentProject();
 
         if (currentProject == null) {
             throw new IllegalStateException("Current project is null");
         }
 
-        return currentProject.getProjectDescription();
+        return currentProject;
     }
 
     private void addEnvironments(@Nonnull List<Environment> sourceList,
@@ -200,12 +219,6 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
 
         select(environment);
         selectionManager.setEnvironment(environment);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setTypeItem(@Nonnull String item) {
-        currentType = item;
     }
 
     /** {@inheritDoc} */
@@ -267,6 +280,59 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         runnerManagerView.setEnableRunButton(runButtonIsEnable);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void setDefaultEnvironment(@Nullable Environment environment) {
+        this.defaultEnvironment = environment;
+
+        CurrentProject currentProject = getCurrentProject();
+
+        ProjectDescriptor descriptor = currentProject.getProjectDescription();
+
+        if (environment == null) {
+            view.setDefaultProjectWidget(null);
+
+            descriptor.getRunners().setDefault(null);
+
+            updateProject(descriptor);
+
+            return;
+        }
+
+        String defaultRunner = currentProject.getRunner();
+
+        defaultEnvWidget.update(environment);
+
+        String environmentId = environment.getId();
+
+        if (!environmentId.equals(defaultRunner)) {
+
+            descriptor.getRunners().setDefault(environmentId);
+
+            updateProject(descriptor);
+        }
+
+        view.setDefaultProjectWidget(defaultEnvWidget);
+    }
+
+    private void updateProject(@Nonnull ProjectDescriptor descriptor) {
+        AsyncRequestCallback<ProjectDescriptor> asyncDescriptorCallback =
+                asyncDescriptorCallbackBuilder.success(new SuccessCallback<ProjectDescriptor>() {
+                    @Override
+                    public void onSuccess(ProjectDescriptor result) {
+                        chooseRunnerAction.selectDefaultRunner();
+                    }
+                }).failure(new FailureCallback() {
+                    @Override
+                    public void onFailure(@Nonnull Throwable reason) {
+                        Log.error(getClass(), reason.getMessage());
+
+                    }
+                }).build();
+
+        projectService.updateProject(descriptor.getPath(), descriptor, asyncDescriptorCallback);
+    }
+
     private void selectSystemScope() {
         projectEnvironments.clear();
 
@@ -300,6 +366,14 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         List<Environment> environments = environmentUtil.getEnvironmentsFromNodes(leaves, SYSTEM);
 
         addEnvironments(systemEnvironments, environments, SYSTEM);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onDefaultRunnerMouseOver() {
+        if (defaultEnvironment != null) {
+            view.showDefaultEnvironmentInfo(defaultEnvironment);
+        }
     }
 
     /** {@inheritDoc} */

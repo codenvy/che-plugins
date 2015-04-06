@@ -79,5 +79,7 @@ public class PropertiesRunnerPanel extends PropertiesPanelPresenter {
         this.view.setVisibleCancelButton(false);
 
         this.view.selectMemory(RAM.detect(runner.getRAM()));
+
+        this.view.hideSwitcher();
     }
 }

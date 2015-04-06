@@ -52,6 +52,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Alexander Andrienko
+ * @author Dmitry Shnurenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class PropertiesPanelPresenterTest {
@@ -310,6 +311,11 @@ public class PropertiesPanelPresenterTest {
     @Test(expected = UnsupportedOperationException.class)
     public void unsupportedOperationExceptionShouldBeThrownWhenCallUpdateEnvironment() {
         presenter.update(environment);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedOperationExceptionShouldBeThrownWhenTryChangeEnvironment() {
+        presenter.onSwitcherChanged(true);
     }
 
     private class DummyPanelProperties extends PropertiesPanelPresenter {

@@ -51,6 +51,7 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPan
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFile;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileEditorInput;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileFactory;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.TemplatesContainer;
 import org.eclipse.che.ide.ext.runner.client.util.TimerFactory;
 import org.eclipse.che.ide.imageviewer.ImageViewerResources;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -145,6 +146,8 @@ public class PropertiesEnvironmentPanelTest {
     private AsyncCallbackBuilder<ProjectDescriptor>    asyncDescriptorCallbackBuilder;
     @Mock
     private Environment                                environment;
+    @Mock
+    private TemplatesContainer                         templatesContainer;
 
     @Mock
     private Runner                                     runner;
@@ -304,6 +307,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    asyncArrayCallbackBuilder,
                                                    voidAsyncCallbackBuilder,
                                                    asyncDescriptorCallbackBuilder,
+                                                   templatesContainer,
                                                    environment);
 
         when(locale.removeEnvironment()).thenReturn(TEXT);
@@ -813,6 +817,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    asyncArrayCallbackBuilder,
                                                    voidAsyncCallbackBuilder,
                                                    asyncDescriptorCallbackBuilder,
+                                                   templatesContainer,
                                                    environment);
 
         verify(appContext).getCurrentProject();
@@ -923,6 +928,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    asyncArrayCallbackBuilder,
                                                    voidAsyncCallbackBuilder,
                                                    asyncDescriptorCallbackBuilder,
+                                                   templatesContainer,
                                                    environment);
 
         presenter.onCancelButtonClicked();
@@ -947,13 +953,15 @@ public class PropertiesEnvironmentPanelTest {
     public void environmentShouldBeUpdatedWhenRunnerConfigExist() throws Exception {
         reset(view);
         when(environment.getScope()).thenReturn(SYSTEM);
+        when(environment.getId()).thenReturn(TEXT);
+        when(currentProject.getRunner()).thenReturn(TEXT2);
         runnerConfigs.put(TEXT, runnerConfiguration);
 
         presenter.update(environment);
 
         verifyUpdateEnvironment();
         verify(runnerConfiguration).getRam();
-
+        verify(view).changeSwitcherState(false);
     }
 
     private void verifyUpdateEnvironment() {
@@ -961,7 +969,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableSaveButton(false);
         verify(view).setEnableDeleteButton(false);
 
-        verify(environment, times(3)).getId();
+        verify(environment, times(4)).getId();
         verify(environment).getName();
         verify(environment).setRam(MB_512.getValue());
 
@@ -976,6 +984,8 @@ public class PropertiesEnvironmentPanelTest {
     public void environmentShouldBeUpdatedWhenRunnerConfigIsNotExist() throws Exception {
         reset(view);
         when(environment.getScope()).thenReturn(SYSTEM);
+        when(environment.getId()).thenReturn(TEXT);
+        when(currentProject.getRunner()).thenReturn(TEXT);
 
         presenter.update(environment);
 
@@ -987,7 +997,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableSaveButton(false);
         verify(view).setEnableDeleteButton(false);
 
-        verify(environment, times(2)).getId();
+        verify(environment, times(3)).getId();
         verify(environment).getName();
         verify(environment).setRam(MB_512.getValue());
 
@@ -997,6 +1007,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).selectScope(SYSTEM);
         verify(runnerConfiguration, never()).getRam();
         verify(environment).getRam();
+        verify(view).changeSwitcherState(true);
     }
 
     @Test
@@ -1013,4 +1024,43 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableCancelButton(true);
     }
 
+    @Test
+    public void switcherShouldBeOn() throws Exception {
+        when(environment.getScope()).thenReturn(SYSTEM);
+
+        presenter.onSwitcherChanged(true);
+
+        verify(templatesContainer).setDefaultEnvironment(environment);
+    }
+
+    @Test
+    public void switcherShouldBeOff() throws Exception {
+        when(environment.getScope()).thenReturn(SYSTEM);
+
+        presenter.onSwitcherChanged(false);
+
+        verify(templatesContainer).setDefaultEnvironment(null);
+    }
+
+    @Test
+    public void switcherShouldNotBeChangedWhenScopeIsProject() throws Exception {
+        when(environment.getScope()).thenReturn(PROJECT);
+
+        presenter.onSwitcherChanged(false);
+
+        verify(templatesContainer, never()).setDefaultEnvironment(Matchers.<Environment>anyObject());
+    }
+
+    @Test
+    public void switcherShouldBeHiddenWhen() throws Exception {
+        when(environment.getScope()).thenReturn(PROJECT);
+        when(environment.getType()).thenReturn(TEXT);
+        when(currentProject.getRunner()).thenReturn(TEXT);
+        when(environment.getId()).thenReturn(TEXT);
+
+        presenter.update(environment);
+
+        verify(view).hideSwitcher();
+        verify(view).changeSwitcherState(true);
+    }
 }

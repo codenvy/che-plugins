@@ -42,7 +42,7 @@ import static org.eclipse.che.ide.api.editor.EditorPartPresenter.PROP_INPUT;
  */
 public abstract class PropertiesPanelPresenter implements PropertiesPanelView.ActionDelegate, PropertiesPanel {
 
-    private   static final String UNSUPPORTED_METHOD = "This is operation is unsupported";
+    private static final String UNSUPPORTED_METHOD = "This is operation is unsupported";
 
     protected final PropertiesPanelView view;
 
@@ -189,6 +189,12 @@ public abstract class PropertiesPanelPresenter implements PropertiesPanelView.Ac
     /** {@inheritDoc} */
     @Override
     public void onCancelButtonClicked() {
+        throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onSwitcherChanged(boolean isOn) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
     }
 }

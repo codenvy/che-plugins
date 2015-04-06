@@ -202,6 +202,17 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
     /** Hides panel with property buttons. */
     void hideButtonsPanel();
 
+    /**
+     * Calls special method which changes state of switcher.
+     *
+     * @param isOn
+     *         <code>true</code> switcher is on,<code>false</code> switcher is off
+     */
+    void changeSwitcherState(boolean isOn);
+
+    /** Hides switcher for current panel. */
+    void hideSwitcher();
+
     interface ActionDelegate {
 
         /** Performs some actions in response to user's changing some configuration. */
@@ -219,6 +230,14 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
         /** Performs some actions in response to user's clicking on the 'Cancel' button. */
         void onCancelButtonClicked();
 
+        /**
+         * Performs some actions in response to user's changing switcher.
+         *
+         * @param isOn
+         *         <code>true</code> switcher state when selected environment is default <code>false</code> when
+         *         environments is not default
+         */
+        void onSwitcherChanged(boolean isOn);
     }
 
 }

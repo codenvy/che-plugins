@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.templates;
 
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
@@ -17,11 +22,15 @@ import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.TemplatesView.ActionDelegate;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.defaultrunnerinfo.DefaultRunnerInfo;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.environment.EnvironmentWidget;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.filterwidget.FilterWidget;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -32,6 +41,8 @@ import java.util.Map;
 
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,15 +53,21 @@ import static org.mockito.Mockito.when;
 @RunWith(GwtMockitoTestRunner.class)
 public class TemplatesViewImplTest {
 
+    private static final String SOME_TEXT = "someText";
+
     private Map<Scope, List<Environment>> environmentMap;
 
     //constructor mocks
     @Mock
     private RunnerLocalizationConstant locale;
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private RunnerResources            resources;
     @Mock
     private WidgetFactory              widgetFactory;
+    @Mock
+    private DefaultRunnerInfo          defaultRunnerInfo;
+    @Mock
+    private PopupPanel                 popupPanel;
 
     //additional mocks
     @Mock
@@ -65,17 +82,64 @@ public class TemplatesViewImplTest {
     private Environment       projectEnvironment2;
     @Mock
     private FilterWidget      filterWidget;
+    @Mock
+    private EnvironmentWidget environmentWidget;
+    @Mock
+    private MouseOverEvent    overEvent;
+    @Mock
+    private MouseOutEvent     outEvent;
+    @Mock
+    private ActionDelegate    delegate;
+
+    @Captor
+    private ArgumentCaptor<MouseOverHandler> mouseOverCaptor;
+    @Captor
+    private ArgumentCaptor<MouseOutHandler>  mouseOutCaptor;
 
     @InjectMocks
     private TemplatesViewImpl view;
 
     @Before
     public void setUp() throws Exception {
+        view.setDelegate(delegate);
+
+        when(locale.templatesDefaultRunnerStub()).thenReturn(SOME_TEXT);
+        when(resources.runnerCss().fullSize()).thenReturn(SOME_TEXT);
+        when(resources.runnerCss().defaultRunnerStub()).thenReturn(SOME_TEXT);
+        when(resources.runnerCss().fontSizeTen()).thenReturn(SOME_TEXT);
+
         environmentMap = new EnumMap<>(Scope.class);
         environmentMap.put(PROJECT, Arrays.asList(projectEnvironment1, projectEnvironment2));
         environmentMap.put(SYSTEM, Arrays.asList(systemEnvironment1, systemEnvironment2));
 
         when(widgetFactory.createEnvironment()).thenReturn(widget);
+    }
+
+    @Test
+    public void constructorShouldBeVerified() {
+        verify(locale).templatesDefaultRunnerStub();
+
+        verify(resources.runnerCss()).fullSize();
+        verify(resources.runnerCss()).defaultRunnerStub();
+        verify(resources.runnerCss()).fontSizeTen();
+    }
+
+    @Test
+    public void onMouseOverHandlerShouldBeFired() {
+        verify(view.defaultRunner).addDomHandler(mouseOverCaptor.capture(), eq(MouseOverEvent.getType()));
+
+        mouseOverCaptor.getValue().onMouseOver(overEvent);
+
+        verify(delegate).onDefaultRunnerMouseOver();
+    }
+
+    @Test
+    public void onMouseOutHandlerShouldBeFired() {
+        verify(view.defaultRunner).addDomHandler(mouseOutCaptor.capture(), eq(MouseOutEvent.getType()));
+
+        mouseOutCaptor.getValue().onMouseOut(outEvent);
+
+        verify(popupPanel).hide();
     }
 
     @Test
@@ -128,4 +192,21 @@ public class TemplatesViewImplTest {
         verify(view.environmentsPanel).clear();
     }
 
+    @Test
+    public void defaultRunnerShouldBeSet() throws Exception {
+        view.setDefaultProjectWidget(environmentWidget);
+
+        verify(view.defaultRunner).setWidget(environmentWidget);
+    }
+
+    @Test
+    public void defaultEnvironmentInfoShouldBeSet() throws Exception {
+        when(view.defaultRunner.getAbsoluteLeft()).thenReturn(0);
+        when(view.defaultRunner.getAbsoluteTop()).thenReturn(0);
+
+        view.showDefaultEnvironmentInfo(systemEnvironment1);
+
+        verify(popupPanel).setPopupPosition(175, -90);
+        verify(popupPanel).show();
+    }
 }

@@ -52,6 +52,15 @@
         }
     </ui:style>
     <g:DockLayoutPanel unit="PX" addStyleNames="{style.container}">
+        <!--default runner panel-->
+        <g:north size="12">
+            <g:FlowPanel>
+                <g:Label text="{locale.templateDefaultRunner}" addStyleNames="{resources.runnerCss.fontSizeTen}"/>
+            </g:FlowPanel>
+        </g:north>
+        <g:north size="40">
+            <g:SimpleLayoutPanel ui:field="defaultRunner"/>
+        </g:north>
         <!--scope panel-->
         <g:north size="45">
             <g:SimplePanel ui:field="filterPanel"/>

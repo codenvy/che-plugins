@@ -141,6 +141,10 @@ public interface RunnerResources extends ClientBundle {
         String leftTabContainerShadow();
 
         String itemIcon();
+
+        String defaultRunnerStub();
+
+        String hideElement();
     }
 
 }

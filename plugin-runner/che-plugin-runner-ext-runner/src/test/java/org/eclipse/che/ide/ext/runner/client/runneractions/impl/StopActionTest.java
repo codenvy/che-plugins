@@ -51,7 +51,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -244,7 +243,7 @@ public class StopActionTest {
         verify(runner).setStatus(Runner.Status.STOPPED);
         verify(consoleContainer).printInfo(runner, MESSAGE);
 
-        verify(notificationManager, times(2)).showNotification(notificationCaptor.capture());
+        verify(notificationManager).showNotification(notificationCaptor.capture());
         Notification notification = notificationCaptor.getValue();
         assertThat(notification.getMessage(), is(MESSAGE));
         assertThat(notification.getType(), is(Notification.Type.INFO));
@@ -278,7 +277,7 @@ public class StopActionTest {
         verify(runner).setStatus(Runner.Status.STOPPED);
         verify(consoleContainer).printInfo(runner, MESSAGE);
 
-        verify(notificationManager, times(2)).showNotification(notificationCaptor.capture());
+        verify(notificationManager).showNotification(notificationCaptor.capture());
         Notification notification = notificationCaptor.getValue();
         assertThat(notification.getMessage(), is(MESSAGE));
         assertThat(notification.getType(), is(Notification.Type.INFO));
@@ -313,7 +312,7 @@ public class StopActionTest {
         verify(logsAction).perform(runner);
         verify(consoleContainer).printError(runner, MESSAGE);
 
-        verify(notificationManager, times(2)).showNotification(notificationCaptor.capture());
+        verify(notificationManager).showNotification(notificationCaptor.capture());
         Notification notification = notificationCaptor.getValue();
         //because type of message ERROR
         assertThat(notification.getType(), is(Notification.Type.ERROR));

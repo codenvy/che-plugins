@@ -46,5 +46,6 @@ public class PropertiesStubPanelTest {
         verify(view).setEnableScopeProperty(false);
 
         verify(view).hideButtonsPanel();
+        verify(view).hideSwitcher();
     }
 }

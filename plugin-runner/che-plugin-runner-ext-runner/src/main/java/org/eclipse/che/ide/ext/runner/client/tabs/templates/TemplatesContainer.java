@@ -45,14 +45,6 @@ public interface TemplatesContainer extends TabPresenter {
      */
     void addEnvironments(@Nonnull RunnerEnvironmentTree tree, @Nonnull Scope scope);
 
-    /**
-     * Adds language type item in special lis box on templates panel.
-     *
-     * @param item
-     *         item which need set to special list box on templates panel
-     */
-    void setTypeItem(@Nonnull String item);
-
     /** Shows environments when user click on templates tab the first time. */
     void showEnvironments();
 
@@ -61,5 +53,13 @@ public interface TemplatesContainer extends TabPresenter {
 
     /** Changes enable state run button */
     void changeEnableStateRunButton();
+
+    /**
+     * Sets current environment as default for project. If we want delete default environment we need hand on null.
+     *
+     * @param environment
+     *         environment which need set
+     */
+    void setDefaultEnvironment(@Nullable Environment environment);
 
 }

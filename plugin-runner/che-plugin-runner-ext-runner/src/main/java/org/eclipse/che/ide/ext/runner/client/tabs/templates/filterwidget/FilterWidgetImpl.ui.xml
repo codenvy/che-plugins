@@ -28,11 +28,11 @@
 
         .label {
             float: left;
-            margin-top: -1px;
+            margin-top: 3px;
         }
 
         .margin {
-            margin-left: 20px;
+            margin-left: 19px;
         }
 
     </ui:style>
