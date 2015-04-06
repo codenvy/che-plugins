@@ -12,9 +12,12 @@ package org.eclipse.che.ide.ext.git.server.nativegit.commands;
 
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
+import org.eclipse.che.ide.ext.git.shared.GitUser;
 import org.eclipse.che.ide.ext.git.shared.Tag;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Create tag
@@ -27,6 +30,7 @@ public class TagCreateCommand extends GitCommand<Tag> {
     private String  commit;
     private String  message;
     private boolean force;
+    private GitUser committer;
 
     public TagCreateCommand(File repository) {
         super(repository);
@@ -49,6 +53,16 @@ public class TagCreateCommand extends GitCommand<Tag> {
         if (force) {
             commandLine.add("--force");
         }
+
+        if (committer != null) {
+            Map<String, String> environment = new HashMap<>();
+            environment.put("GIT_COMMITTER_NAME", committer.getName());
+            environment.put("GIT_COMMITTER_EMAIL", committer.getEmail());
+            setCommandEnvironment(environment);
+        } else {
+            throw new GitException("Committer can't be null");
+        }
+
         start();
         return DtoFactory.getInstance().createDto(Tag.class).withName(name);
     }
@@ -92,4 +106,15 @@ public class TagCreateCommand extends GitCommand<Tag> {
         this.force = force;
         return this;
     }
+
+    /**
+     * @param committer
+     *         committer of commit
+     * @return CommitCommand with established committer
+     */
+    public TagCreateCommand setCommitter(GitUser committer) {
+        this.committer = committer;
+        return this;
+    }
+
 }

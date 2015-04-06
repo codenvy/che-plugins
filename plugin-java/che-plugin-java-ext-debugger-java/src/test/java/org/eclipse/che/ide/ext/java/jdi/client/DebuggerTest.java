@@ -54,7 +54,6 @@ import java.lang.reflect.Method;
 
 import static org.eclipse.che.api.runner.ApplicationStatus.NEW;
 import static org.eclipse.che.api.runner.ApplicationStatus.RUNNING;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyByte;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
@@ -92,8 +91,6 @@ public class DebuggerTest extends BaseTest {
     private EvaluateExpressionPresenter  evaluateExpressionPresenter;
     @Mock
     private ChangeValuePresenter         changeValuePresenter;
-    @InjectMocks
-    private DebuggerPresenter            presenter;
     @Mock
     private ApplicationProcessDescriptor applicationProcessDescriptor;
     @Mock
@@ -121,6 +118,9 @@ public class DebuggerTest extends BaseTest {
     @Mock
     private Runner                       runner2;
 
+    @InjectMocks
+    private DebuggerPresenter presenter;
+
     @Before
     public void setUp() {
         super.setUp();
@@ -134,7 +134,7 @@ public class DebuggerTest extends BaseTest {
     }
 
     @Test
-    public void debuggerShouldNotBeShowedIfStatusOfOtheRunnerIsChanged() throws Exception {
+    public void debuggerShouldNotBeShowedIfStatusOfTheRunnerIsChanged() throws Exception {
         when(dtoFactory.createDto(RunOptions.class)).thenReturn(mock(RunOptions.class));
         when(runnerManager.launchRunner(Matchers.<RunOptions>any())).thenReturn(runner2);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
@@ -151,7 +151,7 @@ public class DebuggerTest extends BaseTest {
 
         applicationStatusEventHandler.onRunnerStatusChanged(runner);
 
-        verify(service, never()).connect(anyString(), anyByte(), (AsyncRequestCallback<DebuggerInfo>)any());
+        verify(service, never()).connect(anyString(), anyByte(), Matchers.<AsyncRequestCallback<DebuggerInfo>>any());
     }
 
     @Test
@@ -172,7 +172,7 @@ public class DebuggerTest extends BaseTest {
 
         applicationStatusEventHandler.onRunnerStatusChanged(runner);
 
-        verify(service, never()).connect(anyString(), anyByte(), (AsyncRequestCallback<DebuggerInfo>)any());
+        verify(service, never()).connect(anyString(), anyByte(), Matchers.<AsyncRequestCallback<DebuggerInfo>>any());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class DebuggerTest extends BaseTest {
 
         applicationStatusEventHandler.onRunnerStatusChanged(runner);
 
-        verify(service, never()).connect(anyString(), anyByte(), (AsyncRequestCallback<DebuggerInfo>)any());
+        verify(service, never()).connect(anyString(), anyByte(), Matchers.<AsyncRequestCallback<DebuggerInfo>>any());
 
     }
 
@@ -211,7 +211,7 @@ public class DebuggerTest extends BaseTest {
 
         applicationStatusEventHandler.onRunnerStatusChanged(runner);
 
-        verify(service).connect(anyString(), anyByte(), (AsyncRequestCallback<DebuggerInfo>)any());
+        verify(service).connect(anyString(), anyByte(), Matchers.<AsyncRequestCallback<DebuggerInfo>>any());
 
     }
 
@@ -226,12 +226,13 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<DebuggerInfo> callback = (AsyncRequestCallback<DebuggerInfo>)arguments[2];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, debuggerInfoMock);
                 return callback;
             }
-        }).when(service).connect(anyString(), anyInt(), (AsyncRequestCallback<DebuggerInfo>)anyObject());
+        }).when(service).connect(anyString(), anyInt(), Matchers.<AsyncRequestCallback<DebuggerInfo>>anyObject());
 
         presenter.debug();
 
@@ -242,11 +243,11 @@ public class DebuggerTest extends BaseTest {
 
         applicationStatusEventHandler.onRunnerStatusChanged(runner);
 
-        verify(service).connect(eq(DEBUG_HOST), eq(DEBUG_PORT), (AsyncRequestCallback<DebuggerInfo>)anyObject());
+        verify(service).connect(eq(DEBUG_HOST), eq(DEBUG_PORT), Matchers.<AsyncRequestCallback<DebuggerInfo>>anyObject());
         verifySetEnableButtons(DISABLE_BUTTON);
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
-        verify(view).setEnableRemoveAllBreakpointsButton(!DISABLE_BUTTON);
-        verify(view).setEnableDisconnectButton(!DISABLE_BUTTON);
+        verify(view).setEnableRemoveAllBreakpointsButton(true);
+        verify(view).setEnableDisconnectButton(true);
         verify(workspaceAgent).openPart(presenter, PartStackType.INFORMATION);
     }
 
@@ -258,12 +259,13 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<DebuggerInfo> callback = (AsyncRequestCallback<DebuggerInfo>)arguments[2];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).connect(anyString(), anyInt(), (AsyncRequestCallback<DebuggerInfo>)anyObject());
+        }).when(service).connect(anyString(), anyInt(), Matchers.<AsyncRequestCallback<DebuggerInfo>>anyObject());
 
         presenter.debug();
 
@@ -274,7 +276,7 @@ public class DebuggerTest extends BaseTest {
 
         applicationStatusEventHandler.onRunnerStatusChanged(runner);
 
-        verify(service).connect(eq(DEBUG_HOST), eq(DEBUG_PORT), (AsyncRequestCallback<DebuggerInfo>)anyObject());
+        verify(service).connect(eq(DEBUG_HOST), eq(DEBUG_PORT), Matchers.<AsyncRequestCallback<DebuggerInfo>>anyObject());
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 
@@ -296,16 +298,17 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, (Void)null);
                 return callback;
             }
-        }).when(service).disconnect(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).disconnect(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         presenter.onDisconnectButtonClicked();
 
-        verify(service).disconnect(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).disconnect(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         verifySetEnableButtons(DISABLE_BUTTON);
 
@@ -323,16 +326,17 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).disconnect(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).disconnect(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         presenter.onDisconnectButtonClicked();
 
-        verify(service).disconnect(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).disconnect(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 
@@ -342,17 +346,18 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, (Void)null);
                 return callback;
             }
-        }).when(service).resume(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).resume(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         presenter.onResumeButtonClicked();
 
         verifySetEnableButtons(DISABLE_BUTTON);
-        verify(service).resume(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).resume(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(view).setVariables(anyListOf(Variable.class));
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
         verify(gutterManager).unmarkCurrentBreakpoint();
@@ -364,16 +369,17 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).resume(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).resume(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         presenter.onResumeButtonClicked();
 
-        verify(service).resume(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).resume(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 
@@ -383,29 +389,30 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, (Void)null);
                 return callback;
             }
-        }).when(service).stepInto(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).stepInto(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         when(view.resetStepIntoButton(false)).thenReturn(true);
 
         presenter.onStepIntoButtonClicked();
 
-        verify(service).stepInto(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).stepInto(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(view).setVariables(anyListOf(Variable.class));
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
         verify(gutterManager).unmarkCurrentBreakpoint();
     }
 
     @Test
-    public void testStepIntoRequestIfKeyup() throws Exception {
+    public void testStepIntoRequestIfKeyUp() throws Exception {
         when(view.resetStepIntoButton(false)).thenReturn(false);
 
         presenter.onStepIntoButtonClicked();
 
-        verify(service, never()).stepInto(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service, never()).stepInto(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
     }
 
     @Test
@@ -414,17 +421,18 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).stepInto(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).stepInto(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         when(view.resetStepIntoButton(false)).thenReturn(true);
 
         presenter.onStepIntoButtonClicked();
 
-        verify(service).stepInto(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).stepInto(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 
@@ -434,17 +442,18 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, (Void)null);
                 return callback;
             }
-        }).when(service).stepOver(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).stepOver(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         when(view.resetStepOverButton(false)).thenReturn(true);
 
         presenter.onStepOverButtonClicked();
 
-        verify(service).stepOver(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).stepOver(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(view).setVariables(anyListOf(Variable.class));
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
         verify(gutterManager).unmarkCurrentBreakpoint();
@@ -456,17 +465,18 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).stepOver(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).stepOver(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         when(view.resetStepOverButton(false)).thenReturn(true);
 
         presenter.onStepOverButtonClicked();
 
-        verify(service).stepOver(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).stepOver(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 
@@ -476,7 +486,7 @@ public class DebuggerTest extends BaseTest {
 
         presenter.onStepOverButtonClicked();
 
-        verify(service, never()).stepOver(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service, never()).stepOver(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
     }
 
     @Test
@@ -485,17 +495,18 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, (Void)null);
                 return callback;
             }
-        }).when(service).stepReturn(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).stepReturn(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         when(view.resetStepReturnButton(false)).thenReturn(true);
 
         presenter.onStepReturnButtonClicked();
 
-        verify(service).stepReturn(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).stepReturn(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(view).setVariables(anyListOf(Variable.class));
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
         verify(gutterManager).unmarkCurrentBreakpoint();
@@ -507,17 +518,18 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[1];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).stepReturn(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).stepReturn(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         when(view.resetStepReturnButton(false)).thenReturn(true);
 
         presenter.onStepReturnButtonClicked();
 
-        verify(service).stepReturn(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).stepReturn(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 
@@ -527,7 +539,7 @@ public class DebuggerTest extends BaseTest {
 
         presenter.onStepReturnButtonClicked();
 
-        verify(service, never()).stepReturn(anyString(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service, never()).stepReturn(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
     }
 
     @Test
@@ -536,16 +548,17 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[2];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, (Void)null);
                 return callback;
             }
-        }).when(service).addBreakpoint(anyString(), (BreakPoint)anyObject(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).addBreakpoint(anyString(), (BreakPoint)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         presenter.addBreakpoint(file, anyInt(), asyncCallbackBreakpoint);
 
-        verify(service).addBreakpoint(anyString(), (BreakPoint)anyObject(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).addBreakpoint(anyString(), (BreakPoint)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(asyncCallbackBreakpoint).onSuccess((Breakpoint)anyObject());
     }
 
@@ -555,16 +568,17 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[2];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).addBreakpoint(anyString(), (BreakPoint)anyObject(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).addBreakpoint(anyString(), (BreakPoint)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         presenter.addBreakpoint(file, anyInt(), asyncCallbackBreakpoint);
 
-        verify(service).addBreakpoint(anyString(), (BreakPoint)anyObject(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).addBreakpoint(anyString(), (BreakPoint)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(asyncCallbackBreakpoint).onFailure((Throwable)anyObject());
     }
 
@@ -574,16 +588,17 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[2];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, (Void)null);
                 return callback;
             }
-        }).when(service).deleteBreakpoint(anyString(), (BreakPoint)anyObject(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).deleteBreakpoint(anyString(), (BreakPoint)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         presenter.deleteBreakpoint(file, anyInt(), asyncCallbackVoid);
 
-        verify(service).deleteBreakpoint(anyString(), (BreakPoint)anyObject(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).deleteBreakpoint(anyString(), (BreakPoint)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(asyncCallbackVoid).onSuccess((Void)anyObject());
     }
 
@@ -593,16 +608,17 @@ public class DebuggerTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
+                //noinspection unchecked
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[2];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).deleteBreakpoint(anyString(), (BreakPoint)anyObject(), (AsyncRequestCallback<Void>)anyObject());
+        }).when(service).deleteBreakpoint(anyString(), (BreakPoint)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
 
         presenter.deleteBreakpoint(file, anyInt(), asyncCallbackVoid);
 
-        verify(service).deleteBreakpoint(anyString(), (BreakPoint)anyObject(), (AsyncRequestCallback<Void>)anyObject());
+        verify(service).deleteBreakpoint(anyString(), (BreakPoint)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(asyncCallbackVoid).onFailure((Throwable)anyObject());
     }
 
@@ -611,7 +627,9 @@ public class DebuggerTest extends BaseTest {
         presenter.onSelectedVariableElement(mock(Variable.class));
         presenter.onChangeValueButtonClicked();
 
-        verify(changeValuePresenter).showDialog((DebuggerInfo)anyObject(), (Variable)anyObject(), (AsyncCallback<String>)anyObject());
+        verify(changeValuePresenter).showDialog((DebuggerInfo)anyObject(),
+                                                (Variable)anyObject(),
+                                                Matchers.<AsyncCallback<String>>anyObject());
     }
 
     @Test

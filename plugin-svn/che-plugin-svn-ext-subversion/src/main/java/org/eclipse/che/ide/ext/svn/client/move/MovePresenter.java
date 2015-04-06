@@ -108,7 +108,7 @@ public class MovePresenter extends SubversionActionPresenter implements MoveView
             }
         });
 
-        view.onShow();
+        view.onShow(sources.size() == 1);
     }
 
     /** {@inheritDoc} */
@@ -170,7 +170,18 @@ public class MovePresenter extends SubversionActionPresenter implements MoveView
         } else {
             TreeNode<?> destinationNode = view.getDestinationNode();
             if (destinationNode instanceof StorableNode) {
-                return relPath(projectPath, ((StorableNode)destinationNode).getPath());
+                final String relPath = relPath(projectPath, ((StorableNode)destinationNode).getPath());
+                if (sources.size() > 1) {
+                    return relPath;
+                }
+
+                final String newName = view.getNewName();
+
+                if (Strings.isNullOrEmpty(newName)) {
+                    return relPath;
+                }
+
+                return Strings.isNullOrEmpty(relPath) ? newName : relPath + '/' + newName;
             }
             return null;
         }

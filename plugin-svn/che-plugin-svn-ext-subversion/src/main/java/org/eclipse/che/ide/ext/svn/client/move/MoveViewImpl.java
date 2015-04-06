@@ -82,6 +82,12 @@ public class MoveViewImpl extends Window implements MoveView {
     @UiField
     TextBox commentTextBox;
 
+    @UiField
+    DockLayoutPanel newNamePanel;
+
+    @UiField
+    TextBox newNameTextBox;
+
     @UiField(provided = true)
     SubversionExtensionResources             resources;
     @UiField(provided = true)
@@ -288,9 +294,9 @@ public class MoveViewImpl extends Window implements MoveView {
         alertMarker.getStyle().setVisibility(Style.Visibility.VISIBLE);
 
         Tooltip.create((elemental.dom.Element)alertMarker.getElement(),
-                       PositionController.VerticalAlign.TOP,
-                       PositionController.HorizontalAlign.MIDDLE,
-                       message);
+                PositionController.VerticalAlign.TOP,
+                PositionController.HorizontalAlign.MIDDLE,
+                message);
 
         btnMove.setEnabled(false);
     }
@@ -329,8 +335,16 @@ public class MoveViewImpl extends Window implements MoveView {
 
     /** {@inheritDoc} */
     @Override
-    public void onShow() {
+    public void onShow(boolean singleSelectedItem) {
+        newNamePanel.setVisible(singleSelectedItem);
+        newNameTextBox.setText(null);
         show();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getNewName() {
+        return newNameTextBox.getText();
     }
 
     /** {@inheritDoc} */

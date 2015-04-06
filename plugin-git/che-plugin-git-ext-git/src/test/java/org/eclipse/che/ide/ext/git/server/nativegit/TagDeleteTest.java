@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.server.nativegit;
 
+import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
 import org.eclipse.che.ide.ext.git.server.nativegit.commands.TagListCommand;
+import org.eclipse.che.ide.ext.git.shared.GitUser;
 import org.eclipse.che.ide.ext.git.shared.Tag;
 import org.eclipse.che.ide.ext.git.shared.TagDeleteRequest;
 import org.testng.annotations.Test;
@@ -31,9 +33,10 @@ public class TagDeleteTest extends BaseTest {
     public void testDeleteTag() throws GitException {
         //given
         //create tags
+        GitUser committer = DtoFactory.getInstance().createDto(GitUser.class).withName("n").withEmail("e@gs.com");
         NativeGit defaultGit = new NativeGit(getRepository().toFile());
-        defaultGit.createTagCreateCommand().setName("first-tag").execute();
-        defaultGit.createTagCreateCommand().setName("second-tag").execute();
+        defaultGit.createTagCreateCommand().setName("first-tag").setCommitter(committer).execute();
+        defaultGit.createTagCreateCommand().setName("second-tag").setCommitter(committer).execute();
 
         TagListCommand tagListCommand = new TagListCommand(getRepository().toFile());
         assertTrue(tagExists(tagListCommand.execute(), "first-tag"));

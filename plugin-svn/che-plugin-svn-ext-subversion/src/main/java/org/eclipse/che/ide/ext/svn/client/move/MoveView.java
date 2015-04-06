@@ -64,6 +64,9 @@ public interface MoveView extends View<MoveView.ActionDelegate> {
     /** Return comment. */
     String getComment();
 
+    /** Return new name for target item. */
+    String getNewName();
+
     /** Return target node, in case if we perform copying WC->WC. */
     TreeNode<?> getDestinationNode();
 
@@ -71,5 +74,5 @@ public interface MoveView extends View<MoveView.ActionDelegate> {
     void onClose();
 
     /** Perform actions when open window performed. */
-    void onShow();
+    void onShow(boolean singleSelectedItem);
 }

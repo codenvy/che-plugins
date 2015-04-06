@@ -83,7 +83,7 @@ public class MovePresenterTest extends BaseSubversionPresenterTest {
 
         presenter.showMove();
 
-        verify(view).onShow();
+        verify(view).onShow(false);
     }
 
     @Test

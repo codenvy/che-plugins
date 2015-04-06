@@ -133,4 +133,10 @@ public interface JavaRuntimeLocalizationConstant extends com.google.gwt.i18n.cli
 
     @Key("evaluateExpressionFailed")
     String evaluateExpressionFailed(String reason);
+
+    @Key("connect.to.remote")
+    String connectToRemote();
+
+    @Key("connect.to.remote.description")
+    String connectToRemoteDescription();
 }

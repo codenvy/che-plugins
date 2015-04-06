@@ -16,6 +16,21 @@ import elemental.events.MouseEvent;
 import elemental.html.TableCellElement;
 import elemental.html.TableElement;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SplitLayoutPanel;
+import com.google.gwt.user.client.ui.ToggleButton;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.parts.PartStackUIResources;
 import org.eclipse.che.ide.api.parts.base.BaseView;
@@ -30,21 +45,6 @@ import org.eclipse.che.ide.ui.tree.Tree;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
 import org.eclipse.che.ide.util.dom.Elements;
 import org.eclipse.che.ide.util.input.SignalEvent;
-import com.google.gwt.user.client.ui.SplitLayoutPanel;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.ToggleButton;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import org.vectomatic.dom.svg.ui.SVGImage;
 
 import javax.annotation.Nonnull;
@@ -187,6 +187,7 @@ public class DebuggerViewImpl extends BaseView<DebuggerView.ActionDelegate> impl
 
             @Override
             public void onNodeClosed(TreeNodeElement<Variable> node) {
+                selectedVariable = null;
             }
 
             @Override
@@ -211,7 +212,9 @@ public class DebuggerViewImpl extends BaseView<DebuggerView.ActionDelegate> impl
             @Override
             public void onNodeSelected(TreeNodeElement<Variable> node, SignalEvent event) {
                 selectedVariable = node;
-                delegate.onSelectedVariableElement(selectedVariable.getData());
+                if (node != null) {
+                    delegate.onSelectedVariableElement(selectedVariable.getData());
+                }
             }
 
             @Override
@@ -221,7 +224,7 @@ public class DebuggerViewImpl extends BaseView<DebuggerView.ActionDelegate> impl
             @Override
             public void onRootDragDrop(MouseEvent event) {
             }
-            
+
             @Override
             public void onKeyboard(KeyboardEvent event) {
             }

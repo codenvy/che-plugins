@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (c) 2012-2015 Codenvy, S.A.
  * All rights reserved. This program and the accompanying materials
@@ -72,11 +73,15 @@ import org.eclipse.che.ide.util.loging.Log;
 import org.eclipse.che.ide.websocket.MessageBus;
 import org.eclipse.che.ide.websocket.WebSocketException;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
+import org.eclipse.che.ide.websocket.rest.exceptions.ServerException;
 import org.vectomatic.dom.svg.ui.SVGResource;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.eclipse.che.api.runner.ApplicationStatus.CANCELLED;
 import static org.eclipse.che.api.runner.ApplicationStatus.RUNNING;
@@ -124,12 +129,13 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
     private       SubscriptionHandler<DebuggerEventList> debuggerEventsHandler;
     private       SubscriptionHandler<Void>              debuggerDisconnectedHandler;
     private       List<Variable>                         variables;
-    private       ApplicationProcessDescriptor           appDescriptor;
-    private       ProjectDescriptor                      project;
     private       Location                               executionPoint;
     private       Runner                                 runner;
 
-    /** Create presenter. */
+    private String host;
+    private int    port;
+    private String srcFolder;
+
     @Inject
     public DebuggerPresenter(DebuggerView view,
                              final DebuggerServiceClient service,
@@ -146,7 +152,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                              final RunnerManager runnerManager,
                              final DtoFactory dtoFactory,
                              DtoUnmarshallerFactory dtoUnmarshallerFactory,
-                             AppContext appContext) {
+                             final AppContext appContext) {
         this.view = view;
         this.eventBus = eventBus;
         this.runnerManager = runnerManager;
@@ -182,9 +188,8 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                 }
                 closeView();
 
-                if (exception instanceof org.eclipse.che.ide.websocket.rest.exceptions.ServerException) {
-                    org.eclipse.che.ide.websocket.rest.exceptions.ServerException serverException =
-                            (org.eclipse.che.ide.websocket.rest.exceptions.ServerException)exception;
+                if (exception instanceof ServerException) {
+                    ServerException serverException = (ServerException)exception;
                     if (HTTPStatus.INTERNAL_ERROR == serverException.getHTTPStatus() && serverException.getMessage() != null
                         && serverException.getMessage().contains("not found")) {
                         runnerManager.stopRunner(runner);
@@ -224,7 +229,23 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
             public void onProjectOpened(ProjectActionEvent event) {
-                // do nothing
+                CurrentProject currentProject = appContext.getCurrentProject();
+
+                if (currentProject == null) {
+                    return;
+                }
+
+                ProjectDescriptor descriptor = currentProject.getProjectDescription();
+
+                Map<String, List<String>> attributes = descriptor.getAttributes();
+
+                String defaultBuilder = descriptor.getBuilders().getDefault();
+
+                String key = defaultBuilder + ".source.folder";
+
+                List<String> sources = attributes.get(key);
+
+                srcFolder = sources == null ? "src/main/java" : sources.get(0);
             }
 
             @Override
@@ -251,14 +272,15 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                 if (runner != null) {
                     existingDescriptor = runner.getDescriptor();
                 }
-                if (changedDescriptor == null || runner == null || existingDescriptor == null || runner.getProcessId() != changedRunner.getProcessId() ||
+                if (changedDescriptor == null || runner == null || existingDescriptor == null ||
+                    runner.getProcessId() != changedRunner.getProcessId() ||
                     currentProject == null) {
                     return;
                 }
 
                 runner = changedRunner;
                 if (RUNNING.equals(changedDescriptor.getStatus())) {
-                    attachDebugger(changedDescriptor, currentProject.getProjectDescription());
+                    attachDebugger(changedDescriptor.getDebugHost(), changedDescriptor.getDebugPort());
                 }
 
                 if (STOPPED.equals(changedDescriptor.getStatus()) || CANCELLED.equals(changedDescriptor.getStatus())) {
@@ -327,10 +349,10 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             }
             this.executionPoint = location;
 
-            final String filePath = resolveFilePathByLocation(location);
+            final String filePath = resolveFilePathByLocation(location, activeFile);
             if (activeFile == null || !filePath.equalsIgnoreCase(activeFile.getPath())) {
                 final Location finalLocation = location;
-                openFile(location, new AsyncCallback<FileNode>() {
+                openFile(location, activeFile, new AsyncCallback<FileNode>() {
                     @Override
                     public void onSuccess(FileNode result) {
                         if (result != null && filePath != null && filePath.equalsIgnoreCase(result.getPath())) {
@@ -361,14 +383,23 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
      * @return file path
      */
     @Nonnull
-    private String resolveFilePathByLocation(@Nonnull Location location) {
-        final String sourcePath = "src/main/java";
-        return project.getPath() + "/" + sourcePath + "/" + location.getClassName().replace(".", "/") + ".java";
+    private String resolveFilePathByLocation(@Nonnull Location location, @Nullable VirtualFile activeFile) {
+        if (activeFile == null) {
+            return "";
+        }
+
+        return activeFile.getProject().getPath() + "/" + srcFolder + "/" + location.getClassName().replace(".", "/") + ".java";
     }
 
-    private void openFile(@Nonnull Location location, final AsyncCallback<FileNode> callback) {
-        final String filePath = resolveFilePathByLocation(location);
-        appContext.getCurrentProject().getCurrentTree().getNodeByPath(filePath, new AsyncCallback<TreeNode<?>>() {
+    private void openFile(@Nonnull Location location, @Nullable VirtualFile activeFile, final AsyncCallback<FileNode> callback) {
+        final String filePath = resolveFilePathByLocation(location, activeFile);
+        CurrentProject currentProject = appContext.getCurrentProject();
+
+        if (currentProject == null) {
+            return;
+        }
+
+        currentProject.getCurrentTree().getNodeByPath(filePath, new AsyncCallback<TreeNode<?>>() {
             public HandlerRegistration handlerRegistration;
 
             @Override
@@ -464,6 +495,8 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             protected void onSuccess(String result) {
                 breakpointManager.removeAllBreakpoints();
                 view.setBreakpoints(new ArrayList<Breakpoint>());
+                view.setExecutionPoint(true, null);
+                view.setVariables(new ArrayList<Variable>());
             }
 
             @Override
@@ -644,26 +677,24 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
     }
 
     /**
-     * Attach debugger to the specified app.
+     * Attached debugger via special host and port for current project.
      *
-     * @param appDescriptor
-     *         descriptor of application to debug
-     * @param project
-     *         project to debug
+     * @param host
+     *         host which need to connect to debugger
+     * @param port
+     *         port which need to connect to debugger
      */
-    private void attachDebugger(@Nonnull final ApplicationProcessDescriptor appDescriptor, ProjectDescriptor project) {
-        this.project = project;
-        this.appDescriptor = appDescriptor;
-        service.connect(appDescriptor.getDebugHost(), appDescriptor.getDebugPort(),
-                        new AsyncRequestCallback<DebuggerInfo>(dtoUnmarshallerFactory.newUnmarshaller(DebuggerInfo.class)) {
+    public void attachDebugger(@Nonnull final String host, @Nonnegative final int port) {
+        this.host = host;
+        this.port = port;
+
+        service.connect(host, port, new AsyncRequestCallback<DebuggerInfo>(dtoUnmarshallerFactory.newUnmarshaller(DebuggerInfo.class)) {
                             @Override
                             public void onSuccess(DebuggerInfo result) {
                                 debuggerInfo = result;
-                                Notification notification =
-                                        new Notification(constant.debuggerConnected(
-                                                appDescriptor.getDebugHost() + ':' + appDescriptor.getDebugPort()), INFO);
+                                Notification notification = new Notification(constant.debuggerConnected(host + ':' + port), INFO);
                                 notificationManager.showNotification(notification);
-                                showDialog(debuggerInfo);
+                                showDialog(result);
                                 startCheckingEvents();
                             }
 
@@ -683,7 +714,11 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                 @Override
                 protected void onSuccess(Void result) {
                     changeButtonsEnableState(false);
-                    runnerManager.stopRunner(runner);
+
+                    if (runner != null) {
+                        runnerManager.stopRunner(runner);
+                    }
+
                     onDebuggerDisconnected();
                     closeView();
                 }
@@ -735,15 +770,8 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
         debuggerInfo = null;
         breakpointManager.unmarkCurrentBreakpoint();
         breakpointManager.removeAllBreakpoints();
-
-        // appDescriptor can be null after reopening a project
-        if (appDescriptor != null) {
-            Notification notification =
-                    new Notification(constant.debuggerDisconnected(appDescriptor.getDebugHost() + ':' + appDescriptor.getDebugPort()),
-                                     INFO);
-            notificationManager.showNotification(notification);
-            appDescriptor = null;
-        }
+        Notification notification = new Notification(constant.debuggerDisconnected(host + ':' + port), INFO);
+        notificationManager.showNotification(notification);
     }
 
     private void updateBreakPoints() {

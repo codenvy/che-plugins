@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.jdi.client.debug;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+
 import org.eclipse.che.ide.ext.java.jdi.client.JavaRuntimeLocalizationConstant;
 import org.eclipse.che.ide.ext.java.jdi.shared.BreakPoint;
 import org.eclipse.che.ide.ext.java.jdi.shared.DebuggerEventList;
@@ -22,9 +26,6 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
 import org.eclipse.che.ide.rest.AsyncRequestLoader;
 import org.eclipse.che.ide.ui.loader.EmptyLoader;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 import javax.annotation.Nonnull;
 

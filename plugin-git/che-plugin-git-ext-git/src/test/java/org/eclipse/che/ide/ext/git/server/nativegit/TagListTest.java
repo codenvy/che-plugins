@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.server.nativegit;
 
+import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
+import org.eclipse.che.ide.ext.git.shared.GitUser;
 import org.eclipse.che.ide.ext.git.shared.Tag;
 import org.eclipse.che.ide.ext.git.shared.TagListRequest;
 import org.testng.annotations.BeforeMethod;
@@ -30,9 +32,11 @@ public class TagListTest extends BaseTest {
     @BeforeMethod
     protected void createTags() throws Exception {
         NativeGit defaultGit = new NativeGit(getRepository().toFile());
-        defaultGit.createTagCreateCommand().setName("first-tag").execute();
-        defaultGit.createTagCreateCommand().setName("first-tag-other").execute();
-        defaultGit.createTagCreateCommand().setName("second-tag").execute();
+
+        GitUser committer = DtoFactory.getInstance().createDto(GitUser.class).withName("n").withEmail("e@gs.com");
+        defaultGit.createTagCreateCommand().setName("first-tag").setCommitter(committer).execute();
+        defaultGit.createTagCreateCommand().setName("first-tag-other").setCommitter(committer).execute();
+        defaultGit.createTagCreateCommand().setName("second-tag").setCommitter(committer).execute();
     }
 
     @Test

@@ -22,6 +22,7 @@ import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.debug.DebuggerManager;
 import org.eclipse.che.ide.ext.java.jdi.client.actions.DebugAction;
+import org.eclipse.che.ide.ext.java.jdi.client.actions.RemoteDebugAction;
 import org.eclipse.che.ide.ext.java.jdi.client.debug.DebuggerPresenter;
 import org.eclipse.che.ide.ext.java.jdi.client.fqn.FqnResolverFactory;
 import org.eclipse.che.ide.ext.java.jdi.client.fqn.JavaFqnResolver;
@@ -29,8 +30,6 @@ import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
 
 import static org.eclipse.che.ide.MimeType.TEXT_X_JAVA;
 import static org.eclipse.che.ide.MimeType.TEXT_X_JAVA_SOURCE;
-import static org.eclipse.che.ide.api.action.IdeActions.GROUP_BUILD_TOOLBAR;
-import static org.eclipse.che.ide.api.action.IdeActions.GROUP_MAIN_TOOLBAR;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_RIGHT_TOOLBAR;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_RUN;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_RUN_CONTEXT_MENU;
@@ -52,9 +51,12 @@ public class JavaRuntimeExtension {
     /** Channel for the messages containing message which informs about debugger is disconnected. */
     public static final String DISCONNECT_CHANNEL = "debugger:disconnected:";
 
+    private static final String REMOTE_DEBUG_ID = "remoteDebug";
+
     @Inject
     public JavaRuntimeExtension(ActionManager actionManager,
                                 DebugAction debugAction,
+                                RemoteDebugAction remoteDebugAction,
                                 DebuggerManager debuggerManager,
                                 DebuggerPresenter debuggerPresenter,
                                 FqnResolverFactory resolverFactory,
@@ -62,6 +64,7 @@ public class JavaRuntimeExtension {
                                 JavaRuntimeLocalizationConstant localizationConstant) {
         // register actions
         actionManager.registerAction(localizationConstant.debugAppActionId(), debugAction);
+        actionManager.registerAction(REMOTE_DEBUG_ID, remoteDebugAction);
 
         // add actions in main toolbar
         DefaultActionGroup runToolbarGroup = (DefaultActionGroup)actionManager.getAction(GROUP_RUN_TOOLBAR);
@@ -75,6 +78,7 @@ public class JavaRuntimeExtension {
         // add actions in main menu
         DefaultActionGroup runMenuActionGroup = (DefaultActionGroup)actionManager.getAction(GROUP_RUN);
         runMenuActionGroup.add(debugAction, new Constraints(Anchor.BEFORE, RUN_WITH.getId()));
+        runMenuActionGroup.add(remoteDebugAction, new Constraints(Anchor.AFTER, RUN_WITH.getId()));
 
         // add actions in context menu
         DefaultActionGroup runContextGroup = (DefaultActionGroup)actionManager.getAction(GROUP_RUN_CONTEXT_MENU);

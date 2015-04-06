@@ -174,9 +174,7 @@ public class StopActionTest {
                                  appContext,
                                  callbackBuilderProvider,
                                  runnerUtil,
-                                 actionFactory,
-                                 presenter,
-                                 runner);
+                                 actionFactory);
     }
 
     @Test
@@ -249,7 +247,8 @@ public class StopActionTest {
         assertThat(notification.getMessage(), is(MESSAGE));
         assertThat(notification.getType(), is(Notification.Type.INFO));
 
-        verify(presenter).update(runner);
+        //because in first we set status after click, then after request
+        verify(presenter, times(2)).update(runner);
 
         verify(service).stop(stopLink, callback);
         verify(eventBus).fireEvent(Matchers.<RunnerApplicationStatusEvent>any());
@@ -283,7 +282,8 @@ public class StopActionTest {
         assertThat(notification.getMessage(), is(MESSAGE));
         assertThat(notification.getType(), is(Notification.Type.INFO));
 
-        verify(presenter).update(runner);
+        //because in first we set status after click, then after request
+        verify(presenter, times(2)).update(runner);
 
         verify(service).stop(stopLink, callback);
         verify(eventBus).fireEvent(Matchers.<RunnerApplicationStatusEvent>any());
@@ -318,7 +318,8 @@ public class StopActionTest {
         //because type of message ERROR
         assertThat(notification.getType(), is(Notification.Type.ERROR));
 
-        verify(presenter).update(runner);
+        //because in first we set status after click, then after request
+        verify(presenter, times(2)).update(runner);
 
         verify(service).stop(stopLink, callback);
         verify(eventBus).fireEvent(Matchers.<RunnerApplicationStatusEvent>any());

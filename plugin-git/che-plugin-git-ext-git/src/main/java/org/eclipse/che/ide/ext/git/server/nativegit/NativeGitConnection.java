@@ -528,6 +528,7 @@ public class NativeGitConnection implements GitConnection {
     @Override
     public Tag tagCreate(TagCreateRequest request) throws GitException {
         return nativeGit.createTagCreateCommand().setName(request.getName())
+                        .setCommitter(getLocalCommitter())
                         .setCommit(request.getCommit())
                         .setMessage(request.getMessage())
                         .setForce(request.isForce())

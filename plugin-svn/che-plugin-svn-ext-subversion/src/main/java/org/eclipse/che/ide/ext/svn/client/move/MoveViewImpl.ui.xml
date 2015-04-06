@@ -22,6 +22,10 @@
             margin: 5px;
         }
 
+        .margin-bottom-5 {
+            margin-bottom: 5px;
+        }
+
         .block-header {
             overflow: hidden;
         }
@@ -68,7 +72,24 @@
         <g:Dock direction="NORTH">
             <g:DeckPanel animationEnabled="true" ui:field="deckPanel">
                 <!-- WC -> WC -->
-                <g:DockLayoutPanel unit="PX" width="320px" height="200px" ui:field="treeContainer"/>
+                <g:DockPanel width="320px">
+                    <g:Dock direction="NORTH">
+                        <g:DockLayoutPanel unit="PX" width="320px" height="200px" ui:field="treeContainer"
+                                           addStyleNames="{style.margin-bottom-5}"/>
+                    </g:Dock>
+                    <g:Dock direction="NORTH">
+                        <g:DockLayoutPanel unit="PX" width="320px" height="35px" ui:field="newNamePanel">
+                            <g:west size="120">
+                                <g:HorizontalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
+                                    <g:Label text="New name:" addStyleNames="{style.margin5}"/>
+                                </g:HorizontalPanel>
+                            </g:west>
+                            <g:center>
+                                <g:TextBox width="186px" height="20px" ui:field="newNameTextBox"/>
+                            </g:center>
+                        </g:DockLayoutPanel>
+                    </g:Dock>
+                </g:DockPanel>
 
                 <!-- URL -> URL -->
                 <g:DockPanel width="320px">
