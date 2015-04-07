@@ -190,3 +190,13 @@
     opacity: 0;
     cursor: default !important;
 }
+
+.defaultRunnerStub {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.hideElement {
+    opacity: 0;
+    cursor: default !important;
+}
