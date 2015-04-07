@@ -1043,24 +1043,9 @@ public class PropertiesEnvironmentPanelTest {
     }
 
     @Test
-    public void switcherShouldNotBeChangedWhenScopeIsProject() throws Exception {
-        when(environment.getScope()).thenReturn(PROJECT);
+    public void switcherShouldNotBeChanged() throws Exception {
+        presenter.onSwitcherChanged(true);
 
-        presenter.onSwitcherChanged(false);
-
-        verify(templatesContainer, never()).setDefaultEnvironment(Matchers.<Environment>anyObject());
-    }
-
-    @Test
-    public void switcherShouldBeHiddenWhen() throws Exception {
-        when(environment.getScope()).thenReturn(PROJECT);
-        when(environment.getType()).thenReturn(TEXT);
-        when(currentProject.getRunner()).thenReturn(TEXT);
-        when(environment.getId()).thenReturn(TEXT);
-
-        presenter.update(environment);
-
-        verify(view).hideSwitcher();
-        verify(view).changeSwitcherState(true);
+        verify(templatesContainer).setDefaultEnvironment(environment);
     }
 }

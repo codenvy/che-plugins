@@ -60,7 +60,6 @@ import java.util.Map;
 
 import static org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl.ROOT_FOLDER;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
-import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
 
 /**
  * @author Andrey Plotnikov
@@ -495,9 +494,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
 
         Scope scope = environment.getScope();
 
-        boolean isProjectScope = PROJECT.equals(scope);
-
-        view.setEnableDeleteButton(isProjectScope);
+        view.setEnableDeleteButton(PROJECT.equals(scope));
 
         String environmentName = environment.getName();
 
@@ -515,18 +512,12 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         String defaultRunner = currentProject.getRunner();
 
         view.changeSwitcherState(environment.getId().equals(defaultRunner));
-
-        if (isProjectScope) {
-            view.hideSwitcher();
-        }
     }
 
     /** {@inheritDoc} */
     @Override
     public void onSwitcherChanged(boolean isOn) {
-        if (SYSTEM.equals(environment.getScope())) {
-            templatesContainer.setDefaultEnvironment(isOn ? environment : null);
-        }
+        templatesContainer.setDefaultEnvironment(isOn ? environment : null);
     }
 
     /** {@inheritDoc} */

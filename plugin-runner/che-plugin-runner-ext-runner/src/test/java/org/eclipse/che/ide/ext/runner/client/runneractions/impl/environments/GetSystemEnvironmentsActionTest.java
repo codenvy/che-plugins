@@ -219,7 +219,6 @@ public class GetSystemEnvironmentsActionTest {
         verify(environmentUtil, times(2)).getEnvironmentsByProjectType(tree, MESSAGE, SYSTEM);
         verify(templatesContainerProvider, times(2)).get();
         verify(chooseRunnerAction, times(2)).addSystemRunners(Matchers.<List<Environment>>anyObject());
-        verify(templatesContainer, times(2)).setDefaultEnvironment(null);
     }
 
     @Test

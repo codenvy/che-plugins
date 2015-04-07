@@ -140,8 +140,6 @@ public class GetSystemEnvironmentsAction extends AbstractRunnerAction {
                 container.setDefaultEnvironment(environment);
 
                 break;
-            } else {
-                container.setDefaultEnvironment(null);
             }
         }
     }

@@ -38,6 +38,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
@@ -100,6 +101,8 @@ public class GetProjectEnvironmentsActionTest {
     private CurrentProject                              currentProject;
     @Mock
     private ProjectDescriptor                           descriptor;
+    @Mock
+    private Environment                                 environment;
 
     //captors
     @Captor
@@ -124,9 +127,12 @@ public class GetProjectEnvironmentsActionTest {
         when(templatesContainerProvider.get()).thenReturn(templatesContainer);
         //preparing callbacks for server
         when(appContext.getCurrentProject()).thenReturn(project);
+        when(project.getRunner()).thenReturn(SOME_STRING);
         when(callbackBuilderProvider.get()).thenReturn(asyncCallbackBuilder);
         when(asyncCallbackBuilder.unmarshaller(RunnerEnvironmentTree.class)).thenReturn(asyncCallbackBuilder);
         when(asyncCallbackBuilder.failure(any(FailureCallback.class))).thenReturn(asyncCallbackBuilder);
+        when(environmentUtil.getEnvironmentsByProjectType(result, SOME_STRING, PROJECT)).thenReturn(Arrays.asList(environment));
+        when(environment.getId()).thenReturn(SOME_STRING);
         when(asyncCallbackBuilder.success(Matchers.<SuccessCallback<RunnerEnvironmentTree>>anyObject()))
                 .thenReturn(asyncCallbackBuilder);
         when(asyncCallbackBuilder.build()).thenReturn(asyncRequestCallback);
@@ -197,9 +203,9 @@ public class GetProjectEnvironmentsActionTest {
 
     @Test
     public void shouldPerformSuccessWithToRunnerEnvironment() {
-        when(environmentUtil.getEnvironmentsByProjectType(result, SOME_STRING, PROJECT)).thenReturn(environments);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(currentProject.getProjectDescription()).thenReturn(descriptor);
+        when(currentProject.getRunner()).thenReturn(SOME_STRING);
         when(descriptor.getPath()).thenReturn(SOME_STRING);
         when(descriptor.getType()).thenReturn(SOME_STRING);
 
@@ -216,6 +222,7 @@ public class GetProjectEnvironmentsActionTest {
         verify(environmentUtil).getEnvironmentsByProjectType(result, SOME_STRING, PROJECT);
 
         verify(projectService).getRunnerEnvironments(SOME_STRING, asyncRequestCallback);
-        verify(chooseRunnerAction).addProjectRunners(environments);
+        verify(chooseRunnerAction).addProjectRunners(Matchers.<List<Environment>>anyObject());
+        verify(templatesContainer).setDefaultEnvironment(environment);
     }
 }

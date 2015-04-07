@@ -452,6 +452,8 @@ public class TemplatesPresenterTest {
 
     @Test
     public void defaultRunnerShouldNotBeSetWhenEnvironmentIsNull() throws Exception {
+        reset(view);
+
         presenter.setDefaultEnvironment(null);
 
         verify(view).setDefaultProjectWidget(null);
@@ -478,7 +480,6 @@ public class TemplatesPresenterTest {
 
         presenter.setDefaultEnvironment(environment);
 
-        verify(view, never()).setDefaultProjectWidget(null);
         verify(descriptor, never()).getRunners();
         verify(runnersDescriptor, never()).setDefault(SOME_TEXT);
 
@@ -494,8 +495,6 @@ public class TemplatesPresenterTest {
         when(environment.getId()).thenReturn("other");
 
         presenter.setDefaultEnvironment(environment);
-
-        verify(view, never()).setDefaultProjectWidget(null);
 
         verify(currentProject).getRunner();
         verify(environmentWidget).update(environment);

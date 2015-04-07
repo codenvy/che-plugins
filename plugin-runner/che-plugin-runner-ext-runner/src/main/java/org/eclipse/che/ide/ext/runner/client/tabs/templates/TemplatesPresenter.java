@@ -109,6 +109,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         this.view = view;
         this.view.setDelegate(this);
         this.view.setFilterWidget(filter);
+        this.view.setDefaultProjectWidget(null);
 
         this.defaultEnvWidget = defaultEnvWidget;
 

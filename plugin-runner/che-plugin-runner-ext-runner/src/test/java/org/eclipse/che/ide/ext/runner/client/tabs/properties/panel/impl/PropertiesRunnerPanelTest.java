@@ -145,7 +145,6 @@ public class PropertiesRunnerPanelTest {
         verify(view).setVisibleSaveButton(false);
         verify(view).setVisibleDeleteButton(false);
         verify(view).setVisibleCancelButton(false);
-        verify(view).hideSwitcher();
     }
 
     @Test
@@ -169,6 +168,5 @@ public class PropertiesRunnerPanelTest {
 
         verify(runner).getRAM();
         verify(view).selectMemory(any(RAM.class));
-        verify(view).hideSwitcher();
     }
 }
