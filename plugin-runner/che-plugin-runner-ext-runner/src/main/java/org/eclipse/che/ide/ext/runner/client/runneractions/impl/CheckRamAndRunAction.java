@@ -129,6 +129,8 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
 
         if (!isSufficientMemory(totalMemory, usedMemory, requiredMemory)) {
             runner.setStatus(Runner.Status.FAILED);
+
+            managerPresenter.update(runner);
             return;
         }
 
