@@ -150,6 +150,7 @@ public class EnvironmentImpl implements Environment {
         return type;
     }
 
+    /** {@inheritDoc} */
     @Nonnull
     @Override
     public Map<String, String> getOptions() {
@@ -160,5 +161,13 @@ public class EnvironmentImpl implements Environment {
     @Override
     public int compareTo(@Nonnull Environment otherEnvironment) {
         return name.toLowerCase().compareTo(otherEnvironment.getName().toLowerCase());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Environment)) return false;
+        Environment other = (Environment)obj;
+        return (this.id.equals(other.getId()));
     }
 }

@@ -10,18 +10,20 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.actions;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
+import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.CustomComponentAction;
+import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.action.Presentation;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.client.inject.factories.DropDownListFactory;
+import org.eclipse.che.ide.dropdown.ListHeaderWidget;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
@@ -31,6 +33,8 @@ import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.eclipse.che.ide.ext.runner.client.RunnerExtension.RUNNER_LIST;
+
 /**
  * Action which allows user select runner from all environments.
  *
@@ -39,32 +43,42 @@ import java.util.List;
  */
 @Singleton
 public class ChooseRunnerAction extends AbstractRunnerActions implements CustomComponentAction {
-    private final ListBox    environments;
-    private final AppContext appContext;
+    private static final String PROJECT_ENVIRONMENT = "projectEnvironment";
+    private static final String SYSTEM_ENVIRONMENT  = "systemEnvironment";
 
-    private List<Environment> systemRunners;
-    private List<Environment> projectRunners;
+    private final AppContext          appContext;
+    private final ListHeaderWidget    listHeaderWidget;
+    private final DropDownListFactory configRunnerFactory;
+    private final RunnerResources     resources;
+    private final ActionManager       actionManager;
+
+    private List<Environment>  systemRunners;
+    private List<Environment>  projectRunners;
+    private DefaultActionGroup projectActions;
+    private DefaultActionGroup systemActions;
 
     @Inject
     public ChooseRunnerAction(RunnerResources resources,
                               RunnerLocalizationConstant locale,
-                              AppContext appContext) {
+                              AppContext appContext,
+                              ActionManager actionManager,
+                              DropDownListFactory dropDownListFactory) {
         super(appContext, locale.actionChooseRunner(), locale.actionChooseRunner(), null);
 
         this.appContext = appContext;
+        this.listHeaderWidget = dropDownListFactory.createList(RUNNER_LIST);
+        this.resources = resources;
+        this.actionManager = actionManager;
+        this.configRunnerFactory = dropDownListFactory;
 
         systemRunners = new LinkedList<>();
         projectRunners = new LinkedList<>();
 
-        environments = new ListBox();
-        environments.addStyleName(resources.runnerCss().runnersAction());
-        environments.addStyleName(resources.runnerCss().runnerFontStyle());
-        environments.addChangeHandler(new ChangeHandler() {
-            @Override
-            public void onChange(ChangeEvent event) {
-                selectEnvironment();
-            }
-        });
+        projectActions = new DefaultActionGroup(PROJECT_ENVIRONMENT, false, actionManager);
+        systemActions = new DefaultActionGroup(SYSTEM_ENVIRONMENT, false, actionManager);
+
+        actionManager.registerAction(PROJECT_ENVIRONMENT, projectActions);
+        actionManager.registerAction(SYSTEM_ENVIRONMENT, systemActions);
     }
 
     /** {@inheritDoc} */
@@ -76,7 +90,7 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
     /** {@inheritDoc} */
     @Override
     public Widget createCustomComponent(Presentation presentation) {
-        return environments;
+        return (Widget)listHeaderWidget;
     }
 
     /**
@@ -86,17 +100,29 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
      *         list of system environments
      */
     public void addSystemRunners(@Nonnull List<Environment> systemEnvironments) {
+        DefaultActionGroup runnersList = (DefaultActionGroup)actionManager.getAction(RUNNER_LIST);
+
         systemRunners.clear();
-        environments.clear();
+
+        clearRunnerActions(runnersList);
+        projectActions.removeAll();
+        systemActions.removeAll();
 
         for (Environment environment : projectRunners) {
-            environments.addItem(environment.getName());
+            String name = environment.getName();
+            projectActions.add(configRunnerFactory.createElement(name, resources.scopeProject(), listHeaderWidget));
         }
+
+        runnersList.addSeparator();
 
         for (Environment environment : systemEnvironments) {
             String name = environment.getName();
-            environments.addItem(name);
+            systemActions.add(configRunnerFactory.createElement(name, resources.scopeSystem(), listHeaderWidget));
         }
+
+        runnersList.addAll(projectActions);
+        runnersList.addSeparator();
+        runnersList.addAll(systemActions);
 
         systemRunners.addAll(systemEnvironments);
 
@@ -110,31 +136,52 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
      *         list of system environments
      */
     public void addProjectRunners(@Nonnull List<Environment> projectEnvironments) {
+        DefaultActionGroup runnersList = (DefaultActionGroup)actionManager.getAction(RUNNER_LIST);
+
         projectRunners.clear();
-        environments.clear();
+
+        clearRunnerActions(runnersList);
+        projectActions.removeAll();
+        systemActions.removeAll();
 
         for (Environment environment : projectEnvironments) {
             String name = environment.getName();
-            environments.addItem(name);
+            projectActions.add(configRunnerFactory.createElement(name, resources.scopeProject(), listHeaderWidget));
         }
 
+        runnersList.addSeparator();
+
         for (Environment environment : systemRunners) {
-            environments.addItem(environment.getName());
+            String name = environment.getName();
+            systemActions.add(configRunnerFactory.createElement(name, resources.scopeSystem(), listHeaderWidget));
         }
+
+        runnersList.addAll(projectActions);
+        runnersList.addSeparator();
+        runnersList.addAll(systemActions);
 
         projectRunners.addAll(projectEnvironments);
 
         selectDefaultRunner();
     }
 
+    private void clearRunnerActions(@Nonnull DefaultActionGroup runnersList) {
+        for (Action a : projectActions.getChildActionsOrStubs()) {
+            runnersList.remove(a);
+        }
+        for (Action a : systemActions.getChildActionsOrStubs()) {
+            runnersList.remove(a);
+        }
+    }
+
     /** @return selected environment. */
     @Nullable
     public Environment selectEnvironment() {
         //Method returns null if list of environments is empty. And app will be run with default runner.
-        if (environments.getItemCount() < 1) {
+        if (systemRunners.isEmpty() && projectRunners.isEmpty()) {
             return null;
         }
-        String selectedEnvironmentName = environments.getValue(environments.getSelectedIndex());
+        String selectedEnvironmentName = listHeaderWidget.getSelectedElementName();
 
         for (Environment environment : projectRunners) {
             if (environment.getName().equals(selectedEnvironmentName)) {
@@ -158,9 +205,17 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
             return;
         }
 
-        for (int index = 0; index < environments.getItemCount(); index++) {
-            if (runnerName.equals(environments.getValue(index))) {
-                environments.setItemSelected(index, true);
+        for (Environment e : systemRunners) {
+            if (runnerName.equals(e.getName())) {
+                listHeaderWidget.selectElement(resources.scopeSystem(), e.getName());
+                return;
+            }
+        }
+
+        for (Environment e : projectRunners) {
+            if (runnerName.equals(e.getName())) {
+                listHeaderWidget.selectElement(resources.scopeProject(), e.getName());
+
                 return;
             }
         }

@@ -20,7 +20,8 @@ import javax.annotation.Nonnull;
 public enum ActionId {
     RUN_APP_ID("runApp"),
     CHOOSE_RUNNER_ID("chooseRunner"),
-    RUN_WITH("runWith");
+    RUN_WITH("runWith"),
+    CREATE_CUSTOM_RUNNER("createCustomRunner");
 
     private final String id;
 

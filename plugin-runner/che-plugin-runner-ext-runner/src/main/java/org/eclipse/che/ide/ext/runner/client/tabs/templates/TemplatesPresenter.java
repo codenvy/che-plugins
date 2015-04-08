@@ -1,13 +1,15 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2012-2015 Codenvy, S.A.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * <p/>
  * Contributors:
- *   Codenvy, S.A. - initial API and implementation
- *******************************************************************************/
+ * Codenvy, S.A. - initial API and implementation
+ * *****************************************************************************
+ */
 package org.eclipse.che.ide.ext.runner.client.tabs.templates;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -82,6 +84,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     private RunnerEnvironmentTree tree;
     private Environment           defaultEnvironment;
     private Environment           selectedEnvironment;
+    private List<Environment>     previousProjectEnvironments;
 
     @Inject
     public TemplatesPresenter(TemplatesView view,
@@ -123,6 +126,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
 
         this.projectEnvironments = new ArrayList<>();
         this.systemEnvironments = new ArrayList<>();
+        this.previousProjectEnvironments = new ArrayList<>();
 
         this.environmentMap = new EnumMap<>(Scope.class);
         this.environmentMap.put(PROJECT, projectEnvironments);
@@ -175,10 +179,28 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         environmentMap.put(scope, sourceList);
         view.addEnvironment(environmentMap);
 
-        selectPreviousOrFirstEnvironment();
+        if (PROJECT.equals(scope) && previousProjectEnvironments.size() < sourceList.size()) {
+            selectNewProjectEnvironment(sourceList);
+        } else {
+            selectPreviousOrFirstEnvironment();
+        }
+
+        if (PROJECT.equals(scope)) {
+            previousProjectEnvironments.clear();
+            previousProjectEnvironments.addAll(sourceList);
+        }
 
         if (!(RUNNERS).equals(panelState.getState())) {
             changeEnableStateRunButton();
+        }
+    }
+
+    private void selectNewProjectEnvironment(@Nonnull List<Environment> currentProjectEnvironments) {
+        for (Environment environment : currentProjectEnvironments) {
+            if (!previousProjectEnvironments.contains(environment)) {
+                select(environment);
+                selectionManager.setEnvironment(environment);
+            }
         }
     }
 

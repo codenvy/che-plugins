@@ -84,7 +84,7 @@ public class TemplatesViewImpl extends Composite implements TemplatesView {
     private final DefaultRunnerInfo                   defaultRunnerInfo;
     private final PopupPanel                          popupPanel;
 
-    private ActionDelegate delegate;
+    private ActionDelegate    delegate;
 
     @Inject
     public TemplatesViewImpl(RunnerResources resources,
