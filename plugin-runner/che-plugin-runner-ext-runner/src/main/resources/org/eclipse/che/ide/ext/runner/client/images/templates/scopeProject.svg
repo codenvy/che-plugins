@@ -4,7 +4,7 @@
     <defs></defs>
     <g id="Page-1" stroke-width="1">
         <g  transform="translate(2.000000, -3.000000)">
-            <polygon fill="none" stroke-width="7" transform="translate(91.500000, 91.500000) rotate(-330.000000) translate(-91.500000, -91.500000) " points="91.5 25 149.090689 58.25 149.090689 124.75 91.5 158 33.9093106 124.75 33.9093106 58.25 "></polygon>
+            <polygon fill="none" stroke-width="7" stroke="#dbdbdb" transform="translate(91.500000, 91.500000) rotate(-330.000000) translate(-91.500000, -91.500000) " points="91.5 25 149.090689 58.25 149.090689 124.75 91.5 158 33.9093106 124.75 33.9093106 58.25 "></polygon>
             <text font-family="Arial" font-size="86" font-weight="normal">
                 <tspan x="63" y="120">P</tspan>
             </text>
