@@ -12,31 +12,49 @@ package org.eclipse.che.ide.ext.runner.client.actions;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.api.action.Action;
+import org.eclipse.che.ide.api.action.ActionGroup;
 import org.eclipse.che.ide.api.action.ActionManager;
+import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.client.inject.factories.DropDownListFactory;
+import org.eclipse.che.ide.dropdown.ListHeaderWidget;
+import org.eclipse.che.ide.dropdown.SimpleListElementAction;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.vectomatic.dom.svg.ui.SVGResource;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static org.eclipse.che.ide.ext.runner.client.RunnerExtension.RUNNER_LIST;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Alexander Andrienko
  * @author Dmitry Shnurenko
+ * @author Valeriy Svydenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class ChooseRunnerActionTest {
 
-    private static final String TEXT        = "some test/test/runner";
-    private static final String SELECTED_ID = "should select this runner";
+    private static final String TEXT = "some test/test/runner";
     private List<Environment> projectEnvList;
     private List<Environment> systemEnvList;
 
@@ -57,147 +75,174 @@ public class ChooseRunnerActionTest {
     @Mock
     private Environment               projectEnv1;
     @Mock
-    private Environment               projectEnv2;
-    @Mock
     private Environment               systemEnv1;
     @Mock
-    private Environment               systemEnv2;
+    private SimpleListElementAction   systemAction;
+    @Mock
+    private SimpleListElementAction   projectAction;
+    @Mock
+    private DefaultActionGroup        runnersList;
+    @Mock
+    private ListHeaderWidget          listHeaderWidget;
+    @Mock
+    private SVGResource               svgResource;
 
     private ChooseRunnerAction action;
 
     @Before
     public void setUp() {
         when(locale.actionChooseRunner()).thenReturn(TEXT);
-        when(resources.runnerCss()).thenReturn(css);
-        when(css.fontStyle()).thenReturn(TEXT);
-        when(css.runnersAction()).thenReturn(TEXT);
+        when(listFactory.createList(RUNNER_LIST)).thenReturn(listHeaderWidget);
 
         action = new ChooseRunnerAction(resources, locale, appContext, actionManager, listFactory);
 
-        projectEnvList = Arrays.asList(projectEnv1, projectEnv2);
-        systemEnvList = Arrays.asList(systemEnv1, systemEnv2);
+        projectEnvList = Collections.singletonList(projectEnv1);
+        systemEnvList = Collections.singletonList(systemEnv1);
 
+        when(resources.scopeSystem()).thenReturn(svgResource);
+        when(resources.scopeProject()).thenReturn(svgResource);
+        when(systemEnv1.getName()).thenReturn(TEXT);
+        when(systemEnv1.getId()).thenReturn(TEXT);
         when(projectEnv1.getName()).thenReturn(TEXT);
-        when(projectEnv2.getName()).thenReturn(TEXT);
-        when(projectEnv1.getName()).thenReturn(TEXT);
-        when(projectEnv2.getName()).thenReturn(SELECTED_ID);
-    }
-
-    /*@Test
-    public void prepareActionShouldBePerformed() throws Exception {
-        verify(locale, times(2)).actionChooseRunner();
-        verify(resources, times(2)).runnerCss();
-        verify(css).runnersAction();
-        verify(css).runnerFontStyle();
-    }
-
-    @Test
-    public void projectEnvironmentsShouldBeAdded() {
-        //current project not null
-        CurrentProject currentProject = mock(CurrentProject.class);
-        when(appContext.getCurrentProject()).thenReturn(currentProject);
-        when(currentProject.getRunner()).thenReturn(TEXT);
         when(projectEnv1.getId()).thenReturn(TEXT);
-
-        action.addProjectRunners(projectEnvList);
-
-        verify(appContext).getCurrentProject();
-
-        verify(projectEnv1).getId();
-        verify(projectEnv1, times(2)).getName();
-        verify(projectEnv2).getName();
     }
 
     @Test
-    public void systemEnvironmentsShouldBeAdded() {
-        when(appContext.getCurrentProject()).thenReturn(null);
-
-        action.addSystemRunners(systemEnvList);
-
-        verify(appContext).getCurrentProject();
-
-        verify(systemEnv1).getName();
-        verify(systemEnv2).getName();
+    public void actionShouldBePerformed() throws Exception {
+        verify(locale, times(2)).actionChooseRunner();
+        verify(listFactory).createList(RUNNER_LIST);
+        verify(actionManager, times(2)).registerAction(anyString(), Matchers.<Action>any());
     }
 
     @Test
-    public void systemEnvironmentsShouldBeAddedWhenProjectRunnerAreAlreadyAdded() {
-        when(appContext.getCurrentProject()).thenReturn(null);
-        action.addProjectRunners(projectEnvList);
-
-        action.addSystemRunners(systemEnvList);
-
-        verify(appContext, times(2)).getCurrentProject();
-
-        verify(projectEnv1, times(2)).getName();
-        verify(projectEnv2, times(2)).getName();
-        verify(systemEnv1).getName();
-        verify(systemEnv2).getName();
-    }
-
-    @Test
-    public void onlyProjectEnvironmentsShouldBeAdded() {
-        when(appContext.getCurrentProject()).thenReturn(null);
-
-        action.addProjectRunners(projectEnvList);
-
-        verify(appContext).getCurrentProject();
-
-        verify(projectEnv1).getName();
-        verify(projectEnv2).getName();
-    }
-
-    @Test
-    public void projectEnvironmentsShouldBeAddedWhenSystemRunnerAreAlreadyAdded() {
-        when(appContext.getCurrentProject()).thenReturn(null);
-        action.addSystemRunners(systemEnvList);
-
-        action.addProjectRunners(projectEnvList);
-
-        verify(appContext, times(2)).getCurrentProject();
-
-        verify(systemEnv1, times(2)).getName();
-        verify(systemEnv2, times(2)).getName();
-        verify(projectEnv1).getName();
-        verify(projectEnv2).getName();
-    }
-
-    @Test
-    public void defaultRunnerShouldBeSelected() throws Exception {
+    public void systemRunnersShouldBeAdded() throws Exception {
         CurrentProject currentProject = mock(CurrentProject.class);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
         when(currentProject.getRunner()).thenReturn(TEXT);
-        when(systemEnv1.getId()).thenReturn(TEXT + TEXT);
-        when(systemEnv2.getId()).thenReturn(TEXT);
-        when(systemEnv2.getName()).thenReturn(TEXT);
+        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(systemAction);
 
         action.addSystemRunners(systemEnvList);
 
+        verify(systemEnv1, times(4)).getName();
+        verify(resources, times(2)).scopeSystem();
+        verify(listFactory).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(runnersList, times(2)).addSeparator();
+        verify(runnersList, times(2)).addAll(Matchers.<ActionGroup>any());
+        verify(listHeaderWidget).selectElement(resources.scopeProject(), TEXT);
+
         action.addProjectRunners(projectEnvList);
 
-        verify(appContext, times(2)).getCurrentProject();
-
-        verify(systemEnv1, times(2)).getId();
-        verify(systemEnv2, times(2)).getId();
-        verify(systemEnv2, times(4)).getName();
+        verify(listFactory, times(3)).createElement(TEXT, svgResource, listHeaderWidget);
     }
 
     @Test
-    public void defaultRunnerShouldBeNull() throws Exception {
+    public void projectRunnersShouldBeAdded() throws Exception {
         CurrentProject currentProject = mock(CurrentProject.class);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
         when(currentProject.getRunner()).thenReturn(TEXT);
-        when(projectEnv1.getId()).thenReturn(TEXT + TEXT);
-        when(projectEnv2.getId()).thenReturn(TEXT + TEXT);
+        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(projectAction);
 
         action.addProjectRunners(projectEnvList);
 
-        verify(appContext).getCurrentProject();
-        verify(projectEnv1).getId();
-        verify(projectEnv2).getId();
-    }*/
+        verify(projectEnv1, times(4)).getName();
+        verify(resources, times(2)).scopeProject();
+        verify(listFactory).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(runnersList, times(2)).addSeparator();
+        verify(runnersList, times(2)).addAll(Matchers.<ActionGroup>any());
+        verify(listHeaderWidget).selectElement(resources.scopeProject(), TEXT);
+
+        action.addSystemRunners(systemEnvList);
+
+        verify(listFactory, times(3)).createElement(TEXT, svgResource, listHeaderWidget);
+    }
 
     @Test
-    public void testName() throws Exception {
+    public void defaultRunnerShouldNotBeSelectedIfCurrentProjectIsNull() throws Exception {
+        when(appContext.getCurrentProject()).thenReturn(null);
+
+        action.selectDefaultRunner();
+
+        verify(listHeaderWidget, never()).selectElement((SVGResource)any(), anyString());
+    }
+
+    @Test
+    public void defaultRunnerShouldNotBeSelectedIfProjectDoesNotHaveAnyEnvironments() throws Exception {
+        CurrentProject currentProject = mock(CurrentProject.class);
+        when(appContext.getCurrentProject()).thenReturn(currentProject);
+
+        action.selectDefaultRunner();
+
+        verify(listHeaderWidget, never()).selectElement((SVGResource)any(), anyString());
+    }
+
+    @Test
+    public void EnvironmentShouldNotBeSelectedIfProjectDoesNotHaveAnyEnvironment() throws Exception {
+        action.selectEnvironment();
+
+        verify(listHeaderWidget, never()).getSelectedElementName();
+    }
+
+    @Test
+    public void selectedEnvironmentShouldBeProjectEnvironment() throws Exception {
+        CurrentProject currentProject = mock(CurrentProject.class);
+        when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
+        when(currentProject.getRunner()).thenReturn(TEXT);
+        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(projectAction);
+
+        action.addProjectRunners(projectEnvList);
+
+        verify(projectEnv1, times(4)).getName();
+        verify(resources, times(2)).scopeProject();
+        verify(listFactory).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(runnersList, times(2)).addSeparator();
+        verify(runnersList, times(2)).addAll(Matchers.<ActionGroup>any());
+        verify(listHeaderWidget).selectElement(resources.scopeProject(), TEXT);
+
+        when(listHeaderWidget.getSelectedElementName()).thenReturn(TEXT);
+
+        assertThat(action.selectEnvironment(), is(projectEnv1));
+
+        verify(listHeaderWidget).getSelectedElementName();
+    }
+
+    @Test
+    public void selectedEnvironmentShouldBeSystemEnvironment() throws Exception {
+        CurrentProject currentProject = mock(CurrentProject.class);
+        when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
+        when(currentProject.getRunner()).thenReturn(TEXT);
+        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(projectAction);
+
+        action.addSystemRunners(systemEnvList);
+
+        verify(systemEnv1, times(4)).getName();
+        verify(resources, times(2)).scopeSystem();
+        verify(listFactory).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(runnersList, times(2)).addSeparator();
+        verify(runnersList, times(2)).addAll(Matchers.<ActionGroup>any());
+        verify(listHeaderWidget).selectElement(resources.scopeProject(), TEXT);
+
+        when(listHeaderWidget.getSelectedElementName()).thenReturn(TEXT);
+
+        assertThat(action.selectEnvironment(), is(systemEnv1));
+
+        verify(listHeaderWidget).getSelectedElementName();
+    }
+
+    @Test
+    public void selectedEnvironmentIsNullIfSelectedNameDoesNotExist() throws Exception {
+        CurrentProject currentProject = mock(CurrentProject.class);
+        when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
+        when(currentProject.getRunner()).thenReturn(TEXT);
+        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(projectAction);
+
+        action.addSystemRunners(systemEnvList);
+        action.addProjectRunners(projectEnvList);
+
+        assertThat(action.selectEnvironment(), nullValue());
     }
 }

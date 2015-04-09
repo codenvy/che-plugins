@@ -109,15 +109,13 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
         systemActions.removeAll();
 
         for (Environment environment : projectRunners) {
-            String name = environment.getName();
-            projectActions.add(configRunnerFactory.createElement(name, resources.scopeProject(), listHeaderWidget));
+            projectActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeProject(), listHeaderWidget));
         }
 
         runnersList.addSeparator();
 
         for (Environment environment : systemEnvironments) {
-            String name = environment.getName();
-            systemActions.add(configRunnerFactory.createElement(name, resources.scopeSystem(), listHeaderWidget));
+            systemActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeSystem(), listHeaderWidget));
         }
 
         runnersList.addAll(projectActions);
@@ -145,15 +143,13 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
         systemActions.removeAll();
 
         for (Environment environment : projectEnvironments) {
-            String name = environment.getName();
-            projectActions.add(configRunnerFactory.createElement(name, resources.scopeProject(), listHeaderWidget));
+            projectActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeProject(), listHeaderWidget));
         }
 
         runnersList.addSeparator();
 
         for (Environment environment : systemRunners) {
-            String name = environment.getName();
-            systemActions.add(configRunnerFactory.createElement(name, resources.scopeSystem(), listHeaderWidget));
+            systemActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeSystem(), listHeaderWidget));
         }
 
         runnersList.addAll(projectActions);
