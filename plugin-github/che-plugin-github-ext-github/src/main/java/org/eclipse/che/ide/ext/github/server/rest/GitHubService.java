@@ -169,11 +169,9 @@ public class GitHubService {
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequest createPullRequest(@PathParam("user") String user, @PathParam("repository") String repository, GitHubPullRequestCreationInput input)
             throws IOException {
-        GitHubPullRequest pullRequest =
-                gitHubDTOFactory.createPullRequest(gitHubFactory.connect().getUser(user).getRepository(repository).createPullRequest(
-                        input.getTitle(), input.getHead(), input.getBase(), input.getBody()));
-
-        return pullRequest;
+        return gitHubDTOFactory.createPullRequest(gitHubFactory.connect().getUser(user).getRepository(repository)
+                                                               .createPullRequest(input.getTitle(), input.getHead(), input.getBase(),
+                                                                                  input.getBody()));
     }
 
     @Path("list/available")
