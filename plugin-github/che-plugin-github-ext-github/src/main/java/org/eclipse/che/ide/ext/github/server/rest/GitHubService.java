@@ -224,6 +224,9 @@ public class GitHubService {
         return gitHubDTOFactory.createCollaborators(gitHubFactory.connect().getUser(user).getRepository(repository).getCollaborators());
     }
 
+    /**
+     * @deprecated use necessary method from rest service
+     */
     @GET
     @Path("token/{userid}")
     @Produces(MediaType.TEXT_PLAIN)
