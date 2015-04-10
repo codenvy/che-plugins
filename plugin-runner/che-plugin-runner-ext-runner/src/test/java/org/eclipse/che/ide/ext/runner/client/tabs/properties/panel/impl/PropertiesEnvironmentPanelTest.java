@@ -26,7 +26,6 @@ import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.editor.EditorProvider;
-import org.eclipse.che.ide.api.editor.EditorRegistry;
 import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -114,8 +113,6 @@ public class PropertiesEnvironmentPanelTest {
     private PropertiesPanelView                        view;
     @Mock
     private DtoFactory                                 dtoFactory;
-    @Mock
-    private EditorRegistry                             editorRegistry;
     @Mock
     private FileTypeRegistry                           fileTypeRegistry;
     @Mock
@@ -270,7 +267,6 @@ public class PropertiesEnvironmentPanelTest {
         when(asyncDescriptorCallbackBuilder.failure(any(FailureCallback.class))).thenReturn(asyncDescriptorCallbackBuilder);
 
         when(asyncCallbackBuilder.build()).thenReturn(asyncRequestCallback);
-        when(editorRegistry.getEditor(fileType)).thenReturn(editorProvider);
         when(editorProvider.getEditor()).thenReturn(editor);
         when(editor.getEditorInput()).thenReturn(editorInput);
         when(editorInput.getFile()).thenReturn(file);
@@ -292,7 +288,7 @@ public class PropertiesEnvironmentPanelTest {
 
         presenter = new PropertiesEnvironmentPanel(view,
                                                    dtoFactory,
-                                                   editorRegistry,
+                                                   editorProvider,
                                                    fileTypeRegistry,
                                                    dockerFileFactory,
                                                    projectService,
@@ -802,7 +798,7 @@ public class PropertiesEnvironmentPanelTest {
 
         presenter = new PropertiesEnvironmentPanel(view,
                                                    dtoFactory,
-                                                   editorRegistry,
+                                                   editorProvider,
                                                    fileTypeRegistry,
                                                    dockerFileFactory,
                                                    projectService,
@@ -851,8 +847,6 @@ public class PropertiesEnvironmentPanelTest {
         verify(environment, times(2)).getId();
 
         verify(environment, times(2)).getPath();
-        //we can't use mock for fileType that why we have null FileType
-        verify(editorRegistry, times(3)).getEditor(any(FileType.class));
         verify(editorProvider, times(3)).getEditor();
         verify(editor, times(3)).addPropertyListener(any(PropertyListener.class));
 
@@ -886,7 +880,6 @@ public class PropertiesEnvironmentPanelTest {
 
         verify(fileTypeRegistry).getFileTypeByFile(file);
         //we can't use mock for fileType that why we have null FileType
-        verify(editorRegistry).getEditor(fileType);
         verify(editorProvider).getEditor();
         verify(editor).addPropertyListener(any(PropertyListener.class));
 
@@ -903,7 +896,6 @@ public class PropertiesEnvironmentPanelTest {
         EditorPartPresenter editor2 = mock(TestEditor.class);
         when(editor2.getEditorInput()).thenReturn(editorInput);
         when(fileTypeRegistry.getFileTypeByFile(file)).thenReturn(fileType);
-        when(editorRegistry.getEditor(fileType)).thenReturn(editorProvider);
         when(editorProvider.getEditor()).thenReturn(editor2);
         when(((UndoableEditor)editor2).getUndoRedo()).thenReturn(handlesUndoRedo);
 
@@ -913,7 +905,7 @@ public class PropertiesEnvironmentPanelTest {
 
         presenter = new PropertiesEnvironmentPanel(view,
                                                    dtoFactory,
-                                                   editorRegistry,
+                                                   editorProvider,
                                                    fileTypeRegistry,
                                                    dockerFileFactory,
                                                    projectService,

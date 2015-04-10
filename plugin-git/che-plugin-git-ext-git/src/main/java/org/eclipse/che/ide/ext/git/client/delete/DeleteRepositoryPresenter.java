@@ -12,23 +12,21 @@ package org.eclipse.che.ide.ext.git.client.delete;
 
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.notification.Notification;
+import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
-import static org.eclipse.che.ide.api.notification.Notification.Type.INFO;
-
 /**
  * Delete repository command handler, performs deleting Git repository.
  *
- * @author <a href="mailto:zhulevaanna@gmail.com">Ann Zhuleva</a>
+ * @author Ann Zhuleva
  */
 @Singleton
 public class DeleteRepositoryPresenter {
@@ -68,15 +66,15 @@ public class DeleteRepositoryPresenter {
             protected void onSuccess(Void result) {
                 project.getRootProject().getAttributes().get("vcs.provider.name").clear();
 
-                Notification notification = new Notification(constant.deleteGitRepositorySuccess(), INFO);
-                notificationManager.showNotification(notification);
+                notificationManager.showInfo(constant.deleteGitRepositorySuccess());
+                //it's need for hide .git in project tree
+                eventBus.fireEvent(new RefreshProjectTreeEvent());
             }
 
             @Override
             protected void onFailure(Throwable exception) {
                 eventBus.fireEvent(new ExceptionThrownEvent(exception));
-                Notification notification = new Notification(exception.getMessage(), ERROR);
-                notificationManager.showNotification(notification);
+                notificationManager.showError(exception.getMessage());
             }
         });
     }

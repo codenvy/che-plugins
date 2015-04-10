@@ -15,42 +15,53 @@ import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.Collections;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Alexander Andrienko
+ * @author Florent Benoit
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class NameGeneratorTest {
 
+
+
+    /**
+     * First copy is named 'copy of'
+     */
     @Test
-    public void nameShouldBeGenerated() {
-        String expectedName = cutSecond(NameGenerator.PREFIX_NAME + NameGenerator.DATE_TIME_FORMAT.format(new Date()));
-        String actualName = cutSecond(NameGenerator.generate());
-
-        assertThat(actualName, is(expectedName));
+    public void generateFirstName() {
+        String generated = NameGenerator.generateCopy("hello", Collections.<String>emptyList());
+        String expectedName = "Copy of hello";
+        assertEquals(expectedName, generated);
     }
 
-    private String cutSecond(String name) {
-        return name.substring(0, 19) + name.substring(20, name.length());
+    /**
+     * Second copy is named 'copy2 of ...'
+     */
+    @Test
+    public void generateAlreadyExistsFirstName() {
+        String existsName = "Copy of hello";
+        String generated = NameGenerator.generateCopy("hello", Arrays.asList(existsName));
+        String expectedName = "Copy2 of hello";
+
+        assertEquals(expectedName, generated);
     }
 
-    @SuppressWarnings("unchecked")
-    @Test(expected = UnsupportedOperationException.class)
-    public void prepareActionShouldBePerformed() throws Throwable {
-        Constructor<NameGenerator> constructor= (Constructor<NameGenerator>) NameGenerator.class.getDeclaredConstructors()[0];
-        constructor.setAccessible(true);
-        try {
-            //creation instance of NameGenerator
-            constructor.newInstance();
-        } catch (InvocationTargetException exception) {
-            assertThat(exception.getCause().getMessage(), is("Creation instance for this class is unsupported operation"));
-            throw exception.getCause();
-        }
+    /**
+     * Third copy is named 'copy of ... rev3'
+     */
+    @Test
+    public void generateAlreadyExistsTwiceName() {
+        String existsName = "Copy of hello";
+        String existsName2 = "Copy2 of hello";
+        String generated = NameGenerator.generateCopy("hello", Arrays.asList(existsName, existsName2));
+        String expectedName = "Copy3 of hello";
+
+        assertEquals(expectedName, generated);
     }
+
 }

@@ -10,22 +10,22 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.web.html.editor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.jseditor.client.changeintercept.ChangeInterceptorProvider;
 import org.eclipse.che.ide.jseditor.client.changeintercept.TextChangeInterceptor;
 import org.eclipse.che.ide.jseditor.client.codeassist.CodeAssistProcessor;
-import org.eclipse.che.ide.jseditor.client.editorconfig.DefaultTextEditorConfiguration;
+import org.eclipse.che.ide.jseditor.client.editorconfig.AutoSaveTextEditorConfiguration;
 import org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The html type editor configuration.
  */
-public class HtmlEditorConfiguration extends DefaultTextEditorConfiguration {
+public class HtmlEditorConfiguration extends AutoSaveTextEditorConfiguration {
 
     /**
      * Auto edit factories.

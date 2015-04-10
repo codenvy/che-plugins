@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -65,6 +66,10 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
 
     private static final PropertiesPanelViewImplUiBinder UI_BINDER = GWT.create(PropertiesPanelViewImplUiBinder.class);
 
+    @UiField
+    Label configLink;
+    @UiField
+    FlowPanel configLinkPanel;
     @UiField
     TextBox name;
     @UiField
@@ -262,6 +267,11 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
         return type.getText();
     }
 
+    @Override
+    public void setConfig(@Nonnull String config) {
+        configLink.setText(config);
+    }
+
     /** {@inheritDoc} */
     @Override
     public void setType(@Nonnull String type) {
@@ -362,6 +372,9 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
         cancelBtn.setVisible(visible);
     }
 
+    @Override
+    public void setVisibleConfigLink(boolean visible) { configLinkPanel.setVisible(visible); }
+
     /** {@inheritDoc} */
     @Override
     public void showEditor(@Nullable EditorPartPresenter editor) {
@@ -401,4 +414,8 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
         delegate.onConfigurationChanged();
     }
 
+    @UiHandler({"configLink"})
+    public void handleConfigClick(@SuppressWarnings("UnusedParameters") ClickEvent event) {
+        delegate.onConfigLinkClicked();
+    }
 }

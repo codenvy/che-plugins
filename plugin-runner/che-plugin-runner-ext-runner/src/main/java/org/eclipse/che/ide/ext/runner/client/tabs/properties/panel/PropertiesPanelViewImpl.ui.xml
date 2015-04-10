@@ -47,6 +47,15 @@
             box-shadow: 0 1px 0 0 rgba(223, 223, 223, 0.4);
         }
 
+        .settingField[disabled], .listBoxStyle[disabled]{
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            box-shadow: none;
+            background-color: inherit;
+        }
+
         .listBoxStyle {
             width: 170px !important;
             padding-left: 3px;
@@ -74,6 +83,15 @@
             margin-top: 14px;
         }
 
+        .linkLabel {
+            cursor: pointer;
+            color: #0090e4 !important;
+            width: 160px;
+            float: right;
+            margin-right: 38px;
+            margin-top: 3px;
+        }
+
         .switcherLabel {
             margin-top: 2px;
             margin-left: 12px;
@@ -93,6 +111,11 @@
             <g:FlowPanel>
                 <g:FlowPanel>
                     <g:FlowPanel addStyleNames="{style.settingsPanel}">
+                        <g:FlowPanel addStyleNames="{style.itemPanel}" ui:field="configLinkPanel">
+                            <g:Label text="{locale.propertiesConfig}" addStyleNames="{style.label} {resources.runnerCss.propertiesFont}"/>
+                            <g:Label text="Runner Configs" ui:field="configLink" addStyleNames="{style.linkLabel} {resources.runnerCss.propertiesFont}"/>
+                        </g:FlowPanel>
+
                         <g:FlowPanel addStyleNames="{style.itemPanel}">
                             <g:Label text="{locale.propertiesName}" addStyleNames="{style.label} {resources.runnerCss.propertiesFont}"/>
                             <g:TextBox ui:field="name" addStyleNames="{style.settingField} {resources.runnerCss.propertiesFont}"/>

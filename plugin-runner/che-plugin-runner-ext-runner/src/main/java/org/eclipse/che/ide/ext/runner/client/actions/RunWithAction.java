@@ -13,6 +13,9 @@ package org.eclipse.che.ide.ext.runner.client.actions;
 import com.google.inject.Inject;
 
 import org.eclipse.che.ide.api.action.ActionEvent;
+import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
+import org.eclipse.che.ide.api.action.permits.ActionPermit;
+import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
@@ -30,24 +33,34 @@ public class RunWithAction extends AbstractRunnerActions {
     private final RunnerManagerPresenter     runnerManagerPresenter;
     private final TabContainer               tabContainer;
     private final RunnerLocalizationConstant locale;
+    private final ActionPermit               runActionPermit;
+    private final ActionDenyAccessDialog     runActionDenyAccessDialog;
 
     @Inject
     public RunWithAction(RunnerManagerPresenter runnerManagerPresenter,
                          @LeftPanel TabContainer tabContainer,
                          RunnerLocalizationConstant locale,
                          AppContext appContext,
-                         RunnerResources resources) {
+                         RunnerResources resources,
+                         @Run ActionPermit runActionPermit,
+                         @Run ActionDenyAccessDialog runActionDenyAccessDialog) {
         super(appContext, locale.actionRunWith(), locale.actionRunWith(), resources.runWith());
 
         this.runnerManagerPresenter = runnerManagerPresenter;
         this.tabContainer = tabContainer;
         this.locale = locale;
+        this.runActionPermit = runActionPermit;
+        this.runActionDenyAccessDialog = runActionDenyAccessDialog;
     }
 
     /** {@inheritDoc} */
     @Override
     public void actionPerformed(ActionEvent e) {
-        runnerManagerPresenter.setActive();
-        tabContainer.showTab(locale.runnerTabTemplates());
+        if (runActionPermit.isAllowed()) {
+            runnerManagerPresenter.setActive();
+            tabContainer.showTab(locale.runnerTabTemplates());
+        } else {
+            runActionDenyAccessDialog.show();
+        }
     }
 }

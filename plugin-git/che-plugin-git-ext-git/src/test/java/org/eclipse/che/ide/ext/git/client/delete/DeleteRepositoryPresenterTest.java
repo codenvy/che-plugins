@@ -11,7 +11,7 @@
 package org.eclipse.che.ide.ext.git.client.delete;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.ide.api.notification.Notification;
+import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -19,6 +19,7 @@ import org.eclipse.che.ide.ui.window.Window;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -81,11 +82,11 @@ public class DeleteRepositoryPresenterTest extends BaseTest {
 
         verify(appContext).getCurrentProject();
         verify(service).deleteRepository(eq(rootProjectDescriptor), (AsyncRequestCallback<Void>)anyObject());
-        verify(notificationManager).showNotification((Notification)anyObject());
-        verify(constant).deleteGitRepositorySuccess();
+        verify(notificationManager).showInfo(eq(constant.deleteGitRepositorySuccess()));
         verify(rootProjectDescriptor).getAttributes();
         verify(attributes).get(anyString());
         verify(vcsProvider).clear();
+        verify(eventBus).fireEvent(Matchers.<RefreshProjectTreeEvent>anyObject());
     }
 
     @Test
@@ -105,7 +106,7 @@ public class DeleteRepositoryPresenterTest extends BaseTest {
 
         verify(appContext).getCurrentProject();
         verify(service).deleteRepository(eq(rootProjectDescriptor), (AsyncRequestCallback<Void>)anyObject());
-        verify(notificationManager).showNotification((Notification)anyObject());
+        verify(notificationManager).showError(anyString());
         verify(eventBus).fireEvent((ExceptionThrownEvent)anyObject());
     }
 }

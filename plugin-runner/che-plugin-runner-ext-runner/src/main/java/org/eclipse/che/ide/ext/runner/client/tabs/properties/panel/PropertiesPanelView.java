@@ -72,6 +72,14 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
     String getType();
 
     /**
+     * Changes content of Config label.
+     *
+     * @param config
+     *         content that needs to be set
+     */
+    void setConfig(@Nonnull String config);
+
+    /**
      * Changes content of Type field.
      *
      * @param type
@@ -192,6 +200,14 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
     void setVisibleCancelButton(boolean visible);
 
     /**
+     * Sets visibility of the config clink.
+     *
+     * @param visible
+     *         config link visibility
+     */
+    void setVisibleConfigLink(boolean visible);
+
+    /**
      * Show a given editor in the special place on the container.
      *
      * @param editor
@@ -217,6 +233,9 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
 
         /** Performs some actions in response to user's changing some configuration. */
         void onConfigurationChanged();
+
+        /** Performs some actions in response to user's clicking configuration link. */
+        void onConfigLinkClicked();
 
         /** Performs some actions in response to user's clicking on the 'Create' button. */
         void onCopyButtonClicked();

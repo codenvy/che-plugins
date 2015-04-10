@@ -168,6 +168,9 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("template.match.project.type")
     String matchProjectType();
 
+    @Key("properties.config")
+    String propertiesConfig();
+
     @Key("properties.name")
     String propertiesName();
 

@@ -141,7 +141,8 @@
                         <configuration>
                             <tasks>
                                 <!-- Unzip Tomcat package -->
-                                <unzip dest="${project.build.directory}/classes" src="${project.build.directory}/classes/tomcat.zip">
+                                <mkdir dir="${project.build.directory}/classes/tomcat-bundle"/>
+                                <unzip dest="${project.build.directory}/classes/tomcat-bundle" src="${project.build.directory}/classes/tomcat.zip">
                                     <patternset>
                                         <exclude name="**/ROOT/**" />
                                         <exclude name="**/docs/**" />
@@ -150,10 +151,7 @@
                                         <exclude name="**/host-manager/**" />
                                     </patternset>
                                 </unzip>
-                                <move todir="${project.build.directory}/classes/tomcat-bundle">
-                                    <fileset dir="${project.build.directory}/classes/apache-tomcat-${org.apache.tomcat.version}" />
-                                </move>
-                                <delete file="${project.build.directory}/classes/tomcat.zip" />
+                               <delete file="${project.build.directory}/classes/tomcat.zip" />
                                 <!-- Move additional libraries and WAR's -->
                                 <move todir="${project.build.directory}/classes/tomcat-bundle">
                                     <fileset dir="${project.build.directory}/classes/tomcat-resources" />

@@ -13,6 +13,9 @@ package org.eclipse.che.ide.ext.runner.client.runneractions.impl;
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.gwt.client.RunnerServiceClient;
+import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
+import org.eclipse.che.ide.api.action.permits.ActionPermit;
+import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
@@ -26,6 +29,7 @@ import org.eclipse.che.ide.ext.runner.client.runneractions.AbstractRunnerAction;
 import org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.LaunchAction;
 import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
+
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -50,6 +54,8 @@ public class RunAction extends AbstractRunnerAction {
     private final RunnerUtil                                                   runnerUtil;
     private final LaunchAction                                                 launchAction;
     private final AnalyticsEventLogger                                         eventLogger;
+    private final ActionPermit                                                 runActionPermit;
+    private final ActionDenyAccessDialog                                       runActionDenyAccessDialog;
 
     @Inject
     public RunAction(RunnerServiceClient service,
@@ -59,7 +65,9 @@ public class RunAction extends AbstractRunnerAction {
                      Provider<AsyncCallbackBuilder<ApplicationProcessDescriptor>> callbackBuilderProvider,
                      RunnerUtil runnerUtil,
                      RunnerActionFactory actionFactory,
-                     AnalyticsEventLogger eventLogger) {
+                     AnalyticsEventLogger eventLogger,
+                     @Run ActionPermit runActionPermit,
+                     @Run ActionDenyAccessDialog runActionDenyAccessDialog) {
         this.service = service;
         this.appContext = appContext;
         this.locale = locale;
@@ -68,6 +76,8 @@ public class RunAction extends AbstractRunnerAction {
         this.runnerUtil = runnerUtil;
         this.eventLogger = eventLogger;
         this.launchAction = actionFactory.createLaunch();
+        this.runActionPermit = runActionPermit;
+        this.runActionDenyAccessDialog = runActionDenyAccessDialog;
 
         addAction(launchAction);
     }
@@ -77,24 +87,25 @@ public class RunAction extends AbstractRunnerAction {
     public void perform(@Nonnull final Runner runner) {
         eventLogger.log(this);
 
-        final CurrentProject project = appContext.getCurrentProject();
-        if (project == null) {
-            return;
-        }
+        if (runActionPermit.isAllowed()) {
+            final CurrentProject project = appContext.getCurrentProject();
+            if (project == null) {
+                return;
+            }
 
-        presenter.setActive();
+            presenter.setActive();
 
-        AsyncRequestCallback<ApplicationProcessDescriptor> callback = callbackBuilderProvider
-                .get()
-                .unmarshaller(ApplicationProcessDescriptor.class)
-                .success(new SuccessCallback<ApplicationProcessDescriptor>() {
-                    @Override
-                    public void onSuccess(ApplicationProcessDescriptor descriptor) {
-                        runner.setProcessDescriptor(descriptor);
-                        runner.setRAM(descriptor.getMemorySize());
-                        runner.setStatus(Runner.Status.IN_PROGRESS);
+            AsyncRequestCallback<ApplicationProcessDescriptor> callback = callbackBuilderProvider
+                    .get()
+                    .unmarshaller(ApplicationProcessDescriptor.class)
+                    .success(new SuccessCallback<ApplicationProcessDescriptor>() {
+                        @Override
+                        public void onSuccess(ApplicationProcessDescriptor descriptor) {
+                            runner.setProcessDescriptor(descriptor);
+                            runner.setRAM(descriptor.getMemorySize());
+                            runner.setStatus(Runner.Status.IN_PROGRESS);
 
-                        presenter.addRunnerId(descriptor.getProcessId());
+                            presenter.addRunnerId(descriptor.getProcessId());
 
                         launchAction.perform(runner);
                     }
@@ -113,7 +124,10 @@ public class RunAction extends AbstractRunnerAction {
                 })
                 .build();
 
-        service.run(project.getProjectDescription().getPath(), runner.getOptions(), callback);
+            service.run(project.getProjectDescription().getPath(), runner.getOptions(), callback);
+        } else {
+            runActionDenyAccessDialog.show();
+        }
     }
 
 }

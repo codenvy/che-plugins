@@ -19,6 +19,8 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides methods which allow work with templates panel.
@@ -44,6 +46,12 @@ public interface TemplatesContainer extends TabPresenter {
      *         scope of environments which are saved in list
      */
     void addEnvironments(@Nonnull RunnerEnvironmentTree tree, @Nonnull Scope scope);
+
+    /**
+     * Gets the managed environments
+     * @return the map of scope/list of environments
+     */
+    Map<Scope, List<Environment>> getEnvironments();
 
     /** Shows environments when user click on templates tab the first time. */
     void showEnvironments();

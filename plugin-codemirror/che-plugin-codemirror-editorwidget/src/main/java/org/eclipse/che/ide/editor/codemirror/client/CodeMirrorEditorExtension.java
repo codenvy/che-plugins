@@ -10,8 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.editor.codemirror.client;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.gwt.core.client.Callback;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptException;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.RunAsyncCallback;
+import com.google.inject.Inject;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
@@ -27,7 +32,7 @@ import org.eclipse.che.ide.editor.codemirror.resources.client.BasePathConstant;
 import org.eclipse.che.ide.editor.codemirrorjso.client.CodeMirrorOverlay;
 import org.eclipse.che.ide.jseditor.client.codeassist.CompletionResources;
 import org.eclipse.che.ide.jseditor.client.defaulteditor.EditorBuilder;
-import org.eclipse.che.ide.jseditor.client.editorconfig.DefaultTextEditorConfiguration;
+import org.eclipse.che.ide.jseditor.client.editorconfig.AutoSaveTextEditorConfiguration;
 import org.eclipse.che.ide.jseditor.client.editortype.EditorType;
 import org.eclipse.che.ide.jseditor.client.editortype.EditorTypeRegistry;
 import org.eclipse.che.ide.jseditor.client.requirejs.RequireJsLoader;
@@ -37,13 +42,9 @@ import org.eclipse.che.ide.jseditor.client.texteditor.AbstractEditorModule.Initi
 import org.eclipse.che.ide.jseditor.client.texteditor.ConfigurableTextEditor;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import org.eclipse.che.ide.util.loging.Log;
-import com.google.gwt.core.client.Callback;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptException;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.RunAsyncCallback;
-import com.google.inject.Inject;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Extension(title = "CodeMirror Editor", version = "1.1.0")
 public class CodeMirrorEditorExtension {
@@ -241,7 +242,7 @@ public class CodeMirrorEditorExtension {
             @Override
             public ConfigurableTextEditor buildEditor() {
                 final EmbeddedTextEditorPresenter<CodeMirrorEditorWidget> editor = codeMirrorTextEditorFactory.createTextEditor();
-                editor.initialize(new DefaultTextEditorConfiguration(), notificationManager);
+                editor.initialize(new AutoSaveTextEditorConfiguration(), notificationManager);
                 return editor;
             }
         });

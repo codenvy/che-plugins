@@ -19,12 +19,12 @@ import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorInitException;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.editor.EditorProvider;
-import org.eclipse.che.ide.api.editor.EditorRegistry;
-import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.parts.PropertyListener;
+import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.constants.TimeInterval;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
+import org.eclipse.che.ide.ext.runner.client.tabs.container.TabContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanelView;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
@@ -32,6 +32,7 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileEditorInput;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileFactory;
 import org.eclipse.che.ide.ext.runner.client.util.TimerFactory;
+import org.eclipse.che.ide.ext.runner.client.util.annotations.LeftPanel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +43,6 @@ import org.mockito.Mock;
 import static org.eclipse.che.ide.ext.runner.client.constants.TimeInterval.ONE_SEC;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_512;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,8 +59,6 @@ public class PropertiesRunnerPanelTest {
     @Mock
     private PropertiesPanelView view;
     @Mock
-    private EditorRegistry      editorRegistry;
-    @Mock
     private FileTypeRegistry    fileTypeRegistry;
     @Mock
     private DockerFileFactory   dockerFileFactory;
@@ -70,6 +68,10 @@ public class PropertiesRunnerPanelTest {
     private TimerFactory        timerFactory;
     @Mock
     private Runner              runner;
+    @Mock
+    private TabContainer        tabContainer;
+    @Mock
+    private RunnerLocalizationConstant locale;
 
     @Mock
     private CurrentProject      currentProject;
@@ -92,17 +94,16 @@ public class PropertiesRunnerPanelTest {
         when(timerFactory.newInstance(any(TimerFactory.TimerCallBack.class))).thenReturn(timer);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(currentProject.getProjectDescription()).thenReturn(descriptor);
-        when(editorRegistry.getEditor(isNull(FileType.class))).thenReturn(editorProvider);
         when(editorProvider.getEditor()).thenReturn(editor);
         when(dockerFileFactory.newInstance(TEXT)).thenReturn(file);
 
         new PropertiesRunnerPanel(view,
-                                  editorRegistry,
+                                  editorProvider,
                                   fileTypeRegistry,
                                   dockerFileFactory,
                                   appContext,
                                   timerFactory,
-                                  runner);
+                                  runner, tabContainer, locale);
 
         when(runner.getTitle()).thenReturn(TEXT);
         when(runner.getRAM()).thenReturn(MB_512.getValue());
@@ -125,7 +126,6 @@ public class PropertiesRunnerPanelTest {
         verify(dockerFileFactory).newInstance(TEXT);
 
         verify(fileTypeRegistry).getFileTypeByFile(file);
-        verify(editorRegistry).getEditor(isNull(FileType.class));
         verify(editorProvider).getEditor();
 
         verify(editor).addPropertyListener(any(PropertyListener.class));
