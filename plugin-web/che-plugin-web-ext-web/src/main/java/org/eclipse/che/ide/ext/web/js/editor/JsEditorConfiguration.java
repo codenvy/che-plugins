@@ -10,26 +10,25 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.web.js.editor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.web.html.editor.AutoEditStrategyFactory;
-
 import org.eclipse.che.ide.jseditor.client.changeintercept.ChangeInterceptorProvider;
 import org.eclipse.che.ide.jseditor.client.changeintercept.TextChangeInterceptor;
 import org.eclipse.che.ide.jseditor.client.codeassist.CodeAssistProcessor;
-import org.eclipse.che.ide.jseditor.client.editorconfig.DefaultTextEditorConfiguration;
+import org.eclipse.che.ide.jseditor.client.editorconfig.AutoSaveTextEditorConfiguration;
 import org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The css css type editor configuration.
  * 
  * @author <a href="mailto:evidolob@exoplatform.com">Evgen Vidolob</a>
  */
-public class JsEditorConfiguration extends DefaultTextEditorConfiguration {
+public class JsEditorConfiguration extends AutoSaveTextEditorConfiguration {
 
 
     private Set<AutoEditStrategyFactory> autoEditStrategyFactories;

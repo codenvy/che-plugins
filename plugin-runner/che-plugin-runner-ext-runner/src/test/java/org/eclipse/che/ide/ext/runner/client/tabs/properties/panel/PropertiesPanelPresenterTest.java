@@ -20,7 +20,6 @@ import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.editor.EditorProvider;
-import org.eclipse.che.ide.api.editor.EditorRegistry;
 import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.parts.PartPresenter;
@@ -52,6 +51,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Alexander Andrienko
+ * @author Dmitry Shnurenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class PropertiesPanelPresenterTest {
@@ -64,8 +64,6 @@ public class PropertiesPanelPresenterTest {
     @Mock
     private AppContext          appContext;
 
-    @Mock
-    private EditorRegistry                      editorRegistry;
     @Mock
     private FileTypeRegistry                    fileTypeRegistry;
     @Mock
@@ -112,7 +110,6 @@ public class PropertiesPanelPresenterTest {
         when(currentProject.getProjectDescription()).thenReturn(descriptor);
 
         when(fileTypeRegistry.getFileTypeByFile(file)).thenReturn(fileType);
-        when(editorRegistry.getEditor(fileType)).thenReturn(editorProvider);
         when(editorProvider.getEditor()).thenReturn(editor);
 
         when(editor.getEditorInput()).thenReturn(editorInput);
@@ -152,10 +149,9 @@ public class PropertiesPanelPresenterTest {
     public void propertiesShouldBeChangedWithPropIdPropInputAndEditorIsNotInstanceOfHasReadOnlyProperty() {
         PartPresenter partPresenter = mock(PartPresenter.class);
 
-        presenter.initializeEditor(file, editorRegistry, fileTypeRegistry);
+        presenter.initializeEditor(file, editorProvider, fileTypeRegistry);
 
         verify(fileTypeRegistry).getFileTypeByFile(file);
-        verify(editorRegistry).getEditor(fileType);
         verify(editorProvider).getEditor();
 
         verify(editor).addPropertyListener(propertyListenerArgCaptor.capture());
@@ -171,10 +167,9 @@ public class PropertiesPanelPresenterTest {
         when(editorProvider.getEditor()).thenReturn(editor2);
         when(file.isReadOnly()).thenReturn(true);
 
-        presenter.initializeEditor(file, editorRegistry, fileTypeRegistry);
+        presenter.initializeEditor(file, editorProvider, fileTypeRegistry);
 
         verify(fileTypeRegistry).getFileTypeByFile(file);
-        verify(editorRegistry).getEditor(fileType);
         verify(editorProvider).getEditor();
 
         verify(editor2).addPropertyListener(propertyListenerArgCaptor.capture());
@@ -193,10 +188,9 @@ public class PropertiesPanelPresenterTest {
         when(editorProvider.getEditor()).thenReturn(editor2);
         when(file.isReadOnly()).thenReturn(true);
 
-        presenter.initializeEditor(file, editorRegistry, fileTypeRegistry);
+        presenter.initializeEditor(file, editorProvider, fileTypeRegistry);
 
         verify(fileTypeRegistry).getFileTypeByFile(file);
-        verify(editorRegistry).getEditor(fileType);
         verify(editorProvider).getEditor();
 
         verify(editor2).addPropertyListener(propertyListenerArgCaptor.capture());
@@ -213,7 +207,7 @@ public class PropertiesPanelPresenterTest {
         when(editorProvider.getEditor()).thenReturn(editor2);
         when(file.isReadOnly()).thenReturn(true);
 
-        presenter.initializeEditor(file, editorRegistry, fileTypeRegistry);
+        presenter.initializeEditor(file, editorProvider, fileTypeRegistry);
 
         verify(editor2).addPropertyListener(propertyListenerArgCaptor.capture());
         propertyListenerArgCaptor.getValue().propertyChanged(partPresenter, PROP_DIRTY);
@@ -257,7 +251,7 @@ public class PropertiesPanelPresenterTest {
     public void presenterShouldGoneContainerWhenEditorNotNull() {
         AcceptsOneWidget container = mock(AcceptsOneWidget.class);
 
-        presenter.initializeEditor(file, editorRegistry, fileTypeRegistry);
+        presenter.initializeEditor(file, editorProvider, fileTypeRegistry);
         presenter.go(container);
 
         verify(container).setWidget(view);
@@ -310,6 +304,11 @@ public class PropertiesPanelPresenterTest {
     @Test(expected = UnsupportedOperationException.class)
     public void unsupportedOperationExceptionShouldBeThrownWhenCallUpdateEnvironment() {
         presenter.update(environment);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedOperationExceptionShouldBeThrownWhenTryChangeEnvironment() {
+        presenter.onSwitcherChanged(true);
     }
 
     private class DummyPanelProperties extends PropertiesPanelPresenter {

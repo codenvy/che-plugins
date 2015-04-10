@@ -130,7 +130,8 @@ public interface WidgetFactory {
     @EnvironmentProperties
     PropertiesPanel createPropertiesPanel(@Nonnull Environment environment);
 
-    /** Creates stab of properties panel widget
+    /**
+     * Creates stab of properties panel widget
      *
      * @return an instance of {@link PropertiesPanel}
      */

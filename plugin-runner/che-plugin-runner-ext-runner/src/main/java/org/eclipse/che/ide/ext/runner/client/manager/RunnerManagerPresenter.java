@@ -31,6 +31,7 @@ import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.base.BasePresenter;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
+import org.eclipse.che.ide.ext.runner.client.actions.ChooseRunnerAction;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.ModelsFactory;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.RunnerActionFactory;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
@@ -115,6 +116,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     private final RunnerCounter               runnerCounter;
     private final Set<Long>                   runnersId;
     private final RunnerUtil                  runnerUtil;
+    private ChooseRunnerAction                chooseRunnerAction;
 
     private GetRunningProcessesAction getRunningProcessAction;
 
@@ -127,6 +129,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
                                   ModelsFactory modelsFactory,
                                   AppContext appContext,
                                   DtoFactory dtoFactory,
+                                  ChooseRunnerAction chooseRunnerAction,
                                   EventBus eventBus,
                                   RunnerLocalizationConstant locale,
                                   @LeftPanel TabContainer leftTabContainer,
@@ -147,6 +150,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
         this.view.setDelegate(this);
         this.locale = locale;
         this.dtoFactory = dtoFactory;
+        this.chooseRunnerAction = chooseRunnerAction;
         this.actionFactory = actionFactory;
         this.modelsFactory = modelsFactory;
         this.appContext = appContext;
@@ -374,6 +378,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
         } else {
             launchRunner();
         }
+
     }
 
     /** {@inheritDoc} */
@@ -453,6 +458,14 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
         RunOptions runOptions = dtoFactory.createDto(RunOptions.class)
                                           .withSkipBuild(Boolean.valueOf(currentProject.getAttributeValue("runner:skipBuild")))
                                           .withMemorySize(ram);
+
+        if (this.selectedEnvironment == null) {
+            Environment environment = chooseRunnerAction.selectEnvironment();
+            if (environment != null) {
+                runOptions = runOptions.withOptions(environment.getOptions()).withEnvironmentId(environment.getId());
+            }
+        }
+
 
         return launchRunner(modelsFactory.createRunner(runOptions));
     }
@@ -550,10 +563,10 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
             return;
         }
 
+        templateContainer.showEnvironments();
+
         getRunningProcessAction.perform();
         getSystemEnvironmentsAction.perform();
-
-        templateContainer.showEnvironments();
 
         runnerTimer.schedule(ONE_SEC.getValue());
     }

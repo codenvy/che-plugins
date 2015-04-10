@@ -16,7 +16,7 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorInitException;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
-import org.eclipse.che.ide.api.editor.EditorRegistry;
+import org.eclipse.che.ide.api.editor.EditorProvider;
 import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.parts.PartPresenter;
@@ -42,13 +42,14 @@ import static org.eclipse.che.ide.api.editor.EditorPartPresenter.PROP_INPUT;
  */
 public abstract class PropertiesPanelPresenter implements PropertiesPanelView.ActionDelegate, PropertiesPanel {
 
-    private   static final String UNSUPPORTED_METHOD = "This is operation is unsupported";
+    private static final String UNSUPPORTED_METHOD = "This is operation is unsupported";
 
     protected final PropertiesPanelView view;
 
     protected CurrentProject      currentProject;
     protected EditorPartPresenter editor;
     protected int                 undoOperations;
+
 
     public PropertiesPanelPresenter(@Nonnull PropertiesPanelView view, @Nonnull AppContext appContext) {
         this.view = view;
@@ -61,6 +62,7 @@ public abstract class PropertiesPanelPresenter implements PropertiesPanelView.Ac
         }
 
         setEnableSaveCancelDeleteBtn(false);
+        this.view.setVisibleConfigLink(true);
     }
 
     protected void setEnableSaveCancelDeleteBtn(boolean enable) {
@@ -70,10 +72,10 @@ public abstract class PropertiesPanelPresenter implements PropertiesPanelView.Ac
     }
 
     protected void initializeEditor(@Nonnull final FileNode file,
-                                    @Nonnull EditorRegistry editorRegistry,
+                                    @Nonnull EditorProvider provider,
                                     @Nonnull FileTypeRegistry fileTypeRegistry) {
         FileType fileType = fileTypeRegistry.getFileTypeByFile(file);
-        editor = editorRegistry.getEditor(fileType).getEditor();
+        editor = provider.getEditor();
 
         // wait when editor is initialized
         editor.addPropertyListener(new PropertyListener() {
@@ -189,6 +191,16 @@ public abstract class PropertiesPanelPresenter implements PropertiesPanelView.Ac
     /** {@inheritDoc} */
     @Override
     public void onCancelButtonClicked() {
+        throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onConfigLinkClicked() {
+        throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
+    }
+
+    public void onSwitcherChanged(boolean isOn) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
     }
 }

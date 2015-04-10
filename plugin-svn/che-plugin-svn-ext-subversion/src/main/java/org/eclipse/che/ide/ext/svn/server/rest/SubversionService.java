@@ -14,7 +14,6 @@ import org.eclipse.che.api.core.ForbiddenException;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.rest.Service;
-import org.eclipse.che.api.vfs.server.ContentStream;
 import org.eclipse.che.api.vfs.server.MountPoint;
 import org.eclipse.che.api.vfs.server.VirtualFile;
 import org.eclipse.che.api.vfs.server.VirtualFileSystem;
@@ -56,7 +55,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -342,31 +340,12 @@ public class SubversionService extends Service {
     }
 
     @Path("export/{projectPath:.*}")
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response exportPath(final @PathParam("projectPath") String projectPath,
                                final @DefaultValue(".") @QueryParam("path") String path,
                                final @QueryParam("revision") String revision) throws ServerException, IOException {
-        return this.subversionApi.exportPath(getRealPath(projectPath), path, revision, getServiceContext(), workspaceId);
-
-    }
-
-    @Path("export/download/{projectPath:.*}")
-    @GET
-    @Produces("application/zip")
-    public Response downloadExportedPath(final @PathParam("projectPath") String projectPath) throws NotFoundException, IOException {
-        final ContentStream zip = this.subversionApi.downloadExportedPath(projectPath);
-        if (zip == null) {
-            return Response.status(404).build();
-        }
-
-        final Response.ResponseBuilder responseBuilder = Response
-                .ok(zip.getStream(), zip.getMimeType())
-                .lastModified(zip.getLastModificationDate())
-                .header(HttpHeaders.CONTENT_LENGTH, Long.toString(zip.getLength()))
-                .header("Content-Disposition", "attachment; filename=\"" + zip.getFileName() + '"');
-
-        return responseBuilder.build();
+        return this.subversionApi.exportPath(getRealPath(projectPath), path, revision);
     }
 
     /**

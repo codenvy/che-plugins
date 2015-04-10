@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 import org.eclipse.che.ide.ext.svn.server.SubversionException;
 import org.eclipse.che.ide.ext.svn.server.SubversionProjectImporter;
@@ -131,7 +132,7 @@ public class SubversionProjectImporterTest {
     }
 
     /**
-     * Test for {@link SubversionProjectImporter#importSources(com.codenvy.api.project.server.FolderEntry, String, java.util.Map, com.codenvy.api.core.util.LineConsumerFactory)}
+     * Test for {@link SubversionProjectImporter#importSources(org.eclipse.che.api.project.server.FolderEntry, String, java.util.Map, org.eclipse.che.api.core.util.LineConsumerFactory)}
      * invalid url.
      *
      * @throws Exception if anything goes wrong
@@ -149,13 +150,13 @@ public class SubversionProjectImporterTest {
         } catch (SubversionException e) {
             final String message = e.getMessage();
 
-            assertTrue(message.trim().startsWith("svn: E170000: URL 'file://"));
-            assertTrue(message.trim().endsWith("/fake' doesn't exist"));
+            boolean assertBoolean = Pattern.matches("svn: (E[0-9]{6}: )?URL 'file://.*/fake' doesn't exist\n?", message.trim());
+            assertTrue(message, assertBoolean);
         }
     }
 
     /**
-     * Test for {@link SubversionProjectImporter#importSources(com.codenvy.api.project.server.FolderEntry, String, java.util.Map, com.codenvy.api.core.util.LineConsumerFactory)}
+     * Test for {@link SubversionProjectImporter#importSources(org.eclipse.che.api.project.server.FolderEntry, String, java.util.Map, org.eclipse.che.api.core.util.LineConsumerFactory)}
      * with a valid url.
      *
      * @throws Exception if anything goes wrong

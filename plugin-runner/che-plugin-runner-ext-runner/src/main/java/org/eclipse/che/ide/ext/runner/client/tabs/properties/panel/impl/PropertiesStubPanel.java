@@ -38,5 +38,6 @@ public class PropertiesStubPanel extends PropertiesPanelPresenter {
         this.view.setEnableScopeProperty(false);
 
         this.view.hideButtonsPanel();
+        this.view.hideSwitcher();
     }
 }

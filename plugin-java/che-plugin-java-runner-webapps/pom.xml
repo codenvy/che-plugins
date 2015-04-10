@@ -78,14 +78,12 @@
                         <configuration>
                             <tasks>
                                 <!-- Unzip Tomcat package -->
-                                <unzip dest="${project.build.directory}/classes" src="${project.build.directory}/classes/tomcat.zip">
+                                <mkdir dir="${project.build.directory}/classes/tomcat-bundle"/>
+                                <unzip dest="${project.build.directory}/classes/tomcat-bundle" src="${project.build.directory}/classes/tomcat.zip">
                                     <patternset>
                                         <exclude name="**/webapps/**" />
                                     </patternset>
                                 </unzip>
-                                <move todir="${project.build.directory}/classes/tomcat-bundle">
-                                    <fileset dir="${project.build.directory}/classes/apache-tomcat-${org.apache.tomcat.version}" />
-                                </move>
                                 <delete file="${project.build.directory}/classes/tomcat.zip" />
                                 <!-- Zip prepared Tomcat binary distribution and remove temporary directory -->
                                 <zip basedir="${project.build.directory}/classes/tomcat-bundle" destfile="${project.build.directory}/classes/tomcat.zip" />

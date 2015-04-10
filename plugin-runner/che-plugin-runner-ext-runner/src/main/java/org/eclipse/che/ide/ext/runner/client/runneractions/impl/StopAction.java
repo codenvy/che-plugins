@@ -41,6 +41,11 @@ import static org.eclipse.che.ide.api.notification.Notification.Status.FINISHED;
 import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
 import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 import static org.eclipse.che.ide.api.notification.Notification.Type.INFO;
+import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.DONE;
+import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.FAILED;
+import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.IN_PROGRESS;
+import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.RUNNING;
+import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.STOPPED;
 
 /**
  * Action for stopping current runner.
@@ -130,7 +135,7 @@ public class StopAction extends AbstractRunnerAction {
                 .failure(new FailureCallback() {
                     @Override
                     public void onFailure(@Nonnull Throwable reason) {
-                        runner.setStatus(Runner.Status.FAILED);
+                        runner.setStatus(FAILED);
                         presenter.update(runner);
                         runner.setProcessDescriptor(null);
 
@@ -160,7 +165,7 @@ public class StopAction extends AbstractRunnerAction {
 
         Runner.Status runnerStatus = runner.getStatus();
 
-        if (Runner.Status.RUNNING.equals(runnerStatus) || Runner.Status.DONE.equals(runnerStatus) || Runner.Status.IN_PROGRESS.equals(runnerStatus)) {
+        if (RUNNING.equals(runnerStatus) || DONE.equals(runnerStatus) || IN_PROGRESS.equals(runnerStatus) || STOPPED.equals(runnerStatus)) {
             notificationType = INFO;
 
             consoleContainer.printInfo(runner, message);
@@ -176,8 +181,6 @@ public class StopAction extends AbstractRunnerAction {
         notification.setMessage(message);
         notification.setType(notificationType);
         notification.setStatus(FINISHED);
-
-        notificationManager.showNotification(notification);
 
         presenter.update(runner);
 

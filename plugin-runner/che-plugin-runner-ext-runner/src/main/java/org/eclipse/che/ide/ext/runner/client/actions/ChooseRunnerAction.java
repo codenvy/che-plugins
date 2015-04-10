@@ -151,7 +151,8 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
         return null;
     }
 
-    private void selectDefaultRunner() {
+    /** Selects default environment from system environments if it is defined for current project. */
+    public void selectDefaultRunner() {
         String runnerName = getDefaultRunnerName();
         if (runnerName == null) {
             return;

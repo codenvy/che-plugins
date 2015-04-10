@@ -26,7 +26,6 @@ import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.editor.EditorProvider;
-import org.eclipse.che.ide.api.editor.EditorRegistry;
 import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -51,6 +50,7 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPan
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFile;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileEditorInput;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileFactory;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.TemplatesContainer;
 import org.eclipse.che.ide.ext.runner.client.util.TimerFactory;
 import org.eclipse.che.ide.imageviewer.ImageViewerResources;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -114,8 +114,6 @@ public class PropertiesEnvironmentPanelTest {
     @Mock
     private DtoFactory                                 dtoFactory;
     @Mock
-    private EditorRegistry                             editorRegistry;
-    @Mock
     private FileTypeRegistry                           fileTypeRegistry;
     @Mock
     private DockerFileFactory                          dockerFileFactory;
@@ -145,6 +143,8 @@ public class PropertiesEnvironmentPanelTest {
     private AsyncCallbackBuilder<ProjectDescriptor>    asyncDescriptorCallbackBuilder;
     @Mock
     private Environment                                environment;
+    @Mock
+    private TemplatesContainer                         templatesContainer;
 
     @Mock
     private Runner                                     runner;
@@ -267,7 +267,6 @@ public class PropertiesEnvironmentPanelTest {
         when(asyncDescriptorCallbackBuilder.failure(any(FailureCallback.class))).thenReturn(asyncDescriptorCallbackBuilder);
 
         when(asyncCallbackBuilder.build()).thenReturn(asyncRequestCallback);
-        when(editorRegistry.getEditor(fileType)).thenReturn(editorProvider);
         when(editorProvider.getEditor()).thenReturn(editor);
         when(editor.getEditorInput()).thenReturn(editorInput);
         when(editorInput.getFile()).thenReturn(file);
@@ -289,7 +288,7 @@ public class PropertiesEnvironmentPanelTest {
 
         presenter = new PropertiesEnvironmentPanel(view,
                                                    dtoFactory,
-                                                   editorRegistry,
+                                                   editorProvider,
                                                    fileTypeRegistry,
                                                    dockerFileFactory,
                                                    projectService,
@@ -304,6 +303,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    asyncArrayCallbackBuilder,
                                                    voidAsyncCallbackBuilder,
                                                    asyncDescriptorCallbackBuilder,
+                                                   templatesContainer,
                                                    environment);
 
         when(locale.removeEnvironment()).thenReturn(TEXT);
@@ -798,7 +798,7 @@ public class PropertiesEnvironmentPanelTest {
 
         presenter = new PropertiesEnvironmentPanel(view,
                                                    dtoFactory,
-                                                   editorRegistry,
+                                                   editorProvider,
                                                    fileTypeRegistry,
                                                    dockerFileFactory,
                                                    projectService,
@@ -813,6 +813,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    asyncArrayCallbackBuilder,
                                                    voidAsyncCallbackBuilder,
                                                    asyncDescriptorCallbackBuilder,
+                                                   templatesContainer,
                                                    environment);
 
         verify(appContext).getCurrentProject();
@@ -846,8 +847,6 @@ public class PropertiesEnvironmentPanelTest {
         verify(environment, times(2)).getId();
 
         verify(environment, times(2)).getPath();
-        //we can't use mock for fileType that why we have null FileType
-        verify(editorRegistry, times(3)).getEditor(any(FileType.class));
         verify(editorProvider, times(3)).getEditor();
         verify(editor, times(3)).addPropertyListener(any(PropertyListener.class));
 
@@ -881,7 +880,6 @@ public class PropertiesEnvironmentPanelTest {
 
         verify(fileTypeRegistry).getFileTypeByFile(file);
         //we can't use mock for fileType that why we have null FileType
-        verify(editorRegistry).getEditor(fileType);
         verify(editorProvider).getEditor();
         verify(editor).addPropertyListener(any(PropertyListener.class));
 
@@ -898,7 +896,6 @@ public class PropertiesEnvironmentPanelTest {
         EditorPartPresenter editor2 = mock(TestEditor.class);
         when(editor2.getEditorInput()).thenReturn(editorInput);
         when(fileTypeRegistry.getFileTypeByFile(file)).thenReturn(fileType);
-        when(editorRegistry.getEditor(fileType)).thenReturn(editorProvider);
         when(editorProvider.getEditor()).thenReturn(editor2);
         when(((UndoableEditor)editor2).getUndoRedo()).thenReturn(handlesUndoRedo);
 
@@ -908,7 +905,7 @@ public class PropertiesEnvironmentPanelTest {
 
         presenter = new PropertiesEnvironmentPanel(view,
                                                    dtoFactory,
-                                                   editorRegistry,
+                                                   editorProvider,
                                                    fileTypeRegistry,
                                                    dockerFileFactory,
                                                    projectService,
@@ -923,6 +920,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    asyncArrayCallbackBuilder,
                                                    voidAsyncCallbackBuilder,
                                                    asyncDescriptorCallbackBuilder,
+                                                   templatesContainer,
                                                    environment);
 
         presenter.onCancelButtonClicked();
@@ -947,13 +945,15 @@ public class PropertiesEnvironmentPanelTest {
     public void environmentShouldBeUpdatedWhenRunnerConfigExist() throws Exception {
         reset(view);
         when(environment.getScope()).thenReturn(SYSTEM);
+        when(environment.getId()).thenReturn(TEXT);
+        when(currentProject.getRunner()).thenReturn(TEXT2);
         runnerConfigs.put(TEXT, runnerConfiguration);
 
         presenter.update(environment);
 
         verifyUpdateEnvironment();
         verify(runnerConfiguration).getRam();
-
+        verify(view).changeSwitcherState(false);
     }
 
     private void verifyUpdateEnvironment() {
@@ -961,7 +961,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableSaveButton(false);
         verify(view).setEnableDeleteButton(false);
 
-        verify(environment, times(3)).getId();
+        verify(environment, times(4)).getId();
         verify(environment).getName();
         verify(environment).setRam(MB_512.getValue());
 
@@ -976,6 +976,8 @@ public class PropertiesEnvironmentPanelTest {
     public void environmentShouldBeUpdatedWhenRunnerConfigIsNotExist() throws Exception {
         reset(view);
         when(environment.getScope()).thenReturn(SYSTEM);
+        when(environment.getId()).thenReturn(TEXT);
+        when(currentProject.getRunner()).thenReturn(TEXT);
 
         presenter.update(environment);
 
@@ -987,7 +989,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableSaveButton(false);
         verify(view).setEnableDeleteButton(false);
 
-        verify(environment, times(2)).getId();
+        verify(environment, times(3)).getId();
         verify(environment).getName();
         verify(environment).setRam(MB_512.getValue());
 
@@ -997,6 +999,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).selectScope(SYSTEM);
         verify(runnerConfiguration, never()).getRam();
         verify(environment).getRam();
+        verify(view).changeSwitcherState(true);
     }
 
     @Test
@@ -1013,4 +1016,28 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableCancelButton(true);
     }
 
+    @Test
+    public void switcherShouldBeOn() throws Exception {
+        when(environment.getScope()).thenReturn(SYSTEM);
+
+        presenter.onSwitcherChanged(true);
+
+        verify(templatesContainer).setDefaultEnvironment(environment);
+    }
+
+    @Test
+    public void switcherShouldBeOff() throws Exception {
+        when(environment.getScope()).thenReturn(SYSTEM);
+
+        presenter.onSwitcherChanged(false);
+
+        verify(templatesContainer).setDefaultEnvironment(null);
+    }
+
+    @Test
+    public void switcherShouldNotBeChanged() throws Exception {
+        presenter.onSwitcherChanged(true);
+
+        verify(templatesContainer).setDefaultEnvironment(environment);
+    }
 }

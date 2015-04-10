@@ -111,7 +111,7 @@ public class AngularJSCompletionProposal implements CompletionProposal {
     @Override
     public Icon getIcon() {
         if (invocationContext != null) {
-            new Icon("angularjs.property", invocationContext.getResources().property());
+            return new Icon("angularjs.property", invocationContext.getResources().property());
         }
         return null;
     }

@@ -402,6 +402,8 @@ public class CheckRamAndRunActionTest {
         verify(runnerUtil).showWarning(MESSAGES_TOTAL_LESS_REQUIRED_MEMORY);
 
         verify(runner).setStatus(Runner.Status.FAILED);
+
+        verify(managerPresenter).update(runner);
     }
 
     @Test
@@ -447,6 +449,7 @@ public class CheckRamAndRunActionTest {
         verify(runnerUtil).showWarning(AVAILABLE_MEMORY_LESS_THEN_REQUIRED);
 
         verify(runner).setStatus(Runner.Status.FAILED);
+        verify(managerPresenter).update(runner);
     }
 
     @Test

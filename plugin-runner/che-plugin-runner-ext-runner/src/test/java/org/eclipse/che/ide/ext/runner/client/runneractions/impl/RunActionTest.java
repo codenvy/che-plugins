@@ -18,6 +18,8 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.api.runner.gwt.client.RunnerServiceClient;
+import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
+import org.eclipse.che.ide.api.action.permits.ActionPermit;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
@@ -41,6 +43,7 @@ import org.mockito.Mock;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_512;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -93,6 +96,10 @@ public class RunActionTest {
     private ApplicationProcessDescriptor                                  descriptor;
     @Mock
     private LaunchAction                                                  launchAction;
+    @Mock
+    private ActionPermit                                                  runActionPermit;
+    @Mock
+    private ActionDenyAccessDialog                                        runActionDenyAccessDialog;
     //captors
     @Captor
     private ArgumentCaptor<FailureCallback>                               failedCallBackCaptor;
@@ -104,8 +111,11 @@ public class RunActionTest {
     @Before
     public void setUp() {
         when(actionFactory.createLaunch()).thenReturn(launchAction);
+        when(runActionPermit.isAllowed()).thenReturn(true);
+
         runAction = new RunAction(service, appContext, locale, presenter,
-                                  callbackBuilderProvider, runnerUtil, actionFactory, eventLogger);
+                                  callbackBuilderProvider, runnerUtil, actionFactory, eventLogger, runActionPermit,
+                                  runActionDenyAccessDialog);
 
         //preparing callbacks for server
         when(appContext.getCurrentProject()).thenReturn(project);
@@ -166,6 +176,9 @@ public class RunActionTest {
 
         when(runner.getOptions()).thenReturn(runOptions);
         when(locale.startApplicationFailed(PROJECT_NAME)).thenReturn(someRunningMessage);
+        when(project.getRunner()).thenReturn(PROJECT_NAME);
+        when(projectDescriptor.getName()).thenReturn(someRunningMessage);
+        when(locale.startApplicationFailed(someRunningMessage)).thenReturn(someRunningMessage);
 
         runAction.perform(runner);
 
@@ -176,7 +189,38 @@ public class RunActionTest {
         FailureCallback failureCallback = failedCallBackCaptor.getValue();
         failureCallback.onFailure(reason);
 
-        runnerUtil.showError(runner, someRunningMessage, null);
+        verify(runnerUtil).showError(runner, someRunningMessage, null);
+
+        verify(project).getRunner();
+        verify(project, times(2)).getProjectDescription();
+        verify(projectDescriptor).getName();
+        verify(locale).startApplicationFailed(someRunningMessage);
+
+        verify(service).run(PATH_TO_PROJECT, runOptions, asyncRequestCallback);
+    }
+
+    @Test
+    public void shouldFailedWhenDefaultRunnerAbsent() {
+        String someRunningMessage = "run information";
+
+        when(runner.getOptions()).thenReturn(runOptions);
+        when(locale.startApplicationFailed(PROJECT_NAME)).thenReturn(someRunningMessage);
+        when(projectDescriptor.getName()).thenReturn(someRunningMessage);
+        when(locale.defaultRunnerAbsent()).thenReturn(someRunningMessage);
+
+        runAction.perform(runner);
+
+        verify(eventLogger).log(runAction);
+        verify(presenter).setActive();
+
+        verify(asyncCallbackBuilder).failure(failedCallBackCaptor.capture());
+        FailureCallback failureCallback = failedCallBackCaptor.getValue();
+        failureCallback.onFailure(reason);
+
+        verify(runnerUtil).showError(runner, someRunningMessage, null);
+
+        verify(project).getRunner();
+        verify(locale).defaultRunnerAbsent();
 
         verify(service).run(PATH_TO_PROJECT, runOptions, asyncRequestCallback);
     }

@@ -72,6 +72,14 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
     String getType();
 
     /**
+     * Changes content of Config label.
+     *
+     * @param config
+     *         content that needs to be set
+     */
+    void setConfig(@Nonnull String config);
+
+    /**
      * Changes content of Type field.
      *
      * @param type
@@ -192,6 +200,14 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
     void setVisibleCancelButton(boolean visible);
 
     /**
+     * Sets visibility of the config clink.
+     *
+     * @param visible
+     *         config link visibility
+     */
+    void setVisibleConfigLink(boolean visible);
+
+    /**
      * Show a given editor in the special place on the container.
      *
      * @param editor
@@ -202,10 +218,24 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
     /** Hides panel with property buttons. */
     void hideButtonsPanel();
 
+    /**
+     * Calls special method which changes state of switcher.
+     *
+     * @param isOn
+     *         <code>true</code> switcher is on,<code>false</code> switcher is off
+     */
+    void changeSwitcherState(boolean isOn);
+
+    /** Hides switcher for current panel. */
+    void hideSwitcher();
+
     interface ActionDelegate {
 
         /** Performs some actions in response to user's changing some configuration. */
         void onConfigurationChanged();
+
+        /** Performs some actions in response to user's clicking configuration link. */
+        void onConfigLinkClicked();
 
         /** Performs some actions in response to user's clicking on the 'Create' button. */
         void onCopyButtonClicked();
@@ -219,6 +249,14 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
         /** Performs some actions in response to user's clicking on the 'Cancel' button. */
         void onCancelButtonClicked();
 
+        /**
+         * Performs some actions in response to user's changing switcher.
+         *
+         * @param isOn
+         *         <code>true</code> switcher state when selected environment is default <code>false</code> when
+         *         environments is not default
+         */
+        void onSwitcherChanged(boolean isOn);
     }
 
 }

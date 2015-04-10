@@ -10,8 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.jseditor.java.client.editor;
 
-import static org.eclipse.che.ide.jseditor.client.partition.DefaultPartitioner.DEFAULT_PARTITIONING;
-import static org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner.DEFAULT_CONTENT_TYPE;
+import com.google.inject.Provider;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 
 import org.eclipse.che.ide.api.texteditor.outline.OutlineModel;
 import org.eclipse.che.ide.collections.Collections;
@@ -31,9 +32,9 @@ import org.eclipse.che.ide.jseditor.client.reconciler.ReconcilerFactory;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import org.eclipse.che.ide.util.executor.BasicIncrementalScheduler;
 import org.eclipse.che.ide.util.executor.UserActivityManager;
-import com.google.inject.Provider;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+
+import static org.eclipse.che.ide.jseditor.client.partition.DefaultPartitioner.DEFAULT_PARTITIONING;
+import static org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner.DEFAULT_CONTENT_TYPE;
 
 /**
  * Text editor configuration for java files.
@@ -135,7 +136,7 @@ public class JsJavaEditorConfiguration extends DefaultTextEditorConfiguration {
     private Reconciler initReconciler(final ReconcilerFactory reconcilerFactory,
                                       final JavaReconcilerStrategy javaReconcilerStrategy) {
         final BasicIncrementalScheduler scheduler = new BasicIncrementalScheduler(userActivityManager, 50, 100);
-        final Reconciler reconciler = reconcilerFactory.create(DEFAULT_PARTITIONING, scheduler, this.partitioner);
+        final Reconciler reconciler = reconcilerFactory.create(DEFAULT_PARTITIONING, this.partitioner);
         reconciler.addReconcilingStrategy(DEFAULT_CONTENT_TYPE, javaReconcilerStrategy);
         return reconciler;
     }

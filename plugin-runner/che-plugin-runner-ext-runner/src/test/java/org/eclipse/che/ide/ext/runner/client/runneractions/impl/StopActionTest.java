@@ -242,7 +242,7 @@ public class StopActionTest {
         verify(runner).setStatus(Runner.Status.STOPPED);
         verify(consoleContainer).printInfo(runner, MESSAGE);
 
-        verify(notificationManager, times(2)).showNotification(notificationCaptor.capture());
+        verify(notificationManager).showNotification(notificationCaptor.capture());
         Notification notification = notificationCaptor.getValue();
         assertThat(notification.getMessage(), is(MESSAGE));
         assertThat(notification.getType(), is(Notification.Type.INFO));
@@ -277,7 +277,7 @@ public class StopActionTest {
         verify(runner).setStatus(Runner.Status.STOPPED);
         verify(consoleContainer).printInfo(runner, MESSAGE);
 
-        verify(notificationManager, times(2)).showNotification(notificationCaptor.capture());
+        verify(notificationManager).showNotification(notificationCaptor.capture());
         Notification notification = notificationCaptor.getValue();
         assertThat(notification.getMessage(), is(MESSAGE));
         assertThat(notification.getType(), is(Notification.Type.INFO));
@@ -290,9 +290,9 @@ public class StopActionTest {
     }
 
     @Test
-    public void shouldSuccessPerformWithStatusNotRunningOrDone() {
+    public void shouldSuccessPerformWithStatusIsFailed() {
         //set status not running or done
-        when(runner.getStatus()).thenReturn(Runner.Status.TIMEOUT);
+        when(runner.getStatus()).thenReturn(Runner.Status.FAILED);
 
         when(runner.getOptions()).thenReturn(runOptions);
 
@@ -313,7 +313,7 @@ public class StopActionTest {
         verify(logsAction).perform(runner);
         verify(consoleContainer).printError(runner, MESSAGE);
 
-        verify(notificationManager, times(2)).showNotification(notificationCaptor.capture());
+        verify(notificationManager).showNotification(notificationCaptor.capture());
         Notification notification = notificationCaptor.getValue();
         //because type of message ERROR
         assertThat(notification.getType(), is(Notification.Type.ERROR));

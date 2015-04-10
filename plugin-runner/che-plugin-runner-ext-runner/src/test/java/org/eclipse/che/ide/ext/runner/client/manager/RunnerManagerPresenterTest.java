@@ -30,6 +30,7 @@ import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PartStack;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
+import org.eclipse.che.ide.ext.runner.client.actions.ChooseRunnerAction;
 import org.eclipse.che.ide.ext.runner.client.constants.TimeInterval;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.ModelsFactory;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.RunnerActionFactory;
@@ -64,6 +65,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -211,8 +213,12 @@ public class RunnerManagerPresenterTest {
     private Timer                     timer;
     @Mock
     private ProjectTypeDefinition     definition;
+
     @Mock
-    private RunnersDescriptor         runnersDescriptor;
+    private ChooseRunnerAction chooseRunnerAction;
+
+    @Mock
+    private RunnersDescriptor runnersDescriptor;
 
     private RunnerManagerPresenter presenter;
 
@@ -256,6 +262,7 @@ public class RunnerManagerPresenterTest {
                                                modelsFactory,
                                                appContext,
                                                dtoFactory,
+                                               chooseRunnerAction,
                                                eventBus,
                                                locale,
                                                leftTabContainer,
@@ -298,6 +305,9 @@ public class RunnerManagerPresenterTest {
         when(currentProject.getAttributeValue("runner:skipBuild")).thenReturn("true");
         when(runOptions.withSkipBuild(true)).thenReturn(runOptions);
         when(runOptions.withMemorySize(MB_512.getValue())).thenReturn(runOptions);
+        when(runOptions.withOptions(any(Map.class))).thenReturn(runOptions);
+        when(runOptions.withEnvironmentId(anyString())).thenReturn(runOptions);
+
         when(actionFactory.createCheckRamAndRun()).thenReturn(checkRamAndRunAction);
 
         //part stack
@@ -679,6 +689,26 @@ public class RunnerManagerPresenterTest {
 
         verifyLaunchRunnerWithNotNullCurrentProject();
     }
+
+    /**
+     * IDEX-2319 Check that if runner is selected in choose options this will run this one.
+     */
+    @Test
+    public void runnerShouldRunSelectedEnvironment() {
+        when(chooseRunnerAction.selectEnvironment()).thenReturn(runnerEnvironment);
+        when(runnerEnvironment.getId()).thenReturn("myEnvId");
+        Map<String, String> options =Collections.emptyMap();
+        when(runnerEnvironment.getOptions()).thenReturn(options);
+
+        // click on Run
+        presenter.onRunButtonClicked();
+
+        // check run options contains the env ID
+        verify(runOptions).withOptions(any(Map.class));
+        verify(runOptions).withEnvironmentId("myEnvId");
+    }
+
+
 
     @Test
     public void runnerShouldBeRunIfSelectedRunnerNotNullAndStatusIsInProgress() {

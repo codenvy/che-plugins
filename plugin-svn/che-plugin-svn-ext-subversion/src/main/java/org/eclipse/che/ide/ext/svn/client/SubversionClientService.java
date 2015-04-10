@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.svn.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import org.eclipse.che.api.core.rest.shared.dto.Hyperlinks;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 import javax.validation.constraints.NotNull;
@@ -216,20 +215,6 @@ public interface SubversionClientService {
                  final AsyncCallback<List<String>> callback);
 
     void saveCredentials(String repositoryUrl, String username, String password, AsyncRequestCallback<Void> callback);
-
-    /**
-     * Perform exporting specified path from working directory.
-     *
-     * @param projectPath
-     *         the project path
-     * @param exportPath
-     *         exported path
-     * @param revision
-     *         exported revision
-     * @param callback
-     *         the callback
-     */
-    void export(String projectPath, String exportPath, String revision, AsyncRequestCallback<Hyperlinks> callback);
 
     /**
      * Move provided path.

@@ -40,6 +40,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
@@ -110,6 +111,8 @@ public class GetSystemEnvironmentsActionTest {
     private AppContext                                             appContext;
     @Mock
     private CurrentProject                                         currentProject;
+    @Mock
+    private Environment                                            environment;
 
     @InjectMocks
     private GetSystemEnvironmentsAction action;
@@ -129,10 +132,12 @@ public class GetSystemEnvironmentsActionTest {
         //preparing callbacks for server
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(currentProject.getProjectDescription()).thenReturn(projectDescriptor);
+        when(currentProject.getRunner()).thenReturn(MESSAGE);
+        when(environment.getId()).thenReturn(MESSAGE);
         when(projectDescriptor.getType()).thenReturn(MESSAGE);
         when(templatesContainerProvider.get()).thenReturn(templatesContainer);
         when(environmentUtil.getAllEnvironments(tree)).thenReturn(leaves);
-        when(environmentUtil.getEnvironmentsByProjectType(tree, MESSAGE, SYSTEM)).thenReturn(environments);
+        when(environmentUtil.getEnvironmentsByProjectType(tree, MESSAGE, SYSTEM)).thenReturn(Arrays.asList(environment));
         when(environmentUtil.getEnvironmentsFromNodes(leaves, SYSTEM)).thenReturn(environments);
         when(environmentUtil.getRunnerCategoryByProjectType(tree, MESSAGE)).thenReturn(tree);
         when(tree.getDisplayName()).thenReturn(MESSAGE);
@@ -197,6 +202,7 @@ public class GetSystemEnvironmentsActionTest {
 
     @Test
     public void getSystemEnvironmentsActionShouldBePerformedWhenEnvironmentTreeIsNotNull() throws Exception {
+        when(currentProject.getRunner()).thenReturn(null);
         action.perform();
 
         verify(eventLogger).log(action);
@@ -212,9 +218,7 @@ public class GetSystemEnvironmentsActionTest {
         verify(appContext, times(2)).getCurrentProject();
         verify(environmentUtil, times(2)).getEnvironmentsByProjectType(tree, MESSAGE, SYSTEM);
         verify(templatesContainerProvider, times(2)).get();
-        verify(environmentUtil, times(2)).getRunnerCategoryByProjectType(tree, MESSAGE);
-        verify(templatesContainer, times(2)).setTypeItem(MESSAGE);
-        verify(chooseRunnerAction, times(2)).addSystemRunners(environments);
+        verify(chooseRunnerAction, times(2)).addSystemRunners(Matchers.<List<Environment>>anyObject());
     }
 
     @Test
@@ -229,9 +233,8 @@ public class GetSystemEnvironmentsActionTest {
         successCallback.onSuccess(tree);
 
         verify(currentProject).getRunner();
-        verify(environmentUtil).getCorrectCategoryName(MESSAGE);
-        verify(templatesContainer).setTypeItem(MESSAGE);
         verify(environmentUtil, never()).getRunnerCategoryByProjectType(Matchers.<RunnerEnvironmentTree>anyObject(), anyString());
+        verify(templatesContainer).setDefaultEnvironment(environment);
     }
 
     @Test
@@ -244,8 +247,6 @@ public class GetSystemEnvironmentsActionTest {
         SuccessCallback<RunnerEnvironmentTree> successCallback = successCallBackCaptor.getValue();
         successCallback.onSuccess(tree);
 
-        verify(environmentUtil).getRunnerCategoryByProjectType(tree, MESSAGE);
-        verify(templatesContainer).setTypeItem(MESSAGE);
         verify(environmentUtil, never()).getCorrectCategoryName(anyString());
     }
 
@@ -281,7 +282,6 @@ public class GetSystemEnvironmentsActionTest {
         action.perform();
 
         verify(eventLogger, times(2)).log(action);
-        verify(templatesContainer, never()).setTypeItem(anyString());
     }
 
     @Test

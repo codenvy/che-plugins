@@ -15,10 +15,8 @@ import com.google.common.base.Strings;
 import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.google.web.bindery.event.shared.EventBus;
-
-import org.eclipse.che.api.core.rest.shared.dto.Hyperlinks;
-import org.eclipse.che.api.core.rest.shared.dto.Link;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -26,24 +24,11 @@ import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
-import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
-import org.eclipse.che.ide.ext.svn.shared.Constants;
-import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-import org.eclipse.che.ide.rest.Unmarshallable;
-import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
-import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import static org.eclipse.che.ide.api.notification.Notification.Status.FINISHED;
 import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
-import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
-import static org.eclipse.che.ide.api.notification.Notification.Type.INFO;
 
 /**
  * Presenter for the {@link org.eclipse.che.ide.ext.svn.client.export.ExportView}.
@@ -54,11 +39,9 @@ import static org.eclipse.che.ide.api.notification.Notification.Type.INFO;
 public class ExportPresenter extends SubversionActionPresenter implements ExportView.ActionDelegate {
 
     private ExportView              view;
-    private SubversionClientService service;
     private NotificationManager     notificationManager;
-    private DtoUnmarshallerFactory  dtoUnmarshallerFactory;
-    private DialogFactory           dialogFactory;
     private SubversionExtensionLocalizationConstants constants;
+    private final String              baseHttpUrl;
 
     private TreeNode<?> selectedNode;
 
@@ -69,19 +52,17 @@ public class ExportPresenter extends SubversionActionPresenter implements Export
                            WorkspaceAgent workspaceAgent,
                            ProjectExplorerPart projectExplorerPart,
                            ExportView view,
-                           SubversionClientService service,
                            NotificationManager notificationManager,
-                           DtoUnmarshallerFactory dtoUnmarshallerFactory,
-                           DialogFactory dialogFactory,
-                           SubversionExtensionLocalizationConstants constants) {
+                           SubversionExtensionLocalizationConstants constants,
+                           @Named("restContext") String restContext,
+                           @Named("workspaceId") String workspaceId) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
         this.view = view;
-        this.service = service;
         this.notificationManager = notificationManager;
-        this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
-        this.dialogFactory = dialogFactory;
         this.constants = constants;
         this.view.setDelegate(this);
+
+        this.baseHttpUrl = restContext + "/svn/" + workspaceId;
     }
 
     public void showExport(TreeNode<?> selectedNode) {
@@ -96,38 +77,6 @@ public class ExportPresenter extends SubversionActionPresenter implements Export
         view.onClose();
     }
 
-    private class DownloadDialogHandler implements Notification.OpenNotificationHandler {
-        private       Link   downloadLink;
-        private final String exportedPath;
-
-        public DownloadDialogHandler(@Nonnull String exportedPath) {
-            this.exportedPath = exportedPath;
-        }
-
-        public void setDownloadLink(@Nullable Link downloadLink) {
-            this.downloadLink = downloadLink;
-        }
-
-        @Override
-        public void onOpenClicked() {
-            if (downloadLink == null) {
-                return;
-            }
-
-            dialogFactory.createChoiceDialog(constants.downloadTitle(),
-                                             constants.downloadFinished(exportedPath),
-                                             constants.downloadButton(),
-                                             constants.downloadButtonCanceled(),
-                                             new ConfirmCallback() {
-                                                 @Override
-                                                 public void accepted() {
-                                                     Window.open(downloadLink.getHref(), "_self", "");
-                                                 }
-                                             },
-                                             null).show();
-        }
-    }
-
     /** {@inheritDoc} */
     @Override
     public void onExportClicked() {
@@ -140,40 +89,25 @@ public class ExportPresenter extends SubversionActionPresenter implements Export
         final String exportPath =
                 MoreObjects.firstNonNull(Strings.emptyToNull(relPath(projectPath, ((StorableNode)selectedNode).getPath())), projectPath);
         final String revision = view.isRevisionSpecified() ? view.getRevision() : null;
-        final DownloadDialogHandler openHandler = new DownloadDialogHandler(exportPath);
 
-        final Notification notification = new Notification(constants.exportStarted(exportPath), PROGRESS, openHandler);
+        final Notification notification = new Notification(constants.exportStarted(exportPath), PROGRESS);
         notificationManager.showNotification(notification);
 
         view.onClose();
 
-        Unmarshallable<Hyperlinks> unmarshaller = dtoUnmarshallerFactory.newUnmarshaller(Hyperlinks.class);
+        char prefix = '?';
+        StringBuilder url = new StringBuilder(baseHttpUrl + "/export" + projectPath);
 
-        service.export(projectPath, projectPath.equals(exportPath) ? null : exportPath, revision, new AsyncRequestCallback<Hyperlinks>(unmarshaller) {
-            @Override
-            protected void onSuccess(final Hyperlinks links) {
-                notification.setMessage(constants.exportSuccessful(exportPath));
-                notification.setStatus(FINISHED);
-                notification.setType(INFO);
+        if (!Strings.isNullOrEmpty(exportPath)) {
+            url.append(prefix).append("path").append('=').append(exportPath);
+            prefix = '&';
+        }
 
-                final Link downloadLink = links.getLink(Constants.REL_DOWNLOAD_EXPORT_PATH);
-                if (downloadLink == null) {
-                    return;
-                }
+        if (!Strings.isNullOrEmpty(revision)) {
+            url.append(prefix).append("revision").append('=').append(revision);
+        }
 
-                openHandler.setDownloadLink(downloadLink);
-                MoreObjects.firstNonNull(notification.getOpenHandler(), openHandler).onOpenClicked();
-            }
-
-            @Override
-            protected void onFailure(Throwable exception) {
-                String errorMessage = exception.getMessage();
-
-                notification.setMessage(errorMessage);
-                notification.setStatus(FINISHED);
-                notification.setType(ERROR);
-            }
-        });
+        Window.open(url.toString(), "_self", "");
     }
 
     /** {@inheritDoc} */

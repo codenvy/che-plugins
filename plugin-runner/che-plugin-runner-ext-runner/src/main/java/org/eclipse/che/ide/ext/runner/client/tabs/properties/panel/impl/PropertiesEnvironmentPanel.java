@@ -13,6 +13,7 @@ package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.impl;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import com.google.inject.name.Named;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
@@ -21,7 +22,7 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.project.shared.dto.RunnerConfiguration;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorInput;
-import org.eclipse.che.ide.api.editor.EditorRegistry;
+import org.eclipse.che.ide.api.editor.EditorProvider;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
@@ -43,6 +44,7 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFile;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileFactory;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.TemplatesContainer;
 import org.eclipse.che.ide.ext.runner.client.util.NameGenerator;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -71,7 +73,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
 
     private final Environment                                environment;
     private final DtoFactory                                 dtoFactory;
-    private final EditorRegistry                             editorRegistry;
+    private final EditorProvider                             editorProvider;
     private final FileTypeRegistry                           fileTypeRegistry;
     private final DockerFileFactory                          dockerFileFactory;
     private final ProjectServiceClient                       projectService;
@@ -86,6 +88,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     private final AsyncCallbackBuilder<ProjectDescriptor>    asyncDescriptorCallbackBuilder;
     private final DialogFactory                              dialogFactory;
     private final List<RemovePanelListener>                  listeners;
+    private final TemplatesContainer                         templatesContainer;
 
     private ProjectDescriptor                projectDescriptor;
     private Map<String, RunnerConfiguration> runnerConfigs;
@@ -95,7 +98,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     @AssistedInject
     public PropertiesEnvironmentPanel(final PropertiesPanelView view,
                                       DtoFactory dtoFactory,
-                                      @Nonnull final EditorRegistry editorRegistry,
+                                      @Named("DefaultEditorProvider")EditorProvider editorProvider,
                                       @Nonnull final FileTypeRegistry fileTypeRegistry,
                                       final DockerFileFactory dockerFileFactory,
                                       final ProjectServiceClient projectService,
@@ -110,11 +113,12 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
                                       AsyncCallbackBuilder<Array<ItemReference>> asyncArrayCallbackBuilder,
                                       AsyncCallbackBuilder<Void> voidAsyncCallbackBuilder,
                                       AsyncCallbackBuilder<ProjectDescriptor> asyncDescriptorCallbackBuilder,
+                                      TemplatesContainer templatesContainer,
                                       @Assisted @Nonnull final Environment environment) {
         super(view, appContext);
 
         this.dtoFactory = dtoFactory;
-        this.editorRegistry = editorRegistry;
+        this.editorProvider = editorProvider;
         this.fileTypeRegistry = fileTypeRegistry;
         this.dockerFileFactory = dockerFileFactory;
         this.projectService = projectService;
@@ -128,6 +132,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         this.asyncArrayCallbackBuilder = asyncArrayCallbackBuilder;
         this.voidAsyncCallbackBuilder = voidAsyncCallbackBuilder;
         this.asyncDescriptorCallbackBuilder = asyncDescriptorCallbackBuilder;
+        this.templatesContainer = templatesContainer;
 
         this.dialogFactory = dialogFactory;
 
@@ -138,6 +143,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         this.view.setEnableBootProperty(false);
         this.view.setEnableShutdownProperty(false);
         this.view.setEnableScopeProperty(false);
+        this.view.setVisibleConfigLink(false);
 
         this.view.setVisibleSaveButton(isProjectScope);
         this.view.setVisibleDeleteButton(isProjectScope);
@@ -189,7 +195,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
                                                                                            unmarshallerFactory,
                                                                                            environment.getName());
 
-                                                     initializeEditor(file, editorRegistry, fileTypeRegistry);
+                                                     initializeEditor(file, editorProvider, fileTypeRegistry);
                                                  }
                                              }
                                          })
@@ -207,13 +213,28 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
 
     private void getSystemEnvironmentDocker() {
         DockerFile file = dockerFileFactory.newInstance(environment.getPath());
-        initializeEditor(file, editorRegistry, fileTypeRegistry);
+        initializeEditor(file, editorProvider, fileTypeRegistry);
     }
+
+
+
 
     /** {@inheritDoc} */
     @Override
     public void onCopyButtonClicked() {
-        final String fileName = NameGenerator.generate();
+        // get projects env
+        Map<Scope, List<Environment>> envs = this.templatesContainer.getEnvironments();
+        List<Environment> projectEnvs = envs.get(Scope.PROJECT);
+        List<String> existingNames = new ArrayList<>();
+        if (projectEnvs != null) {
+            for (Environment env : projectEnvs) {
+                existingNames.add(env.getName());
+            }
+        }
+        // new name is based from existing one
+        final String fileName = NameGenerator.generateCopy(environment.getName(), existingNames);
+
+
         String path = projectDescriptor.getPath() + ROOT_FOLDER + fileName;
 
         AsyncRequestCallback<ItemReference> callback = asyncCallbackBuilder.unmarshaller(ItemReference.class)
@@ -504,6 +525,16 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         view.setName(environmentName);
         view.setType(environment.getType());
         view.selectScope(scope);
+
+        String defaultRunner = currentProject.getRunner();
+
+        view.changeSwitcherState(environment.getId().equals(defaultRunner));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onSwitcherChanged(boolean isOn) {
+        templatesContainer.setDefaultEnvironment(isOn ? environment : null);
     }
 
     /** {@inheritDoc} */

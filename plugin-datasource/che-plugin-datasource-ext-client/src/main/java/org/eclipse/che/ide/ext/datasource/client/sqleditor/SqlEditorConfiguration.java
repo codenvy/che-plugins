@@ -10,18 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.datasource.client.sqleditor;
 
-import javax.validation.constraints.NotNull;
-
 import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.datasource.client.sqleditor.codeassist.SqlCodeAssistProcessor;
 import org.eclipse.che.ide.ext.datasource.client.store.DatabaseInfoOracle;
 import org.eclipse.che.ide.jseditor.client.codeassist.CodeAssistProcessor;
-import org.eclipse.che.ide.jseditor.client.editorconfig.DefaultTextEditorConfiguration;
+import org.eclipse.che.ide.jseditor.client.editorconfig.AutoSaveTextEditorConfiguration;
 import org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner;
 import org.eclipse.che.ide.jseditor.client.texteditor.ConfigurableTextEditor;
 
-public class SqlEditorConfiguration extends DefaultTextEditorConfiguration {
+import javax.validation.constraints.NotNull;
+
+public class SqlEditorConfiguration extends AutoSaveTextEditorConfiguration {
 
     private SqlCodeAssistProcessor codeAssistProcessor;
     private final SqlEditorResources resource;

@@ -10,10 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.util;
 
-import com.google.gwt.i18n.client.DateTimeFormat;
-
 import javax.annotation.Nonnull;
-import java.util.Date;
+import java.util.List;
 
 /**
  * The class contains business logic which allows us to generate names for environments
@@ -21,16 +19,30 @@ import java.util.Date;
  * @author Dmitry Shnurenko
  */
 public class NameGenerator {
-    public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("hh-mm-ss_dd-mm-yyyy");
-    public static final String PREFIX_NAME = "Environment_";
 
+    /** Utility class */
     private NameGenerator() {
-        throw new UnsupportedOperationException("Creation instance for this class is unsupported operation");
+
     }
 
-    /** @return environment name which consists of string 'Environment ' and current date */
+
+    /**
+     * Gets environment name which consists of string 'Copy of ' and existing name with a current date
+     * If there is an existing name, add a number suffix like "Copy2 of", "Copy3 of", etc.
+     *  @return
+     */
     @Nonnull
-    public static String generate() {
-        return "Environment_" + DATE_TIME_FORMAT.format(new Date());
+    public static String generateCopy(String name, List<String> existingNames) {
+        String baseName = name.replace("+", " ");
+        String computeName = "Copy of ".concat(baseName);
+        boolean alreadyExists = existingNames.contains(computeName);
+        int index = 2;
+        while (alreadyExists) {
+            computeName = "Copy".concat(String.valueOf(index)).concat(" of ").concat(baseName);
+            alreadyExists = existingNames.contains(computeName);
+            index++;
+        }
+        return computeName;
     }
+
 }

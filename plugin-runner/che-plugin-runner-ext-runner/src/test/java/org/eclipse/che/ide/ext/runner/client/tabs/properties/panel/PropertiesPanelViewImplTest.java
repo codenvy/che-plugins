@@ -12,6 +12,8 @@ package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
@@ -24,6 +26,7 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.button.PropertyButt
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Boot;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Shutdown;
+import org.eclipse.che.ide.ui.switcher.Switcher;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +60,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Alexander Andrienko
+ * @author Dmitry Shnurenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class PropertiesPanelViewImplTest {
@@ -73,6 +77,8 @@ public class PropertiesPanelViewImplTest {
     private RunnerResources            resources;
     @Mock
     private WidgetFactory              widgetFactory;
+    @Mock
+    private Switcher                   switcher;
 
     @Mock
     private PropertyButtonWidget               createButtonWidget;
@@ -86,9 +92,13 @@ public class PropertiesPanelViewImplTest {
     private PropertiesPanelView.ActionDelegate delegate;
     @Mock
     private EditorPartPresenter                editor;
+    @Mock
+    private ValueChangeEvent<Boolean>          changeEvent;
 
     @Captor
     private ArgumentCaptor<PropertyButtonWidget.ActionDelegate> captor;
+    @Captor
+    private ArgumentCaptor<ValueChangeHandler<Boolean>>         valueChangeCaptor;
 
     @Mock
     private RunnerResources.RunnerCss runnerCss;
@@ -114,9 +124,23 @@ public class PropertiesPanelViewImplTest {
         when(widgetFactory.createPropertyButton(DELETE, GREY)).thenReturn(deleteButtonWidget);
         when(widgetFactory.createPropertyButton(CANCEL, GREY)).thenReturn(cancelButtonWidget);
 
-        view = new PropertiesPanelViewImpl(locale, resources, widgetFactory);
+        when(changeEvent.getValue()).thenReturn(true);
+
+        view = new PropertiesPanelViewImpl(locale, resources, widgetFactory, switcher);
+        view.setDelegate(delegate);
 
         when(view.name.getText()).thenReturn(TEXT);
+    }
+
+    @Test
+    public void switcherValueShouldBeChanged() throws Exception {
+        verify(switcher).addValueChangeHandler(valueChangeCaptor.capture());
+
+        valueChangeCaptor.getValue().onValueChange(changeEvent);
+
+        verify(delegate).onSwitcherChanged(true);
+        verify(changeEvent).getValue();
+        verify(view.switcherPanel).add(switcher);
     }
 
     @Test
@@ -500,6 +524,16 @@ public class PropertiesPanelViewImplTest {
         view.handleChange(event);
 
         verify(delegate).onConfigurationChanged();
+    }
+
+    @Test
+    public void elementsShouldBeHideWhenScopeIsProject() throws Exception {
+        when(resources.runnerCss().hideElement()).thenReturn(TEXT);
+
+        view.hideSwitcher();
+
+        verify(switcher).addStyleName(TEXT);
+        verify(resources.runnerCss(), times(2)).hideElement();
     }
 
 }

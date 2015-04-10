@@ -19,6 +19,8 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides methods which allow work with templates panel.
@@ -46,12 +48,10 @@ public interface TemplatesContainer extends TabPresenter {
     void addEnvironments(@Nonnull RunnerEnvironmentTree tree, @Nonnull Scope scope);
 
     /**
-     * Adds language type item in special lis box on templates panel.
-     *
-     * @param item
-     *         item which need set to special list box on templates panel
+     * Gets the managed environments
+     * @return the map of scope/list of environments
      */
-    void setTypeItem(@Nonnull String item);
+    Map<Scope, List<Environment>> getEnvironments();
 
     /** Shows environments when user click on templates tab the first time. */
     void showEnvironments();
@@ -61,5 +61,13 @@ public interface TemplatesContainer extends TabPresenter {
 
     /** Changes enable state run button */
     void changeEnableStateRunButton();
+
+    /**
+     * Sets current environment as default for project. If we want delete default environment we need hand on null.
+     *
+     * @param environment
+     *         environment which need set
+     */
+    void setDefaultEnvironment(@Nullable Environment environment);
 
 }

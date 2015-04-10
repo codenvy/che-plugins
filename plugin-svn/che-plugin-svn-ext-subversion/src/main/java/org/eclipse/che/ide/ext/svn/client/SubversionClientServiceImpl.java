@@ -16,7 +16,6 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import org.eclipse.che.api.core.rest.shared.dto.Hyperlinks;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.svn.shared.AddRequest;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
@@ -39,7 +38,6 @@ import org.eclipse.che.ide.rest.AsyncRequestFactory;
 import org.eclipse.che.ide.rest.AsyncRequestLoader;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 
-import com.google.common.base.Strings;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -262,23 +260,6 @@ public class SubversionClientServiceImpl implements SubversionClientService {
                         callback.onFailure(exception);
                    }
                });
-    }
-
-    @Override
-    public void export(String projectPath, String exportPath, String revision, AsyncRequestCallback<Hyperlinks> callback) {
-        char prefix = '?';
-        StringBuilder url = new StringBuilder(baseHttpUrl + "/export" + projectPath);
-
-        if (!Strings.isNullOrEmpty(exportPath)) {
-            url.append(prefix).append("path").append('=').append(exportPath);
-            prefix = '&';
-        }
-
-        if (!Strings.isNullOrEmpty(revision)) {
-            url.append(prefix).append("revision").append('=').append(revision);
-        }
-
-        asyncRequestFactory.createPostRequest(url.toString(), null).loader(loader).send(callback);
     }
 
     protected List<String> parseConflictsList(List<String> output) {

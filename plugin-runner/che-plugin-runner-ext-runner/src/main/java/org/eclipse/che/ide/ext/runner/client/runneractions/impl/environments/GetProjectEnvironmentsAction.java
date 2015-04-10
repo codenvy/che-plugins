@@ -99,6 +99,17 @@ public class GetProjectEnvironmentsAction extends AbstractRunnerAction {
                                                                                                              descriptor.getType(),
                                                                                                              PROJECT);
                         panel.addEnvironments(result, PROJECT);
+
+                        String defaultRunner = currentProject.getRunner();
+
+                        for (Environment environment : projectEnvironments) {
+                            if (environment.getId().equals(defaultRunner)) {
+                                panel.setDefaultEnvironment(environment);
+
+                                break;
+                            }
+                        }
+
                         chooseRunnerAction.addProjectRunners(projectEnvironments);
                     }
                 })

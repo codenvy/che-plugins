@@ -12,7 +12,7 @@ package org.eclipse.che.ide.ext.git.client.init;
 
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.notification.Notification;
+import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitRepositoryInitializer;
@@ -20,10 +20,9 @@ import org.eclipse.che.ide.util.loging.Log;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
-
-import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 
 /**
  * Presenter for Git command Init Repository.
@@ -34,16 +33,19 @@ import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 @Singleton
 public class InitRepositoryPresenter {
     private final GitRepositoryInitializer gitRepositoryInitializer;
+    private final EventBus                 eventBus;
     private final AppContext               appContext;
     private final GitLocalizationConstant  constant;
     private final NotificationManager      notificationManager;
 
     @Inject
     public InitRepositoryPresenter(AppContext appContext,
+                                   EventBus eventBus,
                                    GitLocalizationConstant constant,
                                    NotificationManager notificationManager,
                                    GitRepositoryInitializer gitRepositoryInitializer) {
         this.appContext = appContext;
+        this.eventBus = eventBus;
         this.constant = constant;
         this.notificationManager = notificationManager;
         this.gitRepositoryInitializer = gitRepositoryInitializer;
@@ -65,8 +67,9 @@ public class InitRepositoryPresenter {
 
             @Override
             public void onSuccess(Void result) {
-                Notification notification = new Notification(constant.initSuccess(), Notification.Type.INFO);
-                notificationManager.showNotification(notification);
+                notificationManager.showInfo(constant.initSuccess());
+                //it's need for show .git in project tree
+                eventBus.fireEvent(new RefreshProjectTreeEvent());
             }
         });
     }
@@ -79,7 +82,6 @@ public class InitRepositoryPresenter {
      */
     private void handleError(@Nonnull Throwable e) {
         String errorMessage = (e.getMessage() != null && !e.getMessage().isEmpty()) ? e.getMessage() : constant.initFailed();
-        Notification notification = new Notification(errorMessage, ERROR);
-        notificationManager.showNotification(notification);
+        notificationManager.showError(errorMessage);
     }
 }
