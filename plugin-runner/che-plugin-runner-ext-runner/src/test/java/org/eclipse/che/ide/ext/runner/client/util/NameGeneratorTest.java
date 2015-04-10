@@ -12,22 +12,29 @@ package org.eclipse.che.ide.ext.runner.client.util;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.ext.runner.client.models.Environment;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Alexander Andrienko
  * @author Florent Benoit
+ * @author Valeriy Svydenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class NameGeneratorTest {
-
-
+    @Mock
+    private Environment environment1;
+    @Mock
+    private Environment environment2;
 
     /**
      * First copy is named 'copy of'
@@ -64,4 +71,31 @@ public class NameGeneratorTest {
         assertEquals(expectedName, generated);
     }
 
+    @Test
+    public void generateCustomEnvironmentName() throws Exception {
+        String projectName = "project";
+        String newName = "ENV3-project";
+
+        when(environment1.getName()).thenReturn("ENV1-" + projectName);
+        when(environment2.getName()).thenReturn("ENV2-" + projectName);
+        List<Environment> environments = Arrays.asList(environment1, environment2);
+
+        String generated = NameGenerator.generateCustomEnvironmentName(environments, projectName);
+
+        assertEquals(newName, generated);
+    }
+
+    @Test
+    public void generateCustomEnvironmentName2() throws Exception {
+        String projectName = "project";
+        String newName = "ENV2-project";
+
+        when(environment1.getName()).thenReturn("ENV1-" + projectName);
+        when(environment2.getName()).thenReturn("ENV3-" + projectName);
+        List<Environment> environments = Arrays.asList(environment1, environment2);
+
+        String generated = NameGenerator.generateCustomEnvironmentName(environments, projectName);
+
+        assertEquals(newName, generated);
+    }
 }

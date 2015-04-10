@@ -216,14 +216,11 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         initializeEditor(file, editorProvider, fileTypeRegistry);
     }
 
-
-
-
     /** {@inheritDoc} */
     @Override
     public void onCopyButtonClicked() {
         // get projects env
-        Map<Scope, List<Environment>> envs = this.templatesContainer.getEnvironments();
+        Map<Scope, List<Environment>> envs = templatesContainer.getEnvironments();
         List<Environment> projectEnvs = envs.get(Scope.PROJECT);
         List<String> existingNames = new ArrayList<>();
         if (projectEnvs != null) {

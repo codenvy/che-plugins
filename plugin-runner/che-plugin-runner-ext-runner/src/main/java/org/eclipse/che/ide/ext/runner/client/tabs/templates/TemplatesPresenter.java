@@ -179,14 +179,14 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         view.addEnvironment(environmentMap);
 
         if (PROJECT.equals(scope) && previousProjectEnvironments.size() < sourceList.size()) {
-            selectNewProjectEnvironment(sourceList);
+            selectNewProjectEnvironment(targetList);
         } else {
             selectPreviousOrFirstEnvironment();
         }
 
         if (PROJECT.equals(scope)) {
             previousProjectEnvironments.clear();
-            previousProjectEnvironments.addAll(sourceList);
+            previousProjectEnvironments.addAll(targetList);
         }
 
         if (!(RUNNERS).equals(panelState.getState())) {
@@ -341,8 +341,8 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
             return;
         }
 
-        view.setDefaultProjectWidget(defaultEnvWidget);
         defaultEnvWidget.update(environment);
+        view.setDefaultProjectWidget(defaultEnvWidget);
     }
 
     private void updateProject(@Nonnull ProjectDescriptor descriptor, @Nullable final EnvironmentWidget environmentWidget) {

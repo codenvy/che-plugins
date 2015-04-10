@@ -27,6 +27,7 @@ import org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerPresenter;
 import org.eclipse.che.ide.ext.runner.client.runneractions.impl.environments.GetProjectEnvironmentsAction;
 import org.eclipse.che.ide.ext.runner.client.tabs.container.TabContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanelPresenter;
+import org.eclipse.che.ide.ext.runner.client.tabs.templates.TemplatesPresenter;
 import org.eclipse.che.ide.ext.runner.client.util.NameGenerator;
 import org.eclipse.che.ide.ext.runner.client.util.annotations.LeftPanel;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -35,6 +36,7 @@ import org.eclipse.che.ide.util.loging.Log;
 import javax.annotation.Nonnull;
 
 import static org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl.ROOT_FOLDER;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 
 /**
  * @author Valeriy Svydenko
@@ -51,6 +53,7 @@ public class CreateCustomRunnerAction extends AbstractRunnerActions {
     private final RunnerManagerPresenter              runnerManagerPresenter;
     private final TabContainer                        tabContainer;
     private final RunnerLocalizationConstant          locale;
+    private final TemplatesPresenter                  templatesPresenter;
 
     private CurrentProject currentProject;
 
@@ -63,12 +66,14 @@ public class CreateCustomRunnerAction extends AbstractRunnerActions {
                                     GetProjectEnvironmentsAction getProjectEnvironmentsAction,
                                     AsyncCallbackBuilder<ItemReference> asyncCallbackBuilder,
                                     ProjectServiceClient projectService,
+                                    TemplatesPresenter templatesPresenter,
                                     @LeftPanel TabContainer tabContainer) {
         super(appContext, locale.createCustomRunner(), locale.createCustomRunner(), resources.runWith());
 
         this.locale = locale;
         this.getProjectEnvironmentsAction = getProjectEnvironmentsAction;
         this.notificationManager = notificationManager;
+        this.templatesPresenter = templatesPresenter;
         this.asyncCallbackBuilder = asyncCallbackBuilder;
         this.projectService = projectService;
         this.resources = resources;
@@ -92,7 +97,8 @@ public class CreateCustomRunnerAction extends AbstractRunnerActions {
             return;
         }
 
-        final String fileName = NameGenerator.generate();
+        final String fileName = NameGenerator.generateCustomEnvironmentName(templatesPresenter.getEnvironments().get(PROJECT),
+                                                                            currentProject.getProjectDescription().getName());
         String path = currentProject.getProjectDescription().getPath() + ROOT_FOLDER + fileName;
 
         AsyncRequestCallback<ItemReference> callback = asyncCallbackBuilder.unmarshaller(ItemReference.class)

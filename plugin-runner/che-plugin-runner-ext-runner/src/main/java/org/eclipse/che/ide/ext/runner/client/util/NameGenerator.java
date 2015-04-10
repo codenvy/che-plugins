@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.util;
 
+import org.eclipse.che.ide.ext.runner.client.models.Environment;
+
 import javax.annotation.Nonnull;
 import java.util.List;
 
@@ -17,8 +19,10 @@ import java.util.List;
  * The class contains business logic which allows us to generate names for environments
  *
  * @author Dmitry Shnurenko
+ * @author Valeriy Svydenko
  */
 public class NameGenerator {
+    private static final String CUSTOM_ENV_PREFIX = "ENV";
 
     /** Utility class */
     private NameGenerator() {
@@ -29,7 +33,8 @@ public class NameGenerator {
     /**
      * Gets environment name which consists of string 'Copy of ' and existing name with a current date
      * If there is an existing name, add a number suffix like "Copy2 of", "Copy3 of", etc.
-     *  @return
+     *
+     * @return
      */
     @Nonnull
     public static String generateCopy(String name, List<String> existingNames) {
@@ -43,6 +48,28 @@ public class NameGenerator {
             index++;
         }
         return computeName;
+    }
+
+    /**
+     * Gets project environments name which is creating from scratch.
+     *
+     * @param environments
+     *         list of existing environments
+     * @param projectName
+     *         name of current project
+     * @return name of new custom environment
+     */
+    public static String generateCustomEnvironmentName(@Nonnull List<Environment> environments, @Nonnull String projectName) {
+        int counter = 1;
+        String name = CUSTOM_ENV_PREFIX + counter + '-' + projectName;
+        for (Environment environment : environments) {
+            if (environment.getName().equals(name)) {
+                counter++;
+                name = CUSTOM_ENV_PREFIX + counter + '-' + projectName;
+            }
+        }
+
+        return name;
     }
 
 }
