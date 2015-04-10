@@ -19,6 +19,11 @@ import org.kohsuke.github.GitHub;
 
 import java.io.IOException;
 
+/**
+ * Factory class used to generate connection to GitHub
+ *
+ * @author Igor Vinokur
+ */
 public class GitHubFactory {
 
     private final OAuthTokenProvider oauthTokenProvider;
@@ -28,10 +33,21 @@ public class GitHubFactory {
         this.oauthTokenProvider = oauthTokenProvider;
     }
 
+    /**
+     * Connect to GitHub API
+     * @return connected GitHub API class
+     * @throws IOException
+     */
     public GitHub connect() throws IOException {
         return GitHub.connectUsingOAuth(getToken(getUserId()));
     }
 
+    /**
+     * Get user's token
+     * @param user user's ID
+     * @return authentication token
+     * @throws IOException
+     */
     public String getToken(String user) throws IOException {
         OAuthToken token = oauthTokenProvider.getToken("github", user);
         String oauthToken = token != null ? token.getToken() : null;
