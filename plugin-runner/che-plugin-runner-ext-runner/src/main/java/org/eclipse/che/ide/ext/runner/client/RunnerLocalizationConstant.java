@@ -171,6 +171,9 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("properties.config")
     String propertiesConfig();
 
+    @Key("properties.open.config")
+    String propertiesOpenConfig();
+
     @Key("properties.name")
     String propertiesName();
 

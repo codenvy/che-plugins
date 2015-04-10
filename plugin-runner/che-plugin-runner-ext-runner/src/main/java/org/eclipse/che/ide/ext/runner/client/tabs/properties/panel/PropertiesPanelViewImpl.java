@@ -87,9 +87,10 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
     @UiField
     ListBox          shutdown;
     @UiField
-    SplitLayoutPanel switcherPanel;
+    Switcher         projectDefault;
     @UiField
-    Label            defaultLabel;
+    FlowPanel        projectDefaultPanel;
+
 
     @UiField
     DockLayoutPanel   propertiesPanel;
@@ -104,7 +105,6 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
 
     private final WidgetFactory widgetFactory;
     private final Label         unAvailableMessage;
-    private final Switcher      switcher;
 
     private ActionDelegate delegate;
 
@@ -115,8 +115,7 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
     @Inject
     public PropertiesPanelViewImpl(RunnerLocalizationConstant locale,
                                    RunnerResources resources,
-                                   WidgetFactory widgetFactory,
-                                   Switcher switcher) {
+                                   WidgetFactory widgetFactory) {
         this.locale = locale;
         this.resources = resources;
 
@@ -167,7 +166,6 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
         };
         cancelBtn = createButton(locale.propertiesButtonCancel(), cancelDelegate, GREY);
 
-        this.switcher = switcher;
 
         ValueChangeHandler<Boolean> valueChangeHandler = new ValueChangeHandler<Boolean>() {
             @Override
@@ -176,9 +174,7 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
             }
         };
 
-        switcher.addValueChangeHandler(valueChangeHandler);
-
-        switcherPanel.add(switcher);
+        projectDefault.addValueChangeHandler(valueChangeHandler);
     }
 
     private void prepareField(@Nonnull ListBox field, @Nonnull Set<? extends Enum> items) {
@@ -394,14 +390,13 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
     /** {@inheritDoc} */
     @Override
     public void changeSwitcherState(boolean isOn) {
-        switcher.setValue(isOn);
+        projectDefault.setValue(isOn);
     }
 
     /** {@inheritDoc} */
     @Override
     public void hideSwitcher() {
-        switcher.addStyleName(resources.runnerCss().hideElement());
-        defaultLabel.addStyleName(resources.runnerCss().hideElement());
+        projectDefaultPanel.setVisible(false);
     }
 
     @UiHandler("name")

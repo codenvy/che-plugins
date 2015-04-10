@@ -77,8 +77,6 @@ public class PropertiesPanelViewImplTest {
     private RunnerResources            resources;
     @Mock
     private WidgetFactory              widgetFactory;
-    @Mock
-    private Switcher                   switcher;
 
     @Mock
     private PropertyButtonWidget               createButtonWidget;
@@ -126,23 +124,23 @@ public class PropertiesPanelViewImplTest {
 
         when(changeEvent.getValue()).thenReturn(true);
 
-        view = new PropertiesPanelViewImpl(locale, resources, widgetFactory, switcher);
+        view = new PropertiesPanelViewImpl(locale, resources, widgetFactory);
         view.setDelegate(delegate);
 
         when(view.name.getText()).thenReturn(TEXT);
     }
 
-    @Test
+   /* @Test
     public void switcherValueShouldBeChanged() throws Exception {
-        verify(switcher).addValueChangeHandler(valueChangeCaptor.capture());
+     *//*  // verify(switcher).addValueChangeHandler(valueChangeCaptor.capture());
 
-        valueChangeCaptor.getValue().onValueChange(changeEvent);
+        valueChangeCaptor.getValue().onValueChange(changeEvent);*//*
+
 
         verify(delegate).onSwitcherChanged(true);
         verify(changeEvent).getValue();
-        verify(view.switcherPanel).add(switcher);
     }
-
+*/
     @Test
     public void prepareActionShouldBePerformed() {
         ramItemsShouldBeAdded();
@@ -525,15 +523,4 @@ public class PropertiesPanelViewImplTest {
 
         verify(delegate).onConfigurationChanged();
     }
-
-    @Test
-    public void elementsShouldBeHideWhenScopeIsProject() throws Exception {
-        when(resources.runnerCss().hideElement()).thenReturn(TEXT);
-
-        view.hideSwitcher();
-
-        verify(switcher).addStyleName(TEXT);
-        verify(resources.runnerCss(), times(2)).hideElement();
-    }
-
 }
