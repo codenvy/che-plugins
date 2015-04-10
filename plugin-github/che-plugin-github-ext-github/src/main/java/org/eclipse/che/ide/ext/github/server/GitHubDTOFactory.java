@@ -79,9 +79,7 @@ public class GitHubDTOFactory {
      * @throws IOException
      */
     public GitHubRepositoryList createRepositoriesList() throws IOException {
-        GitHubRepositoryList dtoRepositoriesList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
-
-        return dtoRepositoriesList;
+        return DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
     }
 
     /**

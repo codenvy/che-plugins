@@ -47,6 +47,7 @@ public class GitHubFactory {
      * @param user user's ID
      * @return authentication token
      * @throws IOException
+     * @deprecated Use getToken method from rest service
      */
     public String getToken(String user) throws IOException {
         OAuthToken token = oauthTokenProvider.getToken("github", user);
