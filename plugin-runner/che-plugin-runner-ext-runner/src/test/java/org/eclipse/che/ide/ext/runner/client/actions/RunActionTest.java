@@ -10,32 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.actions;
 
-import com.google.inject.Provider;
-
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
-import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
-import org.eclipse.che.api.runner.gwt.client.RunnerServiceClient;
 import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
-import org.eclipse.che.ide.ext.runner.client.callbacks.AsyncCallbackBuilder;
-import org.eclipse.che.ide.ext.runner.client.callbacks.FailureCallback;
-import org.eclipse.che.ide.ext.runner.client.callbacks.SuccessCallback;
-import org.eclipse.che.ide.ext.runner.client.inject.factories.RunnerActionFactory;
 import org.eclipse.che.ide.ext.runner.client.manager.RunnerManager;
-import org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerPresenter;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
-import org.eclipse.che.ide.ext.runner.client.models.Runner;
-import org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.LaunchAction;
-import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -76,15 +62,15 @@ public class RunActionTest {
     private NotificationManager        notificationManager;
 
     @Mock
-    private ChooseRunnerAction chooseRunnerAction;
+    private ChooseRunnerAction          chooseRunnerAction;
     @Mock
-    private AppContext         appContext;
+    private AppContext                  appContext;
     @Mock
-    private CurrentProject     currentProject;
+    private CurrentProject              currentProject;
     @Mock
-    private Environment        environment;
+    private Environment                 environment;
     @Mock
-    private ActionPermit       runActionPermit;
+    private ResourcesLockedActionPermit runActionPermit;
 
     @InjectMocks
     private RunAction action;

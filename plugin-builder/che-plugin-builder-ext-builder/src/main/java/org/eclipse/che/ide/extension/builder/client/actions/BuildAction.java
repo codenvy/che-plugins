@@ -11,7 +11,7 @@
 package org.eclipse.che.ide.extension.builder.client.actions;
 
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.action.permits.Build;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -33,11 +33,11 @@ import org.eclipse.che.ide.extension.builder.client.build.BuildController;
 @Singleton
 public class BuildAction extends ProjectAction {
 
-    private final BuildController        buildController;
-    private final AnalyticsEventLogger   eventLogger;
-    private final BuildContext           buildContext;
-    private final ActionPermit           buildActionPermit;
-    private final ActionDenyAccessDialog buildActionDenyAccessDialog;
+    private final BuildController             buildController;
+    private final AnalyticsEventLogger        eventLogger;
+    private final BuildContext                buildContext;
+    private final ResourcesLockedActionPermit buildActionPermit;
+    private final ActionDenyAccessDialog      buildActionDenyAccessDialog;
 
     @Inject
     public BuildAction(BuildController buildController,
@@ -45,7 +45,7 @@ public class BuildAction extends ProjectAction {
                        BuilderLocalizationConstant localizationConstant,
                        AnalyticsEventLogger eventLogger,
                        BuildContext buildContext,
-                       @Build ActionPermit buildActionPermit,
+                       @Build ResourcesLockedActionPermit buildActionPermit,
                        @Build ActionDenyAccessDialog buildActionDenyAccessDialog) {
         super(localizationConstant.buildProjectControlTitle(), localizationConstant.buildProjectControlDescription(), resources.build());
         this.buildController = buildController;

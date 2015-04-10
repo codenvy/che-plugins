@@ -23,6 +23,9 @@ import org.eclipse.che.api.project.shared.dto.RunnerConfiguration;
 import org.eclipse.che.api.project.shared.dto.RunnersDescriptor;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
+import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
+import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
@@ -160,6 +163,10 @@ public class RunnerManagerPresenterTest {
     private GetSystemEnvironmentsAction  getSystemEnvironmentsAction;
     @Mock
     private RunnerUtil                   runnerUtil;
+    @Mock
+    private ResourcesLockedActionPermit  runActionPermit;
+    @Mock
+    private ActionDenyAccessDialog       runActionDenyAccessDialog;
 
     //tab builder mocks
     @Mock
@@ -278,7 +285,9 @@ public class RunnerManagerPresenterTest {
                                                selectionManager,
                                                timerFactory,
                                                getSystemEnvironmentsAction,
-                                               runnerUtil);
+                                               runnerUtil,
+                                               runActionPermit,
+                                               runActionDenyAccessDialog);
 
         //adding runner
         when(dtoFactory.createDto(RunOptions.class)).thenReturn(runOptions);
@@ -685,6 +694,8 @@ public class RunnerManagerPresenterTest {
 
     @Test
     public void runnerShouldNotBeRunIfRunnerAndSelectedEnvironmentAreNull() {
+        when(runActionPermit.isAllowed()).thenReturn(true);
+
         presenter.onRunButtonClicked();
 
         verifyLaunchRunnerWithNotNullCurrentProject();
@@ -713,6 +724,7 @@ public class RunnerManagerPresenterTest {
     @Test
     public void runnerShouldBeRunIfSelectedRunnerNotNullAndStatusIsInProgress() {
         when(runner.getStatus()).thenReturn(Runner.Status.IN_PROGRESS);
+        when(runActionPermit.isAllowed()).thenReturn(true);
         presenter.addRunner(processDescriptor);
         reset(view, history);
 
@@ -752,6 +764,7 @@ public class RunnerManagerPresenterTest {
         when(runnerConfiguration.getRam()).thenReturn(RAM_SIZE);
         when(runOptions.withMemorySize(RAM_SIZE)).thenReturn(defaultRunOptions);
         when(modelsFactory.createRunner(defaultRunOptions)).thenReturn(runner);
+        when(runActionPermit.isAllowed()).thenReturn(true);
 
         presenter.addRunner(processDescriptor);
         reset(view, history);
@@ -782,6 +795,7 @@ public class RunnerManagerPresenterTest {
     @Test
     public void newRunnerShouldBeRunIfPanelStateIsNotTemplate() {
         when(panelState.getState()).thenReturn(RUNNERS);
+        when(runActionPermit.isAllowed()).thenReturn(true);
         presenter.addRunner(processDescriptor);
         reset(view, history);
 
@@ -809,6 +823,7 @@ public class RunnerManagerPresenterTest {
         when(runOptions.withMemorySize(RAM_SIZE)).thenReturn(runOptions);
         when(modelsFactory.createRunner(runOptions, TEXT)).thenReturn(runner);
         when(panelState.getState()).thenReturn(TEMPLATE);
+        when(runActionPermit.isAllowed()).thenReturn(true);
 
         presenter.onSelectionChanged(Selection.ENVIRONMENT);
 
@@ -834,6 +849,7 @@ public class RunnerManagerPresenterTest {
 
     @Test
     public void runnerShouldBeRerunIfRunnerActionIsNull() throws Exception {
+        when(runActionPermit.isAllowed()).thenReturn(true);
         presenter.addRunner(processDescriptor);
         reset(view, history);
 
@@ -853,6 +869,7 @@ public class RunnerManagerPresenterTest {
     @Test
     public void runnerShouldBeRerunIfRunnerNotNullAndStatusIsStopped() {
         when(runner.getStatus()).thenReturn(STOPPED);
+        when(runActionPermit.isAllowed()).thenReturn(true);
         presenter.addRunner(processDescriptor);
         reset(view, history);
 
@@ -882,6 +899,7 @@ public class RunnerManagerPresenterTest {
         when(runOptions.withMemorySize(RAM_SIZE)).thenReturn(runOptions);
         when(modelsFactory.createRunner(runOptions, TEXT)).thenReturn(runner);
         when(panelState.getState()).thenReturn(TEMPLATE);
+        when(runActionPermit.isAllowed()).thenReturn(true);
 
         presenter.addRunner(processDescriptor);
         reset(view, history);
@@ -952,6 +970,8 @@ public class RunnerManagerPresenterTest {
 
     @Test
     public void runnerShouldNotBeLaunched() {
+        when(runActionPermit.isAllowed()).thenReturn(true);
+
         presenter.launchRunner();
 
         verifyLaunchRunnerWithNotNullCurrentProject();
@@ -1161,6 +1181,8 @@ public class RunnerManagerPresenterTest {
     @Test(expected = IllegalStateException.class)
     public void runnerShouldNotLaunchWhenCurrentProjectIsNull() {
         when(appContext.getCurrentProject()).thenReturn(null);
+        when(runActionPermit.isAllowed()).thenReturn(true);
+
         presenter.launchRunner(runOptions);
     }
 

@@ -14,7 +14,7 @@ import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.gwt.client.RunnerServiceClient;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -54,7 +54,7 @@ public class RunAction extends AbstractRunnerAction {
     private final RunnerUtil                                                   runnerUtil;
     private final LaunchAction                                                 launchAction;
     private final AnalyticsEventLogger                                         eventLogger;
-    private final ActionPermit                                                 runActionPermit;
+    private final ResourcesLockedActionPermit                                  runActionPermit;
     private final ActionDenyAccessDialog                                       runActionDenyAccessDialog;
 
     @Inject
@@ -66,7 +66,7 @@ public class RunAction extends AbstractRunnerAction {
                      RunnerUtil runnerUtil,
                      RunnerActionFactory actionFactory,
                      AnalyticsEventLogger eventLogger,
-                     @Run ActionPermit runActionPermit,
+                     @Run ResourcesLockedActionPermit runActionPermit,
                      @Run ActionDenyAccessDialog runActionDenyAccessDialog) {
         this.service = service;
         this.appContext = appContext;
@@ -107,11 +107,11 @@ public class RunAction extends AbstractRunnerAction {
 
                             presenter.addRunnerId(descriptor.getProcessId());
 
-                        launchAction.perform(runner);
-                    }
-                })
-                .failure(new FailureCallback() {
-                    @Override
+                            launchAction.perform(runner);
+                        }
+                    })
+                    .failure(new FailureCallback() {
+                        @Override
                     public void onFailure(@Nonnull Throwable reason) {
 
                         if (project.getRunner() == null) {
