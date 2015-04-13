@@ -39,6 +39,8 @@ import static org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl.ROOT_
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 
 /**
+ * Action which allows user create environment from scratch.
+ *
  * @author Valeriy Svydenko
  */
 public class CreateCustomRunnerAction extends AbstractRunnerActions {
@@ -82,6 +84,7 @@ public class CreateCustomRunnerAction extends AbstractRunnerActions {
         this.tabContainer = tabContainer;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed(ActionEvent e) {
         runnerManagerPresenter.setActive();

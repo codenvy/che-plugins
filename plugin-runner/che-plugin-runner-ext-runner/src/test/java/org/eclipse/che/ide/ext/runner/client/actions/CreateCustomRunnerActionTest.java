@@ -48,21 +48,16 @@ import java.util.Map;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * @author Valeriy Svydenko
- */
+/** @author Valeriy Svydenko */
 @RunWith(GwtMockitoTestRunner.class)
 public class CreateCustomRunnerActionTest {
-    private static final String DOCKER_TEMPLATE  = "docker";
-
-    @Captor
-    private ArgumentCaptor<SuccessCallback<ItemReference>> successCallbackArgumentCaptor;
+    private static final String DOCKER_TEMPLATE = "docker";
+    private static final String TEXT            = "text";
 
     //variables for constructor
     @Mock
@@ -87,22 +82,50 @@ public class CreateCustomRunnerActionTest {
     private TabContainer                        tabContainer;
 
     @Mock
-    private ActionEvent                         e;
+    private ActionEvent                         actionEvent;
     @Mock
     private CurrentProject                      currentProject;
     @Mock
     private ItemReference                       itemReference1;
     @Mock
+    private Environment                         environment;
+    @Mock
+    private TextResource                        textResource;
+    @Mock
+    private Throwable                           exception;
+    @Mock
+    private ProjectDescriptor                   projectDescriptor;
+    @Mock
     private AsyncRequestCallback<ItemReference> asyncRequestCallback;
+
+    @Captor
+    private ArgumentCaptor<SuccessCallback<ItemReference>> successCallbackArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<FailureCallback>                failureCallbackArgumentCaptor;
 
     private CreateCustomRunnerAction action;
 
     @Before
     public void setUp() {
+        when(currentProject.getProjectDescription()).thenReturn(projectDescriptor);
+        when(environment.getName()).thenReturn("environmentName");
+        when(projectDescriptor.getPath()).thenReturn("/path");
+        when(projectDescriptor.getName()).thenReturn("project");
+        when(resources.dockerTemplate()).thenReturn(textResource);
+        when(textResource.getText()).thenReturn(DOCKER_TEMPLATE);
+        when(exception.getMessage()).thenReturn(TEXT);
+
         when(asyncCallbackBuilder.unmarshaller(ItemReference.class)).thenReturn(asyncCallbackBuilder);
         when(asyncCallbackBuilder.success(Matchers.<SuccessCallback<ItemReference>>anyObject())).thenReturn(asyncCallbackBuilder);
         when(asyncCallbackBuilder.failure(any(FailureCallback.class))).thenReturn(asyncCallbackBuilder);
         when(asyncCallbackBuilder.build()).thenReturn(asyncRequestCallback);
+
+        List<Environment> projectEnvironments = Collections.singletonList(environment);
+        Map<Scope, List<Environment>> environments = new EnumMap<>(Scope.class);
+        environments.put(Scope.PROJECT, projectEnvironments);
+
+        when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(templatesPresenter.getEnvironments()).thenReturn(environments);
 
         action = new CreateCustomRunnerAction(locale,
                                               appContext,
@@ -118,7 +141,7 @@ public class CreateCustomRunnerActionTest {
 
     @Test
     public void actionShouldBePerformed() throws Exception {
-        action.actionPerformed(e);
+        action.actionPerformed(actionEvent);
 
         verify(runnerManagerPresenter).setActive();
         verify(locale).runnerTabTemplates();
@@ -128,7 +151,7 @@ public class CreateCustomRunnerActionTest {
     public void environmentShouldNotBeCreatedIfCurrentProjectIsNull() throws Exception {
         when(appContext.getCurrentProject()).thenReturn(null);
 
-        action.actionPerformed(e);
+        action.actionPerformed(actionEvent);
 
         verify(runnerManagerPresenter).setActive();
         verify(locale).runnerTabTemplates();
@@ -137,23 +160,7 @@ public class CreateCustomRunnerActionTest {
 
     @Test
     public void environmentShouldBeCreated() throws Exception {
-        ProjectDescriptor projectDescriptor = mock(ProjectDescriptor.class);
-        Environment environment = mock(Environment.class);
-        when(environment.getName()).thenReturn("environmentName");
-        List<Environment> projectEnvironments = Collections.singletonList(environment);
-        Map<Scope, List<Environment>> environments = new EnumMap<>(Scope.class);
-        environments.put(Scope.PROJECT, projectEnvironments);
-        TextResource textResource = mock(TextResource.class);
-
-        when(appContext.getCurrentProject()).thenReturn(currentProject);
-        when(templatesPresenter.getEnvironments()).thenReturn(environments);
-        when(currentProject.getProjectDescription()).thenReturn(projectDescriptor);
-        when(projectDescriptor.getPath()).thenReturn("/path");
-        when(projectDescriptor.getName()).thenReturn("project");
-        when(resources.dockerTemplate()).thenReturn(textResource);
-        when(textResource.getText()).thenReturn(DOCKER_TEMPLATE);
-
-        action.actionPerformed(e);
+        action.actionPerformed(actionEvent);
 
         verify(runnerManagerPresenter).setActive();
         verify(locale).runnerTabTemplates();
@@ -162,16 +169,50 @@ public class CreateCustomRunnerActionTest {
 
         successCallbackArgumentCaptor.getValue().onSuccess(itemReference1);
 
-        successCallbackArgumentCaptor.getValue().onSuccess(itemReference1);
-
         verify(projectService).createFolder(anyString(), eq(asyncRequestCallback));
-        verify(projectDescriptor, times(3)).getPath();
+        verify(projectDescriptor, times(2)).getPath();
 
-        verify(asyncCallbackBuilder, times(3)).unmarshaller(ItemReference.class);
-        verify(asyncCallbackBuilder, times(3)).success(successCallbackArgumentCaptor.capture());
+        verify(asyncCallbackBuilder, times(2)).unmarshaller(ItemReference.class);
+        verify(asyncCallbackBuilder, times(2)).success(successCallbackArgumentCaptor.capture());
 
         successCallbackArgumentCaptor.getValue().onSuccess(itemReference1);
 
         verify(getProjectEnvironmentsAction).perform();
+    }
+
+    @Test
+    public void notificationMessageShouldBeShowedIfParentFolderDoesNotCreate() throws Exception {
+        action.actionPerformed(actionEvent);
+
+        verify(runnerManagerPresenter).setActive();
+        verify(locale).runnerTabTemplates();
+        verify(asyncCallbackBuilder).unmarshaller(ItemReference.class);
+        verify(asyncCallbackBuilder).failure(failureCallbackArgumentCaptor.capture());
+
+        failureCallbackArgumentCaptor.getValue().onFailure(exception);
+
+        verify(notificationManager).showError(TEXT);
+    }
+
+    @Test
+    public void environmentDoesNotCreatedIfDockerFileNotCrested() throws Exception {
+        action.actionPerformed(actionEvent);
+
+        verify(runnerManagerPresenter).setActive();
+        verify(locale).runnerTabTemplates();
+        verify(asyncCallbackBuilder).unmarshaller(ItemReference.class);
+        verify(asyncCallbackBuilder).success(successCallbackArgumentCaptor.capture());
+
+        successCallbackArgumentCaptor.getValue().onSuccess(itemReference1);
+
+        verify(projectService).createFolder(anyString(), eq(asyncRequestCallback));
+        verify(projectDescriptor, times(2)).getPath();
+
+        verify(asyncCallbackBuilder, times(2)).unmarshaller(ItemReference.class);
+        verify(asyncCallbackBuilder, times(2)).failure(failureCallbackArgumentCaptor.capture());
+
+        failureCallbackArgumentCaptor.getValue().onFailure(exception);
+
+        verify(getProjectEnvironmentsAction, never()).perform();
     }
 }
