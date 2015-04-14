@@ -64,4 +64,71 @@ public class NameGeneratorTest {
         assertEquals(expectedName, generated);
     }
 
+
+    /**
+     * Copying a copy should result in a new increment of a copy, not copy of copy
+     */
+    @Test
+    public void generateCopyOfCopy() {
+        String existsName = "Copy of hello";
+        String existsName2 = "Copy2 of hello";
+        String generated = NameGenerator.generateCopy("Copy of hello", Arrays.asList(existsName, existsName2));
+        String expectedName = "Copy3 of hello";
+
+        assertEquals(expectedName, generated);
+    }
+
+    /**
+     * Copying a copy should result in a new increment of a copy, not copy of copy
+     */
+    @Test
+    public void generateCopyOfCopy2() {
+        String existsName = "Copy of hello";
+        String existsName2 = "Copy2 of hello";
+        String existsName3 = "Copy3 of hello";
+        String generated = NameGenerator.generateCopy("Copy3 of hello", Arrays.asList(existsName, existsName2, existsName3));
+        String expectedName = "Copy4 of hello";
+
+        assertEquals(expectedName, generated);
+    }
+
+
+    /**
+     * Test remove copy prefix
+     */
+    @Test
+    public void removeNonExistingPrefix() {
+        String name = NameGenerator.removeCopyPrefix("removeNonExistingPrefix of hello");
+        assertEquals("removeNonExistingPrefix of hello", name);
+    }
+
+    /**
+     * Test remove copy prefix
+     */
+    @Test
+    public void removeCopyPrefix() {
+        String name = NameGenerator.removeCopyPrefix("Copy of hello");
+        assertEquals("hello", name);
+    }
+
+
+    /**
+     * Test remove copy prefix
+     */
+    @Test
+    public void removeCopy2Prefix() {
+        String name = NameGenerator.removeCopyPrefix("Copy2 of hello");
+        assertEquals("hello", name);
+    }
+
+    /**
+     * Test remove copy prefix
+     */
+    @Test
+    public void removeCopy1234Prefix() {
+        String name = NameGenerator.removeCopyPrefix("Copy1234 of hello");
+        assertEquals("hello", name);
+    }
+
+
 }
