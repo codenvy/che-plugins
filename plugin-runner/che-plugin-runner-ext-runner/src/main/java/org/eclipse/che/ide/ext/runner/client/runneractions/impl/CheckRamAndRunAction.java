@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.runneractions.impl;
 
+import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -227,7 +228,14 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
         }
 
         if (availableMemory < requiredMemory) {
-            runnerUtil.showWarning(constant.messagesAvailableLessRequiredMemory(totalMemory, usedMemory, requiredMemory));
+            dialogFactory.createChoiceDialog(constant.messagesAvailableLessOverrideMemoryTitle(), constant.messagesAvailableLessOverrideMemoryContent(),
+                    constant.messagesAvailableLessOverrideMemorySettingsLink(), constant.messagesAvailableLessOverrideMemoryBackToConfig(),
+                    new ConfirmCallback() {
+                        @Override
+                        public void accepted() {
+                            Window.open("/dashboard/#/organizations", "_blank", null);
+                        }
+                    }, null);
             return false;
         }
 
@@ -240,7 +248,14 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
         int availableMemory = totalMemory - usedMemory;
 
         if (availableMemory < overrideMemory) {
-            runnerUtil.showError(runner, constant.messagesAvailableLessOverrideMemory(availableMemory), null);
+            dialogFactory.createChoiceDialog(constant.messagesAvailableLessOverrideMemoryTitle(), constant.messagesAvailableLessOverrideMemoryContent(),
+                    constant.messagesAvailableLessOverrideMemorySettingsLink(), constant.messagesAvailableLessOverrideMemoryBackToConfig(),
+                    new ConfirmCallback() {
+                        @Override
+                        public void accepted() {
+                            Window.open("/dashboard/#/organizations", "_blank", null);
+                        }
+                    }, null);
             return false;
         }
 

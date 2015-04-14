@@ -65,9 +65,6 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("messages.totalLessOverrideMemory")
     String messagesTotalLessOverrideMemory(@Nonnegative int overrideRAM, @Nonnegative int totalRAM);
 
-    @Key("messages.availableLessOverrideMemory")
-    String messagesAvailableLessOverrideMemory(@Nonnegative int availableRAM);
-
     @Key("messages.overrideMemory")
     String messagesOverrideMemory();
 
@@ -259,4 +256,16 @@ public interface RunnerLocalizationConstant extends Messages {
 
     @Key("template.default.project.runner")
     String templateDefaultProjectRunner();
+
+    @Key("messages.availableLessOverrideMemory.title")
+    String messagesAvailableLessOverrideMemoryTitle();
+
+    @Key("messages.availableLessOverrideMemory.content")
+    String messagesAvailableLessOverrideMemoryContent();
+
+    @Key("messages.availableLessOverrideMemory.settingsLink")
+    String messagesAvailableLessOverrideMemorySettingsLink();
+
+    @Key("messages.availableLessOverrideMemory.backToConfig")
+    String messagesAvailableLessOverrideMemoryBackToConfig();
 }
