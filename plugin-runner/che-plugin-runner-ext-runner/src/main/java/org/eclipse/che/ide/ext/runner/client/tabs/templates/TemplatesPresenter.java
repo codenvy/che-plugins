@@ -140,7 +140,7 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
 
     /** {@inheritDoc} */
     @Override
-    public void addEnvironments(@Nonnull RunnerEnvironmentTree tree, @Nonnull Scope scope) {
+    public List<Environment> addEnvironments(@Nonnull RunnerEnvironmentTree tree, @Nonnull Scope scope) {
         ProjectDescriptor descriptor = getCurrentProject().getProjectDescription();
 
         List<Environment> list;
@@ -154,6 +154,8 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
 
         List<Environment> environments = environmentUtil.getEnvironmentsByProjectType(tree, descriptor.getType(), scope);
         addEnvironments(list, environments, scope);
+
+        return environments;
     }
 
     @Nonnull

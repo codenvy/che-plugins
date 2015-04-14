@@ -10,12 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.actions;
 
-import com.google.inject.Provider;
-
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
-import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
-import org.eclipse.che.api.runner.gwt.client.RunnerServiceClient;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
 import org.eclipse.che.ide.api.action.permits.ActionPermit;
@@ -25,17 +21,8 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
-import org.eclipse.che.ide.ext.runner.client.callbacks.AsyncCallbackBuilder;
-import org.eclipse.che.ide.ext.runner.client.callbacks.FailureCallback;
-import org.eclipse.che.ide.ext.runner.client.callbacks.SuccessCallback;
-import org.eclipse.che.ide.ext.runner.client.inject.factories.RunnerActionFactory;
 import org.eclipse.che.ide.ext.runner.client.manager.RunnerManager;
-import org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerPresenter;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
-import org.eclipse.che.ide.ext.runner.client.models.Runner;
-import org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.LaunchAction;
-import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -45,11 +32,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_256;
 
 /**
  * @author Dmitry Shnurenko
@@ -85,6 +73,8 @@ public class RunActionTest {
     private Environment        environment;
     @Mock
     private ActionPermit       runActionPermit;
+    @Mock
+    private ActionDenyAccessDialog runActionDenyAccessDialog;
 
     @InjectMocks
     private RunAction action;
@@ -104,6 +94,7 @@ public class RunActionTest {
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
+        verify(runActionPermit).isAllowed();
         verify(runnerManager, never()).launchRunner();
         verify(runnerManager, never()).launchRunner(Matchers.<RunOptions>any(), anyString());
     }
@@ -119,6 +110,7 @@ public class RunActionTest {
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
+        verify(runActionPermit).isAllowed();
         verify(runnerManager).launchRunner();
     }
 
@@ -134,6 +126,7 @@ public class RunActionTest {
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
+        verify(runActionPermit).isAllowed();
         verify(runnerManager).launchRunner();
     }
 
@@ -147,6 +140,7 @@ public class RunActionTest {
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
+        verify(runActionPermit).isAllowed();
         verify(runnerManager).launchRunner();
     }
 
@@ -155,19 +149,41 @@ public class RunActionTest {
         when(chooseRunnerAction.selectEnvironment()).thenReturn(environment);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(currentProject.getRunner()).thenReturn(SOME_STRING + SOME_STRING);
+
         when(environment.getName()).thenReturn(SOME_STRING);
+        when(environment.getId()).thenReturn(SOME_STRING);
+        when(environment.getRam()).thenReturn(MB_256.getValue());
+
         when(dtoFactory.createDto(RunOptions.class)).thenReturn(runOptions);
         when(runOptions.withOptions(Matchers.<Map<String, String>>any())).thenReturn(runOptions);
         when(runOptions.withEnvironmentId(anyString())).thenReturn(runOptions);
+        when(runOptions.withMemorySize(MB_256.getValue())).thenReturn(runOptions);
         when(runActionPermit.isAllowed()).thenReturn(true);
 
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
         verify(environment).getOptions();
+        verify(environment, times(2)).getId();
+        verify(environment).getRam();
         verify(environment).getName();
+
+        verify(dtoFactory).createDto(RunOptions.class);
+        verify(runOptions).withOptions(Matchers.<Map<String, String>>any());
+        verify(runOptions).withEnvironmentId(anyString());
+        verify(runOptions).withMemorySize(MB_256.getValue());
+
         verify(runOptions).withOptions(Matchers.<Map<String, String>>any());
         verify(runnerManager).launchRunner(runOptions, SOME_STRING);
+    }
+
+    @Test
+    public void actionShouldNotBeLaunchBecauseWeHaveNotPermission() throws Exception {
+        action.actionPerformed(actionEvent);
+
+        verify(eventLogger).log(action);
+        verify(runActionPermit).isAllowed();
+        verify(runActionDenyAccessDialog).show();
     }
 
     @Test
@@ -179,6 +195,8 @@ public class RunActionTest {
 
         action.actionPerformed(actionEvent);
 
+        verify(eventLogger).log(action);
+        verify(runActionPermit).isAllowed();
         verify(locale).actionRunnerNotSpecified();
         verify(notificationManager).showError(SOME_STRING);
     }
