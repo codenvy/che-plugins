@@ -42,9 +42,6 @@ public class GitHubDTOFactory {
     @Inject
     GitHubFactory gitHub;
 
-    private GitHubRepository parent = null;
-    private Boolean isParent = false;
-
     /**
      * Create DTO object of GitHub repositories collection from given repositories list
      * @param ghRepositoriesList collection of repositories from kohsuke GitHub library
