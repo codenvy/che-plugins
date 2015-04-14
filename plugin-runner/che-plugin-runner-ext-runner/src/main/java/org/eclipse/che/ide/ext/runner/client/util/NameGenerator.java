@@ -34,7 +34,6 @@ public class NameGenerator {
 
 
     protected static String removeCopyPrefix(String name) {
-        String newName = name;
         RegExp regexp = RegExp.compile("Copy\\d* of (.*)");
         MatchResult matchResult = regexp.exec(name);
         // do not find prefix, return as this
@@ -45,10 +44,8 @@ public class NameGenerator {
     }
 
     /**
-     * Gets environment name which consists of string 'Copy of ' and existing name with a current date
-     * If there is an existing name, add a number suffix like "Copy2 of", "Copy3 of", etc.
-     *
-     * @return
+     * @return environment name which consists of string 'Copy of ' and existing name with a current date. If there is an existing name,
+     * add a number suffix like "Copy2 of", "Copy3 of", etc.
      */
     @Nonnull
     public static String generateCopy(String name, List<String> existingNames) {
