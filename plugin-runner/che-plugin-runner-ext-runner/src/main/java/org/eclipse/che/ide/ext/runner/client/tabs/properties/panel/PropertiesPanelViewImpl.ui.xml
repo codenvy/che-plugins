@@ -38,7 +38,7 @@
         .settingField {
             float: right;
             font-weight: inherit;
-            width: 160px;
+            width: 150px;
             border: 1px solid #191c1e;
             border-radius: 2px;
             margin-right: 35px;
@@ -55,10 +55,16 @@
             border: none;
             box-shadow: none;
             background-color: inherit;
+            margin-right: 40px;
+            padding-left: 0px;
+        }
+
+        .settingField[disabled] {
+            margin-right: 43px;
         }
 
         .listBoxStyle {
-            width: 170px !important;
+            width: 160px !important;
             padding-left: 3px;
         }
 
