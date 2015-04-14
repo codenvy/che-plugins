@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.server;
 
+import com.google.inject.Inject;
+
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.github.shared.Collaborators;
 import org.eclipse.che.ide.ext.github.shared.GitHubPullRequest;
@@ -23,6 +25,7 @@ import org.kohsuke.github.GHPersonSet;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
+import org.kohsuke.github.GitHub;
 import org.kohsuke.github.PagedIterable;
 
 import java.io.IOException;
@@ -35,6 +38,12 @@ import java.util.List;
  * @author Igor Vinokur
  */
 public class GitHubDTOFactory {
+
+    @Inject
+    GitHubFactory gitHub;
+
+    private GitHubRepository parent = null;
+    private Boolean isParent = false;
 
     /**
      * Create DTO object of GitHub repositories collection from given repositories list
@@ -113,8 +122,14 @@ public class GitHubDTOFactory {
         dtoRepository.setPushedAt(String.valueOf(ghRepository.getPushedAt()));
         dtoRepository.setHasDownloads(ghRepository.hasDownloads());
         dtoRepository.setHasIssues(ghRepository.hasIssues());
-        if (ghRepository.getParent() != null) {
+
+        if (ghRepository.isFork() && ghRepository.getParent() != null && dtoRepository.getParent() == null) {
             dtoRepository.setParent(createRepository(ghRepository.getParent()));
+        }
+        //if a repository is received from list, we have to get it separately to get his parent
+        if (ghRepository.isFork() && ghRepository.getParent() == null && dtoRepository.getParent() == null) {
+            dtoRepository.setParent(createRepository(gitHub.connect().getUser(ghRepository.getOwner().getLogin())
+                                                           .getRepository(ghRepository.getName()).getParent()));
         }
 
         return dtoRepository;
