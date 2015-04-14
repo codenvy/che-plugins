@@ -281,9 +281,7 @@ public class ConsoleContainerPresenterTest {
 
     @Test
     public void selectedConsoleShouldBeDeleted() {
-        presenter.deleteSelectedConsole();
-
-        verify(selectionManager).getRunner();
+        presenter.deleteConsoleByRunner(runner);
 
         when(selectionManager.getRunner()).thenReturn(runner);
         presenter.onSelectionChanged(RUNNER);

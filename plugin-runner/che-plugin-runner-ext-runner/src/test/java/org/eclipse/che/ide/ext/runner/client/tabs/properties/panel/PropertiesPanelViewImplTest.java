@@ -183,7 +183,7 @@ public class PropertiesPanelViewImplTest {
 
     private void ramItemsShouldBeAdded() {
         for (Enum item : EnumSet.range(MB_128, MB_8192)) {
-            verify(view.ram).addItem(item.toString());
+            verify(view.ram).addItem(item.toString().toLowerCase());
         }
     }
 

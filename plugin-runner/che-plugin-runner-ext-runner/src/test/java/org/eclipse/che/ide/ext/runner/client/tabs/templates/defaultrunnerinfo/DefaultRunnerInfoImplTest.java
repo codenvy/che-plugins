@@ -58,7 +58,7 @@ public class DefaultRunnerInfoImplTest {
 
         verify(view.name).setText(SOME_TEXT);
         verify(view.type).setText(SOME_TEXT);
-        verify(view.ram).setText("512 MB");
+        verify(view.ram).setText("512 mb");
 
         verify(environment).getName();
         verify(environment).getType();

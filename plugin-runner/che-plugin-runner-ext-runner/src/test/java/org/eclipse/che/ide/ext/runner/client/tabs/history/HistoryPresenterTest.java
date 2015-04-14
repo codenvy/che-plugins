@@ -173,7 +173,7 @@ public class HistoryPresenterTest {
         historyPresenter.onRunnerCleanBtnClicked(runner);
 
         verify(view).removeRunner(runnerWidget);
-        verify(consolePresenter).deleteSelectedConsole();
+        verify(consolePresenter).deleteConsoleByRunner(runner);
         verify(selectionManager).getRunner();
     }
 
@@ -186,7 +186,7 @@ public class HistoryPresenterTest {
         historyPresenter.onRunnerCleanBtnClicked(runner2);
 
         verify(view).removeRunner(runnerWidget2);
-        verify(consolePresenter).deleteSelectedConsole();
+        verify(consolePresenter).deleteConsoleByRunner(runner2);
         verify(selectionManager).getRunner();
 
         verify(selectionManager, times(2)).setRunner(runner);
@@ -204,7 +204,7 @@ public class HistoryPresenterTest {
         historyPresenter.onRunnerCleanBtnClicked(runner2);
 
         verify(view).removeRunner(runnerWidget2);
-        verify(consolePresenter).deleteSelectedConsole();
+        verify(consolePresenter).deleteConsoleByRunner(runner2);
         verify(selectionManager).getRunner();
 
         verify(selectionManager, never()).setRunner(runner);

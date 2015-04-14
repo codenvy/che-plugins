@@ -12,24 +12,26 @@ package org.eclipse.che.ide.ext.java.jdi.client.debug;
 
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.ext.java.jdi.shared.Variable;
 import org.eclipse.che.ide.ui.tree.NodeDataAdapter;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * The adapter for debug variable node.
  *
- * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
+ * @author Andrey Plotnikov
+ * @@author Dmitry Shnurenko
  */
-public class VariableNodeDataAdapter implements NodeDataAdapter<Variable> {
-    private HashMap<Variable, TreeNodeElement<Variable>> treeNodeElements = new HashMap<>();
+public class VariableNodeDataAdapter implements NodeDataAdapter<DebuggerVariable> {
+    private HashMap<DebuggerVariable, TreeNodeElement<DebuggerVariable>> treeNodeElements = new HashMap<>();
 
     /** {@inheritDoc} */
     @Override
-    public int compare(Variable a, Variable b) {
+    public int compare(@Nonnull DebuggerVariable a, @Nonnull DebuggerVariable b) {
         List<String> pathA = a.getVariablePath().getPath();
         List<String> pathB = b.getVariablePath().getPath();
 
@@ -48,76 +50,84 @@ public class VariableNodeDataAdapter implements NodeDataAdapter<Variable> {
 
     /** {@inheritDoc} */
     @Override
-    public boolean hasChildren(Variable data) {
+    public boolean hasChildren(@Nonnull DebuggerVariable data) {
         return !data.isPrimitive();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Array<Variable> getChildren(Variable data) {
-        List<Variable> variables = data.getVariables();
-        return variables != null ? Collections.createArray(variables) : Collections.<Variable>createArray();
+    @Nonnull
+    public Array<DebuggerVariable> getChildren(@Nonnull DebuggerVariable data) {
+        List<DebuggerVariable> variables = data.getVariables();
+        return Collections.createArray(variables);
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getNodeId(Variable data) {
+    @Nullable
+    public String getNodeId(@Nonnull DebuggerVariable data) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getNodeName(Variable data) {
+    @Nonnull
+    public String getNodeName(@Nonnull DebuggerVariable data) {
         return data.getName() + ": " + data.getValue();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Variable getParent(Variable data) {
+    @Nullable
+    public DebuggerVariable getParent(@Nonnull DebuggerVariable data) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public TreeNodeElement<Variable> getRenderedTreeNode(Variable data) {
+    @Nullable
+    public TreeNodeElement<DebuggerVariable> getRenderedTreeNode(@Nonnull DebuggerVariable data) {
         return treeNodeElements.get(data);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setNodeName(Variable data, String name) {
+    public void setNodeName(@Nonnull DebuggerVariable data,@Nonnull String name) {
         // do nothing
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setRenderedTreeNode(Variable data, TreeNodeElement<Variable> renderedNode) {
+    public void setRenderedTreeNode(@Nonnull DebuggerVariable data,@Nonnull TreeNodeElement<DebuggerVariable> renderedNode) {
         treeNodeElements.put(data, renderedNode);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Variable getDragDropTarget(Variable data) {
+    @Nullable
+    public DebuggerVariable getDragDropTarget(@Nonnull DebuggerVariable data) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Array<String> getNodePath(Variable data) {
+    @Nonnull
+    public Array<String> getNodePath(@Nonnull DebuggerVariable data) {
         return Collections.createArray(data.getVariablePath().getPath());
     }
 
     /** {@inheritDoc} */
     @Override
-    public Variable getNodeByPath(Variable root, Array<String> relativeNodePath) {
-        Variable localRoot = root;
+    @Nullable
+    public DebuggerVariable getNodeByPath(@Nonnull DebuggerVariable root,@Nonnull Array<String> relativeNodePath) {
+        DebuggerVariable localRoot = root;
         for (int i = 0; i < relativeNodePath.size(); i++) {
             String path = relativeNodePath.get(i);
             if (localRoot != null) {
-                Array<Variable> variables = Collections.createArray(localRoot.getVariables());
+                Array<DebuggerVariable> variables = Collections.createArray(localRoot.getVariables());
                 localRoot = null;
                 for (int j = 0; j < variables.size(); j++) {
-                    Variable variable = variables.get(i);
+                    DebuggerVariable variable = variables.get(i);
                     if (variable.getName().equals(path)) {
                         localRoot = variable;
                         break;

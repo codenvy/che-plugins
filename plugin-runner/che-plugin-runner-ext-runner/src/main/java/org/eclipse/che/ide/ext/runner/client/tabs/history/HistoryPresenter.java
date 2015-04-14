@@ -130,7 +130,7 @@ public class HistoryPresenter implements HistoryPanel, RunnerWidget.ActionDelega
 
         view.removeRunner(widget);
         runnerWidgets.remove(runner);
-        consolePresenter.deleteSelectedConsole();
+        consolePresenter.deleteConsoleByRunner(runner);
 
         if (runner.equals(selectionManager.getRunner())) {
             selectFirst();

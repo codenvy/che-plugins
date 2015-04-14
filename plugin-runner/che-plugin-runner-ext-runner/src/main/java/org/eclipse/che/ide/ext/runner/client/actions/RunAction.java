@@ -17,7 +17,6 @@ import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
 import org.eclipse.che.ide.api.action.permits.ActionPermit;
-import org.eclipse.che.ide.api.action.permits.Build;
 import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -94,7 +93,8 @@ public class RunAction extends AbstractRunnerActions {
             } else {
                 RunOptions runOptions = dtoFactory.createDto(RunOptions.class)
                                                   .withOptions(environment.getOptions())
-                                                  .withEnvironmentId(environment.getId());
+                                                  .withEnvironmentId(environment.getId())
+                                                  .withMemorySize(environment.getRam());
 
                 runnerManager.launchRunner(runOptions, environment.getName());
             }

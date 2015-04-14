@@ -56,6 +56,8 @@ import static org.eclipse.che.ide.ext.runner.client.state.State.TEMPLATE;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.never;
@@ -222,7 +224,7 @@ public class TemplatesPresenterTest {
         presenter.onValueChanged();
         reset(view, propertiesContainer, selectionManager);
 
-        presenter.addEnvironments(tree, SYSTEM);
+        assertThat(presenter.addEnvironments(tree, SYSTEM).isEmpty(), is(true));
 
         verify(propertiesContainer).setVisible(true);
         verify(propertiesContainer).show(isNull(Environment.class));
@@ -231,7 +233,7 @@ public class TemplatesPresenterTest {
 
     @Test
     public void environmentWithScopeProjectShouldBeAdded() throws Exception {
-        presenter.addEnvironments(tree, PROJECT);
+        assertThat(presenter.addEnvironments(tree, PROJECT), hasItems(projectEnvironment1, projectEnvironment2));
 
         getProjectDescriptorShouldBeVerified();
 
@@ -250,7 +252,8 @@ public class TemplatesPresenterTest {
     @Test
     public void environmentsShouldBeShown() throws Exception {
         presenter.showEnvironments();
-        presenter.addEnvironments(tree, PROJECT);
+
+        assertThat(presenter.addEnvironments(tree, PROJECT), hasItems(projectEnvironment1, projectEnvironment2));
 
         verify(view).setDefaultProjectWidget(null);
         verify(view).clearEnvironmentsPanel();
@@ -267,7 +270,7 @@ public class TemplatesPresenterTest {
         when(selectionManager.getEnvironment()).thenReturn(null);
 
         presenter.showEnvironments();
-        presenter.addEnvironments(tree, PROJECT);
+        assertThat(presenter.addEnvironments(tree, PROJECT), hasItems(projectEnvironment1, projectEnvironment2));
 
         verify(view).clearEnvironmentsPanel();
         verify(projectEnvironmentsAction).perform();
@@ -283,7 +286,7 @@ public class TemplatesPresenterTest {
         when(selectionManager.getEnvironment()).thenReturn(environment);
 
         presenter.showEnvironments();
-        presenter.addEnvironments(tree, PROJECT);
+        assertThat(presenter.addEnvironments(tree, PROJECT), hasItems(projectEnvironment1, projectEnvironment2));
 
         verify(view).clearEnvironmentsPanel();
         verify(projectEnvironmentsAction).perform();
@@ -361,6 +364,7 @@ public class TemplatesPresenterTest {
 
         presenter.onValueChanged();
         presenter.addEnvironments(tree, SYSTEM);
+        assertThat(presenter.addEnvironments(tree, SYSTEM), hasItems(systemEnvironment1, systemEnvironment1));
 
         reset(propertiesContainer, selectionManager);
     }
@@ -423,7 +427,7 @@ public class TemplatesPresenterTest {
     public void runnerStateShouldNotBeChangedIfOpenRunnerPropertiesPanel1() {
         when(panelState.getState()).thenReturn(RUNNERS);
 
-        presenter.addEnvironments(tree, PROJECT);
+        assertThat(presenter.addEnvironments(tree, PROJECT), hasItems(projectEnvironment1, projectEnvironment2));
 
         getProjectDescriptorShouldBeVerified();
 

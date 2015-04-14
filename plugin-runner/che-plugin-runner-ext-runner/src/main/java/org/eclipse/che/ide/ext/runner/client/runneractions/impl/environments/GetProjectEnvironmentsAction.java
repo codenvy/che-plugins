@@ -54,7 +54,6 @@ public class GetProjectEnvironmentsAction extends AbstractRunnerAction {
     private final Provider<AsyncCallbackBuilder<RunnerEnvironmentTree>> callbackBuilderProvider;
     private final RunnerLocalizationConstant                            locale;
     private final ChooseRunnerAction                                    chooseRunnerAction;
-    private final GetEnvironmentsUtil                                   environmentUtil;
 
     @Inject
     public GetProjectEnvironmentsAction(AppContext appContext,
@@ -62,7 +61,6 @@ public class GetProjectEnvironmentsAction extends AbstractRunnerAction {
                                         NotificationManager notificationManager,
                                         Provider<AsyncCallbackBuilder<RunnerEnvironmentTree>> callbackBuilderProvider,
                                         RunnerLocalizationConstant locale,
-                                        GetEnvironmentsUtil environmentUtil,
                                         RunnerUtil runnerUtil,
                                         ChooseRunnerAction chooseRunnerAction,
                                         Provider<TemplatesContainer> templatesPanelProvider) {
@@ -74,7 +72,6 @@ public class GetProjectEnvironmentsAction extends AbstractRunnerAction {
         this.notificationManager = notificationManager;
         this.callbackBuilderProvider = callbackBuilderProvider;
         this.locale = locale;
-        this.environmentUtil = environmentUtil;
     }
 
     /** {@inheritDoc} */
@@ -95,10 +92,7 @@ public class GetProjectEnvironmentsAction extends AbstractRunnerAction {
                     public void onSuccess(RunnerEnvironmentTree result) {
                         TemplatesContainer panel = templatesPanelProvider.get();
 
-                        List<Environment> projectEnvironments = environmentUtil.getEnvironmentsByProjectType(result,
-                                                                                                             descriptor.getType(),
-                                                                                                             PROJECT);
-                        panel.addEnvironments(result, PROJECT);
+                        List<Environment> projectEnvironments = panel.addEnvironments(result, PROJECT);
 
                         String defaultRunner = currentProject.getRunner();
 

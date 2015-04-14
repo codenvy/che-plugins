@@ -27,6 +27,7 @@ import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.debug.Breakpoint;
 import org.eclipse.che.ide.debug.BreakpointManager;
 import org.eclipse.che.ide.ext.java.jdi.client.debug.DebuggerPresenter;
+import org.eclipse.che.ide.ext.java.jdi.client.debug.DebuggerVariable;
 import org.eclipse.che.ide.ext.java.jdi.client.debug.DebuggerView;
 import org.eclipse.che.ide.ext.java.jdi.client.debug.changevalue.ChangeValuePresenter;
 import org.eclipse.che.ide.ext.java.jdi.client.debug.expression.EvaluateExpressionPresenter;
@@ -358,7 +359,7 @@ public class DebuggerTest extends BaseTest {
 
         verifySetEnableButtons(DISABLE_BUTTON);
         verify(service).resume(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
-        verify(view).setVariables(anyListOf(Variable.class));
+        verify(view).setVariables(anyListOf(DebuggerVariable.class));
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
         verify(gutterManager).unmarkCurrentBreakpoint();
     }
@@ -401,7 +402,7 @@ public class DebuggerTest extends BaseTest {
         presenter.onStepIntoButtonClicked();
 
         verify(service).stepInto(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
-        verify(view).setVariables(anyListOf(Variable.class));
+        verify(view).setVariables(anyListOf(DebuggerVariable.class));
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
         verify(gutterManager).unmarkCurrentBreakpoint();
     }
@@ -454,7 +455,7 @@ public class DebuggerTest extends BaseTest {
         presenter.onStepOverButtonClicked();
 
         verify(service).stepOver(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
-        verify(view).setVariables(anyListOf(Variable.class));
+        verify(view).setVariables(anyListOf(DebuggerVariable.class));
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
         verify(gutterManager).unmarkCurrentBreakpoint();
     }
@@ -507,7 +508,7 @@ public class DebuggerTest extends BaseTest {
         presenter.onStepReturnButtonClicked();
 
         verify(service).stepReturn(anyString(), Matchers.<AsyncRequestCallback<Void>>anyObject());
-        verify(view).setVariables(anyListOf(Variable.class));
+        verify(view).setVariables(anyListOf(DebuggerVariable.class));
         verify(view).setEnableChangeValueButtonEnable(eq(DISABLE_BUTTON));
         verify(gutterManager).unmarkCurrentBreakpoint();
     }
@@ -624,7 +625,7 @@ public class DebuggerTest extends BaseTest {
 
     @Test
     public void shouldOpenChangeVariableValueDialog() throws Exception {
-        presenter.onSelectedVariableElement(mock(Variable.class));
+        presenter.onSelectedVariableElement(mock(DebuggerVariable.class));
         presenter.onChangeValueButtonClicked();
 
         verify(changeValuePresenter).showDialog((DebuggerInfo)anyObject(),

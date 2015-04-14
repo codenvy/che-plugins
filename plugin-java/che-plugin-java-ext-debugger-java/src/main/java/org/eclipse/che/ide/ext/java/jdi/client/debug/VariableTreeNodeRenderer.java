@@ -10,24 +10,27 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.jdi.client.debug;
 
-import elemental.html.DivElement;
 import elemental.dom.Element;
+import elemental.html.DivElement;
 import elemental.html.SpanElement;
 
-import org.eclipse.che.ide.ext.java.jdi.shared.Variable;
+import com.google.gwt.resources.client.CssResource;
+import com.google.gwt.resources.client.ImageResource;
+
 import org.eclipse.che.ide.ui.tree.NodeRenderer;
 import org.eclipse.che.ide.ui.tree.Tree;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
 import org.eclipse.che.ide.util.dom.Elements;
-import com.google.gwt.resources.client.CssResource;
-import com.google.gwt.resources.client.ImageResource;
+
+import javax.annotation.Nonnull;
 
 /**
  * The rendered for debug variable node.
  *
- * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
+ * @author Andrey Plotnikov
+ * @@author Dmitry Shnurenko
  */
-public class VariableTreeNodeRenderer implements NodeRenderer<Variable> {
+public class VariableTreeNodeRenderer implements NodeRenderer<DebuggerVariable> {
     public interface Css extends CssResource {
         @ClassName("variable-root")
         String variableRoot();
@@ -49,20 +52,20 @@ public class VariableTreeNodeRenderer implements NodeRenderer<Variable> {
 
     private final Css css;
 
-    public VariableTreeNodeRenderer(Resources res) {
+    public VariableTreeNodeRenderer(@Nonnull Resources res) {
         this.css = res.variableCss();
         this.css.ensureInjected();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Element getNodeKeyTextContainer(SpanElement treeNodeLabel) {
+    public Element getNodeKeyTextContainer(@Nonnull SpanElement treeNodeLabel) {
         return (Element)treeNodeLabel.getChildNodes().item(1);
     }
 
     /** {@inheritDoc} */
     @Override
-    public SpanElement renderNodeContents(Variable data) {
+    public SpanElement renderNodeContents(@Nonnull DebuggerVariable data) {
         SpanElement root = Elements.createSpanElement(css.variableRoot());
         DivElement icon = Elements.createDivElement(css.variableIcon());
         SpanElement label = Elements.createSpanElement(css.variableLabel());
@@ -77,7 +80,7 @@ public class VariableTreeNodeRenderer implements NodeRenderer<Variable> {
 
     /** {@inheritDoc} */
     @Override
-    public void updateNodeContents(TreeNodeElement<Variable> treeNode) {
+    public void updateNodeContents(@Nonnull TreeNodeElement<DebuggerVariable> treeNode) {
         // do nothing
     }
 }

@@ -19,12 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerPresenter.TIMER_STUB;
-import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_128;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Andrey Plotnikov
+ * @author Dmitry Shnurenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class MoreInfoImplTest {
@@ -41,7 +41,7 @@ public class MoreInfoImplTest {
         when(runner.getStopTime()).thenReturn(SOME_TEXT);
         when(runner.getTimeout()).thenReturn(SOME_TEXT);
         when(runner.getActiveTime()).thenReturn(SOME_TEXT);
-        when(runner.getRAM()).thenReturn(MB_128.getValue());
+        when(runner.getRAM()).thenReturn(128);
 
         widget.update(runner);
 
@@ -49,7 +49,7 @@ public class MoreInfoImplTest {
         verify(widget.finished).setText(SOME_TEXT);
         verify(widget.timeout).setText(SOME_TEXT);
         verify(widget.activeTime).setText(SOME_TEXT);
-        verify(widget.ram).setText(MB_128.toString());
+        verify(widget.ram).setText("128MB");
     }
 
     @Test

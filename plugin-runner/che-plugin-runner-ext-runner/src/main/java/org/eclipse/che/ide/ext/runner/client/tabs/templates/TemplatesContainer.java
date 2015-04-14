@@ -44,8 +44,9 @@ public interface TemplatesContainer extends TabPresenter {
      *         list of environments which need add
      * @param scope
      *         scope of environments which are saved in list
+     * return list environments generated from tree by scope
      */
-    void addEnvironments(@Nonnull RunnerEnvironmentTree tree, @Nonnull Scope scope);
+    List<Environment>  addEnvironments(@Nonnull RunnerEnvironmentTree tree, @Nonnull Scope scope);
 
     /**
      * Gets the managed environments

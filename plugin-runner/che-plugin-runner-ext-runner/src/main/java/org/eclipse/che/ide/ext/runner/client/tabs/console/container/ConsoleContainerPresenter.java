@@ -169,11 +169,10 @@ public class ConsoleContainerPresenter implements ConsoleContainer,
 
     /** {@inheritDoc} */
     @Override
-    public void deleteSelectedConsole() {
-        Runner runner = selectionManager.getRunner();
-        Console selectedConsole = consoles.get(runner);
+    public void deleteConsoleByRunner(@Nonnull Runner runner) {
+        Console console = consoles.get(runner);
 
-        view.removeWidget(selectedConsole);
+        view.removeWidget(console);
         consoles.remove(runner);
     }
 }

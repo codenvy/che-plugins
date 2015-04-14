@@ -12,10 +12,10 @@ package org.eclipse.che.ide.ext.github.server.inject;
 
 import org.eclipse.che.api.project.server.ProjectImporter;
 import org.eclipse.che.ide.ext.git.server.nativegit.SshKeyUploader;
-import org.eclipse.che.ide.ext.github.server.GitHub;
+import org.eclipse.che.ide.ext.github.server.GitHubDTOFactory;
+import org.eclipse.che.ide.ext.github.server.GitHubFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubKeyUploader;
 import org.eclipse.che.ide.ext.github.server.GitHubProjectImporter;
-import org.eclipse.che.ide.ext.github.server.rest.GitHubExceptionMapper;
 import org.eclipse.che.ide.ext.github.server.rest.GitHubService;
 import org.eclipse.che.inject.DynaModule;
 import com.google.inject.AbstractModule;
@@ -32,7 +32,8 @@ public class GitHubModule extends AbstractModule {
     /** {@inheritDoc} */
     @Override
     protected void configure() {
-        bind(GitHub.class);
+        bind(GitHubFactory.class);
+        bind(GitHubDTOFactory.class);
 
         Multibinder<ProjectImporter> projectImporterMultibinder = Multibinder.newSetBinder(binder(), ProjectImporter.class);
         projectImporterMultibinder.addBinding().to(GitHubProjectImporter.class);
@@ -40,6 +41,5 @@ public class GitHubModule extends AbstractModule {
         Multibinder.newSetBinder(binder(), SshKeyUploader.class).addBinding().to(GitHubKeyUploader.class);
 
         bind(GitHubService.class);
-        bind(GitHubExceptionMapper.class);
     }
 }
