@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.impl;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -216,14 +217,11 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         initializeEditor(file, editorProvider, fileTypeRegistry);
     }
 
-
-
-
     /** {@inheritDoc} */
     @Override
     public void onCopyButtonClicked() {
         // get projects env
-        Map<Scope, List<Environment>> envs = this.templatesContainer.getEnvironments();
+        Map<Scope, List<Environment>> envs = templatesContainer.getEnvironments();
         List<Environment> projectEnvs = envs.get(Scope.PROJECT);
         List<String> existingNames = new ArrayList<>();
         if (projectEnvs != null) {
@@ -324,7 +322,13 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     }
 
     private String generateEnvironmentId(@Nonnull String environmentName) {
-        return ENVIRONMENT_ID_PREFIX + environmentName;
+
+        String newName = URL.encode(ENVIRONMENT_ID_PREFIX + environmentName);
+        // with GWT mocks, native methods can be empty
+        if ("".equals(newName)) {
+            return ENVIRONMENT_ID_PREFIX + environmentName;
+        }
+        return newName;
     }
 
     /** {@inheritDoc} */

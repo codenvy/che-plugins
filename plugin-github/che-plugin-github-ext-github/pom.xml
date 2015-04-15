@@ -71,6 +71,11 @@
             <version>${che.plugins.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.kohsuke</groupId>
+            <artifactId>github-api</artifactId>
+            <version>${org.kohsuke.github-api.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-user</artifactId>
             <version>${com.google.gwt.version}</version>

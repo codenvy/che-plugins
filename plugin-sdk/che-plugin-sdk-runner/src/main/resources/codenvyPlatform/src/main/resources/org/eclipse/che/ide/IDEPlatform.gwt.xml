@@ -39,6 +39,7 @@
     <inherits name='org.eclipse.che.api.VFS'/>
     <inherits name='org.eclipse.che.api.Analytics'/>
     <inherits name='org.eclipse.che.ide.editor.codemirror.CodeMirrorEditor'/>
+    <inherits name='org.eclipse.che.env.local.LocalEnvironment'/>
 
     <stylesheet src="IDE.css"/>
 

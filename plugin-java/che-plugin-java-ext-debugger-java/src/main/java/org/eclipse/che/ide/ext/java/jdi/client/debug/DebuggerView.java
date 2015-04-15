@@ -10,21 +10,22 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.jdi.client.debug;
 
+import com.google.gwt.user.client.ui.ToggleButton;
+
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.api.parts.base.BaseActionDelegate;
-import org.eclipse.che.ide.ext.java.jdi.shared.Location;
-import org.eclipse.che.ide.ext.java.jdi.shared.Variable;
-
 import org.eclipse.che.ide.debug.Breakpoint;
-import com.google.gwt.user.client.ui.ToggleButton;
+import org.eclipse.che.ide.ext.java.jdi.shared.Location;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
- * The view of {@link DebuggerPresenter}.
+ * Provides methods which allow change view representation of debugger panel. Also the interface contains inner action delegate
+ * interface which provides methods which allows react on user's actions.
  *
- * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
+ * @author Andrey Plotnikov
+ * @author Dmitry Shnurenko
  */
 public interface DebuggerView extends View<DebuggerView.ActionDelegate> {
     /** Needs for delegate some function into Debugger view. */
@@ -62,7 +63,7 @@ public interface DebuggerView extends View<DebuggerView.ActionDelegate> {
          * @param variable
          *         variable that is selected
          */
-        void onSelectedVariableElement(@Nonnull Variable variable);
+        void onSelectedVariableElement(@Nonnull DebuggerVariable variable);
     }
 
     /**
@@ -73,7 +74,7 @@ public interface DebuggerView extends View<DebuggerView.ActionDelegate> {
      * @param location
      *         information about the execution point
      */
-    public void setExecutionPoint(boolean absentInformation, Location location);
+    public void setExecutionPoint(boolean absentInformation, @Nonnull Location location);
 
     /**
      * Sets variables.
@@ -81,7 +82,7 @@ public interface DebuggerView extends View<DebuggerView.ActionDelegate> {
      * @param variables
      *         available variables
      */
-    void setVariables(@Nonnull List<Variable> variables);
+    void setVariables(@Nonnull List<DebuggerVariable> variables);
 
     /**
      * Sets breakpoints.
@@ -164,7 +165,7 @@ public interface DebuggerView extends View<DebuggerView.ActionDelegate> {
      * @param state
      *         the new state of button
      */
-    public boolean setButtonState(ToggleButton button, boolean state);
+    public boolean setButtonState(@Nonnull ToggleButton button, boolean state);
 
     /**
      * Sets whether Change value button is enabled.
@@ -199,5 +200,5 @@ public interface DebuggerView extends View<DebuggerView.ActionDelegate> {
      * @param variables
      *         variable what need to add into
      */
-    void setVariablesIntoSelectedVariable(@Nonnull List<Variable> variables);
+    void setVariablesIntoSelectedVariable(@Nonnull List<DebuggerVariable> variables);
 }

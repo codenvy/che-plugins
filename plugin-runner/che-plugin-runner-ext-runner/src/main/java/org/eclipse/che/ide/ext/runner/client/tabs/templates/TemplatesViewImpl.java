@@ -196,7 +196,7 @@ public class TemplatesViewImpl extends Composite implements TemplatesView {
     public void setDefaultProjectWidget(@Nullable EnvironmentWidget widget) {
         defaultRunner.setWidget(widget == null ? defaultRunnerStub : widget);
 
-        for (Environment environment: environmentWidgets.keySet()) {
+        for (Environment environment : environmentWidgets.keySet()) {
             environmentWidgets.get(environment).update(environment);
         }
     }
@@ -216,6 +216,7 @@ public class TemplatesViewImpl extends Composite implements TemplatesView {
     /** {@inheritDoc} */
     @Override
     public void clearEnvironmentsPanel() {
+        environmentWidgets.clear();
         environmentsPanel.clear();
     }
 

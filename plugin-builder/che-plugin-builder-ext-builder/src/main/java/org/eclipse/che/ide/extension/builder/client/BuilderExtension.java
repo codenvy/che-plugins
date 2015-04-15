@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.builder.client;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.action.IdeActions;
@@ -18,20 +21,18 @@ import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
+import org.eclipse.che.ide.extension.builder.client.actions.BrowseTargetFolderAction;
 import org.eclipse.che.ide.extension.builder.client.actions.BuildAction;
+import org.eclipse.che.ide.extension.builder.client.console.BuilderConsolePresenter;
+import org.eclipse.che.ide.extension.builder.client.console.BuilderConsoleToolbar;
+import org.eclipse.che.ide.extension.builder.client.console.ClearConsoleAction;
 import org.eclipse.che.ide.extension.builder.client.console.indicators.ArtifactURLIndicator;
 import org.eclipse.che.ide.extension.builder.client.console.indicators.BuildFinishedIndicator;
 import org.eclipse.che.ide.extension.builder.client.console.indicators.BuildStartedIndicator;
 import org.eclipse.che.ide.extension.builder.client.console.indicators.BuildStatusIndicator;
 import org.eclipse.che.ide.extension.builder.client.console.indicators.BuildTimeoutThresholdIndicator;
-import org.eclipse.che.ide.extension.builder.client.actions.BrowseTargetFolderAction;
-import org.eclipse.che.ide.extension.builder.client.console.BuilderConsolePresenter;
-import org.eclipse.che.ide.extension.builder.client.console.BuilderConsoleToolbar;
-import org.eclipse.che.ide.extension.builder.client.console.ClearConsoleAction;
 import org.eclipse.che.ide.extension.builder.client.console.indicators.BuildTotalTimeIndicator;
-import org.eclipse.che.ide.toolbar.ToolbarPresenter;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.eclipse.che.ide.ui.toolbar.ToolbarPresenter;
 
 /**
  * Builder extension entry point.

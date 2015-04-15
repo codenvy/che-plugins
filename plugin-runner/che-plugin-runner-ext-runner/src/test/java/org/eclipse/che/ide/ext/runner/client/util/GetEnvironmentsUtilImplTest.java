@@ -29,14 +29,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
+import static org.eclipse.che.ide.ext.runner.client.util.GetEnvironmentsUtil.BLANK_TYPE;
 import static org.eclipse.che.ide.ext.runner.client.util.GetEnvironmentsUtil.DEFAULT_RUNNER_PROJECT_TYPE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -311,6 +314,19 @@ public class GetEnvironmentsUtilImplTest {
         String projectType = util.getType();
 
         assertThat(projectType.isEmpty(), is(true));
+    }
+
+
+
+    @Test
+    public void blankTypeShouldBeReturnedForBlank() throws Exception {
+        when(currentProject.getRunner()).thenReturn(null);
+        when(descriptor.getType()).thenReturn(BLANK_TYPE);
+        when(projectTypeRegistry.getProjectType(BLANK_TYPE)).thenReturn(definition);
+        when(definition.getRunnerCategories()).thenReturn(Collections.<String>emptyList());
+        String projectType = util.getType();
+
+        assertEquals("blank", projectType);
     }
 
     @Test

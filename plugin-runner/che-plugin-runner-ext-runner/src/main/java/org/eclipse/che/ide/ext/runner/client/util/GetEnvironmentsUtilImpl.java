@@ -138,6 +138,9 @@ public class GetEnvironmentsUtilImpl implements GetEnvironmentsUtil {
             ProjectTypeDefinition definition = projectTypeRegistry.getProjectType(descriptor.getType());
 
             List<String> categories = definition.getRunnerCategories();
+            if (categories == null || categories.isEmpty()) {
+                return BLANK_TYPE;
+            }
             return categories.get(0);
         } else {
             return getCorrectCategoryName(defaultRunner);

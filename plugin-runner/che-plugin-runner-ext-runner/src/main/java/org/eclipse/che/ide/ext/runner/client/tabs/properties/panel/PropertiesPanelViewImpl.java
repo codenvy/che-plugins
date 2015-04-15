@@ -179,7 +179,7 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
 
     private void prepareField(@Nonnull ListBox field, @Nonnull Set<? extends Enum> items) {
         for (Enum item : items) {
-            field.addItem(item.toString());
+            field.addItem(item.toString().toLowerCase());
         }
     }
 

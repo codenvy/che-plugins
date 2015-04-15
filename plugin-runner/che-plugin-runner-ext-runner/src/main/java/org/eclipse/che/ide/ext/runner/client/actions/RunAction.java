@@ -15,10 +15,6 @@ import com.google.inject.Inject;
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
-import org.eclipse.che.ide.api.action.permits.Build;
-import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -38,15 +34,13 @@ import javax.annotation.Nonnull;
  */
 public class RunAction extends AbstractRunnerActions {
 
-    private final RunnerManager              runnerManager;
-    private final DtoFactory                 dtoFactory;
-    private final ChooseRunnerAction         chooseRunnerAction;
-    private final NotificationManager        notificationManager;
-    private final RunnerLocalizationConstant locale;
-    private final AppContext                 appContext;
-    private final AnalyticsEventLogger       eventLogger;
-    private final ActionPermit runActionPermit;
-    private final ActionDenyAccessDialog runActionDenyAccessDialog;
+    private final RunnerManager               runnerManager;
+    private final DtoFactory                  dtoFactory;
+    private final ChooseRunnerAction          chooseRunnerAction;
+    private final NotificationManager         notificationManager;
+    private final RunnerLocalizationConstant  locale;
+    private final AppContext                  appContext;
+    private final AnalyticsEventLogger        eventLogger;
 
     @Inject
     public RunAction(RunnerManager runnerManager,
@@ -56,9 +50,7 @@ public class RunAction extends AbstractRunnerActions {
                      ChooseRunnerAction chooseRunnerAction,
                      DtoFactory dtoFactory,
                      RunnerResources resources,
-                     AnalyticsEventLogger eventLogger,
-                     @Run ActionPermit runActionPermit,
-                     @Run ActionDenyAccessDialog runActionDenyAccessDialog) {
+                     AnalyticsEventLogger eventLogger) {
         super(appContext, locale.actionRun(), locale.actionRunDescription(), resources.run());
 
         this.runnerManager = runnerManager;
@@ -68,15 +60,12 @@ public class RunAction extends AbstractRunnerActions {
         this.notificationManager = notificationManager;
         this.locale = locale;
         this.eventLogger = eventLogger;
-        this.runActionPermit = runActionPermit;
-        this.runActionDenyAccessDialog = runActionDenyAccessDialog;
     }
 
     /** {@inheritDoc} */
     @Override
     public void actionPerformed(@Nonnull ActionEvent event) {
         eventLogger.log(this);
-        if (runActionPermit.isAllowed()) {
             CurrentProject currentProject = appContext.getCurrentProject();
             if (currentProject == null) {
                 return;
@@ -94,12 +83,10 @@ public class RunAction extends AbstractRunnerActions {
             } else {
                 RunOptions runOptions = dtoFactory.createDto(RunOptions.class)
                                                   .withOptions(environment.getOptions())
-                                                  .withEnvironmentId(environment.getId());
+                                                  .withEnvironmentId(environment.getId())
+                                                  .withMemorySize(environment.getRam());
 
                 runnerManager.launchRunner(runOptions, environment.getName());
             }
-        } else {
-            runActionDenyAccessDialog.show();
-        }
     }
 }

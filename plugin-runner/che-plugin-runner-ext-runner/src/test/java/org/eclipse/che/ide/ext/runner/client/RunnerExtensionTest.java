@@ -19,6 +19,7 @@ import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.runner.client.actions.ChooseRunnerAction;
+import org.eclipse.che.ide.ext.runner.client.actions.CreateCustomRunnerAction;
 import org.eclipse.che.ide.ext.runner.client.actions.RunAction;
 import org.eclipse.che.ide.ext.runner.client.actions.RunWithAction;
 import org.eclipse.che.ide.ext.runner.client.constants.ActionId;
@@ -94,6 +95,7 @@ public class RunnerExtensionTest {
         RunAction runAction = mock(RunAction.class);
         RunWithAction runWithAction = mock(RunWithAction.class);
         ChooseRunnerAction chooseRunnerAction = mock(ChooseRunnerAction.class);
+        CreateCustomRunnerAction createCustomRunnerAction = mock(CreateCustomRunnerAction.class);
 
         DefaultActionGroup rightToolbarGroup = mock(DefaultActionGroup.class);
         DefaultActionGroup runContextGroup = mock(DefaultActionGroup.class);
@@ -106,7 +108,7 @@ public class RunnerExtensionTest {
         when(actionManager.getAction(GROUP_RUN)).thenReturn(mainMenuGroup);
 
         // test step
-        extension.setUpRunActions(actionManager, runAction, runWithAction, chooseRunnerAction);
+        extension.setUpRunActions(actionManager, runAction, runWithAction, chooseRunnerAction, createCustomRunnerAction);
 
         // check step
         verify(rightToolbarGroup).add(actionGroupCaptor.capture(), constraintsCaptor.capture());
@@ -139,6 +141,7 @@ public class RunnerExtensionTest {
         DefaultActionGroup runContextGroup = mock(DefaultActionGroup.class);
         DefaultActionGroup contextMenuGroup = mock(DefaultActionGroup.class);
         DefaultActionGroup mainMenuGroup = mock(DefaultActionGroup.class);
+        CreateCustomRunnerAction createCustomRunnerAction = mock(CreateCustomRunnerAction.class);
 
         when(actionManager.getAction(GROUP_RUN_TOOLBAR)).thenReturn(runToolbarGroup);
         when(actionManager.getAction(GROUP_RUN_CONTEXT_MENU)).thenReturn(runContextGroup);
@@ -146,7 +149,7 @@ public class RunnerExtensionTest {
         when(actionManager.getAction(GROUP_RUN)).thenReturn(mainMenuGroup);
 
         // test step
-        extension.setUpRunActions(actionManager, runAction, runWithAction, chooseRunnerAction);
+        extension.setUpRunActions(actionManager, runAction, runWithAction, chooseRunnerAction, createCustomRunnerAction);
 
         // check step
         verify(actionManager, never()).registerAction(GROUP_RUN_TOOLBAR, runToolbarGroup);

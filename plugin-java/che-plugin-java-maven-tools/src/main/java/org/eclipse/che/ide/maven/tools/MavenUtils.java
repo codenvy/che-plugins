@@ -308,7 +308,7 @@ public class MavenUtils {
 
     public static boolean isCodenvyExtensionProject(Model pom) {
         for (Dependency dependency : pom.getDependencies()) {
-            if ("codenvy-ide-api".equals(dependency.getArtifactId())) {
+            if ("che-core-ide-api".equals(dependency.getArtifactId())) {
                 return true;
             }
         }

@@ -22,8 +22,6 @@ import com.google.inject.multibindings.Multibinder;
 public class CodenvyPluginsModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(ProjectTemplateRegistrar.class).asEagerSingleton();
-
         Multibinder<ProjectType> projectTypeMultibinder = Multibinder.newSetBinder(binder(), ProjectType.class);
         projectTypeMultibinder.addBinding().to(ExtensionProjectType.class);
         projectTypeMultibinder.addBinding().to(TutorialProjectType.class);

@@ -37,7 +37,6 @@ import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.DONE;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.FAILED;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.IN_PROGRESS;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.STOPPED;
-import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_512;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -107,7 +106,7 @@ public class RunnerWidgetTest {
 
         when(resources.runnerCss()).thenReturn(css);
         when(runner.getTitle()).thenReturn(TEXT);
-        when(runner.getRAM()).thenReturn(MB_512.getValue());
+        when(runner.getRAM()).thenReturn(512);
         when(runner.getCreationTime()).thenReturn(TEXT);
 
         runnerWidget.setDelegate(delegate);
@@ -322,7 +321,7 @@ public class RunnerWidgetTest {
         verify(runner).getTitle();
         verify(itemWidget).setName(TEXT);
         verify(runner).getRAM();
-        verify(itemWidget).setDescription(MB_512.toString());
+        verify(itemWidget).setDescription("512MB");
         verify(runner).getCreationTime();
         verify(itemWidget).setStartTime(TEXT);
     }

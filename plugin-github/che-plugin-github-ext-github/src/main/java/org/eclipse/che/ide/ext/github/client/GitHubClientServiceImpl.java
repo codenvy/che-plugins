@@ -46,7 +46,6 @@ public class GitHubClientServiceImpl implements GitHubClientService {
     private static final String LIST_ALL       = "/list/available";
     private static final String COLLABORATORS  = "/collaborators";
     private static final String ORGANIZATIONS  = "/orgs";
-    private static final String PAGE           = "/page";
     private static final String TOKEN          = "/token";
     private static final String USER           = "/user";
     private static final String SSH_GEN        = "/ssh/generate";
@@ -184,14 +183,6 @@ public class GitHubClientServiceImpl implements GitHubClientService {
     public void getRepositoriesByAccount(String account, @Nonnull AsyncRequestCallback<GitHubRepositoryList> callback) {
         String params = (account != null) ? "?account=" + account : "";
         String url = baseUrl + LIST_ACCOUNT;
-        asyncRequestFactory.createGetRequest(url + params).loader(loader).send(callback);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void getPage(String pageLocation, @Nonnull AsyncRequestCallback<GitHubRepositoryList> callback) {
-        String params = (pageLocation != null) ? "?url=" + pageLocation : "";
-        String url = baseUrl + PAGE;
         asyncRequestFactory.createGetRequest(url + params).loader(loader).send(callback);
     }
 

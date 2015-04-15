@@ -245,6 +245,9 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("message.runner.shutting.down")
     String messageRunnerShuttingDown();
 
+    @Key("create.custom.runner")
+    String createCustomRunner();
+
     @Key("template.default.runner")
     String templateDefaultRunner();
 

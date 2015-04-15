@@ -60,6 +60,6 @@ public class DefaultRunnerInfoImpl extends Composite implements DefaultRunnerInf
     public void update(@Nonnull Environment environment) {
         name.setText(environment.getName());
         type.setText(environment.getType());
-        ram.setText(String.valueOf(environment.getRam()) + " MB");
+        ram.setText(String.valueOf(environment.getRam()) + " mb");
     }
 }

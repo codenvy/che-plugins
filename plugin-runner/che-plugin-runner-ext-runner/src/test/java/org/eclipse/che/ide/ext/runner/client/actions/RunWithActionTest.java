@@ -14,8 +14,7 @@ import com.google.gwtmockito.GwtMockitoTestRunner;
 
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
-import org.eclipse.che.ide.api.action.permits.Run;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
@@ -39,19 +38,19 @@ public class RunWithActionTest {
 
     //variables for constructor
     @Mock
-    private RunnerManagerPresenter     runnerManagerPresenter;
+    private RunnerManagerPresenter      runnerManagerPresenter;
     @Mock
-    private TabContainer               tabContainer;
+    private TabContainer                tabContainer;
     @Mock
-    private RunnerResources            resources;
+    private RunnerResources             resources;
     @Mock
-    private RunnerLocalizationConstant locale;
+    private RunnerLocalizationConstant  locale;
     @Mock
-    private AppContext                 appContext;
+    private AppContext                  appContext;
     @Mock
-    private ActionPermit           runActionPermit;
+    private ResourcesLockedActionPermit runActionPermit;
     @Mock
-    private ActionDenyAccessDialog runActionDenyAccessDialog;
+    private ActionDenyAccessDialog      runActionDenyAccessDialog;
 
     @Mock
     private ActionEvent actionEvent;
@@ -63,8 +62,7 @@ public class RunWithActionTest {
         when(runActionPermit.isAllowed()).thenReturn(true);
 
         RunWithAction runWithAction =
-                new RunWithAction(runnerManagerPresenter, tabContainer, locale, appContext, resources, runActionPermit,
-                                  runActionDenyAccessDialog);
+                new RunWithAction(runnerManagerPresenter, tabContainer, locale, appContext, resources);
         runWithAction.actionPerformed(actionEvent);
 
         verify(locale, times(2)).actionRunWith();

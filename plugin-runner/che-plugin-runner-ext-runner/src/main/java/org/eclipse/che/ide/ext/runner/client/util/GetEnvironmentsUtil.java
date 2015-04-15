@@ -28,6 +28,11 @@ import java.util.List;
 @ImplementedBy(GetEnvironmentsUtilImpl.class)
 public interface GetEnvironmentsUtil {
 
+    /**
+     * Blank type
+     */
+    String BLANK_TYPE = "blank";
+
     final String DEFAULT_RUNNER_PROJECT_TYPE = "project:/";
 
     /**

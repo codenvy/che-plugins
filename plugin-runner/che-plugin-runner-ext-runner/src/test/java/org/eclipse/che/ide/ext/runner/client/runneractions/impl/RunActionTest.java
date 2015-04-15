@@ -19,7 +19,7 @@ import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.api.runner.gwt.client.RunnerServiceClient;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
@@ -97,7 +97,7 @@ public class RunActionTest {
     @Mock
     private LaunchAction                                                  launchAction;
     @Mock
-    private ActionPermit                                                  runActionPermit;
+    private ResourcesLockedActionPermit                                   runActionPermit;
     @Mock
     private ActionDenyAccessDialog                                        runActionDenyAccessDialog;
     //captors

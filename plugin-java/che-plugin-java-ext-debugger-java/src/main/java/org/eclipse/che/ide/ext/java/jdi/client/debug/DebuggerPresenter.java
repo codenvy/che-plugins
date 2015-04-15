@@ -99,6 +99,7 @@ import static org.eclipse.che.ide.ext.java.jdi.shared.DebuggerEvent.STEP;
  * @author Vitaly Parfonov
  * @author Artem Zatsarynnyy
  * @author Valeriy Svydenko
+ * @author Dmitry Shnurenko
  */
 @Singleton
 public class DebuggerPresenter extends BasePresenter implements DebuggerView.ActionDelegate, Debugger {
@@ -121,14 +122,14 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
     private       WorkspaceAgent                         workspaceAgent;
     private       FqnResolverFactory                     resolverFactory;
     private       EditorAgent                            editorAgent;
-    private       Variable                               selectedVariable;
+    private       DebuggerVariable                       selectedVariable;
     private       EvaluateExpressionPresenter            evaluateExpressionPresenter;
     private       ChangeValuePresenter                   changeValuePresenter;
     private       NotificationManager                    notificationManager;
     /** Handler for processing events which is received from debugger over WebSocket connection. */
     private       SubscriptionHandler<DebuggerEventList> debuggerEventsHandler;
     private       SubscriptionHandler<Void>              debuggerDisconnectedHandler;
-    private       List<Variable>                         variables;
+    private       List<DebuggerVariable>                 variables;
     private       Location                               executionPoint;
     private       Runner                                 runner;
 
@@ -293,6 +294,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
 
     /** {@inheritDoc} */
     @Override
+    @Nonnull
     public String getTitle() {
         return TITLE;
     }
@@ -444,8 +446,10 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                                           variables.addAll(result.getFields());
                                           variables.addAll(result.getLocalVariables());
 
-                                          DebuggerPresenter.this.variables = variables;
-                                          view.setVariables(variables);
+                                          List<DebuggerVariable> debuggerVariables = getDebuggerVariables(variables);
+
+                                          DebuggerPresenter.this.variables = debuggerVariables;
+                                          view.setVariables(debuggerVariables);
                                           if (!variables.isEmpty()) {
                                               view.setExecutionPoint(variables.get(0).isExistInformation(), executionPoint);
                                           }
@@ -458,6 +462,17 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                                       }
                                   }
                                  );
+    }
+
+    @Nonnull
+    private List<DebuggerVariable> getDebuggerVariables(@Nonnull List<Variable> variables) {
+        List<DebuggerVariable> debuggerVariables = new ArrayList<>();
+
+        for (Variable variable : variables) {
+            debuggerVariables.add(new DebuggerVariable(variable));
+        }
+
+        return debuggerVariables;
     }
 
     /** Change enable state of all buttons (except Disconnect button) on Debugger panel. */
@@ -496,7 +511,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                 breakpointManager.removeAllBreakpoints();
                 view.setBreakpoints(new ArrayList<Breakpoint>());
                 view.setExecutionPoint(true, null);
-                view.setVariables(new ArrayList<Variable>());
+                view.setVariables(new ArrayList<DebuggerVariable>());
             }
 
             @Override
@@ -583,7 +598,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             return;
         }
 
-        changeValuePresenter.showDialog(debuggerInfo, selectedVariable, new AsyncCallback<String>() {
+        changeValuePresenter.showDialog(debuggerInfo, selectedVariable.getVariable(), new AsyncCallback<String>() {
             @Override
             public void onSuccess(String s) {
                 getStackFrameDump();
@@ -605,14 +620,17 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
     /** {@inheritDoc} */
     @Override
     public void onExpandVariablesTree() {
-        List<Variable> rootVariables = selectedVariable.getVariables();
+        List<DebuggerVariable> rootVariables = selectedVariable.getVariables();
         if (rootVariables.size() == 0) {
-            service.getValue(debuggerInfo.getId(), selectedVariable,
+            service.getValue(debuggerInfo.getId(), selectedVariable.getVariable(),
                              new AsyncRequestCallback<Value>(dtoUnmarshallerFactory.newUnmarshaller(Value.class)) {
                                  @Override
                                  protected void onSuccess(Value result) {
                                      List<Variable> variables = result.getVariables();
-                                     view.setVariablesIntoSelectedVariable(variables);
+
+                                     List<DebuggerVariable> debuggerVariables = getDebuggerVariables(variables);
+
+                                     view.setVariablesIntoSelectedVariable(debuggerVariables);
                                      view.updateSelectedVariable();
                                  }
 
@@ -628,7 +646,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
 
     /** {@inheritDoc} */
     @Override
-    public void onSelectedVariableElement(@Nonnull Variable variable) {
+    public void onSelectedVariableElement(@Nonnull DebuggerVariable variable) {
         this.selectedVariable = variable;
         updateChangeValueButtonEnableState();
     }
