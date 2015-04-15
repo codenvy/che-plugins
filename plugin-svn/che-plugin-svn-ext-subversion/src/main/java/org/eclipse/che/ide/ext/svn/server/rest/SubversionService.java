@@ -33,6 +33,8 @@ import org.eclipse.che.ide.ext.svn.shared.CommitRequest;
 import org.eclipse.che.ide.ext.svn.shared.CopyRequest;
 import org.eclipse.che.ide.ext.svn.shared.LockRequest;
 import org.eclipse.che.ide.ext.svn.shared.MoveRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertyDeleteRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertySetRequest;
 import org.eclipse.che.ide.ext.svn.shared.RemoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.ResolveRequest;
 import org.eclipse.che.ide.ext.svn.shared.RevertRequest;
@@ -366,6 +368,46 @@ public class SubversionService extends Service {
     public CLIOutputResponse move(final MoveRequest request) throws ServerException, IOException {
         request.setProjectPath(getRealPath(request.getProjectPath()));
         return this.subversionApi.move(request);
+    }
+
+    /**
+     * Set property to specified path or target.
+     *
+     * @param request
+     *         the property setting request
+     * @return the property setting response
+     * @throws ServerException
+     *         if there is a Subversion issue
+     * @throws IOException
+     *         if there is a problem executing the command
+     */
+    @Path("propset")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    public CLIOutputResponse propset(final PropertySetRequest request) throws ServerException, IOException {
+        request.setProjectPath(getRealPath(request.getProjectPath()));
+        return this.subversionApi.propset(request);
+    }
+
+    /**
+     * Delete property from specified path or target.
+     *
+     * @param request
+     *         the property delete request
+     * @return the property delete response
+     * @throws ServerException
+     *         if there is a Subversion issue
+     * @throws IOException
+     *         if there is a problem executing the command
+     */
+    @Path("propdel")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    public CLIOutputResponse propdel(final PropertyDeleteRequest request) throws ServerException, IOException {
+        request.setProjectPath(getRealPath(request.getProjectPath()));
+        return this.subversionApi.propdel(request);
     }
 
     /**

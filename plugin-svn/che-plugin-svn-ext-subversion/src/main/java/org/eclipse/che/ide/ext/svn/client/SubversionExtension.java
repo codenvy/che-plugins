@@ -179,8 +179,8 @@ public class SubversionExtension {
         // miscellaneousCommandGroup.add(createPatchAction);
         // actionManager.registerAction("SvnApplyPatch", applyPatchAction);
         // miscellaneousCommandGroup.add(applyPatchAction);
-        // actionManager.registerAction("SvnProperties", propertiesAction);
-        // miscellaneousCommandGroup.add(propertiesAction);
+        actionManager.registerAction("SvnProperties", propertiesAction);
+        miscellaneousCommandGroup.add(propertiesAction);
 
         // Commands that manage working copy
         actionManager.registerAction("SvnAdd", addAction);
