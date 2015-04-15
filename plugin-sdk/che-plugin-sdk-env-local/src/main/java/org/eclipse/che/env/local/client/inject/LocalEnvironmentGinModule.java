@@ -14,11 +14,10 @@ import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.env.local.client.ActionDenyAccessDialogLocalEnv;
-import org.eclipse.che.env.local.client.ActionPermitLocalEnv;
+import org.eclipse.che.env.local.client.ResourcesLockedActionPermitLocalEnv;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.action.permits.Build;
-import org.eclipse.che.ide.api.action.permits.Indicator;
 import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 
@@ -29,10 +28,10 @@ import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 public class LocalEnvironmentGinModule extends AbstractGinModule {
     @Override
     protected void configure() {
-        bind(ActionPermit.class).annotatedWith(Build.class).to(ActionPermitLocalEnv.class).in(Singleton.class);
+        bind(ResourcesLockedActionPermit.class).annotatedWith(Build.class).to(ResourcesLockedActionPermitLocalEnv.class).in(Singleton.class);
         bind(ActionDenyAccessDialog.class).annotatedWith(Build.class).to(ActionDenyAccessDialogLocalEnv.class).in(Singleton.class);
-        bind(ActionPermit.class).annotatedWith(Run.class).to(ActionPermitLocalEnv.class).in(Singleton.class);
+        bind(ResourcesLockedActionPermit.class).annotatedWith(Run.class).to(ResourcesLockedActionPermitLocalEnv.class).in(Singleton.class);
         bind(ActionDenyAccessDialog.class).annotatedWith(Run.class).to(ActionDenyAccessDialogLocalEnv.class).in(Singleton.class);
-        bind(ActionPermit.class).annotatedWith(Indicator.class).to(ActionPermitLocalEnv.class).in(Singleton.class);
+        bind(ResourcesLockedActionPermit.class).to(ResourcesLockedActionPermitLocalEnv.class).in(Singleton.class);
     }
 }

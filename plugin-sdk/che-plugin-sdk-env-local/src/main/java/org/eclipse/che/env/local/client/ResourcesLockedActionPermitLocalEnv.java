@@ -10,14 +10,28 @@
  *******************************************************************************/
 package org.eclipse.che.env.local.client;
 
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 
 /**
  * @author Vitaly Parfonov
  */
-public class ActionPermitLocalEnv implements ActionPermit{
+public class ResourcesLockedActionPermitLocalEnv implements ResourcesLockedActionPermit {
+
+    /** {@inheritDoc} */
     @Override
     public boolean isAllowed() {
         return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isAccountLocked() {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isWorkspaceLocked() {
+        return false;
     }
 }

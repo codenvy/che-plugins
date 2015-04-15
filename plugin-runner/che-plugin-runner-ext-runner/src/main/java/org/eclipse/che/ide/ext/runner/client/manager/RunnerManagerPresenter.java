@@ -23,6 +23,9 @@ import org.eclipse.che.api.project.shared.dto.RunnerConfiguration;
 import org.eclipse.che.api.project.shared.dto.RunnersDescriptor;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
+import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
+import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
@@ -116,7 +119,9 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     private final RunnerCounter               runnerCounter;
     private final Set<Long>                   runnersId;
     private final RunnerUtil                  runnerUtil;
-    private ChooseRunnerAction                chooseRunnerAction;
+    private final ResourcesLockedActionPermit runActionPermit;
+    private final ActionDenyAccessDialog      runActionDenyAccessDialog;
+    private       ChooseRunnerAction          chooseRunnerAction;
 
     private GetRunningProcessesAction getRunningProcessAction;
 
@@ -145,7 +150,9 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
                                   SelectionManager selectionManager,
                                   TimerFactory timerFactory,
                                   GetSystemEnvironmentsAction getSystemEnvironmentsAction,
-                                  RunnerUtil runnerUtil) {
+                                  RunnerUtil runnerUtil,
+                                  @Run ResourcesLockedActionPermit runActionPermit,
+                                  @Run ActionDenyAccessDialog runActionDenyAccessDialog) {
         this.view = view;
         this.view.setDelegate(this);
         this.locale = locale;
@@ -157,6 +164,8 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
         this.runnerCounter = runnerCounter;
         this.getSystemEnvironmentsAction = getSystemEnvironmentsAction;
         this.runnerUtil = runnerUtil;
+        this.runActionPermit = runActionPermit;
+        this.runActionDenyAccessDialog = runActionDenyAccessDialog;
 
         this.selectionManager = selectionManager;
         this.selectionManager.addListener(this);
@@ -384,17 +393,22 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     /** {@inheritDoc} */
     @Override
     public void onRerunButtonClicked() {
-        selectedRunner.setStatus(IN_QUEUE);
+        if (runActionPermit.isAllowed()) {
 
-        RunnerAction runnerAction = runnerActions.get(selectedRunner);
-        if (runnerAction == null || runnerAction instanceof LaunchAction) {
-            //Create new CheckRamAndRunAction and update selected runner
-            launchRunner(selectedRunner);
+            selectedRunner.setStatus(IN_QUEUE);
+
+            RunnerAction runnerAction = runnerActions.get(selectedRunner);
+            if (runnerAction == null || runnerAction instanceof LaunchAction) {
+                //Create new CheckRamAndRunAction and update selected runner
+                launchRunner(selectedRunner);
+            } else {
+                runnerAction.perform(selectedRunner);
+
+                update(selectedRunner);
+                selectedRunner.resetCreationTime();
+            }
         } else {
-            runnerAction.perform(selectedRunner);
-
-            update(selectedRunner);
-            selectedRunner.resetCreationTime();
+            runActionDenyAccessDialog.show();
         }
     }
 
@@ -486,27 +500,32 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
 
     @Nonnull
     private Runner launchRunner(@Nonnull Runner runner) {
-        CurrentProject currentProject = appContext.getCurrentProject();
+        if (runActionPermit.isAllowed()) {
 
-        if (currentProject == null) {
-            throw new IllegalStateException("Can't launch runner for current project. Current project is absent...");
+            CurrentProject currentProject = appContext.getCurrentProject();
+
+            if (currentProject == null) {
+                throw new IllegalStateException("Can't launch runner for current project. Current project is absent...");
+            }
+
+            selectedEnvironment = null;
+
+            panelState.setState(RUNNERS);
+            view.showOtherButtons();
+
+            history.addRunner(runner);
+
+            CheckRamAndRunAction checkRamAndRunAction = actionFactory.createCheckRamAndRun();
+            checkRamAndRunAction.perform(runner);
+
+            runnerActions.put(runner, checkRamAndRunAction);
+
+            runner.resetCreationTime();
+            runnerTimer.schedule(ONE_SEC.getValue());
+
+        } else {
+            runActionDenyAccessDialog.show();
         }
-
-        selectedEnvironment = null;
-
-        panelState.setState(RUNNERS);
-        view.showOtherButtons();
-
-        history.addRunner(runner);
-
-        CheckRamAndRunAction checkRamAndRunAction = actionFactory.createCheckRamAndRun();
-        checkRamAndRunAction.perform(runner);
-
-        runnerActions.put(runner, checkRamAndRunAction);
-
-        runner.resetCreationTime();
-        runnerTimer.schedule(ONE_SEC.getValue());
-
         return runner;
     }
 

@@ -14,7 +14,6 @@ import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ActionPermit;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -72,8 +71,6 @@ public class RunActionTest {
     @Mock
     private Environment        environment;
     @Mock
-    private ActionPermit       runActionPermit;
-    @Mock
     private ActionDenyAccessDialog runActionDenyAccessDialog;
 
     @InjectMocks
@@ -89,12 +86,10 @@ public class RunActionTest {
     @Test
     public void actionShouldNotBePerformedIfCurrentProjectIsNull() throws Exception {
         when(appContext.getCurrentProject()).thenReturn(null);
-        when(runActionPermit.isAllowed()).thenReturn(true);
 
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
-        verify(runActionPermit).isAllowed();
         verify(runnerManager, never()).launchRunner();
         verify(runnerManager, never()).launchRunner(Matchers.<RunOptions>any(), anyString());
     }
@@ -105,12 +100,10 @@ public class RunActionTest {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(currentProject.getRunner()).thenReturn('/' + SOME_STRING);
         when(environment.getName()).thenReturn(SOME_STRING);
-        when(runActionPermit.isAllowed()).thenReturn(true);
 
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
-        verify(runActionPermit).isAllowed();
         verify(runnerManager).launchRunner();
     }
 
@@ -121,12 +114,10 @@ public class RunActionTest {
         when(currentProject.getRunner()).thenReturn(SOME_STRING);
         when(environment.getId()).thenReturn(SOME_STRING);
         when(environment.getName()).thenReturn(SOME_STRING);
-        when(runActionPermit.isAllowed()).thenReturn(true);
 
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
-        verify(runActionPermit).isAllowed();
         verify(runnerManager).launchRunner();
     }
 
@@ -135,12 +126,10 @@ public class RunActionTest {
         when(currentProject.getRunner()).thenReturn(SOME_STRING);
         when(chooseRunnerAction.selectEnvironment()).thenReturn(null);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
-        when(runActionPermit.isAllowed()).thenReturn(true);
 
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
-        verify(runActionPermit).isAllowed();
         verify(runnerManager).launchRunner();
     }
 
@@ -158,7 +147,6 @@ public class RunActionTest {
         when(runOptions.withOptions(Matchers.<Map<String, String>>any())).thenReturn(runOptions);
         when(runOptions.withEnvironmentId(anyString())).thenReturn(runOptions);
         when(runOptions.withMemorySize(MB_256.getValue())).thenReturn(runOptions);
-        when(runActionPermit.isAllowed()).thenReturn(true);
 
         action.actionPerformed(actionEvent);
 
@@ -178,25 +166,14 @@ public class RunActionTest {
     }
 
     @Test
-    public void actionShouldNotBeLaunchBecauseWeHaveNotPermission() throws Exception {
-        action.actionPerformed(actionEvent);
-
-        verify(eventLogger).log(action);
-        verify(runActionPermit).isAllowed();
-        verify(runActionDenyAccessDialog).show();
-    }
-
-    @Test
     public void notificationShouldBeShownWhenRunnerIsNotSpecified() throws Exception {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(locale.actionRunnerNotSpecified()).thenReturn(SOME_STRING);
         when(currentProject.getRunner()).thenReturn(null);
-        when(runActionPermit.isAllowed()).thenReturn(true);
 
         action.actionPerformed(actionEvent);
 
         verify(eventLogger).log(action);
-        verify(runActionPermit).isAllowed();
         verify(locale).actionRunnerNotSpecified();
         verify(notificationManager).showError(SOME_STRING);
     }
