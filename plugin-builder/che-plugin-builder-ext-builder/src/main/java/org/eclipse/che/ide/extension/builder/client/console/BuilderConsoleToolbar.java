@@ -12,13 +12,15 @@ package org.eclipse.che.ide.extension.builder.client.console;
 
 import com.google.inject.BindingAnnotation;
 
+import org.eclipse.che.ide.ui.toolbar.Toolbar;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to bind Builder {@link org.eclipse.che.ide.toolbar.Toolbar}.
+ * Used to bind Builder {@link Toolbar}.
  *
  * @author Artem Zatsarynnyy
  */

@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.builder.client.inject;
 
+import com.google.gwt.inject.client.AbstractGinModule;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 import org.eclipse.che.ide.extension.builder.client.console.BuilderConsoleToolbar;
 import org.eclipse.che.ide.extension.builder.client.console.BuilderConsoleView;
 import org.eclipse.che.ide.extension.builder.client.console.BuilderConsoleViewImpl;
-import org.eclipse.che.ide.toolbar.ToolbarPresenter;
-import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
+import org.eclipse.che.ide.ui.toolbar.ToolbarPresenter;
 
 /** @author Andrey Plotnikov */
 @ExtensionGinModule

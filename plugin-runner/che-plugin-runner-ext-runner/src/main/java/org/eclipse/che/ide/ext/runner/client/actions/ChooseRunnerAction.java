@@ -22,8 +22,8 @@ import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.action.Presentation;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.client.inject.factories.DropDownListFactory;
-import org.eclipse.che.ide.dropdown.ListHeaderWidget;
+import org.eclipse.che.ide.ui.dropdown.DropDownListFactory;
+import org.eclipse.che.ide.ui.dropdown.DropDownHeaderWidget;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
@@ -46,11 +46,11 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
     private static final String PROJECT_ENVIRONMENT = "projectEnvironment";
     private static final String SYSTEM_ENVIRONMENT  = "systemEnvironment";
 
-    private final AppContext          appContext;
-    private final ListHeaderWidget    listHeaderWidget;
-    private final DropDownListFactory configRunnerFactory;
-    private final RunnerResources     resources;
-    private final ActionManager       actionManager;
+    private final AppContext           appContext;
+    private final DropDownHeaderWidget dropDownHeaderWidget;
+    private final DropDownListFactory  configRunnerFactory;
+    private final RunnerResources      resources;
+    private final ActionManager        actionManager;
 
     private List<Environment>  systemRunners;
     private List<Environment>  projectRunners;
@@ -66,7 +66,7 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
         super(appContext, locale.actionChooseRunner(), locale.actionChooseRunner(), null);
 
         this.appContext = appContext;
-        this.listHeaderWidget = dropDownListFactory.createList(RUNNER_LIST);
+        this.dropDownHeaderWidget = dropDownListFactory.createList(RUNNER_LIST);
         this.resources = resources;
         this.actionManager = actionManager;
         this.configRunnerFactory = dropDownListFactory;
@@ -90,7 +90,7 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
     /** {@inheritDoc} */
     @Override
     public Widget createCustomComponent(Presentation presentation) {
-        return (Widget)listHeaderWidget;
+        return (Widget)dropDownHeaderWidget;
     }
 
     /**
@@ -109,13 +109,13 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
         systemActions.removeAll();
 
         for (Environment environment : projectRunners) {
-            projectActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeProject(), listHeaderWidget));
+            projectActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeProject(), dropDownHeaderWidget));
         }
 
         runnersList.addSeparator();
 
         for (Environment environment : systemEnvironments) {
-            systemActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeSystem(), listHeaderWidget));
+            systemActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeSystem(), dropDownHeaderWidget));
         }
 
         runnersList.addAll(projectActions);
@@ -143,13 +143,13 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
         systemActions.removeAll();
 
         for (Environment environment : projectEnvironments) {
-            projectActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeProject(), listHeaderWidget));
+            projectActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeProject(), dropDownHeaderWidget));
         }
 
         runnersList.addSeparator();
 
         for (Environment environment : systemRunners) {
-            systemActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeSystem(), listHeaderWidget));
+            systemActions.add(configRunnerFactory.createElement(environment.getName(), resources.scopeSystem(), dropDownHeaderWidget));
         }
 
         runnersList.addAll(projectActions);
@@ -177,7 +177,7 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
         if (systemRunners.isEmpty() && projectRunners.isEmpty()) {
             return null;
         }
-        String selectedEnvironmentName = listHeaderWidget.getSelectedElementName();
+        String selectedEnvironmentName = dropDownHeaderWidget.getSelectedElementName();
 
         for (Environment environment : projectRunners) {
             if (environment.getName().equals(selectedEnvironmentName)) {
@@ -203,14 +203,14 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
 
         for (Environment e : systemRunners) {
             if (runnerName.equals(e.getName())) {
-                listHeaderWidget.selectElement(resources.scopeSystem(), e.getName());
+                dropDownHeaderWidget.selectElement(resources.scopeSystem(), e.getName());
                 return;
             }
         }
 
         for (Environment e : projectRunners) {
             if (runnerName.equals(e.getName())) {
-                listHeaderWidget.selectElement(resources.scopeProject(), e.getName());
+                dropDownHeaderWidget.selectElement(resources.scopeProject(), e.getName());
 
                 return;
             }

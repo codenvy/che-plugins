@@ -18,9 +18,9 @@ import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.client.inject.factories.DropDownListFactory;
-import org.eclipse.che.ide.dropdown.ListHeaderWidget;
-import org.eclipse.che.ide.dropdown.SimpleListElementAction;
+import org.eclipse.che.ide.ui.dropdown.DropDownListFactory;
+import org.eclipse.che.ide.ui.dropdown.DropDownHeaderWidget;
+import org.eclipse.che.ide.ui.dropdown.SimpleListElementAction;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
@@ -83,7 +83,7 @@ public class ChooseRunnerActionTest {
     @Mock
     private DefaultActionGroup        runnersList;
     @Mock
-    private ListHeaderWidget          listHeaderWidget;
+    private DropDownHeaderWidget      dropDownHeaderWidget;
     @Mock
     private SVGResource               svgResource;
 
@@ -92,7 +92,7 @@ public class ChooseRunnerActionTest {
     @Before
     public void setUp() {
         when(locale.actionChooseRunner()).thenReturn(TEXT);
-        when(listFactory.createList(RUNNER_LIST)).thenReturn(listHeaderWidget);
+        when(listFactory.createList(RUNNER_LIST)).thenReturn(dropDownHeaderWidget);
 
         action = new ChooseRunnerAction(resources, locale, appContext, actionManager, listFactory);
 
@@ -120,20 +120,20 @@ public class ChooseRunnerActionTest {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
         when(currentProject.getRunner()).thenReturn(TEXT);
-        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(systemAction);
+        when(listFactory.createElement(TEXT, svgResource, dropDownHeaderWidget)).thenReturn(systemAction);
 
         action.addSystemRunners(systemEnvList);
 
         verify(systemEnv1, times(4)).getName();
         verify(resources, times(2)).scopeSystem();
-        verify(listFactory).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(listFactory).createElement(TEXT, svgResource, dropDownHeaderWidget);
         verify(runnersList, times(2)).addSeparator();
         verify(runnersList, times(2)).addAll(Matchers.<ActionGroup>any());
-        verify(listHeaderWidget).selectElement(resources.scopeProject(), TEXT);
+        verify(dropDownHeaderWidget).selectElement(resources.scopeProject(), TEXT);
 
         action.addProjectRunners(projectEnvList);
 
-        verify(listFactory, times(3)).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(listFactory, times(3)).createElement(TEXT, svgResource, dropDownHeaderWidget);
     }
 
     @Test
@@ -142,20 +142,20 @@ public class ChooseRunnerActionTest {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
         when(currentProject.getRunner()).thenReturn(TEXT);
-        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(projectAction);
+        when(listFactory.createElement(TEXT, svgResource, dropDownHeaderWidget)).thenReturn(projectAction);
 
         action.addProjectRunners(projectEnvList);
 
         verify(projectEnv1, times(4)).getName();
         verify(resources, times(2)).scopeProject();
-        verify(listFactory).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(listFactory).createElement(TEXT, svgResource, dropDownHeaderWidget);
         verify(runnersList, times(2)).addSeparator();
         verify(runnersList, times(2)).addAll(Matchers.<ActionGroup>any());
-        verify(listHeaderWidget).selectElement(resources.scopeProject(), TEXT);
+        verify(dropDownHeaderWidget).selectElement(resources.scopeProject(), TEXT);
 
         action.addSystemRunners(systemEnvList);
 
-        verify(listFactory, times(3)).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(listFactory, times(3)).createElement(TEXT, svgResource, dropDownHeaderWidget);
     }
 
     @Test
@@ -164,7 +164,7 @@ public class ChooseRunnerActionTest {
 
         action.selectDefaultRunner();
 
-        verify(listHeaderWidget, never()).selectElement((SVGResource)any(), anyString());
+        verify(dropDownHeaderWidget, never()).selectElement((SVGResource)any(), anyString());
     }
 
     @Test
@@ -174,14 +174,14 @@ public class ChooseRunnerActionTest {
 
         action.selectDefaultRunner();
 
-        verify(listHeaderWidget, never()).selectElement((SVGResource)any(), anyString());
+        verify(dropDownHeaderWidget, never()).selectElement((SVGResource)any(), anyString());
     }
 
     @Test
     public void EnvironmentShouldNotBeSelectedIfProjectDoesNotHaveAnyEnvironment() throws Exception {
         action.selectEnvironment();
 
-        verify(listHeaderWidget, never()).getSelectedElementName();
+        verify(dropDownHeaderWidget, never()).getSelectedElementName();
     }
 
     @Test
@@ -190,22 +190,22 @@ public class ChooseRunnerActionTest {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
         when(currentProject.getRunner()).thenReturn(TEXT);
-        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(projectAction);
+        when(listFactory.createElement(TEXT, svgResource, dropDownHeaderWidget)).thenReturn(projectAction);
 
         action.addProjectRunners(projectEnvList);
 
         verify(projectEnv1, times(4)).getName();
         verify(resources, times(2)).scopeProject();
-        verify(listFactory).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(listFactory).createElement(TEXT, svgResource, dropDownHeaderWidget);
         verify(runnersList, times(2)).addSeparator();
         verify(runnersList, times(2)).addAll(Matchers.<ActionGroup>any());
-        verify(listHeaderWidget).selectElement(resources.scopeProject(), TEXT);
+        verify(dropDownHeaderWidget).selectElement(resources.scopeProject(), TEXT);
 
-        when(listHeaderWidget.getSelectedElementName()).thenReturn(TEXT);
+        when(dropDownHeaderWidget.getSelectedElementName()).thenReturn(TEXT);
 
         assertThat(action.selectEnvironment(), is(projectEnv1));
 
-        verify(listHeaderWidget).getSelectedElementName();
+        verify(dropDownHeaderWidget).getSelectedElementName();
     }
 
     @Test
@@ -214,22 +214,22 @@ public class ChooseRunnerActionTest {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
         when(currentProject.getRunner()).thenReturn(TEXT);
-        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(projectAction);
+        when(listFactory.createElement(TEXT, svgResource, dropDownHeaderWidget)).thenReturn(projectAction);
 
         action.addSystemRunners(systemEnvList);
 
         verify(systemEnv1, times(4)).getName();
         verify(resources, times(2)).scopeSystem();
-        verify(listFactory).createElement(TEXT, svgResource, listHeaderWidget);
+        verify(listFactory).createElement(TEXT, svgResource, dropDownHeaderWidget);
         verify(runnersList, times(2)).addSeparator();
         verify(runnersList, times(2)).addAll(Matchers.<ActionGroup>any());
-        verify(listHeaderWidget).selectElement(resources.scopeProject(), TEXT);
+        verify(dropDownHeaderWidget).selectElement(resources.scopeProject(), TEXT);
 
-        when(listHeaderWidget.getSelectedElementName()).thenReturn(TEXT);
+        when(dropDownHeaderWidget.getSelectedElementName()).thenReturn(TEXT);
 
         assertThat(action.selectEnvironment(), is(systemEnv1));
 
-        verify(listHeaderWidget).getSelectedElementName();
+        verify(dropDownHeaderWidget).getSelectedElementName();
     }
 
     @Test
@@ -238,7 +238,7 @@ public class ChooseRunnerActionTest {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(actionManager.getAction(RUNNER_LIST)).thenReturn(runnersList);
         when(currentProject.getRunner()).thenReturn(TEXT);
-        when(listFactory.createElement(TEXT, svgResource, listHeaderWidget)).thenReturn(projectAction);
+        when(listFactory.createElement(TEXT, svgResource, dropDownHeaderWidget)).thenReturn(projectAction);
 
         action.addSystemRunners(systemEnvList);
         action.addProjectRunners(projectEnvList);
