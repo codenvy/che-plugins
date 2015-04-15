@@ -12,6 +12,8 @@ package org.eclipse.che.ide.ext.svn.client.inject;
 
 import org.eclipse.che.ide.ext.svn.client.move.MoveView;
 import org.eclipse.che.ide.ext.svn.client.move.MoveViewImpl;
+import org.eclipse.che.ide.ext.svn.client.property.PropertyEditorView;
+import org.eclipse.che.ide.ext.svn.client.property.PropertyEditorViewImpl;
 import org.eclipse.che.ide.ext.svn.client.resolve.ResolveView;
 import org.eclipse.che.ide.ext.svn.client.resolve.ResolveViewImpl;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
@@ -70,6 +72,7 @@ public class SubversionGinModule extends AbstractGinModule {
         bind(CopyView.class).to(CopyViewImpl.class).in(Singleton.class);
         bind(MoveView.class).to(MoveViewImpl.class).in(Singleton.class);
         bind(ExportView.class).to(ExportViewImpl.class).in(Singleton.class);
+        bind(PropertyEditorView.class).to(PropertyEditorViewImpl.class).in(Singleton.class);
 
         install(new GinFactoryModuleBuilder().build(FilteredNodeFactory.class));
         GinMultibinder.newSetBinder(binder(), TreeStructureProvider.class).addBinding().to(FilteredTreeStructureProvider.class);
