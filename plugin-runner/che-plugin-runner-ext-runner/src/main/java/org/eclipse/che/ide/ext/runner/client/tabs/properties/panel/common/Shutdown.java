@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 /**
@@ -18,11 +19,14 @@ import javax.annotation.Nonnull;
  * @author Andrey Plotnikov
  */
 public enum Shutdown {
-    BY_TIMEOUT("by timeout"), ALWAYS_ON("always on");
+    BY_TIMEOUT_1(1, "1 hour timeout"), BY_TIMEOUT_4(4, "4 hour timeout"), ALWAYS_ON(0, "always on");
 
     private final String name;
 
-    Shutdown(@Nonnull String name) {
+    private final int timeout;
+
+    Shutdown(@Nonnegative int timeout, @Nonnull String name) {
+        this.timeout = timeout;
         this.name = name;
     }
 
@@ -32,6 +36,9 @@ public enum Shutdown {
         return name;
     }
 
+    public int getTimeout() {
+        return timeout;
+    }
     /**
      * Returns a value of {@link Shutdown} that is equaled to a given content.
      *
@@ -50,4 +57,12 @@ public enum Shutdown {
                 "You tried to detect unknown shutdown. Please, check your value. Your shutdown is " + content);
     }
 
+    public static Shutdown detect(@Nonnull int timeout) {
+        for (Shutdown shutdown : Shutdown.values()) {
+            if (timeout ==  shutdown.getTimeout()) {
+                return shutdown;
+            }
+        }
+        return null;
+    }
 }

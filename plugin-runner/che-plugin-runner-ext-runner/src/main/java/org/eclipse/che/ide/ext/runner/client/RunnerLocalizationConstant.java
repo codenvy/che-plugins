@@ -271,4 +271,16 @@ public interface RunnerLocalizationConstant extends Messages {
 
     @Key("messages.availableLessOverrideMemory.backToConfig")
     String messagesAvailableLessOverrideMemoryBackToConfig();
+
+    @Key("user.preferences.runners.title")
+    String userPreferencesRunnersTitle();
+
+    @Key("user.preferences.runners.shutdown.policy")
+    String userPreferencesRunnersShutdownPolicy();
+
+    @Key("user.preferences.runners.shutdown.value.title")
+    String userPreferencesRunnersShutdownValueTitle();
+
+    @Key("user.preferences.runners.shutdown.set.button")
+    String userPreferencesRunnersShutdownSetButton();
 }

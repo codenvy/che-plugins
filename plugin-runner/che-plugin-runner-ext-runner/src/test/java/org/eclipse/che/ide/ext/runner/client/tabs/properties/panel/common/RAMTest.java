@@ -40,11 +40,11 @@ public class RAMTest {
 
     @Test
     public void shouldBeReturnDefaultValueOfMemory1() throws Exception {
-        assertThat(512, is(RAM.detect(1).getValue()));
+        assertThat(1024, is(RAM.detect(1).getValue()));
     }
 
     @Test
     public void shouldBeReturnDefaultValueOfMemory2() throws Exception {
-        assertThat(512, is(RAM.detect("text").getValue()));
+        assertThat(1024, is(RAM.detect("text").getValue()));
     }
 }

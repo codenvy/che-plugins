@@ -222,11 +222,6 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
                                        @Nonnegative int usedMemory,
                                        @Nonnegative final int requiredMemory) {
         int availableMemory = totalMemory - usedMemory;
-        if (totalMemory < requiredMemory) {
-            runnerUtil.showWarning(constant.messagesTotalLessRequiredMemory(totalMemory, requiredMemory));
-            return false;
-        }
-
         if (availableMemory < requiredMemory) {
             dialogFactory.createChoiceDialog(constant.messagesAvailableLessOverrideMemoryTitle(), constant.messagesAvailableLessOverrideMemoryContent(),
                     constant.messagesAvailableLessOverrideMemorySettingsLink(), constant.messagesAvailableLessOverrideMemoryBackToConfig(),
@@ -235,7 +230,7 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
                         public void accepted() {
                             Window.open("/dashboard/#/organizations", "_blank", null);
                         }
-                    }, null);
+                    }, null).show();
             return false;
         }
 
@@ -246,7 +241,6 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
                                             @Nonnegative int usedMemory,
                                             @Nonnegative final int overrideMemory) {
         int availableMemory = totalMemory - usedMemory;
-
         if (availableMemory < overrideMemory) {
             dialogFactory.createChoiceDialog(constant.messagesAvailableLessOverrideMemoryTitle(), constant.messagesAvailableLessOverrideMemoryContent(),
                     constant.messagesAvailableLessOverrideMemorySettingsLink(), constant.messagesAvailableLessOverrideMemoryBackToConfig(),
@@ -255,7 +249,7 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
                         public void accepted() {
                             Window.open("/dashboard/#/organizations", "_blank", null);
                         }
-                    }, null);
+                    }, null).show();
             return false;
         }
 

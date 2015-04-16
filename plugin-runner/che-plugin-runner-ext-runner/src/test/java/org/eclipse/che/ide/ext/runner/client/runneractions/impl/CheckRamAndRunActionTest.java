@@ -33,6 +33,7 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.CancelCallback;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
+import org.eclipse.che.ide.ui.dialogs.choice.ChoiceDialog;
 import org.eclipse.che.ide.ui.dialogs.confirm.ConfirmDialog;
 import org.eclipse.che.ide.ui.dialogs.message.MessageDialog;
 import org.junit.Before;
@@ -67,6 +68,7 @@ public class CheckRamAndRunActionTest {
 
     //text for warning or error messages
     private static final String RESOURCE                                = "some resources";
+    private static final String SOME_TXT                                = "some text";
     private static final String ID_ENVIRONMENT                          = "testEnvironmentId";
     private static final String AVAILABLE_MEMORY_LESS_THEN_REQUIRED     = "not enough required memory";
     private static final String MESSAGES_TOTAL_LESS_REQUIRED_MEMORY     = "messages total less required memory";
@@ -115,6 +117,8 @@ public class CheckRamAndRunActionTest {
     private ConfirmDialog                             confirmDialog;
     @Mock
     private MessageDialog                             messageDialog;
+    @Mock
+    private ChoiceDialog                              choiceDialog;
     //run processes
     @Mock
     private RunAction                                 runAction;
@@ -368,7 +372,12 @@ public class CheckRamAndRunActionTest {
         when(runner.getEnvironmentId()).thenReturn(ID_ENVIRONMENT);
         when(runners.getConfigs()).thenReturn(hashMap);
         when(hashMap.get(ID_ENVIRONMENT)).thenReturn(runnerConfiguration);
-        when(constant.messagesTotalLessRequiredMemory(512, 1024)).thenReturn(MESSAGES_TOTAL_LESS_REQUIRED_MEMORY);
+        when(constant.messagesAvailableLessOverrideMemoryContent()).thenReturn(MESSAGES_AVAILABLE_LESS_OVERRIDE_MEMORY);
+        when(constant.messagesAvailableLessOverrideMemoryTitle()).thenReturn(SOME_TXT);
+        when(constant.messagesAvailableLessOverrideMemorySettingsLink()).thenReturn(SOME_TXT);
+        when(constant.messagesAvailableLessOverrideMemoryBackToConfig()).thenReturn(SOME_TXT);
+        when(dialogFactory.createChoiceDialog(anyString(), anyString(), anyString(), anyString(), any(ConfirmCallback.class), any(ConfirmCallback.class)))
+                .thenReturn(choiceDialog);
 
         //total memory
         when(resourcesDescriptor.getTotalMemory()).thenReturn("512");
@@ -398,8 +407,8 @@ public class CheckRamAndRunActionTest {
         verify(runner).getRAM();
         verify(runnerConfiguration).getRam();
 
-        verify(constant).messagesTotalLessRequiredMemory(512, 1024);
-        verify(runnerUtil).showWarning(MESSAGES_TOTAL_LESS_REQUIRED_MEMORY);
+        verify(constant).messagesAvailableLessOverrideMemoryContent();
+        verify(choiceDialog).show();
 
         verify(runner).setStatus(Runner.Status.FAILED);
 
@@ -414,7 +423,12 @@ public class CheckRamAndRunActionTest {
         when(runner.getEnvironmentId()).thenReturn(ID_ENVIRONMENT);
         when(runners.getConfigs()).thenReturn(hashMap);
         when(hashMap.get(ID_ENVIRONMENT)).thenReturn(runnerConfiguration);
-        when(constant.messagesAvailableLessRequiredMemory(512, 256, 384)).thenReturn(AVAILABLE_MEMORY_LESS_THEN_REQUIRED);
+        when(constant.messagesAvailableLessOverrideMemoryContent()).thenReturn(MESSAGES_AVAILABLE_LESS_OVERRIDE_MEMORY);
+        when(constant.messagesAvailableLessOverrideMemoryTitle()).thenReturn(SOME_TXT);
+        when(constant.messagesAvailableLessOverrideMemorySettingsLink()).thenReturn(SOME_TXT);
+        when(constant.messagesAvailableLessOverrideMemoryBackToConfig()).thenReturn(SOME_TXT);
+        when(dialogFactory.createChoiceDialog(anyString(), anyString(), anyString(), anyString(), any(ConfirmCallback.class), any(ConfirmCallback.class)))
+                .thenReturn(choiceDialog);
 
         //total memory
         when(resourcesDescriptor.getTotalMemory()).thenReturn("512");
@@ -445,8 +459,8 @@ public class CheckRamAndRunActionTest {
         verify(runner).getRAM();
         verify(runnerConfiguration).getRam();
 
-        verify(constant).messagesAvailableLessRequiredMemory(512, 256, 384);
-        verify(runnerUtil).showWarning(AVAILABLE_MEMORY_LESS_THEN_REQUIRED);
+        verify(constant).messagesAvailableLessOverrideMemoryContent();
+        verify(choiceDialog).show();
 
         verify(runner).setStatus(Runner.Status.FAILED);
         verify(managerPresenter).update(runner);
@@ -460,7 +474,12 @@ public class CheckRamAndRunActionTest {
         when(runner.getEnvironmentId()).thenReturn(ID_ENVIRONMENT);
         when(runners.getConfigs()).thenReturn(hashMap);
         when(hashMap.get(ID_ENVIRONMENT)).thenReturn(runnerConfiguration);
-        when(constant.messagesAvailableLessOverrideMemory(256)).thenReturn(MESSAGES_AVAILABLE_LESS_OVERRIDE_MEMORY);
+        when(constant.messagesAvailableLessOverrideMemoryContent()).thenReturn(MESSAGES_AVAILABLE_LESS_OVERRIDE_MEMORY);
+        when(constant.messagesAvailableLessOverrideMemoryTitle()).thenReturn(SOME_TXT);
+        when(constant.messagesAvailableLessOverrideMemorySettingsLink()).thenReturn(SOME_TXT);
+        when(constant.messagesAvailableLessOverrideMemoryBackToConfig()).thenReturn(SOME_TXT);
+        when(dialogFactory.createChoiceDialog(anyString(), anyString(), anyString(), anyString(), any(ConfirmCallback.class), any(ConfirmCallback.class)))
+                .thenReturn(choiceDialog);
 
         //total memory
         when(resourcesDescriptor.getTotalMemory()).thenReturn("512");
@@ -491,8 +510,8 @@ public class CheckRamAndRunActionTest {
         verify(runner).getRAM();
         verify(runnerConfiguration).getRam();
 
-        verify(constant).messagesAvailableLessOverrideMemory(256);
-        verify(runnerUtil).showError(runner, MESSAGES_AVAILABLE_LESS_OVERRIDE_MEMORY, null);
+        verify(constant).messagesAvailableLessOverrideMemoryContent();
+        verify(choiceDialog).show();
 
         verify(runner).setStatus(Runner.Status.FAILED);
     }
@@ -624,7 +643,12 @@ public class CheckRamAndRunActionTest {
         when(runners.getConfigs()).thenReturn(hashMap);
         when(hashMap.get(ID_ENVIRONMENT)).thenReturn(runnerConfiguration);
 
-        when(constant.messagesAvailableLessOverrideMemory(268)).thenReturn(MESSAGES_AVAILABLE_LESS_OVERRIDE_MEMORY);
+        when(constant.messagesAvailableLessOverrideMemoryContent()).thenReturn(MESSAGES_AVAILABLE_LESS_OVERRIDE_MEMORY);
+        when(constant.messagesAvailableLessOverrideMemoryTitle()).thenReturn(SOME_TXT);
+        when(constant.messagesAvailableLessOverrideMemorySettingsLink()).thenReturn(SOME_TXT);
+        when(constant.messagesAvailableLessOverrideMemoryBackToConfig()).thenReturn(SOME_TXT);
+        when(dialogFactory.createChoiceDialog(anyString(), anyString(), anyString(), anyString(), any(ConfirmCallback.class), any(ConfirmCallback.class)))
+                .thenReturn(choiceDialog);
 
         //total memory
         when(resourcesDescriptor.getTotalMemory()).thenReturn("1024");
@@ -650,8 +674,8 @@ public class CheckRamAndRunActionTest {
 
         verify(runner).getRAM();
 
-        verify(constant).messagesAvailableLessOverrideMemory(268);
-        verify(runnerUtil).showError(runner, MESSAGES_AVAILABLE_LESS_OVERRIDE_MEMORY, null);
+        verify(constant).messagesAvailableLessOverrideMemoryContent();
+        verify(choiceDialog).show();
 
         verify(runner).setStatus(Runner.Status.FAILED);
     }

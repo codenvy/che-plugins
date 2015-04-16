@@ -48,19 +48,19 @@
             box-shadow: 0 1px 0 0 rgba(223, 223, 223, 0.4);
         }
 
-        .settingField[disabled], .listBoxStyle[disabled] {
+        .settingField[disabled] {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
             border: none;
             box-shadow: none;
             background-color: inherit;
-            margin-right: 40px;
+            margin-right: 43px;
             padding-left: 0px;
         }
 
-        .settingField[disabled] {
-            margin-right: 43px;
+        .listBoxStyle[disabled] {
+            margin-right: 40px !important;
         }
 
         .listBoxStyle {
@@ -101,7 +101,7 @@
 
         .switcher {
             float: left;
-            margin-left: 22px;
+            margin-left: 24px;
         }
     </ui:style>
 

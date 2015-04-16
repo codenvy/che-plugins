@@ -26,7 +26,6 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.button.PropertyButt
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Boot;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Shutdown;
-import org.eclipse.che.ide.ui.switcher.Switcher;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +46,7 @@ import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Shutdown.ALWAYS_ON;
-import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Shutdown.BY_TIMEOUT;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Shutdown.BY_TIMEOUT_4;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -240,14 +239,14 @@ public class PropertiesPanelViewImplTest {
 
     @Test
     public void defaultAmountMemoryShouldBeSelected() {
-        when(view.ram.getValue(MB_512.ordinal())).thenReturn("512");
+        when(view.ram.getValue(MB_1024.ordinal())).thenReturn("1024");
         when(view.ram.getItemCount()).thenReturn(RAM.values().length);
 
         view.selectMemory(DEFAULT);
 
         verify(view.ram).getItemCount();
-        verify(view.ram, times(3)).getValue(anyInt());
-        verify(view.ram).setItemSelected(MB_512.ordinal(), true);
+        verify(view.ram, times(4)).getValue(anyInt());
+        verify(view.ram).setItemSelected(MB_1024.ordinal(), true);
     }
 
     @Test
@@ -317,9 +316,9 @@ public class PropertiesPanelViewImplTest {
     @Test
     public void shutDownParameterShouldBeReturned() {
         when(view.shutdown.getSelectedIndex()).thenReturn(1);
-        when(view.shutdown.getValue(1)).thenReturn(BY_TIMEOUT.toString());
+        when(view.shutdown.getValue(1)).thenReturn(BY_TIMEOUT_4.toString());
 
-        assertThat(view.getShutdown(), is(BY_TIMEOUT));
+        assertThat(view.getShutdown(), is(BY_TIMEOUT_4));
     }
 
     @Test
