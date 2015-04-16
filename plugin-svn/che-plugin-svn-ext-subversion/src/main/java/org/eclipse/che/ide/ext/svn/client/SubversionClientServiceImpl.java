@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.svn.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -246,7 +247,7 @@ public class SubversionClientServiceImpl implements SubversionClientService {
                false, // @param showUpdates whether or not to show repository updates (--show-updates)
                false, // @param showUnversioned whether or not to show unversioned paths (--quiet)
                false, // @param verbose whether or not to be verbose (--verbose)
-               new ArrayList<String>(),
+               Collections.<String>emptyList(),
 
                new AsyncRequestCallback<CLIOutputResponse>(dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponse.class)) {
                    @Override
