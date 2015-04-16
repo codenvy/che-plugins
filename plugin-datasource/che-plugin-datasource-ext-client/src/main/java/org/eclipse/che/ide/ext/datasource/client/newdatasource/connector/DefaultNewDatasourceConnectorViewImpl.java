@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.datasource.client.newdatasource.connector;
 
 import javax.annotation.Nullable;
 
+import com.google.gwt.core.client.GWT;
 import org.eclipse.che.ide.ext.datasource.client.DatasourceUiResources;
 import org.eclipse.che.ide.util.loging.Log;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -37,6 +38,8 @@ import com.google.inject.Inject;
 public class DefaultNewDatasourceConnectorViewImpl extends Composite implements DefaultNewDatasourceConnectorView {
     interface NewDatasourceViewImplUiBinder extends UiBinder<Widget, DefaultNewDatasourceConnectorViewImpl> {
     }
+
+    private static final NewDatasourceViewImplUiBinder UI_BINDER = GWT.create(NewDatasourceViewImplUiBinder.class);
 
     @UiField
     Label                  configureTitleCaption;
@@ -91,8 +94,8 @@ public class DefaultNewDatasourceConnectorViewImpl extends Composite implements 
 
 
     @Inject
-    public DefaultNewDatasourceConnectorViewImpl(NewDatasourceViewImplUiBinder uiBinder) {
-        initWidget(uiBinder.createAndBindUi(this));
+    public DefaultNewDatasourceConnectorViewImpl() {
+        initWidget(UI_BINDER.createAndBindUi(this));
         hostField.setText("localhost");
 
         radioUserPref.setValue(true);
@@ -178,7 +181,14 @@ public class DefaultNewDatasourceConnectorViewImpl extends Composite implements 
         if (!Character.isDigit(event.getCharCode())) {
             portField.cancelKey();
         }
-        delegate.portChanged(Integer.parseInt(portField.getText()));
+    }
+
+    @UiHandler("portField")
+    public void onPortFieldChanged(KeyUpEvent event) {
+        String result = portField.getText();
+        if (!result.equals("")) {
+            delegate.portChanged(Integer.parseInt(result));
+        }
     }
 
     @Override

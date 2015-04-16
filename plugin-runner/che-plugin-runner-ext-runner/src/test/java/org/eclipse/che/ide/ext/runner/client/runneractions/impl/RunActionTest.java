@@ -18,8 +18,6 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.api.runner.gwt.client.RunnerServiceClient;
-import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
-import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
@@ -72,7 +70,7 @@ public class RunActionTest {
     @Mock
     private RunnerActionFactory                                          actionFactory;
     @Mock
-    private AnalyticsEventLogger                                          eventLogger;
+    private AnalyticsEventLogger                                         eventLogger;
 
     @Mock
     private Throwable                                                     reason;
@@ -96,10 +94,6 @@ public class RunActionTest {
     private ApplicationProcessDescriptor                                  descriptor;
     @Mock
     private LaunchAction                                                  launchAction;
-    @Mock
-    private ResourcesLockedActionPermit                                   runActionPermit;
-    @Mock
-    private ActionDenyAccessDialog                                        runActionDenyAccessDialog;
     //captors
     @Captor
     private ArgumentCaptor<FailureCallback>                               failedCallBackCaptor;
@@ -111,11 +105,9 @@ public class RunActionTest {
     @Before
     public void setUp() {
         when(actionFactory.createLaunch()).thenReturn(launchAction);
-        when(runActionPermit.isAllowed()).thenReturn(true);
 
         runAction = new RunAction(service, appContext, locale, presenter,
-                                  callbackBuilderProvider, runnerUtil, actionFactory, eventLogger, runActionPermit,
-                                  runActionDenyAccessDialog);
+                                  callbackBuilderProvider, runnerUtil, actionFactory, eventLogger);
 
         //preparing callbacks for server
         when(appContext.getCurrentProject()).thenReturn(project);

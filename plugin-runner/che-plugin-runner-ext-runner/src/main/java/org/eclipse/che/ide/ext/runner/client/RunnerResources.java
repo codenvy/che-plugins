@@ -132,10 +132,6 @@ public interface RunnerResources extends ClientBundle {
 
         String wrappedText();
 
-        String runnersAction();
-
-        String runnerFontStyle();
-
         String mainButtonIcon();
 
         String leftTabContainerShadow();
@@ -143,8 +139,6 @@ public interface RunnerResources extends ClientBundle {
         String itemIcon();
 
         String defaultRunnerStub();
-
-        String hideElement();
     }
 
 }

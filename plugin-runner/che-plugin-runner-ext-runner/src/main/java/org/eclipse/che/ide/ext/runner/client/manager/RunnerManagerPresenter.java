@@ -62,6 +62,7 @@ import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
 import org.eclipse.che.ide.ext.runner.client.util.TimerFactory;
 import org.eclipse.che.ide.ext.runner.client.util.annotations.LeftPanel;
 import org.eclipse.che.ide.ext.runner.client.util.annotations.RightPanel;
+import org.eclipse.che.ide.util.Config;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -303,8 +304,9 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
                                             .scope(EnumSet.of(RUNNERS))
                                             .tabType(RIGHT)
                                             .build();
-
-        container.addTab(terminalTab);
+        if (!Config.isSdkProject()) {
+            container.addTab(terminalTab);
+        }
 
         TabSelectHandler propertiesHandler = new TabSelectHandler() {
             @Override

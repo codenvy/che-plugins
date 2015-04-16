@@ -33,7 +33,7 @@ public class ResultCellTable extends CellTable<List<String>> {
                            final @NotNull CellTableResourcesQueryResults cellTableResources,
                            final @NotNull SqlRequestLauncherConstants constants) {
         super(pageSize, cellTableResources);
-
+        ensureDebugId("sql-table-result");
         final InlineLabel emptyWidget = new InlineLabel(constants.emptyResult());
         setEmptyTableWidget(emptyWidget);
         emptyWidget.setStyleName(cellTableResources.cellTableStyle().emptyTableWidget());

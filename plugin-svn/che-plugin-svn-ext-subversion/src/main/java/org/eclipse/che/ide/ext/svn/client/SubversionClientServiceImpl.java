@@ -19,10 +19,13 @@ import javax.validation.constraints.NotNull;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.svn.shared.AddRequest;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponseList;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
 import org.eclipse.che.ide.ext.svn.shared.CleanupRequest;
 import org.eclipse.che.ide.ext.svn.shared.CommitRequest;
 import org.eclipse.che.ide.ext.svn.shared.CopyRequest;
+import org.eclipse.che.ide.ext.svn.shared.InfoRequest;
+import org.eclipse.che.ide.ext.svn.shared.InfoResponse;
 import org.eclipse.che.ide.ext.svn.shared.LockRequest;
 import org.eclipse.che.ide.ext.svn.shared.MoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.RemoveRequest;
@@ -120,6 +123,17 @@ public class SubversionClientServiceImpl implements SubversionClientService {
                           .withProjectPath(projectPath);
 
         asyncRequestFactory.createPostRequest(baseHttpUrl + "/remove", request).loader(loader).send(callback);
+    }
+
+    @Override
+    public void info(final @NotNull String projectPath, final List<String> paths, final String revision,
+                     final AsyncRequestCallback<InfoResponse> callback) {
+        final InfoRequest request = dtoFactory.createDto(InfoRequest.class)
+                .withProjectPath(projectPath)
+                .withPaths(paths)
+                .withRevision(revision);
+
+        asyncRequestFactory.createPostRequest(baseHttpUrl + "/info", request).loader(loader).send(callback);
     }
 
     @Override
@@ -278,19 +292,19 @@ public class SubversionClientServiceImpl implements SubversionClientService {
     public void resolve(final String projectPath,
                         final Map<String, String> resolutions,
                         final String depth,
-                        final AsyncCallback<List<String>> callback) {
+                        final AsyncCallback<CLIOutputResponseList> callback) {
         final String url = baseHttpUrl + "/resolve";
         final ResolveRequest request = dtoFactory.createDto(ResolveRequest.class)
                                                  .withProjectPath(projectPath)
                                                  .withConflictResolutions(resolutions)
                                                  .withDepth(depth);
         asyncRequestFactory.createPostRequest(url, request).loader(loader)
-                           .send(new AsyncRequestCallback<CLIOutputResponse>(dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponse.class)) {
+                           .send(new AsyncRequestCallback<CLIOutputResponseList>(dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponseList.class)) {
 
                                @Override
-                               protected void onSuccess(CLIOutputResponse result) {
+                               protected void onSuccess(CLIOutputResponseList result) {
                                    if (result != null) {
-                                       callback.onSuccess(result.getOutput());
+                                       callback.onSuccess(result);
                                    } else {
                                        callback.onFailure(new Exception("resolve : no SvnResponse."));
                                    }
@@ -302,6 +316,7 @@ public class SubversionClientServiceImpl implements SubversionClientService {
                                }
                            });
     }
+
     @Override
     public void saveCredentials(final String repositoryUrl, final String username, final String password,
                                 final AsyncRequestCallback<Void> callback) {

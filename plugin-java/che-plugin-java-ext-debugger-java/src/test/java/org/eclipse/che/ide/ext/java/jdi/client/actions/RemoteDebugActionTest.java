@@ -96,7 +96,7 @@ public class RemoteDebugActionTest {
         verify(appContext).getCurrentProject();
         verify(currentProject, times(2)).getProjectDescription();
         verify(typeRegistry).getProjectType(SOME_TEXT);
-        verify(definition).getRunnerCategories();
+//        verify(definition).getRunnerCategories();
         verify(actionEvent.getPresentation()).setEnabledAndVisible(true);
     }
 
@@ -109,7 +109,7 @@ public class RemoteDebugActionTest {
         verify(appContext).getCurrentProject();
         verify(currentProject, times(2)).getProjectDescription();
         verify(typeRegistry).getProjectType(SOME_TEXT);
-        verify(definition).getRunnerCategories();
+//        verify(definition).getRunnerCategories();
         verify(actionEvent.getPresentation(), never()).setEnabledAndVisible(true);
     }
 

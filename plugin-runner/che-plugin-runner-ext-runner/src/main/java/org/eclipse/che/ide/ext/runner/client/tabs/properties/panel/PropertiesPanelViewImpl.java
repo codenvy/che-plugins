@@ -41,6 +41,7 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Shutdown;
 import org.eclipse.che.ide.ui.switcher.Switcher;
+import org.eclipse.che.ide.util.Config;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -67,13 +68,13 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
     private static final PropertiesPanelViewImplUiBinder UI_BINDER = GWT.create(PropertiesPanelViewImplUiBinder.class);
 
     @UiField
-    Label configLink;
+    Label     configLink;
     @UiField
     FlowPanel configLinkPanel;
     @UiField
-    TextBox name;
+    TextBox   name;
     @UiField
-    TextBox type;
+    TextBox   type;
 
     @UiField
     FlowPanel buttonsPanel;
@@ -96,12 +97,13 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
     DockLayoutPanel   propertiesPanel;
     @UiField
     SimpleLayoutPanel editorPanel;
+    @UiField
+    Label             dockerLabel;
 
     @UiField(provided = true)
     final RunnerLocalizationConstant locale;
     @UiField(provided = true)
     final RunnerResources            resources;
-
 
     private final WidgetFactory widgetFactory;
     private final Label         unAvailableMessage;
@@ -175,6 +177,14 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
         };
 
         projectDefault.addValueChangeHandler(valueChangeHandler);
+
+        if (Config.isSdkProject()) {
+            hideSwitcher();
+            hideButtonsPanel();
+
+            editorPanel.setVisible(false);
+            dockerLabel.setVisible(false);
+        }
     }
 
     private void prepareField(@Nonnull ListBox field, @Nonnull Set<? extends Enum> items) {
@@ -368,8 +378,11 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
         cancelBtn.setVisible(visible);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void setVisibleConfigLink(boolean visible) { configLinkPanel.setVisible(visible); }
+    public void setVisibleConfigLink(boolean visible) {
+        configLinkPanel.setVisible(visible);
+    }
 
     /** {@inheritDoc} */
     @Override

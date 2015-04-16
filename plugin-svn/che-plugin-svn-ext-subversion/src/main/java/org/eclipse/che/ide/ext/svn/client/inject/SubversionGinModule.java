@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.inject;
 
+import org.eclipse.che.ide.ext.svn.client.log.ShowLogsView;
+import org.eclipse.che.ide.ext.svn.client.log.ShowLogsViewImpl;
 import org.eclipse.che.ide.ext.svn.client.move.MoveView;
 import org.eclipse.che.ide.ext.svn.client.move.MoveViewImpl;
 import org.eclipse.che.ide.ext.svn.client.resolve.ResolveView;
@@ -70,6 +72,7 @@ public class SubversionGinModule extends AbstractGinModule {
         bind(CopyView.class).to(CopyViewImpl.class).in(Singleton.class);
         bind(MoveView.class).to(MoveViewImpl.class).in(Singleton.class);
         bind(ExportView.class).to(ExportViewImpl.class).in(Singleton.class);
+        bind(ShowLogsView.class).to(ShowLogsViewImpl.class).in(Singleton.class);
 
         install(new GinFactoryModuleBuilder().build(FilteredNodeFactory.class));
         GinMultibinder.newSetBinder(binder(), TreeStructureProvider.class).addBinding().to(FilteredTreeStructureProvider.class);

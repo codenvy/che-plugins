@@ -178,12 +178,18 @@ public class BuilderConsolePresenter extends BasePresenter implements BuilderCon
         if (activePart == null || !activePart.equals(this)) {
             isUnread = true;
         }
-        firePropertyChange(TITLE_PROPERTY);
     }
 
-    /**
-     * Set the console active (selected) in the parts stack.
-     */
+    /** Do not use it. This is workaround of freezing FF (see IDEX-2327). */
+    public void printFF(char ch) {
+        view.printFF(ch);
+        PartPresenter activePart = partStack.getActivePart();
+        if (activePart == null || !activePart.equals(this)) {
+            isUnread = true;
+        }
+    }
+
+    /** Set the console active (selected) in the parts stack. */
     public void setActive() {
         PartPresenter activePart = partStack.getActivePart();
         if (activePart == null || !activePart.equals(this)) {

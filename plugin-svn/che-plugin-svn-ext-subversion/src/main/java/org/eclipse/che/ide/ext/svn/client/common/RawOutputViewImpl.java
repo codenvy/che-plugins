@@ -41,10 +41,10 @@ public class RawOutputViewImpl extends BaseView<RawOutputView.ActionDelegate> im
     private static final String INFO_COLOR = "lightgreen";
 
     @UiField
-    FlowPanel consoleArea;
+    ScrollPanel scrollPanel;
 
     @UiField
-    ScrollPanel scrollPanel;
+    FlowPanel outputArea;
 
     /**
      * Constructor.
@@ -88,7 +88,7 @@ public class RawOutputViewImpl extends BaseView<RawOutputView.ActionDelegate> im
         html.setHTML("<pre" + preStyle + "><span>" + text + "</span></pre>");
         html.getElement().setAttribute("style", "padding-left: 2px;");
 
-        consoleArea.add(html);
+        outputArea.add(html);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class RawOutputViewImpl extends BaseView<RawOutputView.ActionDelegate> im
                 ";'>" + SimpleHtmlSanitizer.sanitizeHtml(text).asString() + "</span></pre>");
 
         html.getElement().setAttribute("style", "padding-left: 2px;");
-        consoleArea.add(html);
+        outputArea.add(html);
     }
 
     @Override
@@ -108,20 +108,9 @@ public class RawOutputViewImpl extends BaseView<RawOutputView.ActionDelegate> im
         print(text, INFO_COLOR);
     }
 
-//    @Override
-//    public void printBold(String text) {
-//        final String preStyle = " style='margin:0px; font-size: 12px; font-weight: bold;' ";
-//        final HTML html = new HTML();
-//
-//        html.setHTML("<pre" + preStyle + "><span>" + text + "</span></pre>");
-//        html.getElement().setAttribute("style", "padding-left: 2px;");
-//
-//        consoleArea.add(html);
-//    }
-
     @Override
     public void clear() {
-        consoleArea.clear();
+        outputArea.clear();
     }
 
     @Override

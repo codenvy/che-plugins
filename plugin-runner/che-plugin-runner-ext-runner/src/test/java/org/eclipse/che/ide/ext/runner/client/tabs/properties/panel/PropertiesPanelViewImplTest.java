@@ -522,4 +522,11 @@ public class PropertiesPanelViewImplTest {
 
         verify(delegate).onConfigurationChanged();
     }
+
+    @Test
+    public void elementsShouldBeHideWhenScopeIsProject() throws Exception {
+        view.hideSwitcher();
+
+        verify(view.projectDefaultPanel).setVisible(false);
+    }
 }

@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.subactio
 
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.Notification;
@@ -31,6 +32,7 @@ import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
 import org.eclipse.che.ide.ext.runner.client.util.WebSocketUtil;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
+
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
@@ -51,19 +53,20 @@ public class StatusAction extends AbstractRunnerAction {
     /** WebSocket channel to get application's status. */
     private static final String STATUS_CHANNEL = "runner:status:";
 
-    private final DtoUnmarshallerFactory     dtoUnmarshallerFactory;
-    private final DtoFactory                 dtoFactory;
-    private final WebSocketUtil              webSocketUtil;
-    private final AppContext                 appContext;
-    private final EventBus                   eventBus;
-    private final RunnerLocalizationConstant locale;
-    private final RunnerManagerPresenter     presenter;
-    private final GetLogsAction              logsAction;
-    private final RunnerUtil                 runnerUtil;
-    private final RunnerAction               checkHealthStatusAction;
-    private final Notification               notification;
-    private final RunnerManagerView          view;
-    private final ConsoleContainer           consoleContainer;
+    private final DtoUnmarshallerFactory      dtoUnmarshallerFactory;
+    private final DtoFactory                  dtoFactory;
+    private final WebSocketUtil               webSocketUtil;
+    private final AppContext                  appContext;
+    private final EventBus                    eventBus;
+    private final RunnerLocalizationConstant  locale;
+    private final RunnerManagerPresenter      presenter;
+    private final GetLogsAction               logsAction;
+    private final RunnerUtil                  runnerUtil;
+    private final RunnerAction                checkHealthStatusAction;
+    private final Notification                notification;
+    private final RunnerManagerView           view;
+    private final ConsoleContainer            consoleContainer;
+    private final ResourcesLockedActionPermit resourcesLockedActionPermit;
 
     private SubscriptionHandler<ApplicationProcessDescriptor> runnerStatusHandler;
     private String                                            webSocketChannel;
@@ -81,7 +84,8 @@ public class StatusAction extends AbstractRunnerAction {
                         RunnerUtil runnerUtil,
                         ConsoleContainer consoleContainer,
                         RunnerActionFactory actionFactory,
-                        @Nonnull @Assisted Notification notification) {
+                        @Nonnull @Assisted Notification notification,
+                        ResourcesLockedActionPermit resourcesLockedActionPermit) {
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
         this.dtoFactory = dtoFactory;
         this.webSocketUtil = webSocketUtil;
@@ -93,6 +97,7 @@ public class StatusAction extends AbstractRunnerAction {
         this.consoleContainer = consoleContainer;
         this.runnerUtil = runnerUtil;
         this.notification = notification;
+        this.resourcesLockedActionPermit = resourcesLockedActionPermit;
 
         this.logsAction = actionFactory.createGetLogs();
         this.checkHealthStatusAction = actionFactory.createCheckHealthStatus(notification);
@@ -180,6 +185,12 @@ public class StatusAction extends AbstractRunnerAction {
     }
 
     private void processStoppedMessage() {
+        if (resourcesLockedActionPermit.isAccountLocked()) {
+            consoleContainer.printError(runner, locale.accountGigabyteHoursLimitErrorMessage());
+        } else if (resourcesLockedActionPermit.isWorkspaceLocked()) {
+            consoleContainer.printError(runner, locale.workspaceGigabyteHoursLimitErrorMessage());
+        }
+
         runner.setStatus(Runner.Status.STOPPED);
 
         view.updateMoreInfoPopup(runner);

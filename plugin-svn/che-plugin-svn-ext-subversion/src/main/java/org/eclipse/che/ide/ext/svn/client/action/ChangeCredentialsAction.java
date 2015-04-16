@@ -12,7 +12,10 @@ package org.eclipse.che.ide.ext.svn.client.action;
 
 import static org.eclipse.che.ide.ext.svn.shared.SubversionTypeConstant.SUBVERSION_ATTRIBUTE_REPOSITORY_URL;
 
+import java.util.List;
+
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
+import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -51,11 +54,18 @@ public class ChangeCredentialsAction extends SubversionAction {
     @Override
     public void actionPerformed(final ActionEvent e) {
         eventLogger.log(this, "IDE: Changing credentials for Subversion repository");
-        final CurrentProject project = appContext.getCurrentProject();
+        final CurrentProject currentProject = appContext.getCurrentProject();
+        if (currentProject != null) {
+            final ProjectDescriptor rootProjectDescriptor = currentProject.getRootProject();
+            if (rootProjectDescriptor != null) {
+                String repositoryUrl = null;
+                final List<String> attributeValues = rootProjectDescriptor.getAttributes().get(SUBVERSION_ATTRIBUTE_REPOSITORY_URL);
+                if (attributeValues != null && !attributeValues.isEmpty()) {
+                    repositoryUrl = attributeValues.get(0);
+                }
 
-        if (project != null) {
-            final String repositoryUrl = appContext.getCurrentProject().getAttributeValue(SUBVERSION_ATTRIBUTE_REPOSITORY_URL);
-            presenter.askCredentials(repositoryUrl);
+                presenter.askCredentials(repositoryUrl);
+            }
         }
     }
 }

@@ -167,8 +167,8 @@
         <g:center>
             <g:DockLayoutPanel unit="PX" addStyleNames="{resources.runnerCss.fullSize}">
                 <g:north size="25">
-                    <g:Label text="{locale.propertiesDockerfile}" addStyleNames="{style.dockerFileLabel}
-                                                                                 {resources.runnerCss.propertiesFont}"/>
+                    <g:Label ui:field="dockerLabel" text="{locale.propertiesDockerfile}"
+                             addStyleNames="{style.dockerFileLabel} {resources.runnerCss.propertiesFont}"/>
                 </g:north>
 
                 <g:center>

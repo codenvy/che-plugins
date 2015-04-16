@@ -283,6 +283,9 @@ public interface SubversionExtensionLocalizationConstants extends Messages {
     @Key("button.update")
     String buttonUpdate();
 
+    @Key("button.log")
+    String buttonLog();
+
     @Key("update.depth.label")
     String updateDepthLabel();
 

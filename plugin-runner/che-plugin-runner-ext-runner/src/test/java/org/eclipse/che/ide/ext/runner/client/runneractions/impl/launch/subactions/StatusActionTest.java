@@ -14,6 +14,7 @@ import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.runner.ApplicationStatus;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
+import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.Notification;
@@ -32,6 +33,7 @@ import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
 import org.eclipse.che.ide.ext.runner.client.util.WebSocketUtil;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
+
 import com.google.gwt.http.client.Response;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import com.google.web.bindery.event.shared.EventBus;
@@ -55,40 +57,44 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class StatusActionTest {
-    private static final String                   STATUS_CHANNEL       = "runner:status:";
-    private static final long                     PROCESS_ID           = 1234567L;
-    private static final String                   WEB_SOCKET_CHANNEL   = STATUS_CHANNEL + PROCESS_ID;
-    private static final String                   PROJECT_NAME         = "SomeProject";
-    private static final String                   MESSAGE              = "some message";
-    private static final String                   SERVER_ERROR_MESSAGE = "server internal error";
-    private static final String                   FailedMessage        = "{\"message\": \"some error\"}";
-    private static final IllegalArgumentException simpleException      = new IllegalArgumentException();
+    private static final String                   STATUS_CHANNEL              = "runner:status:";
+    private static final long                     PROCESS_ID                  = 1234567L;
+    private static final String                   WEB_SOCKET_CHANNEL          = STATUS_CHANNEL + PROCESS_ID;
+    private static final String                   PROJECT_NAME                = "SomeProject";
+    private static final String                   MESSAGE                     = "some message";
+    private static final String                   SERVER_ERROR_MESSAGE        = "server internal error";
+    private static final String                   FailedMessage               = "{\"message\": \"some error\"}";
+    private static final String                   AccountLockedErrorMessage   = "Account locked error message";
+    private static final String                   WorkspaceLockedErrorMessage = "Workspace locked error message";
+    private static final IllegalArgumentException simpleException             = new IllegalArgumentException();
 
     //variables for constructor
     @Mock
-    private DtoUnmarshallerFactory     dtoUnmarshallerFactory;
+    private DtoUnmarshallerFactory      dtoUnmarshallerFactory;
     @Mock
-    private DtoFactory                 dtoFactory;
+    private DtoFactory                  dtoFactory;
     @Mock
-    private WebSocketUtil              webSocketUtil;
+    private WebSocketUtil               webSocketUtil;
     @Mock
-    private AppContext                 appContext;
+    private AppContext                  appContext;
     @Mock
-    private EventBus                   eventBus;
+    private EventBus                    eventBus;
     @Mock
-    private RunnerLocalizationConstant locale;
+    private RunnerLocalizationConstant  locale;
     @Mock
-    private RunnerManagerPresenter     presenter;
+    private RunnerManagerPresenter      presenter;
     @Mock
-    private RunnerUtil                 runnerUtil;
+    private RunnerUtil                  runnerUtil;
     @Mock
-    private ConsoleContainer    consoleContainer;
+    private ConsoleContainer            consoleContainer;
     @Mock
-    private RunnerManagerView   view;
+    private RunnerManagerView           view;
     @Mock
-    private RunnerActionFactory actionFactory;
+    private RunnerActionFactory         actionFactory;
     @Mock
-    private Notification        notification;
+    private Notification                notification;
+    @Mock
+    private ResourcesLockedActionPermit resourcesLockedActionPermit;
 
     @Mock
     private ServerException                                                   serverException;
@@ -121,6 +127,8 @@ public class StatusActionTest {
         when(actionFactory.createGetLogs()).thenReturn(logsAction);
         when(actionFactory.createCheckHealthStatus(notification)).thenReturn(checkHealthStatusAction);
         when(presenter.getView()).thenReturn(view);
+        when(resourcesLockedActionPermit.isAccountLocked()).thenReturn(false);
+        when(resourcesLockedActionPermit.isWorkspaceLocked()).thenReturn(false);
 
         statusAction = new StatusAction(dtoUnmarshallerFactory,
                                         dtoFactory,
@@ -132,7 +140,8 @@ public class StatusActionTest {
                                         runnerUtil,
                                         consoleContainer,
                                         actionFactory,
-                                        notification);
+                                        notification,
+                                        resourcesLockedActionPermit);
 
         when(project.getProjectDescription()).thenReturn(projectDescriptor);
         when(projectDescriptor.getName()).thenReturn(PROJECT_NAME);
@@ -224,6 +233,97 @@ public class StatusActionTest {
         verify(project).getProjectDescription();
         verify(projectDescriptor).getName();
         verify(locale).applicationFailed(PROJECT_NAME);
+
+        verify(webSocketUtil).unSubscribeHandler(WEB_SOCKET_CHANNEL, processStartedHandler);
+        verify(checkHealthStatusAction).stop();
+
+        //action for super.stop
+        verify(logsAction).removeListener();
+        verify(logsAction).stop();
+
+        verify(eventBus).fireEvent(any(RunnerApplicationStatusEvent.class));
+    }
+
+    @Test
+    public void shouldOnPerformWithStatusStoppedAndWorkspaceLockedErrorMessage() throws Exception {
+        when(locale.applicationStopped(PROJECT_NAME)).thenReturn(FailedMessage);
+        when(locale.workspaceGigabyteHoursLimitErrorMessage()).thenReturn(WorkspaceLockedErrorMessage);
+        when(descriptor.getStatus()).thenReturn(ApplicationStatus.STOPPED);
+        when(resourcesLockedActionPermit.isAccountLocked()).thenReturn(false);
+        when(resourcesLockedActionPermit.isWorkspaceLocked()).thenReturn(true);
+
+        statusAction.perform(runner);
+
+        verify(webSocketUtil).subscribeHandler(eq(WEB_SOCKET_CHANNEL), subscriptionHandlerCaptor.capture());
+        SubscriptionHandler<ApplicationProcessDescriptor> processStartedHandler = subscriptionHandlerCaptor.getValue();
+
+        TestUtil.invokeMethodByName(processStartedHandler, "onMessageReceived", descriptor);
+
+        verify(dtoUnmarshallerFactory).newWSUnmarshaller(ApplicationProcessDescriptor.class);
+        verify(runner).setProcessDescriptor(descriptor);
+
+        verify(consoleContainer).printError(runner, WorkspaceLockedErrorMessage);
+
+        verify(descriptor).getStatus();
+
+        verify(runner).setStatus(Runner.Status.STOPPED);
+        verify(view).updateMoreInfoPopup(runner);
+        verify(view).update(runner);
+
+        verify(project).setIsRunningEnabled(true);
+
+        verify(project).getProjectDescription();
+        verify(projectDescriptor).getName();
+        verify(locale).applicationStopped(PROJECT_NAME);
+
+        verify(notification).update(FailedMessage, Notification.Type.INFO, Notification.Status.FINISHED, null, true);
+
+        verify(consoleContainer).printInfo(runner, FailedMessage);
+
+        verify(webSocketUtil).unSubscribeHandler(WEB_SOCKET_CHANNEL, processStartedHandler);
+        verify(checkHealthStatusAction).stop();
+
+        //action for super.stop
+        verify(logsAction).removeListener();
+        verify(logsAction).stop();
+
+        verify(eventBus).fireEvent(any(RunnerApplicationStatusEvent.class));
+    }
+
+    @Test
+    public void shouldOnPerformWithStatusStoppedAndAccountLockedErrorMessage() throws Exception {
+        when(locale.applicationStopped(PROJECT_NAME)).thenReturn(FailedMessage);
+        when(locale.accountGigabyteHoursLimitErrorMessage()).thenReturn(AccountLockedErrorMessage);
+        when(descriptor.getStatus()).thenReturn(ApplicationStatus.STOPPED);
+        when(resourcesLockedActionPermit.isAccountLocked()).thenReturn(true);
+
+        statusAction.perform(runner);
+
+        verify(webSocketUtil).subscribeHandler(eq(WEB_SOCKET_CHANNEL), subscriptionHandlerCaptor.capture());
+        SubscriptionHandler<ApplicationProcessDescriptor> processStartedHandler = subscriptionHandlerCaptor.getValue();
+
+        TestUtil.invokeMethodByName(processStartedHandler, "onMessageReceived", descriptor);
+
+        verify(dtoUnmarshallerFactory).newWSUnmarshaller(ApplicationProcessDescriptor.class);
+        verify(runner).setProcessDescriptor(descriptor);
+
+        verify(consoleContainer).printError(runner, AccountLockedErrorMessage);
+
+        verify(descriptor).getStatus();
+
+        verify(runner).setStatus(Runner.Status.STOPPED);
+        verify(view).updateMoreInfoPopup(runner);
+        verify(view).update(runner);
+
+        verify(project).setIsRunningEnabled(true);
+
+        verify(project).getProjectDescription();
+        verify(projectDescriptor).getName();
+        verify(locale).applicationStopped(PROJECT_NAME);
+
+        verify(notification).update(FailedMessage, Notification.Type.INFO, Notification.Status.FINISHED, null, true);
+
+        verify(consoleContainer).printInfo(runner, FailedMessage);
 
         verify(webSocketUtil).unSubscribeHandler(WEB_SOCKET_CHANNEL, processStartedHandler);
         verify(checkHealthStatusAction).stop();

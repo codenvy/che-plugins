@@ -17,7 +17,8 @@ import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
-
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponseList;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -132,10 +133,13 @@ public class ResolvePresenter extends SubversionActionPresenter implements Resol
         }
 
         subversionClientService.resolve(project.getPath(), filesConflictResolutionActions, "infinity",
-                new AsyncCallback<List<String>>() {
+                new AsyncCallback<CLIOutputResponseList>() {
                     @Override
-                    public void onSuccess(List<String> result) {
-                        print(result);
+                    public void onSuccess(CLIOutputResponseList result) {
+                        for (CLIOutputResponse outputResponse : result.getCLIOutputResponses()) {
+                            printCommand(outputResponse.getCommand());
+                            printAndSpace(outputResponse.getOutput());
+                        }
                         updateProjectExplorer();
                     }
 

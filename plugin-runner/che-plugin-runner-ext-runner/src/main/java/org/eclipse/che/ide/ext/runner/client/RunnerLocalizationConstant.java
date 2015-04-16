@@ -29,6 +29,12 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("unknown.error.message")
     String unknownErrorMessage();
 
+    @Key("workspaceGigabyteHoursLimit.error.message")
+    String workspaceGigabyteHoursLimitErrorMessage();
+
+    @Key("accountGigabyteHoursLimit.error.message")
+    String accountGigabyteHoursLimitErrorMessage();
+
     String environmentCooking(@Nonnull String projectName);
 
     String applicationStarting(@Nonnull String projectName);

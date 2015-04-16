@@ -50,6 +50,7 @@ import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
+import org.eclipse.che.ide.util.Config;
 import org.eclipse.che.ide.util.loging.Log;
 
 import javax.annotation.Nonnegative;
@@ -97,7 +98,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     @AssistedInject
     public PropertiesEnvironmentPanel(final PropertiesPanelView view,
                                       DtoFactory dtoFactory,
-                                      @Named("DefaultEditorProvider")EditorProvider editorProvider,
+                                      @Named("DefaultEditorProvider") EditorProvider editorProvider,
                                       @Nonnull final FileTypeRegistry fileTypeRegistry,
                                       final DockerFileFactory dockerFileFactory,
                                       final ProjectServiceClient projectService,
@@ -134,6 +135,8 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
 
         this.dialogFactory = dialogFactory;
 
+        this.listeners = new ArrayList<>();
+
         boolean isProjectScope = PROJECT.equals(environment.getScope());
 
         this.view.setEnableNameProperty(isProjectScope);
@@ -147,12 +150,13 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         this.view.setVisibleDeleteButton(isProjectScope);
         this.view.setVisibleCancelButton(isProjectScope);
 
-        this.listeners = new ArrayList<>();
+        if (!Config.isSdkProject()) {
 
-        if (isProjectScope) {
-            getProjectEnvironmentDocker();
-        } else {
-            getSystemEnvironmentDocker();
+            if (isProjectScope) {
+                getProjectEnvironmentDocker();
+            } else {
+                getSystemEnvironmentDocker();
+            }
         }
 
         projectDescriptor = currentProject.getProjectDescription();

@@ -17,20 +17,25 @@ import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
 
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
+import org.eclipse.che.ide.ext.svn.shared.InfoResponse;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
+/**
+ * Shows logs for specified period.
+ */
 public class ShowLogPresenter extends SubversionActionPresenter {
 
     private final AppContext              appContext;
     private final DtoUnmarshallerFactory  dtoUnmarshallerFactory;
     private final SubversionClientService subversionClientService;
     private final NotificationManager     notificationManager;
+
+    private final ShowLogsView            view;
 
     @Inject
     protected ShowLogPresenter(final AppContext appContext,
@@ -40,34 +45,72 @@ public class ShowLogPresenter extends SubversionActionPresenter {
                                final RawOutputPresenter console,
                                final SubversionClientService subversionClientService,
                                final NotificationManager notificationManager,
-                               final ProjectExplorerPart projectExplorerPart) {
+                               final ProjectExplorerPart projectExplorerPart,
+                               final ShowLogsView view) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
 
         this.appContext = appContext;
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
         this.subversionClientService = subversionClientService;
         this.notificationManager = notificationManager;
+        this.view = view;
+
+        view.setDelegate(new ShowLogsView.Delegate() {
+            @Override
+            public void logClicked() {
+                String range = view.rangeFiend().getValue();
+                if (range != null && !range.trim().isEmpty()) {
+                    view.hide();
+                    showLogs(range);
+                }
+            }
+
+            @Override
+            public void cancelClicked() {
+                view.hide();
+            }
+        });
     }
 
     public void showLog() {
-        CurrentProject project = appContext.getCurrentProject();
-        if (project == null) {
+        if (appContext.getCurrentProject() == null) {
             return;
         }
 
-        subversionClientService.showLog(project.getRootProject().getPath(), getSelectedPaths(), "1:HEAD",
-                                        new AsyncRequestCallback<CLIOutputResponse>(dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponse.class)) {
-                                            @Override
-                                            protected void onSuccess(CLIOutputResponse result) {
-                                                printCommand(result.getCommand());
-                                                printAndSpace(result.getOutput());
-                                            }
+        subversionClientService.info(appContext.getCurrentProject().getRootProject().getPath(), getSelectedPaths(), "HEAD",
+                new AsyncRequestCallback<InfoResponse>(dtoUnmarshallerFactory.newUnmarshaller(InfoResponse.class)) {
+                    @Override
+                    protected void onSuccess(InfoResponse result) {
+                        printCommand(result.getCommand());
+                        printAndSpace(result.getOutput());
 
-                                            @Override
-                                            protected void onFailure(Throwable exception) {
-                                                notificationManager.showError(exception.getMessage());
-                                            }
-                                        });
+                        view.setRevisionCount(result.getRevision());
+                        view.rangeFiend().setValue("1:" + result.getRevision());
+                        view.show();
+                    }
+
+                    @Override
+                    protected void onFailure(Throwable exception) {
+                        notificationManager.showError(exception.getMessage());
+                    }
+                });
+
+    }
+
+    private void showLogs(String range) {
+        subversionClientService.showLog(appContext.getCurrentProject().getRootProject().getPath(), getSelectedPaths(), range,
+                new AsyncRequestCallback<CLIOutputResponse>(dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponse.class)) {
+                    @Override
+                    protected void onSuccess(CLIOutputResponse result) {
+                        printCommand(result.getCommand());
+                        printAndSpace(result.getOutput());
+                    }
+
+                    @Override
+                    protected void onFailure(Throwable exception) {
+                        notificationManager.showError(exception.getMessage());
+                    }
+                });
     }
 
 }

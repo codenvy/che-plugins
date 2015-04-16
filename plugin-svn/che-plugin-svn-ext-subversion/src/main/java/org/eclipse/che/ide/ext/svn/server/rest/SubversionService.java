@@ -27,10 +27,13 @@ import org.eclipse.che.ide.ext.svn.server.credentials.CredentialsProvider;
 import org.eclipse.che.ide.ext.svn.server.credentials.CredentialsProvider.Credentials;
 import org.eclipse.che.ide.ext.svn.shared.AddRequest;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponseList;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
 import org.eclipse.che.ide.ext.svn.shared.CleanupRequest;
 import org.eclipse.che.ide.ext.svn.shared.CommitRequest;
 import org.eclipse.che.ide.ext.svn.shared.CopyRequest;
+import org.eclipse.che.ide.ext.svn.shared.InfoRequest;
+import org.eclipse.che.ide.ext.svn.shared.InfoResponse;
 import org.eclipse.che.ide.ext.svn.shared.LockRequest;
 import org.eclipse.che.ide.ext.svn.shared.MoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.RemoveRequest;
@@ -192,6 +195,15 @@ public class SubversionService extends Service {
         return this.subversionApi.status(request);
     }
 
+    @Path("info")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    public InfoResponse info(final InfoRequest request) throws ServerException, IOException {
+        request.setProjectPath(getRealPath(request.getProjectPath()));
+        return this.subversionApi.info(request);
+    }
+
     /**
      * Update the working copy.
      *
@@ -267,7 +279,7 @@ public class SubversionService extends Service {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
-    public CLIOutputResponse resolve(final ResolveRequest request) throws ServerException, IOException {
+    public CLIOutputResponseList resolve(final ResolveRequest request) throws ServerException, IOException {
         request.setProjectPath(getRealPath(request.getProjectPath()));
         return subversionApi.resolve(request);
     }

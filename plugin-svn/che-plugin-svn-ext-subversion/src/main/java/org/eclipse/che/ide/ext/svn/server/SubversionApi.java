@@ -31,6 +31,7 @@ import org.eclipse.che.ide.ext.svn.server.utils.InfoUtils;
 import org.eclipse.che.ide.ext.svn.server.utils.SubversionUtils;
 import org.eclipse.che.ide.ext.svn.shared.AddRequest;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponseList;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
 import org.eclipse.che.ide.ext.svn.shared.CheckoutRequest;
 import org.eclipse.che.ide.ext.svn.shared.CleanupRequest;
@@ -481,11 +482,11 @@ public class SubversionApi {
      * @throws SubversionException
      *         if there is a Subversion issue
      */
-    public CLIOutputResponse resolve(final ResolveRequest request) throws IOException, SubversionException {
+    public CLIOutputResponseList resolve(final ResolveRequest request) throws IOException, SubversionException {
         final File projectPath = new File(request.getProjectPath());
 
         Map<String, String> resolutions = request.getConflictResolutions();
-        List<String> results = new ArrayList<String>();
+        List<CLIOutputResponse> results = new ArrayList<CLIOutputResponse>();
 
         for (String path : resolutions.keySet()) {
             final List<String> uArgs = new LinkedList<>();
@@ -497,12 +498,16 @@ public class SubversionApi {
 
             final CommandLineResult result = runCommand(uArgs, projectPath, Arrays.asList(path));
 
-            results.addAll(result.getStdout());
+            CLIOutputResponse outputResponse = DtoFactory.getInstance()
+                                                   .createDto(CLIOutputResponse.class)
+                                                   .withCommand(result.getCommandLine().toString())
+                                                   .withOutput(result.getStdout());
+            results.add(outputResponse);
         }
 
         return DtoFactory.getInstance()
-                         .createDto(CLIOutputResponse.class)
-                         .withOutput(results);
+                         .createDto(CLIOutputResponseList.class)
+                         .withCLIOutputResponses(results);
     }
 
     /**
@@ -736,26 +741,25 @@ public class SubversionApi {
     }
 
     public InfoResponse info(final InfoRequest request) throws SubversionException, IOException {
+        final List<String> cliArgs = new LinkedList<>();
+        addStandardArgs(cliArgs);
+        cliArgs.add("info");
+
         final File projectPath = new File(request.getProjectPath());
-        List<String> pathList;
-        if (request.getPath() == null) {
-            pathList = Collections.emptyList();
-        } else {
-            pathList = Collections.singletonList(request.getPath());
-        }
-        final CommandLineResult clResult = runCommand(Collections.singletonList("info"),
-                                                      projectPath,
-                                                      pathList,
-                                                      null);
+
+        final CommandLineResult result = runCommand(cliArgs, projectPath,
+                addWorkingCopyPathIfNecessary(request.getPaths()));
+
         final InfoResponse response = DtoFactory.getInstance().createDto(InfoResponse.class)
-                                                .withCommandLine(clResult.getCommandLine().toString())
-                                                .withExitCode(clResult.getExitCode());
-        if (clResult.getExitCode() == 0) {
-            response.withRepositoryUrl(InfoUtils.getRepositoryUrl(clResult.getStdout()))
-                    .withRepositoryRoot(InfoUtils.getRepositoryRootUrl(clResult.getStdout()))
-                    .withRevision(InfoUtils.getRevision(clResult.getStdout()));
+                .withCommand(result.getCommandLine().toString())
+                .withOutput(result.getStdout());
+
+        if (result.getExitCode() == 0) {
+            response.withRepositoryUrl(InfoUtils.getRepositoryUrl(result.getStdout()))
+                    .withRepositoryRoot(InfoUtils.getRepositoryRootUrl(result.getStdout()))
+                    .withRevision(InfoUtils.getRevision(result.getStdout()));
         } else {
-            response.withErrorOutput(clResult.getStderr());
+            response.withErrorOutput(result.getStderr());
         }
 
         return response;

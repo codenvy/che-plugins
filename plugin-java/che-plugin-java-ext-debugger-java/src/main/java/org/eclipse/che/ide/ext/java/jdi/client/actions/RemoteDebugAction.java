@@ -65,16 +65,18 @@ public class RemoteDebugAction extends ProjectAction {
         String projectType = currentProject.getProjectDescription().getType();
         ProjectTypeDefinition definition = typeRegistry.getProjectType(projectType);
 
-        String category = definition.getRunnerCategories().get(0);
-
-        actionEvent.getPresentation().setEnabledAndVisible(JAVA.toString().equals(category));
+        if (definition != null && definition.getRunnerCategories() != null &&
+                !definition.getRunnerCategories().isEmpty()) {
+            String category = definition.getRunnerCategories().get(0);
+            actionEvent.getPresentation().setEnabledAndVisible(JAVA.toString().equals(category));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public void actionPerformed(@Nonnull ActionEvent actionEvent) {
         eventLogger.log(this);
-
         presenter.showDialog();
     }
+
 }
