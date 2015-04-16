@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.subactions;
 
+import com.google.gwt.http.client.Response;
+import com.google.gwtmockito.GwtMockitoTestRunner;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.runner.ApplicationStatus;
@@ -23,7 +27,6 @@ import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.TestUtil;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.RunnerActionFactory;
 import org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerPresenter;
-import org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerView;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.runneractions.impl.GetLogsAction;
 import org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.common.RunnerApplicationStatusEvent;
@@ -32,10 +35,6 @@ import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
 import org.eclipse.che.ide.ext.runner.client.util.WebSocketUtil;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
-import com.google.gwt.http.client.Response;
-import com.google.gwtmockito.GwtMockitoTestRunner;
-import com.google.web.bindery.event.shared.EventBus;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +51,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Alexander Andrienko
+ * @@author Dmitry Shnurenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class StatusActionTest {
@@ -82,13 +82,11 @@ public class StatusActionTest {
     @Mock
     private RunnerUtil                 runnerUtil;
     @Mock
-    private ConsoleContainer    consoleContainer;
+    private ConsoleContainer           consoleContainer;
     @Mock
-    private RunnerManagerView   view;
+    private RunnerActionFactory        actionFactory;
     @Mock
-    private RunnerActionFactory actionFactory;
-    @Mock
-    private Notification        notification;
+    private Notification               notification;
 
     @Mock
     private ServerException                                                   serverException;
@@ -120,7 +118,6 @@ public class StatusActionTest {
     public void setUp() {
         when(actionFactory.createGetLogs()).thenReturn(logsAction);
         when(actionFactory.createCheckHealthStatus(notification)).thenReturn(checkHealthStatusAction);
-        when(presenter.getView()).thenReturn(view);
 
         statusAction = new StatusAction(dtoUnmarshallerFactory,
                                         dtoFactory,
@@ -253,8 +250,7 @@ public class StatusActionTest {
         verify(descriptor).getStatus();
 
         verify(runner).setStatus(Runner.Status.STOPPED);
-        verify(view).updateMoreInfoPopup(runner);
-        verify(view).update(runner);
+        verify(presenter).update(runner);
 
         verify(project).setIsRunningEnabled(true);
 
