@@ -61,7 +61,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -501,12 +500,16 @@ public class SubversionApi {
 
             final CommandLineResult result = runCommand(uArgs, projectPath, Arrays.asList(path));
 
-            results.addAll(result.getStdout());
+            CLIOutputResponse outputResponse = DtoFactory.getInstance()
+                                                         .createDto(CLIOutputResponse.class)
+                                                         .withCommand(result.getCommandLine().toString())
+                                                         .withOutput(result.getStdout());
+            results.add(outputResponse);
         }
 
         return DtoFactory.getInstance()
-                         .createDto(CLIOutputResponse.class)
-                         .withOutput(results);
+                         .createDto(CLIOutputResponseList.class)
+                         .withCLIOutputResponses(results);
     }
 
     /**
