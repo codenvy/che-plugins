@@ -153,13 +153,13 @@ public class SubversionApiITest {
     }
 
     /**
-     * Tests for {@link SubversionApi#propset(PropertySetRequest)} and {@link SubversionApi#propdel(PropertyDeleteRequest)}.
+     * Tests for {@link SubversionApi#propset(PropertySetRequest)}.
      *
      * @throws Exception
      *         if anything goes wrong
      */
     @Test
-    public void testPropSetAndDel() throws Exception {
+    public void testPropSet() throws Exception {
         this.subversionApi.checkout(DtoFactory.getInstance()
                                               .createDto(CheckoutRequest.class)
                                               .withProjectPath(tmpDir.toFile().getAbsolutePath())
@@ -175,16 +175,30 @@ public class SubversionApiITest {
 
         assertEquals(response.getOutput().size(), 1);
         assertEquals(response.getOutput().get(0), "property 'svn:ignore' set on 'A/B'");
+    }
 
-        response = this.subversionApi.propdel(DtoFactory.getInstance().createDto(PropertyDeleteRequest.class)
-                                                        .withProjectPath(tmpDir.toFile().getAbsolutePath())
-                                                        .withPath("A/B")
-                                                        .withForce(true)
-                                                        .withDepth(Depth.DIRS_ONLY)
-                                                        .withName("svn:ignore"));
+    /**
+     * Tests for {@link SubversionApi#propdel(PropertyDeleteRequest)}.
+     *
+     * @throws Exception
+     *         if anything goes wrong
+     */
+    @Test
+    public void testPropDel() throws Exception {
+        this.subversionApi.checkout(DtoFactory.getInstance()
+                                              .createDto(CheckoutRequest.class)
+                                              .withProjectPath(tmpDir.toFile().getAbsolutePath())
+                                              .withUrl("file://" + repoRoot.getAbsolutePath()));
+
+        CLIOutputResponse response = this.subversionApi.propdel(DtoFactory.getInstance().createDto(PropertyDeleteRequest.class)
+                                                                          .withProjectPath(tmpDir.toFile().getAbsolutePath())
+                                                                          .withPath("A/B")
+                                                                          .withForce(true)
+                                                                          .withDepth(Depth.DIRS_ONLY)
+                                                                          .withName("owner"));
 
         assertEquals(response.getOutput().size(), 1);
-        assertEquals(response.getOutput().get(0), "property 'svn:ignore' deleted from 'A/B'.");
+        assertEquals(response.getOutput().get(0), "property 'owner' deleted from 'A/B'.");
     }
 
     /**
