@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.subactions;
 
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -20,7 +24,6 @@ import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.RunnerActionFactory;
 import org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerPresenter;
-import org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerView;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.runneractions.AbstractRunnerAction;
 import org.eclipse.che.ide.ext.runner.client.runneractions.RunnerAction;
@@ -31,9 +34,6 @@ import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
 import org.eclipse.che.ide.ext.runner.client.util.WebSocketUtil;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
 
@@ -62,7 +62,6 @@ public class StatusAction extends AbstractRunnerAction {
     private final RunnerUtil                 runnerUtil;
     private final RunnerAction               checkHealthStatusAction;
     private final Notification               notification;
-    private final RunnerManagerView          view;
     private final ConsoleContainer           consoleContainer;
 
     private SubscriptionHandler<ApplicationProcessDescriptor> runnerStatusHandler;
@@ -89,7 +88,6 @@ public class StatusAction extends AbstractRunnerAction {
         this.eventBus = eventBus;
         this.locale = locale;
         this.presenter = presenter;
-        this.view = presenter.getView();
         this.consoleContainer = consoleContainer;
         this.runnerUtil = runnerUtil;
         this.notification = notification;
@@ -182,8 +180,7 @@ public class StatusAction extends AbstractRunnerAction {
     private void processStoppedMessage() {
         runner.setStatus(Runner.Status.STOPPED);
 
-        view.updateMoreInfoPopup(runner);
-        view.update(runner);
+        presenter.update(runner);
 
         project.setIsRunningEnabled(true);
 
