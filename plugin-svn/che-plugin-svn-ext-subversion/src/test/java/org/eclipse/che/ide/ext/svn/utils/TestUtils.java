@@ -254,12 +254,12 @@ public class TestUtils {
         //Add properties
         final CLIOutputResponse propResponse =
                 subversionApi.propset(dtoFactory.createDto(PropertySetRequest.class)
+                                                .withValue("user")
                                                 .withProjectPath(wcRoot.getAbsolutePath())
                                                 .withPath(".")
                                                 .withForce(true)
                                                 .withDepth(Depth.FULLY_RECURSIVE)
-                                                .withName("owner")
-                                                .withValue("user"));
+                                                .withName("owner"));
 
         assertTrue(propResponse.getOutput().size() > 0);
 

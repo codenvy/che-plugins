@@ -12,55 +12,13 @@ package org.eclipse.che.ide.ext.svn.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
-import javax.validation.constraints.NotNull;
-
 /**
  * Set properties on files, directories, or revisions.
  *
  * @author Vladyslav Zhukovskyi
  */
 @DTO
-public interface PropertySetRequest {
-    /**
-     * @return the project path the request is associated with.
-     */
-    String getProjectPath();
-
-    /**
-     * @param projectPath
-     *         the project path to set
-     */
-    void setProjectPath(@NotNull final String projectPath);
-
-    /**
-     * @param projectPath
-     *         the project path to use
-     */
-    PropertySetRequest withProjectPath(@NotNull final String projectPath);
-
-    /**
-     * Property name.
-     *
-     * @return property name
-     */
-    String getName();
-
-    /**
-     * Property name.
-     *
-     * @param name
-     *         property name
-     */
-    void setName(String name);
-
-    /**
-     * Property name.
-     *
-     * @param name
-     *         property name
-     */
-    PropertySetRequest withName(String name);
-
+public interface PropertySetRequest extends PropertyRequest {
     /**
      * Property value.
      *
@@ -83,84 +41,4 @@ public interface PropertySetRequest {
      *         property value
      */
     PropertySetRequest withValue(String value);
-
-    /**
-     * Instructs Subversion to limit the scope of an operation to a particular tree depth. ARG is one of empty (only the target itself),
-     * files (the target and any immediate file children thereof), immediates (the target and any immediate children thereof), or infinity
-     * (the target and all of its descendants—full recursion).
-     *
-     * @return depth
-     */
-    Depth getDepth();
-
-    /**
-     * Instructs Subversion to limit the scope of an operation to a particular tree depth. ARG is one of empty (only the target itself),
-     * files (the target and any immediate file children thereof), immediates (the target and any immediate children thereof), or infinity
-     * (the target and all of its descendants—full recursion).
-     *
-     * @param depth
-     *         depth
-     */
-    void setDepth(Depth depth);
-
-    /**
-     * Instructs Subversion to limit the scope of an operation to a particular tree depth. ARG is one of empty (only the target itself),
-     * files (the target and any immediate file children thereof), immediates (the target and any immediate children thereof), or infinity
-     * (the target and all of its descendants—full recursion).
-     *
-     * @param depth
-     *         depth
-     */
-    PropertySetRequest withDepth(Depth depth);
-
-    /**
-     * Forces a particular command or operation to run. Subversion will prevent you from performing some operations in normal usage, but you
-     * can pass this option to tell Subversion “I know what I'm doing as well as the possible repercussions of doing it, so let me at 'em.”
-     * This option is the programmatic equivalent of doing your own electrical work with the power on—if you don't know what you're doing,
-     * you're likely to get a nasty shock.
-     *
-     * @return force
-     */
-    boolean isForce();
-
-    /**
-     * Forces a particular command or operation to run. Subversion will prevent you from performing some operations in normal usage, but you
-     * can pass this option to tell Subversion “I know what I'm doing as well as the possible repercussions of doing it, so let me at 'em.”
-     * This option is the programmatic equivalent of doing your own electrical work with the power on—if you don't know what you're doing,
-     * you're likely to get a nasty shock.
-     *
-     * @param force force
-     */
-    void setForce(boolean force);
-
-    /**
-     * Forces a particular command or operation to run. Subversion will prevent you from performing some operations in normal usage, but you
-     * can pass this option to tell Subversion “I know what I'm doing as well as the possible repercussions of doing it, so let me at 'em.”
-     * This option is the programmatic equivalent of doing your own electrical work with the power on—if you don't know what you're doing,
-     * you're likely to get a nasty shock.
-     *
-     * @param force force
-     */
-    PropertySetRequest withForce(boolean force);
-
-    /**
-     * This removes properties from files, directories, or revisions.
-     *
-     * @return path
-     */
-    String getPath();
-
-    /**
-     * This removes properties from files, directories, or revisions.
-     *
-     * @param path path
-     */
-    void setPath(String path);
-
-    /**
-     * This removes properties from files, directories, or revisions.
-     *
-     * @param path path
-     */
-    PropertySetRequest withPath(String path);
 }

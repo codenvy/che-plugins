@@ -153,7 +153,7 @@ public class SubversionApiITest {
     }
 
     /**
-     * Tests for {@link SubversionApi#propset(PropertySetRequest)}.
+     * Tests for {@link SubversionApi#propset(org.eclipse.che.ide.ext.svn.shared.PropertyRequest)}.
      *
      * @throws Exception
      *         if anything goes wrong
@@ -166,19 +166,19 @@ public class SubversionApiITest {
                                               .withUrl("file://" + repoRoot.getAbsolutePath()));
 
         CLIOutputResponse response = this.subversionApi.propset(DtoFactory.getInstance().createDto(PropertySetRequest.class)
+                                                                          .withValue("*.*")
                                                                           .withProjectPath(tmpDir.toFile().getAbsolutePath())
                                                                           .withPath("A/B")
                                                                           .withForce(true)
                                                                           .withDepth(Depth.DIRS_ONLY)
-                                                                          .withName("svn:ignore")
-                                                                          .withValue("*.*"));
+                                                                          .withName("svn:ignore"));
 
         assertEquals(response.getOutput().size(), 1);
         assertEquals(response.getOutput().get(0), "property 'svn:ignore' set on 'A/B'");
     }
 
     /**
-     * Tests for {@link SubversionApi#propdel(PropertyDeleteRequest)}.
+     * Tests for {@link SubversionApi#propdel(org.eclipse.che.ide.ext.svn.shared.PropertyRequest)}.
      *
      * @throws Exception
      *         if anything goes wrong

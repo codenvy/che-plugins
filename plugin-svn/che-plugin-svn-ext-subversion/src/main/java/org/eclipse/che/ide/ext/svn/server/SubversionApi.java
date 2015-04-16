@@ -42,6 +42,7 @@ import org.eclipse.che.ide.ext.svn.shared.InfoResponse;
 import org.eclipse.che.ide.ext.svn.shared.LockRequest;
 import org.eclipse.che.ide.ext.svn.shared.MoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.PropertyDeleteRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertyRequest;
 import org.eclipse.che.ide.ext.svn.shared.PropertySetRequest;
 import org.eclipse.che.ide.ext.svn.shared.RemoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.ResolveRequest;
@@ -627,7 +628,11 @@ public class SubversionApi {
      * @throws ServerException
      *         if there is a Subversion issue
      */
-    public CLIOutputResponse propset(final PropertySetRequest request) throws IOException, ServerException {
+    public CLIOutputResponse propset(final PropertyRequest request) throws IOException, ServerException {
+        if (!(request instanceof PropertySetRequest)) {
+            throw new ServerException("Incorrect request.");
+        }
+
         final File projectPath = new File(request.getProjectPath());
         final List<String> uArgs = new LinkedList<>();
 
@@ -641,7 +646,7 @@ public class SubversionApi {
 
         uArgs.add("propset");
         uArgs.add(request.getName());
-        uArgs.add("\"" + request.getValue() + "\"");
+        uArgs.add("\"" + ((PropertySetRequest)request).getValue() + "\"");
 
         final CommandLineResult result = runCommand(uArgs, projectPath, Arrays.asList(request.getPath()));
 
@@ -662,7 +667,11 @@ public class SubversionApi {
      * @throws ServerException
      *         if there is a Subversion issue
      */
-    public CLIOutputResponse propdel(final PropertyDeleteRequest request) throws IOException, ServerException {
+    public CLIOutputResponse propdel(final PropertyRequest request) throws IOException, ServerException {
+        if (!(request instanceof PropertyDeleteRequest)) {
+            throw new ServerException("Incorrect request.");
+        }
+
         final File projectPath = new File(request.getProjectPath());
         final List<String> uArgs = new LinkedList<>();
 

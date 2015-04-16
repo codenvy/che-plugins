@@ -33,8 +33,7 @@ import org.eclipse.che.ide.ext.svn.shared.CommitRequest;
 import org.eclipse.che.ide.ext.svn.shared.CopyRequest;
 import org.eclipse.che.ide.ext.svn.shared.LockRequest;
 import org.eclipse.che.ide.ext.svn.shared.MoveRequest;
-import org.eclipse.che.ide.ext.svn.shared.PropertyDeleteRequest;
-import org.eclipse.che.ide.ext.svn.shared.PropertySetRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertyRequest;
 import org.eclipse.che.ide.ext.svn.shared.RemoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.ResolveRequest;
 import org.eclipse.che.ide.ext.svn.shared.RevertRequest;
@@ -385,7 +384,7 @@ public class SubversionService extends Service {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
-    public CLIOutputResponse propset(final PropertySetRequest request) throws ServerException, IOException {
+    public CLIOutputResponse propset(final PropertyRequest request) throws ServerException, IOException {
         request.setProjectPath(getRealPath(request.getProjectPath()));
         return this.subversionApi.propset(request);
     }
@@ -405,7 +404,7 @@ public class SubversionService extends Service {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
-    public CLIOutputResponse propdel(final PropertyDeleteRequest request) throws ServerException, IOException {
+    public CLIOutputResponse propdel(final PropertyRequest request) throws ServerException, IOException {
         request.setProjectPath(getRealPath(request.getProjectPath()));
         return this.subversionApi.propdel(request);
     }

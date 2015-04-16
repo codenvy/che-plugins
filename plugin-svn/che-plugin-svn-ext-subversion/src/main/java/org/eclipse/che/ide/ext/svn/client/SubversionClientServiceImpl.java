@@ -27,6 +27,7 @@ import org.eclipse.che.ide.ext.svn.shared.Depth;
 import org.eclipse.che.ide.ext.svn.shared.LockRequest;
 import org.eclipse.che.ide.ext.svn.shared.MoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.PropertyDeleteRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertyRequest;
 import org.eclipse.che.ide.ext.svn.shared.PropertySetRequest;
 import org.eclipse.che.ide.ext.svn.shared.RemoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.ResolveRequest;
@@ -335,11 +336,11 @@ public class SubversionClientServiceImpl implements SubversionClientService {
     @Override
     public void propertySet(String projectPath, String propertyName, String propertyValues, Depth depth, boolean force, String path,
                             AsyncRequestCallback<CLIOutputResponse> callback) {
-        final PropertySetRequest request =
+        final PropertyRequest request =
                 dtoFactory.createDto(PropertySetRequest.class)
+                          .withValue(propertyValues)
                           .withProjectPath(projectPath)
                           .withName(propertyName)
-                          .withValue(propertyValues)
                           .withDepth(depth)
                           .withForce(force)
                           .withPath(path);
@@ -350,7 +351,7 @@ public class SubversionClientServiceImpl implements SubversionClientService {
     @Override
     public void propertyDelete(String projectPath, String propertyName, Depth depth, boolean force, String path,
                                AsyncRequestCallback<CLIOutputResponse> callback) {
-        final PropertyDeleteRequest request =
+        final PropertyRequest request =
                 dtoFactory.createDto(PropertyDeleteRequest.class)
                           .withProjectPath(projectPath)
                           .withName(propertyName)
