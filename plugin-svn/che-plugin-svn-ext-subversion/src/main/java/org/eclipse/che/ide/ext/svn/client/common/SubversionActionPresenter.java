@@ -130,6 +130,8 @@ public class SubversionActionPresenter {
                     final String path = relativePath((StorableNode)item);
                     if (!path.isEmpty()) {
                         paths.add(path);
+                    } else {
+                        paths.add("."); //it may be root path for our project
                     }
                 }
             }

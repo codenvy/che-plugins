@@ -12,6 +12,8 @@ package org.eclipse.che.ide.ext.svn.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Remove a property from an item request.
  *
@@ -19,4 +21,23 @@ import org.eclipse.che.dto.shared.DTO;
  */
 @DTO
 public interface PropertyDeleteRequest extends PropertyRequest {
+    /** {@inheritDoc} */
+    @Override
+    PropertyDeleteRequest withProjectPath(@NotNull final String projectPath);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertyDeleteRequest withName(String name);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertyDeleteRequest withDepth(Depth depth);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertyDeleteRequest withForce(boolean force);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertyDeleteRequest withPath(String path);
 }

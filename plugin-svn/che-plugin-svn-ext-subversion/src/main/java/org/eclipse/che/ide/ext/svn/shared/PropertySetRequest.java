@@ -12,6 +12,8 @@ package org.eclipse.che.ide.ext.svn.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Set properties on files, directories, or revisions.
  *
@@ -41,4 +43,24 @@ public interface PropertySetRequest extends PropertyRequest {
      *         property value
      */
     PropertySetRequest withValue(String value);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertySetRequest withProjectPath(@NotNull final String projectPath);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertySetRequest withName(String name);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertySetRequest withDepth(Depth depth);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertySetRequest withForce(boolean force);
+
+    /** {@inheritDoc} */
+    @Override
+    PropertySetRequest withPath(String path);
 }
