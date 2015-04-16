@@ -15,6 +15,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
 import com.google.common.net.MediaType;
 import com.google.inject.Singleton;
+
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.vfs.server.util.DeleteOnCloseFileInputStream;
 import org.eclipse.che.commons.lang.IoUtil;
@@ -41,6 +42,8 @@ import org.eclipse.che.ide.ext.svn.shared.InfoRequest;
 import org.eclipse.che.ide.ext.svn.shared.InfoResponse;
 import org.eclipse.che.ide.ext.svn.shared.LockRequest;
 import org.eclipse.che.ide.ext.svn.shared.MoveRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertyDeleteRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertySetRequest;
 import org.eclipse.che.ide.ext.svn.shared.RemoveRequest;
 import org.eclipse.che.ide.ext.svn.shared.ResolveRequest;
 import org.eclipse.che.ide.ext.svn.shared.RevertRequest;
@@ -466,9 +469,9 @@ public class SubversionApi {
         final CommandLineResult result = runCommand(uArgs, projectPath, request.getPaths());
 
         return DtoFactory.getInstance()
-                .createDto(CLIOutputResponse.class)
-                .withCommand(result.getCommandLine().toString())
-                .withOutput(result.getStdout());
+                         .createDto(CLIOutputResponse.class)
+                         .withCommand(result.getCommandLine().toString())
+                         .withOutput(result.getStdout());
     }
 
     /**
@@ -486,7 +489,7 @@ public class SubversionApi {
         final File projectPath = new File(request.getProjectPath());
 
         Map<String, String> resolutions = request.getConflictResolutions();
-        List<CLIOutputResponse> results = new ArrayList<CLIOutputResponse>();
+        List<CLIOutputResponse> results = new ArrayList<>();
 
         for (String path : resolutions.keySet()) {
             final List<String> uArgs = new LinkedList<>();
@@ -498,16 +501,12 @@ public class SubversionApi {
 
             final CommandLineResult result = runCommand(uArgs, projectPath, Arrays.asList(path));
 
-            CLIOutputResponse outputResponse = DtoFactory.getInstance()
-                                                   .createDto(CLIOutputResponse.class)
-                                                   .withCommand(result.getCommandLine().toString())
-                                                   .withOutput(result.getStdout());
-            results.add(outputResponse);
+            results.addAll(result.getStdout());
         }
 
         return DtoFactory.getInstance()
-                         .createDto(CLIOutputResponseList.class)
-                         .withCLIOutputResponses(results);
+                         .createDto(CLIOutputResponse.class)
+                         .withOutput(results);
     }
 
     /**
@@ -616,6 +615,71 @@ public class SubversionApi {
                          .withCommand(result.getCommandLine().toString())
                          .withOutput(result.getStdout())
                          .withErrOutput(result.getStderr());
+    }
+
+    /**
+     * Perform an "svn propset" based on the request.
+     *
+     * @param request
+     *         the request
+     * @return the response
+     * @throws IOException
+     *         if there is a problem executing the command
+     * @throws ServerException
+     *         if there is a Subversion issue
+     */
+    public CLIOutputResponse propset(final PropertySetRequest request) throws IOException, ServerException {
+        final File projectPath = new File(request.getProjectPath());
+        final List<String> uArgs = new LinkedList<>();
+
+        addStandardArgs(uArgs);
+
+        if (request.isForce()) {
+            uArgs.add("--force");
+        }
+
+        addDepth(uArgs, request.getDepth().getValue());
+
+        uArgs.add("propset");
+        uArgs.add(request.getName());
+        uArgs.add("\"" + request.getValue() + "\"");
+
+        final CommandLineResult result = runCommand(uArgs, projectPath, Arrays.asList(request.getPath()));
+
+        return DtoFactory.getInstance()
+                         .createDto(CLIOutputResponse.class)
+                         .withCommand(result.getCommandLine().toString())
+                         .withOutput(result.getStdout());
+    }
+
+    /**
+     * Perform an "svn propdel" based on the request.
+     *
+     * @param request
+     *         the request
+     * @return the response
+     * @throws IOException
+     *         if there is a problem executing the command
+     * @throws ServerException
+     *         if there is a Subversion issue
+     */
+    public CLIOutputResponse propdel(final PropertyDeleteRequest request) throws IOException, ServerException {
+        final File projectPath = new File(request.getProjectPath());
+        final List<String> uArgs = new LinkedList<>();
+
+        addStandardArgs(uArgs);
+
+        addDepth(uArgs, request.getDepth().getValue());
+
+        uArgs.add("propdel");
+        uArgs.add(request.getName());
+
+        final CommandLineResult result = runCommand(uArgs, projectPath, Arrays.asList(request.getPath()));
+
+        return DtoFactory.getInstance()
+                         .createDto(CLIOutputResponse.class)
+                         .withCommand(result.getCommandLine().toString())
+                         .withOutput(result.getStdout());
     }
 
     private static void addDepth(final List<String> args, final String depth) {

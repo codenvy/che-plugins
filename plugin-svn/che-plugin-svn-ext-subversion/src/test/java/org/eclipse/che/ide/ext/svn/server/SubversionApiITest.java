@@ -18,7 +18,10 @@ import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
 import org.eclipse.che.ide.ext.svn.shared.CheckoutRequest;
 import org.eclipse.che.ide.ext.svn.shared.CopyRequest;
+import org.eclipse.che.ide.ext.svn.shared.Depth;
 import org.eclipse.che.ide.ext.svn.shared.MoveRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertyDeleteRequest;
+import org.eclipse.che.ide.ext.svn.shared.PropertySetRequest;
 import org.eclipse.che.ide.ext.svn.shared.UpdateRequest;
 import org.eclipse.che.ide.ext.svn.utils.TestUtils;
 import org.junit.Before;
@@ -32,7 +35,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -47,7 +49,7 @@ import static org.junit.Assert.assertTrue;
 public class SubversionApiITest {
 
     @Mock
-    private CredentialsProvider credentialsProvider;
+    private CredentialsProvider   credentialsProvider;
     @Mock
     private RepositoryUrlProvider repositoryUrlProvider;
 
@@ -130,6 +132,12 @@ public class SubversionApiITest {
         assertEquals(response.getOutput().get(1), "D         A/B/lambda");
     }
 
+    /**
+     * Tests for {@link SubversionApi#exportPath(String, String, String)}.
+     *
+     * @throws Exception
+     *         if anything goes wrong
+     */
     @Test
     @SuppressWarnings("unchecked")
     public void testExport() throws Exception {
@@ -140,8 +148,57 @@ public class SubversionApiITest {
 
         Response response = this.subversionApi.exportPath(tmpDir.toFile().getAbsolutePath(), "A/B", null);
 
-        Collection<String> items = ZipUtils.listEntries((InputStream) response.getEntity());
+        Collection<String> items = ZipUtils.listEntries((InputStream)response.getEntity());
         assertEquals(items.size(), 3);
+    }
+
+    /**
+     * Tests for {@link SubversionApi#propset(org.eclipse.che.ide.ext.svn.shared.PropertyRequest)}.
+     *
+     * @throws Exception
+     *         if anything goes wrong
+     */
+    @Test
+    public void testPropSet() throws Exception {
+        this.subversionApi.checkout(DtoFactory.getInstance()
+                                              .createDto(CheckoutRequest.class)
+                                              .withProjectPath(tmpDir.toFile().getAbsolutePath())
+                                              .withUrl("file://" + repoRoot.getAbsolutePath()));
+
+        CLIOutputResponse response = this.subversionApi.propset(DtoFactory.getInstance().createDto(PropertySetRequest.class)
+                                                                          .withValue("*.*")
+                                                                          .withProjectPath(tmpDir.toFile().getAbsolutePath())
+                                                                          .withPath("A/B")
+                                                                          .withForce(true)
+                                                                          .withDepth(Depth.DIRS_ONLY)
+                                                                          .withName("svn:ignore"));
+
+        assertEquals(response.getOutput().size(), 1);
+        assertEquals(response.getOutput().get(0), "property 'svn:ignore' set on 'A/B'");
+    }
+
+    /**
+     * Tests for {@link SubversionApi#propdel(org.eclipse.che.ide.ext.svn.shared.PropertyRequest)}.
+     *
+     * @throws Exception
+     *         if anything goes wrong
+     */
+    @Test
+    public void testPropDel() throws Exception {
+        this.subversionApi.checkout(DtoFactory.getInstance()
+                                              .createDto(CheckoutRequest.class)
+                                              .withProjectPath(tmpDir.toFile().getAbsolutePath())
+                                              .withUrl("file://" + repoRoot.getAbsolutePath()));
+
+        CLIOutputResponse response = this.subversionApi.propdel(DtoFactory.getInstance().createDto(PropertyDeleteRequest.class)
+                                                                          .withProjectPath(tmpDir.toFile().getAbsolutePath())
+                                                                          .withPath("A/B")
+                                                                          .withForce(true)
+                                                                          .withDepth(Depth.DIRS_ONLY)
+                                                                          .withName("owner"));
+
+        assertEquals(response.getOutput().size(), 1);
+        assertEquals(response.getOutput().get(0), "property 'owner' deleted from 'A/B'.");
     }
 
     /**
