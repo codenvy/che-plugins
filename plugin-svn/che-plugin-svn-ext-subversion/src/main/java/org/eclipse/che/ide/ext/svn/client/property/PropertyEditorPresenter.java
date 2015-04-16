@@ -20,6 +20,7 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
+import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
@@ -41,11 +42,12 @@ import static org.eclipse.che.ide.api.notification.Notification.Type.INFO;
 @Singleton
 public class PropertyEditorPresenter extends SubversionActionPresenter implements PropertyEditorView.ActionDelegate {
 
-    private PropertyEditorView      view;
-    private SubversionClientService service;
-    private DtoUnmarshallerFactory  dtoUnmarshallerFactory;
-    private NotificationManager     notificationManager;
-    private Notification            notification;
+    private PropertyEditorView                       view;
+    private SubversionClientService                  service;
+    private DtoUnmarshallerFactory                   dtoUnmarshallerFactory;
+    private NotificationManager                      notificationManager;
+    private SubversionExtensionLocalizationConstants constants;
+    private Notification                             notification;
 
     @Inject
     protected PropertyEditorPresenter(AppContext appContext,
@@ -56,12 +58,14 @@ public class PropertyEditorPresenter extends SubversionActionPresenter implement
                                       PropertyEditorView view,
                                       SubversionClientService service,
                                       DtoUnmarshallerFactory dtoUnmarshallerFactory,
-                                      NotificationManager notificationManager) {
+                                      NotificationManager notificationManager,
+                                      SubversionExtensionLocalizationConstants constants) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
         this.view = view;
         this.service = service;
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
         this.notificationManager = notificationManager;
+        this.constants = constants;
         view.setDelegate(this);
     }
 
@@ -113,7 +117,7 @@ public class PropertyEditorPresenter extends SubversionActionPresenter implement
 
         String headPath = getSelectedPaths().get(0);
 
-        notification = new Notification("Edit start", PROGRESS);
+        notification = new Notification(constants.propertyModifyStart(), PROGRESS);
         notificationManager.showNotification(notification);
 
         Unmarshallable<CLIOutputResponse> unmarshaller = dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponse.class);
@@ -123,7 +127,7 @@ public class PropertyEditorPresenter extends SubversionActionPresenter implement
                                 protected void onSuccess(CLIOutputResponse result) {
                                     printResponse(result.getCommand(), result.getOutput(), result.getErrOutput());
 
-                                    notification.setMessage("Finished");
+                                    notification.setMessage(constants.propertyModifyFinished());
                                     notification.setStatus(FINISHED);
                                     notification.setType(INFO);
                                 }
@@ -132,7 +136,7 @@ public class PropertyEditorPresenter extends SubversionActionPresenter implement
                                 protected void onFailure(Throwable exception) {
                                     String errorMessage = exception.getMessage();
 
-                                    notification.setMessage("Failed" + ": " + errorMessage);
+                                    notification.setMessage(constants.propertyModifyFailed() + errorMessage);
                                     notification.setStatus(FINISHED);
                                     notification.setType(ERROR);
                                 }
@@ -146,7 +150,7 @@ public class PropertyEditorPresenter extends SubversionActionPresenter implement
 
         String headPath = getSelectedPaths().get(0);
 
-        notification = new Notification("Removing start", PROGRESS);
+        notification = new Notification(constants.propertyRemoveStart(), PROGRESS);
         notificationManager.showNotification(notification);
 
         Unmarshallable<CLIOutputResponse> unmarshaller = dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponse.class);
@@ -156,7 +160,7 @@ public class PropertyEditorPresenter extends SubversionActionPresenter implement
                                    protected void onSuccess(CLIOutputResponse result) {
                                        printResponse(result.getCommand(), result.getOutput(), result.getErrOutput());
 
-                                       notification.setMessage("Finished");
+                                       notification.setMessage(constants.propertyRemoveFinished());
                                        notification.setStatus(FINISHED);
                                        notification.setType(INFO);
                                    }
@@ -165,7 +169,7 @@ public class PropertyEditorPresenter extends SubversionActionPresenter implement
                                    protected void onFailure(Throwable exception) {
                                        String errorMessage = exception.getMessage();
 
-                                       notification.setMessage("Failed" + ": " + errorMessage);
+                                       notification.setMessage(constants.propertyRemoveFailed() + errorMessage);
                                        notification.setStatus(FINISHED);
                                        notification.setType(ERROR);
                                    }

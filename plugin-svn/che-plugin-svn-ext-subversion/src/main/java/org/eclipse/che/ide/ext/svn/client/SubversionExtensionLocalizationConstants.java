@@ -498,4 +498,23 @@ public interface SubversionExtensionLocalizationConstants extends Messages {
 
     @Key("move.item.child.detect")
     String moveItemChildDetected();
+
+    /** Property */
+    @Key("property.modify.start")
+    String propertyModifyStart();
+
+    @Key("property.modify.finished")
+    String propertyModifyFinished();
+
+    @Key("property.modifying.failed")
+    String propertyModifyFailed();
+
+    @Key("property.remove.start")
+    String propertyRemoveStart();
+
+    @Key("property.remove.finished")
+    String propertyRemoveFinished();
+
+    @Key("property.remove.failed")
+    String propertyRemoveFailed();
 }
