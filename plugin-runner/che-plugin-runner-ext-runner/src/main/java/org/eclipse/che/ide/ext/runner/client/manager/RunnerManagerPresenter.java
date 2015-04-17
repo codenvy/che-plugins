@@ -373,6 +373,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
             default:
                 String url = runner.getApplicationURL();
                 view.setApplicationURl(url == null ? locale.urlAppRunning() : url);
+                setDebugPort(runner);
         }
     }
 
@@ -607,6 +608,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
         view.setEnableLogsButton(false);
 
         view.setApplicationURl(null);
+        view.setDebugPort(null);
         view.setTimeout(TIMER_STUB);
 
         history.clear();
@@ -715,5 +717,12 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
         view.setEnableRunButton(runnerUtil.hasRunPermission());
 
         view.showOtherButtons();
+    }
+
+    private void setDebugPort(Runner runner) {
+        ApplicationProcessDescriptor runnerDescriptor = runner.getDescriptor();
+        if (runnerDescriptor != null && runnerDescriptor.getDebugPort() != -1) {
+            view.setDebugPort(String.valueOf(runnerDescriptor.getDebugPort()));
+        }
     }
 }

@@ -25,7 +25,6 @@ import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
 import org.eclipse.che.ide.api.action.permits.ResourcesLockedActionPermit;
-import org.eclipse.che.ide.api.action.permits.Run;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
@@ -89,6 +88,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -699,6 +699,45 @@ public class RunnerManagerPresenterTest {
         presenter.onRunButtonClicked();
 
         verifyLaunchRunnerWithNotNullCurrentProject();
+    }
+
+    @Test
+    public void shouldShowDebugPort() {
+        int debugPort = 777_777;
+        presenter.addRunner(processDescriptor);
+        reset(history, terminalContainer, view);
+        when(runner.getStatus()).thenReturn(Runner.Status.DONE);
+        when(runner.getDescriptor()).thenReturn(processDescriptor);
+        when(processDescriptor.getDebugPort()).thenReturn(debugPort);
+
+        presenter.update(runner);
+
+        verify(view).setDebugPort(eq(String.valueOf(debugPort)));
+    }
+
+    @Test
+    public void shouldNotShowDebugPort() {
+        presenter.addRunner(processDescriptor);
+        reset(history, terminalContainer, view);
+        when(runner.getStatus()).thenReturn(Runner.Status.DONE);
+        when(runner.getDescriptor()).thenReturn(processDescriptor);
+        when(processDescriptor.getDebugPort()).thenReturn(-1);
+
+        presenter.update(runner);
+
+        verify(view, never()).setDebugPort(anyString());
+    }
+
+    @Test
+    public void shouldHideDebugPortAfterCloseProject() {
+        presenter.addRunner(processDescriptor);
+        presenter.onRunButtonClicked();
+        presenter.onProjectOpened(projectActionEvent);
+        presenter.setPartStack(partStack);
+
+        presenter.onProjectClosed(projectActionEvent);
+
+        verify(view).setDebugPort((String)isNull());
     }
 
     /**

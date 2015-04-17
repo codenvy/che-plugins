@@ -49,6 +49,14 @@ public interface RunnerManagerView extends View<RunnerManagerView.ActionDelegate
     void setApplicationURl(@Nullable String applicationUrl);
 
     /**
+     * Shows debug port on the view.
+     *
+     * @param debugPort
+     *         debug port which needs set
+     */
+    void setDebugPort(@Nullable String debugPort);
+
+    /**
      * Shows timeout on the view.
      *
      * @param timeout

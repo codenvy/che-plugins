@@ -112,7 +112,11 @@
                             <g:Label ui:field="appReference" addStyleNames="{style.appRefLabel}
                                                                             {resources.runnerCss.fontSizeTwelve}"/>
                         </g:FlowPanel>
-
+                        <g:FlowPanel ui:field="debugPanel" addStyleNames="{style.appInfoPanel}">
+                            <g:Label text="{locale.runnerLabelDebugPort}" addStyleNames="{style.applicationLabel}
+                                                                                         {resources.runnerCss.fontSizeTwelve}"/>
+                            <g:Label ui:field="debugPort" addStyleNames="{style.appRefLabel} {resources.runnerCss.fontSizeTwelve}"/>
+                        </g:FlowPanel>
                         <g:FlowPanel>
                             <g:FlowPanel ui:field="moreInfoPanel" addStyleNames="{style.moreInfoPanel}">
                                 <g:SimpleLayoutPanel ui:field="image" addStyleNames="{style.moreIcon}"/>

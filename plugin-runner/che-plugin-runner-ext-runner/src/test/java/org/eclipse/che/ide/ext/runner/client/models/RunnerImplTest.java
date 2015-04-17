@@ -55,7 +55,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -565,9 +564,9 @@ public class RunnerImplTest {
     }
 
     @Test
-    public void equalsShouldReturnFalseForRunnerObjectsWithSameTitleButDifferentCreationTime() {
+    public void equalsShouldReturnFalseForRunnerObjectsWithSameTitleButDifferentCreationTime() throws Exception{
         runner.setTitle(TEXT);
-        timeout(1000);
+        Thread.sleep(1000);
 
         RunnerImpl runner1 = new RunnerImpl(locale, runnerCounter, util, runOptions);
         runner1.setTitle(TEXT);

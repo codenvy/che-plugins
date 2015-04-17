@@ -20,6 +20,13 @@ import org.eclipse.che.api.vfs.server.VirtualFileSystemRegistry;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.user.UserImpl;
 import org.eclipse.che.dto.server.DtoFactory;
+import org.eclipse.che.ide.ext.svn.shared.AddRequest;
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
+import org.eclipse.che.ide.ext.svn.shared.CheckoutRequest;
+import org.eclipse.che.ide.ext.svn.shared.CommitRequest;
+import org.eclipse.che.ide.ext.svn.shared.Depth;
+import org.eclipse.che.ide.ext.svn.shared.PropertySetRequest;
 import org.eclipse.che.vfs.impl.fs.LocalFileSystemProvider;
 import org.eclipse.che.vfs.impl.fs.WorkspaceHashLocalFSMountStrategy;
 
@@ -33,10 +40,6 @@ import org.eclipse.che.ide.ext.svn.server.credentials.CredentialsProvider;
 import org.eclipse.che.ide.ext.svn.server.repository.RepositoryUrlProvider;
 import org.eclipse.che.ide.ext.svn.server.upstream.CommandLineResult;
 import org.eclipse.che.ide.ext.svn.server.upstream.UpstreamUtils;
-import org.eclipse.che.ide.ext.svn.shared.AddRequest;
-import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
-import org.eclipse.che.ide.ext.svn.shared.CheckoutRequest;
-import org.eclipse.che.ide.ext.svn.shared.CommitRequest;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -79,7 +82,7 @@ public class TestUtils {
         }
     });
 
-    public static final String[] GREEK_TREE = new String[] {
+    public static final String[] GREEK_TREE = new String[]{
             "/",
             "/iota",
             "/A/",
@@ -103,7 +106,7 @@ public class TestUtils {
             "/A/D/G/tau"
     };
 
-    private static final Logger  LOG           = LoggerFactory.getLogger(TestUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestUtils.class);
 
     public static class SystemOutLineConsumer implements LineConsumer {
         @Override
@@ -112,7 +115,8 @@ public class TestUtils {
         }
 
         @Override
-        public void close() throws IOException { }
+        public void close() throws IOException {
+        }
     }
 
     public static class SystemOutLineConsumerFactory implements LineConsumerFactory {
@@ -124,35 +128,37 @@ public class TestUtils {
 
     /**
      * Throws an exception if the CLI result is no a valid "success" response.
-     *
+     * <p/>
      * <b>Note:</b> Might make sense to move this to a core API instead of a test API
      *
-     * @param result the CLI result
-     *
-     * @throws Exception if the CLI result indicates an error
+     * @param result
+     *         the CLI result
+     * @throws Exception
+     *         if the CLI result indicates an error
      */
-    public static void handleCLIResult (final CommandLineResult result) throws Exception {
+    public static void handleCLIResult(final CommandLineResult result) throws Exception {
         if (result.getExitCode() != 0) {
             throw new SubversionException(Joiner.on("\n")
-                    .join(result.getStderr().size() != 0 ?
-                            result.getStderr()
-                                    .toArray(new String[result.getStderr().size()]) :
-                            result.getStdout()
-                                    .toArray(new String[result.getStdout().size()])));
+                                                .join(result.getStderr().size() != 0 ?
+                                                      result.getStderr()
+                                                            .toArray(new String[result.getStderr().size()]) :
+                                                      result.getStdout()
+                                                            .toArray(new String[result.getStdout().size()])));
         }
     }
 
     /**
      * Creates a user and makes that user be the current user.
      *
-     * @param userProfileDao the User Profile DAO
-     *
-     * @throws Exception if anything goes wrong
+     * @param userProfileDao
+     *         the User Profile DAO
+     * @throws Exception
+     *         if anything goes wrong
      */
     public static void createTestUser(final UserProfileDao userProfileDao) throws Exception {
         // set current user
         EnvironmentContext.getCurrent().setUser(new UserImpl("codenvy", "codenvy", null,
-                Arrays.asList("workspace/developer"), false));
+                                                             Arrays.asList("workspace/developer"), false));
 
         // rules for mock
         final Map<String, String> profileAttributes = new HashMap<>();
@@ -162,15 +168,15 @@ public class TestUtils {
         profileAttributes.put("email", "codenvy@codenvy.com");
 
         Mockito.when(userProfileDao.getById("codenvy"))
-                .thenReturn(new Profile().withId("codenvy").withUserId("codenvy").withAttributes(profileAttributes));
+               .thenReturn(new Profile().withId("codenvy").withUserId("codenvy").withAttributes(profileAttributes));
     }
 
     /**
      * Creates a virtual file system.
      *
      * @return the virtual file system
-     *
-     * @throws Exception if anything goes wrong
+     * @throws Exception
+     *         if anything goes wrong
      */
     public static VirtualFileSystem createVirtualFileSystem() throws Exception {
         final File fsRoot = Files.createTempDir();
@@ -182,7 +188,7 @@ public class TestUtils {
         final VirtualFileSystemRegistry registry = new VirtualFileSystemRegistry();
         final WorkspaceHashLocalFSMountStrategy mountStrategy = new WorkspaceHashLocalFSMountStrategy(fsRoot, fsRoot);
         final LocalFileSystemProvider vfsProvider = new LocalFileSystemProvider("my_vfs", mountStrategy,
-                new EventService(), null, registry);
+                                                                                new EventService(), null, registry);
 
         registry.registerProvider("my_vfs", vfsProvider);
 
@@ -195,8 +201,8 @@ public class TestUtils {
      * Creates a new Subversion repository in a temporary location with the Greek Tree structure within it.
      *
      * @return the path to the repository root
-     *
-     * @throws Exception if anything goes wrong
+     * @throws Exception
+     *         if anything goes wrong
      */
     public static File createGreekTreeRepository() throws Exception {
         final File repoRoot = Files.createTempDir();
@@ -207,7 +213,7 @@ public class TestUtils {
         wcRoot.deleteOnExit();
 
         // Create the repository
-        final CommandLineResult result = UpstreamUtils.executeCommandLine(null, "svnadmin", new String[] {
+        final CommandLineResult result = UpstreamUtils.executeCommandLine(null, "svnadmin", new String[]{
                 "create",
                 repoRoot.getAbsolutePath()
         }, -1, repoRoot);
@@ -217,7 +223,7 @@ public class TestUtils {
 
         // Checkout the repository
         final CLIOutputWithRevisionResponse coResponse =
-            subversionApi.checkout(dtoFactory.createDto(CheckoutRequest.class)
+                subversionApi.checkout(dtoFactory.createDto(CheckoutRequest.class)
                                                  .withProjectPath(wcRoot.getAbsolutePath())
                                                  .withUrl("file:///" + repoRoot.getAbsolutePath()));
 
@@ -242,12 +248,24 @@ public class TestUtils {
 
         // Add the files in the working copy to version control
         subversionApi.add(dtoFactory.createDto(AddRequest.class).withProjectPath(wcRoot.getAbsolutePath())
-                                                                .withPaths(pathsToAdd)
-                                                                .withAddParents(true));
+                                    .withPaths(pathsToAdd)
+                                    .withAddParents(true));
+
+        //Add properties
+        final CLIOutputResponse propResponse =
+                subversionApi.propset(dtoFactory.createDto(PropertySetRequest.class)
+                                                .withValue("user")
+                                                .withProjectPath(wcRoot.getAbsolutePath())
+                                                .withPath(".")
+                                                .withForce(true)
+                                                .withDepth(Depth.FULLY_RECURSIVE)
+                                                .withName("owner"));
+
+        assertTrue(propResponse.getOutput().size() > 0);
 
         // Commit the changes
         final CLIOutputWithRevisionResponse cResponse =
-            subversionApi.commit(dtoFactory.createDto(CommitRequest.class)
+                subversionApi.commit(dtoFactory.createDto(CommitRequest.class)
                                                .withProjectPath(wcRoot.getAbsolutePath())
                                                .withMessage("Initial commit."));
 
@@ -257,7 +275,7 @@ public class TestUtils {
     }
 
     public static <T> Matcher<List<T>> sameAsList(final List<T> expectedList) {
-        return new BaseMatcher<List<T>>(){
+        return new BaseMatcher<List<T>>() {
             @Override
             public void describeTo(final Description description) {
                 description.appendText("should contain all and only these elements").appendValue(expectedList);
@@ -268,7 +286,7 @@ public class TestUtils {
                 List<T> actualList;
 
                 try {
-                    actualList = (List<T>) o;
+                    actualList = (List<T>)o;
                 } catch (ClassCastException e) {
                     return false;
                 }

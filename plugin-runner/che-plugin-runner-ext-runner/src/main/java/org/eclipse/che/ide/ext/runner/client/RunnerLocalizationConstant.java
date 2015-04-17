@@ -59,6 +59,9 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("runner.label.application.info")
     String runnerLabelApplicationInfo();
 
+    @Key("runner.label.debug.port")
+    String runnerLabelDebugPort();
+
     @Key("runner.label.timeout.info")
     String runnerLabelTimeoutInfo();
 

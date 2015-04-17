@@ -86,6 +86,10 @@ public class RunnerManagerViewImpl extends BaseView<RunnerManagerView.ActionDele
     Label             timeout;
     @UiField
     SimpleLayoutPanel image;
+    @UiField
+    FlowPanel         debugPanel;
+    @UiField
+    Label             debugPort;
 
     @UiField(provided = true)
     final RunnerResources            resources;
@@ -124,6 +128,7 @@ public class RunnerManagerViewImpl extends BaseView<RunnerManagerView.ActionDele
         setContentWidget(UI_BINDER.createAndBindUi(this));
 
         this.mainPanel.setWidgetMinSize(leftTabsPanel, 185);
+        this.debugPanel.setVisible(false);
 
         this.popupPanel = popupPanel;
         this.popupPanel.removeStyleName(GWT_POPUP_STANDARD_STYLE);
@@ -231,6 +236,7 @@ public class RunnerManagerViewImpl extends BaseView<RunnerManagerView.ActionDele
         changeButtonsState(runner);
 
         moreInfoWidget.update(runner);
+        debugPanel.setVisible(false);
     }
 
     private void changeButtonsState(@Nonnull Runner runner) {
@@ -278,6 +284,16 @@ public class RunnerManagerViewImpl extends BaseView<RunnerManagerView.ActionDele
         }
 
         appReference.setText(applicationUrl);
+    }
+
+    @Override
+    public void setDebugPort(@Nullable String port) {
+        boolean visible = port != null && !port.isEmpty();
+        debugPanel.setVisible(visible);
+
+        if (visible) {
+            debugPort.setText(port);
+        }
     }
 
     /** {@inheritDoc} */
