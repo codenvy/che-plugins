@@ -95,7 +95,7 @@
             color: #0090e4 !important;
             width: 160px;
             float: right;
-            margin-right: 38px;
+            margin-right: 36px;
             margin-top: 3px;
         }
 

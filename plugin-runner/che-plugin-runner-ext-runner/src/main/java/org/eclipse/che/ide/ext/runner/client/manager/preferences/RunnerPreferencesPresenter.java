@@ -123,11 +123,14 @@ public class RunnerPreferencesPresenter extends AbstractPreferencePagePresenter 
         UpdateResourcesDescriptor updateResourcesDescriptor = dtoFactory.createDto(UpdateResourcesDescriptor.class)
                 .withWorkspaceId(appContext.getWorkspace().getId())
                 .withRunnerTimeout(view.getShutdown().getTimeout())
+                .withBuilderTimeout(view.getShutdown().getTimeout())
+                .withRunnerRam(RAM.MB_4096.getValue())
                 .withResourcesUsageLimit(2.0);
 
         accountService.redistributeResources(appContext.getWorkspace().getAccountId(), Collections.createArray(updateResourcesDescriptor), new AsyncRequestCallback<Void>() {
             @Override
             protected void onSuccess(Void result) {
+                shutdown = view.getShutdown();
                 view.enableSetButton(false);
                 loadWorkspace();
             }

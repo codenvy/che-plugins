@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
  * @author Andrey Plotnikov
  */
 public enum Shutdown {
-    BY_TIMEOUT_1(1, "1 hour timeout"), BY_TIMEOUT_4(4, "4 hour timeout"), ALWAYS_ON(0, "always on");
+    BY_TIMEOUT_1(3600, "1 hour timeout"), BY_TIMEOUT_4(14400, "4 hour timeout"), ALWAYS_ON(0, "always on");
 
     private final String name;
 
