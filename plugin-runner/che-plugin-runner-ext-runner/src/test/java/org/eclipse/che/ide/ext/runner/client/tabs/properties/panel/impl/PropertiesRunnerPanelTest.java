@@ -14,6 +14,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.api.workspace.shared.dto.WorkspaceDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorInitException;
@@ -39,6 +40,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+
+import java.util.HashMap;
 
 import static org.eclipse.che.ide.ext.runner.client.constants.TimeInterval.ONE_SEC;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_512;
@@ -76,6 +79,8 @@ public class PropertiesRunnerPanelTest {
     @Mock
     private CurrentProject      currentProject;
     @Mock
+    private WorkspaceDescriptor         currentWorkspace;
+    @Mock
     private Timer               timer;
     @Mock
     private ProjectDescriptor   descriptor;
@@ -93,6 +98,8 @@ public class PropertiesRunnerPanelTest {
     public void setUp() {
         when(timerFactory.newInstance(any(TimerFactory.TimerCallBack.class))).thenReturn(timer);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(appContext.getWorkspace()).thenReturn(currentWorkspace);
+        when(appContext.getWorkspace().getAttributes()).thenReturn(new HashMap<String, String>());
         when(currentProject.getProjectDescription()).thenReturn(descriptor);
         when(editorProvider.getEditor()).thenReturn(editor);
         when(dockerFileFactory.newInstance(TEXT)).thenReturn(file);

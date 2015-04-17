@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
+import org.eclipse.che.api.runner.internal.Constants;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorInitException;
@@ -25,7 +26,7 @@ import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.api.texteditor.HasReadOnlyProperty;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
-import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
+import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.*;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileEditorInput;
 import org.eclipse.che.ide.util.loging.Log;
 
@@ -49,10 +50,12 @@ public abstract class PropertiesPanelPresenter implements PropertiesPanelView.Ac
     protected CurrentProject      currentProject;
     protected EditorPartPresenter editor;
     protected int                 undoOperations;
+    private final AppContext      appContext;
 
 
     public PropertiesPanelPresenter(@Nonnull PropertiesPanelView view, @Nonnull AppContext appContext) {
         this.view = view;
+        this.appContext = appContext;
         this.view.setDelegate(this);
 
         currentProject = appContext.getCurrentProject();
@@ -100,6 +103,17 @@ public abstract class PropertiesPanelPresenter implements PropertiesPanelView.Ac
             editor.init(new DockerFileEditorInput(fileType, file));
         } catch (EditorInitException e) {
             Log.error(getClass(), e);
+        }
+    }
+
+    @Nonnull
+    protected Shutdown getTimeout() {
+        if (appContext.getWorkspace().getAttributes().containsKey(Constants.RUNNER_LIFETIME)) {
+            String value = appContext.getWorkspace().getAttributes().get(Constants.RUNNER_LIFETIME);
+            Shutdown shutdown = Shutdown.detect(Integer.parseInt(value));
+            return  shutdown != null ? shutdown : Shutdown.BY_TIMEOUT_4;
+        } else {
+            return Shutdown.BY_TIMEOUT_4;
         }
     }
 

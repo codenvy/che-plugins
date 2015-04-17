@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.runneractions.impl;
 
+import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -221,13 +222,15 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
                                        @Nonnegative int usedMemory,
                                        @Nonnegative final int requiredMemory) {
         int availableMemory = totalMemory - usedMemory;
-        if (totalMemory < requiredMemory) {
-            runnerUtil.showWarning(constant.messagesTotalLessRequiredMemory(totalMemory, requiredMemory));
-            return false;
-        }
-
         if (availableMemory < requiredMemory) {
-            runnerUtil.showWarning(constant.messagesAvailableLessRequiredMemory(totalMemory, usedMemory, requiredMemory));
+            dialogFactory.createChoiceDialog(constant.messagesAvailableLessOverrideMemoryTitle(), constant.messagesAvailableLessOverrideMemoryContent(),
+                    constant.messagesAvailableLessOverrideMemorySettingsLink(), constant.messagesAvailableLessOverrideMemoryBackToConfig(),
+                    new ConfirmCallback() {
+                        @Override
+                        public void accepted() {
+                            Window.open("/dashboard/#/organizations", "_blank", null);
+                        }
+                    }, null).show();
             return false;
         }
 
@@ -238,9 +241,15 @@ public class CheckRamAndRunAction extends AbstractRunnerAction {
                                             @Nonnegative int usedMemory,
                                             @Nonnegative final int overrideMemory) {
         int availableMemory = totalMemory - usedMemory;
-
         if (availableMemory < overrideMemory) {
-            runnerUtil.showError(runner, constant.messagesAvailableLessOverrideMemory(availableMemory), null);
+            dialogFactory.createChoiceDialog(constant.messagesAvailableLessOverrideMemoryTitle(), constant.messagesAvailableLessOverrideMemoryContent(),
+                    constant.messagesAvailableLessOverrideMemorySettingsLink(), constant.messagesAvailableLessOverrideMemoryBackToConfig(),
+                    new ConfirmCallback() {
+                        @Override
+                        public void accepted() {
+                            Window.open("/dashboard/#/organizations", "_blank", null);
+                        }
+                    }, null).show();
             return false;
         }
 

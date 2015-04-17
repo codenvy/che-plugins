@@ -36,6 +36,8 @@ public class PropertiesStubPanel extends PropertiesPanelPresenter {
         this.view.setEnableBootProperty(false);
         this.view.setEnableShutdownProperty(false);
         this.view.setEnableScopeProperty(false);
+        this.view.setVisibleConfigLink(false);
+        this.view.selectShutdown(getTimeout());
 
         this.view.hideButtonsPanel();
         this.view.hideSwitcher();

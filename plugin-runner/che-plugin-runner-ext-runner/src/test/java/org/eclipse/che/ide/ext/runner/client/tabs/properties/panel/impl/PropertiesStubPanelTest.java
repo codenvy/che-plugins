@@ -12,14 +12,18 @@ package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.impl;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.api.workspace.shared.dto.WorkspaceDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanelView;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.HashMap;
+
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Alexander Andrienko
@@ -30,9 +34,17 @@ public class PropertiesStubPanelTest {
     private PropertiesPanelView view;
     @Mock
     private AppContext          appContext;
+    @Mock
+    private WorkspaceDescriptor         currentWorkspace;
 
-    @InjectMocks
-    private PropertiesStubPanel propertiesStubPanel;
+    @Before
+    public void setUp() {
+        when(appContext.getWorkspace()).thenReturn(currentWorkspace);
+        when(appContext.getWorkspace().getAttributes()).thenReturn(new HashMap<String, String>());
+
+
+        new PropertiesStubPanel(view, appContext);
+    }
 
     @Test
     public void prepareActionShouldBePerformed() {

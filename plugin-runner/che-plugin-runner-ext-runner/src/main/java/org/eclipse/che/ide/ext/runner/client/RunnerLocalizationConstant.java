@@ -65,15 +65,6 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("runner.label.timeout.info")
     String runnerLabelTimeoutInfo();
 
-    @Key("messages.totalLessRequiredMemory")
-    String messagesTotalLessRequiredMemory(@Nonnegative int totalRAM, @Nonnegative int requestedRAM);
-
-    @Key("messages.availableLessRequiredMemory")
-    String messagesAvailableLessRequiredMemory(@Nonnegative int totalRAM, @Nonnegative int usedRAM, @Nonnegative int requestedRAM);
-
-    @Key("messages.availableLessOverrideMemory")
-    String messagesAvailableLessOverrideMemory(@Nonnegative int availableRAM);
-
     @Key("messages.overrideMemory")
     String messagesOverrideMemory();
 
@@ -177,6 +168,9 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("properties.config")
     String propertiesConfig();
 
+    @Key("properties.open.config")
+    String propertiesOpenConfig();
+
     @Key("properties.name")
     String propertiesName();
 
@@ -265,6 +259,30 @@ public interface RunnerLocalizationConstant extends Messages {
 
     @Key("template.default.project.runner")
     String templateDefaultProjectRunner();
+
+    @Key("messages.availableLessOverrideMemory.title")
+    String messagesAvailableLessOverrideMemoryTitle();
+
+    @Key("messages.availableLessOverrideMemory.content")
+    String messagesAvailableLessOverrideMemoryContent();
+
+    @Key("messages.availableLessOverrideMemory.settingsLink")
+    String messagesAvailableLessOverrideMemorySettingsLink();
+
+    @Key("messages.availableLessOverrideMemory.backToConfig")
+    String messagesAvailableLessOverrideMemoryBackToConfig();
+
+    @Key("user.preferences.runners.title")
+    String userPreferencesRunnersTitle();
+
+    @Key("user.preferences.runners.shutdown.policy")
+    String userPreferencesRunnersShutdownPolicy();
+
+    @Key("user.preferences.runners.shutdown.value.title")
+    String userPreferencesRunnersShutdownValueTitle();
+
+    @Key("user.preferences.runners.shutdown.set.button")
+    String userPreferencesRunnersShutdownSetButton();
 
     @Key("terminal.not.ready")
     String terminalNotReady();

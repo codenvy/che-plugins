@@ -20,6 +20,7 @@ import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.project.shared.dto.RunnerConfiguration;
 import org.eclipse.che.api.project.shared.dto.RunnersDescriptor;
+import org.eclipse.che.api.workspace.shared.dto.WorkspaceDescriptor;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -77,6 +78,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl.ROOT_FOLDER;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_1024;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_512;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
@@ -84,11 +86,7 @@ import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.impl.P
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -151,6 +149,8 @@ public class PropertiesEnvironmentPanelTest {
 
     @Mock
     private Runner                                     runner;
+    @Mock
+    private WorkspaceDescriptor                                currentWorkspace;
     @Mock
     private CurrentProject                             currentProject;
     @Mock
@@ -241,6 +241,8 @@ public class PropertiesEnvironmentPanelTest {
         runnerConfigs = new HashMap<>();
 
         when(appContext.getCurrentProject()).thenReturn(currentProject);
+        when(appContext.getWorkspace()).thenReturn(currentWorkspace);
+        when(appContext.getWorkspace().getAttributes()).thenReturn(new HashMap<String, String>());
         when(currentProject.getProjectDescription()).thenReturn(projectDescriptor);
         when(projectDescriptor.getRunners()).thenReturn(runnersDescriptor);
         when(runnersDescriptor.getConfigs()).thenReturn(runnerConfigs);
@@ -763,9 +765,9 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableDeleteButton(false);
 
         verify(environment).getId();
-        verify(environment).setRam(MB_512.getValue());
+        verify(environment).setRam(MB_1024.getValue());
         verify(view).setName(TEXT);
-        verify(view).selectMemory(MB_512);
+        verify(view).selectMemory(MB_1024);
         verify(environment, times(3)).getScope();
         verify(view).selectScope(SYSTEM);
     }
@@ -783,9 +785,9 @@ public class PropertiesEnvironmentPanelTest {
 
         verify(environment).getName();
         verify(environment).getId();
-        verify(environment).setRam(MB_512.getValue());
+        verify(environment).setRam(MB_1024.getValue());
         verify(view).setName(TEXT);
-        verify(view).selectMemory(MB_512);
+        verify(view).selectMemory(MB_1024);
         verify(environment, times(3)).getScope();
         verify(view).selectScope(PROJECT);
     }
@@ -940,9 +942,9 @@ public class PropertiesEnvironmentPanelTest {
         verify(handlesUndoRedo, times(3)).undoable();
 
         verify(environment).getId();
-        verify(environment).setRam(MB_512.getValue());
+        verify(environment).setRam(MB_1024.getValue());
         verify(view).setName(TEXT);
-        verify(view).selectMemory(MB_512);
+        verify(view).selectMemory(MB_1024);
         verify(environment, times(3)).getScope();
         verify(view).selectScope(SYSTEM);
     }

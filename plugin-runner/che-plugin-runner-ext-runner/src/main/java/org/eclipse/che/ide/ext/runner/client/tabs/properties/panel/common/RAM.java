@@ -26,7 +26,7 @@ public enum RAM {
     MB_2048(2048),
     MB_4096(4096),
     MB_8192(8192),
-    DEFAULT(512);
+    DEFAULT(1024);
 
     private final int size;
 

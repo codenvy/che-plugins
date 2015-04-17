@@ -23,7 +23,7 @@ import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.tabs.container.TabContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanelPresenter;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanelView;
-import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
+import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.*;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFile;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileFactory;
 import org.eclipse.che.ide.ext.runner.client.util.TimerFactory;
@@ -73,7 +73,6 @@ public class PropertiesRunnerPanel extends PropertiesPanelPresenter {
 
                 DockerFile file = dockerFileFactory.newInstance(dockerUrl);
                 initializeEditor(file, editorProvider, fileTypeRegistry);
-
                 view.selectMemory(RAM.detect(runner.getRAM()));
             }
         });
@@ -89,6 +88,7 @@ public class PropertiesRunnerPanel extends PropertiesPanelPresenter {
         this.view.setVisibleDeleteButton(false);
         this.view.setVisibleCancelButton(false);
 
+        this.view.selectShutdown(getTimeout());
         this.view.selectMemory(RAM.detect(runner.getRAM()));
     }
 
