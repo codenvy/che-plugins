@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -156,6 +157,47 @@ public class NameGeneratorTest {
         when(environment1.getName()).thenReturn("ENV1-" + projectName);
         when(environment2.getName()).thenReturn("ENV3-" + projectName);
         List<Environment> environments = Arrays.asList(environment1, environment2);
+
+        String generated = NameGenerator.generateCustomEnvironmentName(environments, projectName);
+
+        assertEquals(newName, generated);
+    }
+
+    @Test
+    public void generateCustomEnvironmentName3() throws Exception {
+        String projectName = "project";
+        String newName = "ENV11-project";
+
+        Environment environment3 = mock(Environment.class);
+        Environment environment4 = mock(Environment.class);
+        Environment environment5 = mock(Environment.class);
+        Environment environment6 = mock(Environment.class);
+        Environment environment7 = mock(Environment.class);
+        Environment environment8 = mock(Environment.class);
+        Environment environment9 = mock(Environment.class);
+        Environment environment10 = mock(Environment.class);
+
+        when(environment1.getName()).thenReturn("ENV1-" + projectName);
+        when(environment2.getName()).thenReturn("ENV2-" + projectName);
+        when(environment3.getName()).thenReturn("ENV3-" + projectName);
+        when(environment4.getName()).thenReturn("ENV4-" + projectName);
+        when(environment5.getName()).thenReturn("ENV5-" + projectName);
+        when(environment6.getName()).thenReturn("ENV6-" + projectName);
+        when(environment7.getName()).thenReturn("ENV7-" + projectName);
+        when(environment8.getName()).thenReturn("ENV8-" + projectName);
+        when(environment9.getName()).thenReturn("ENV9-" + projectName);
+        when(environment10.getName()).thenReturn("ENV10-" + projectName);
+
+        List<Environment> environments = Arrays.asList(environment1,
+                                                       environment2,
+                                                       environment3,
+                                                       environment4,
+                                                       environment5,
+                                                       environment6,
+                                                       environment7,
+                                                       environment8,
+                                                       environment9,
+                                                       environment10);
 
         String generated = NameGenerator.generateCustomEnvironmentName(environments, projectName);
 

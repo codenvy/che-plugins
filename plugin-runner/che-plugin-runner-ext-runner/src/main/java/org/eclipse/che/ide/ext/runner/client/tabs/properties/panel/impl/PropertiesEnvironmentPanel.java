@@ -33,6 +33,7 @@ import org.eclipse.che.ide.api.texteditor.UndoableEditor;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
+import org.eclipse.che.ide.ext.runner.client.actions.ChooseRunnerAction;
 import org.eclipse.che.ide.ext.runner.client.callbacks.AsyncCallbackBuilder;
 import org.eclipse.che.ide.ext.runner.client.callbacks.FailureCallback;
 import org.eclipse.che.ide.ext.runner.client.callbacks.SuccessCallback;
@@ -87,6 +88,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     private final AsyncCallbackBuilder<Void>                 voidAsyncCallbackBuilder;
     private final AsyncCallbackBuilder<ProjectDescriptor>    asyncDescriptorCallbackBuilder;
     private final DialogFactory                              dialogFactory;
+    private final ChooseRunnerAction                         chooseRunnerAction;
     private final List<RemovePanelListener>                  listeners;
     private final TemplatesContainer                         templatesContainer;
 
@@ -104,6 +106,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
                                       final ProjectServiceClient projectService,
                                       EventBus eventBus,
                                       AppContext appContext,
+                                      ChooseRunnerAction chooseRunnerAction,
                                       DialogFactory dialogFactory,
                                       RunnerLocalizationConstant locale,
                                       GetProjectEnvironmentsAction projectEnvironmentsAction,
@@ -121,6 +124,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         this.fileTypeRegistry = fileTypeRegistry;
         this.dockerFileFactory = dockerFileFactory;
         this.projectService = projectService;
+        this.chooseRunnerAction = chooseRunnerAction;
         this.eventBus = eventBus;
         this.environment = environment;
         this.locale = locale;
@@ -541,7 +545,12 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     /** {@inheritDoc} */
     @Override
     public void onSwitcherChanged(boolean isOn) {
-        templatesContainer.setDefaultEnvironment(isOn ? environment : null);
+        if (isOn) {
+            templatesContainer.setDefaultEnvironment(environment);
+        } else {
+            templatesContainer.setDefaultEnvironment(null);
+            chooseRunnerAction.setEmptyDefaultRunner();
+        }
     }
 
     /** {@inheritDoc} */

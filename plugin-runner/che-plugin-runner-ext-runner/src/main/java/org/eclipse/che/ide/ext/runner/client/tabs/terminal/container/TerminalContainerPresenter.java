@@ -36,6 +36,7 @@ import static org.eclipse.che.ide.ext.runner.client.selection.Selection.ENVIRONM
  * The class that manages a container of the terminals.
  *
  * @author Valeriy Svydenko
+ * @author Dmitry Shnurenko
  */
 @Singleton
 public class TerminalContainerPresenter implements TerminalContainer,
@@ -81,9 +82,6 @@ public class TerminalContainerPresenter implements TerminalContainer,
                                     }
 
                                     final boolean isRunner = RUNNING.equals(runner.getStatus());
-
-                                    terminal.setVisible(isRunner);
-                                    terminal.setUnavailableLabelVisible(!isRunner);
 
                                     if (isRunner) {
                                         Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {

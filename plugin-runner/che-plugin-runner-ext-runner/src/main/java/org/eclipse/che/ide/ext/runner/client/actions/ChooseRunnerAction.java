@@ -22,11 +22,11 @@ import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.action.Presentation;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.ui.dropdown.DropDownListFactory;
-import org.eclipse.che.ide.ui.dropdown.DropDownHeaderWidget;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
+import org.eclipse.che.ide.ui.dropdown.DropDownHeaderWidget;
+import org.eclipse.che.ide.ui.dropdown.DropDownListFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -215,6 +215,11 @@ public class ChooseRunnerAction extends AbstractRunnerActions implements CustomC
                 return;
             }
         }
+    }
+
+    /** Clears selected element of the 'Choose runner' menu. */
+    public void setEmptyDefaultRunner() {
+        dropDownHeaderWidget.selectElement(null, "");
     }
 
     @Nullable

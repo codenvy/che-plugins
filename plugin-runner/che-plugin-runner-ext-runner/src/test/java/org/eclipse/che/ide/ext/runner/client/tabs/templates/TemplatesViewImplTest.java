@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.templates;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Dmitry Shnurenko
+ * @author Valeriy Svydenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class TemplatesViewImplTest {
@@ -90,12 +93,16 @@ public class TemplatesViewImplTest {
     @Mock
     private MouseOutEvent     outEvent;
     @Mock
+    private ClickEvent        clickEvent;
+    @Mock
     private ActionDelegate    delegate;
 
     @Captor
     private ArgumentCaptor<MouseOverHandler> mouseOverCaptor;
     @Captor
     private ArgumentCaptor<MouseOutHandler>  mouseOutCaptor;
+    @Captor
+    private ArgumentCaptor<ClickHandler>     clickHandlerArgumentCaptor;
 
     @InjectMocks
     private TemplatesViewImpl view;
@@ -123,6 +130,15 @@ public class TemplatesViewImplTest {
         verify(resources.runnerCss()).fullSize();
         verify(resources.runnerCss()).defaultRunnerStub();
         verify(resources.runnerCss()).fontSizeTen();
+    }
+
+    @Test
+    public void onClickHandlerShouldBeFired() throws Exception {
+        verify(view.createNewButton).addDomHandler(clickHandlerArgumentCaptor.capture(), eq(ClickEvent.getType()));
+
+        clickHandlerArgumentCaptor.getValue().onClick(clickEvent);
+
+        verify(delegate).createNewEnvironment();
     }
 
     @Test

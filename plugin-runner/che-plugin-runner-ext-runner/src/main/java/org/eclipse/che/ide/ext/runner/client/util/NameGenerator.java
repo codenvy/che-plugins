@@ -77,10 +77,11 @@ public class NameGenerator {
     public static String generateCustomEnvironmentName(@Nonnull List<Environment> environments, @Nonnull String projectName) {
         int counter = 1;
         String name = CUSTOM_ENV_PREFIX + counter + '-' + projectName;
-        for (Environment environment : environments) {
-            if (environment.getName().equals(name)) {
+        for (int i = 0; i < environments.size(); i++) {
+            if (environments.get(i).getName().equals(name)) {
                 counter++;
-                name = CUSTOM_ENV_PREFIX + counter + '-' + projectName;
+                name = CUSTOM_ENV_PREFIX + String.valueOf(counter) + '-' + projectName;
+                i = 0;
             }
         }
 

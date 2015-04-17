@@ -13,6 +13,7 @@ package org.eclipse.che.ide.ext.runner.client.tabs.terminal.panel;
 import com.google.gwt.user.client.Element;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,8 +22,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.DONE;
+import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.FAILED;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.IN_PROGRESS;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.IN_QUEUE;
+import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.STOPPED;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -33,6 +36,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Andrey Plotnikov
  * @author Valeriy Svydenko
+ * @author Dmitry Shnurenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class TerminalImplTest {
@@ -40,14 +44,18 @@ public class TerminalImplTest {
     private static final String SOME_TEXT = "some text";
 
     @Mock
-    private Runner       runner;
+    private Runner                     runner;
     @Mock
-    private Element      element;
+    private Element                    element;
+    @Mock
+    private RunnerLocalizationConstant locale;
     @InjectMocks
-    private TerminalImpl terminal;
+    private TerminalImpl               terminal;
 
     @Before
     public void setUp() throws Exception {
+        when(locale.terminalNotReady()).thenReturn(SOME_TEXT);
+        when(locale.runnerNotReady()).thenReturn(SOME_TEXT);
         when(terminal.terminal.getElement()).thenReturn(element);
     }
 
@@ -57,6 +65,7 @@ public class TerminalImplTest {
 
         verify(terminal.unavailableLabel).setVisible(true);
         verify(element).removeAttribute("src");
+        verify(terminal.unavailableLabel).setText(SOME_TEXT);
     }
 
     @Test
@@ -67,7 +76,6 @@ public class TerminalImplTest {
 
         terminal.update(runner);
 
-        verify(terminal.unavailableLabel).setVisible(false);
         verify(element).focus();
 
         when(runner.getTerminalURL()).thenReturn(SOME_TEXT + SOME_TEXT);
@@ -78,22 +86,29 @@ public class TerminalImplTest {
     }
 
     @Test
-    public void unavailableLabelShouldBeShowed() throws Exception {
-        when(runner.getStatus()).thenReturn(DONE);
-        when(runner.isAlive()).thenReturn(false);
-        when(runner.getTerminalURL()).thenReturn(SOME_TEXT);
+    public void stubShouldBeShownWhenRunnerIsStopped() throws Exception {
+        when(runner.getStatus()).thenReturn(STOPPED);
 
         terminal.update(runner);
 
-        verify(element).focus();
-        verify(element).removeAttribute("src");
+        verify(locale).runnerNotReady();
+        verifyShowStub();
+    }
+
+    @Test
+    public void stubShouldBeShownWhenRunnerIsFailed() throws Exception {
+        when(runner.getStatus()).thenReturn(FAILED);
+
+        terminal.update(runner);
+
+        verify(locale).runnerNotReady();
+        verifyShowStub();
+    }
+
+    private void verifyShowStub(){
+        verify(terminal.unavailableLabel).setText(SOME_TEXT);
         verify(terminal.unavailableLabel).setVisible(true);
-
-        when(runner.getTerminalURL()).thenReturn(SOME_TEXT + SOME_TEXT);
-
-        terminal.update(runner);
-
-        verify(terminal.terminal, never()).setUrl(anyString());
+        verify(terminal.terminal).setVisible(false);
     }
 
     @Test
@@ -149,6 +164,8 @@ public class TerminalImplTest {
         terminal.setUnavailableLabelVisible(true);
 
         verify(terminal.unavailableLabel).setVisible(true);
+        verify(terminal.unavailableLabel).setText(SOME_TEXT);
+        verify(locale).runnerNotReady();
     }
 
     @Test
@@ -158,6 +175,16 @@ public class TerminalImplTest {
         terminal.setUrl(runner);
 
         verify(terminal.terminal).setUrl(eq(SOME_TEXT));
+    }
+
+    @Test
+    public void stubShouldBeShownWhenUrlIsNull() {
+        when(runner.getApplicationURL()).thenReturn(null);
+
+        terminal.setUrl(runner);
+
+        verify(locale).terminalNotReady();
+        verifyShowStub();
     }
 
     @Test

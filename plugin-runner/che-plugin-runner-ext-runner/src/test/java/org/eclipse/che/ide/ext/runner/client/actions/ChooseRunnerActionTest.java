@@ -18,12 +18,12 @@ import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.ui.dropdown.DropDownListFactory;
-import org.eclipse.che.ide.ui.dropdown.DropDownHeaderWidget;
-import org.eclipse.che.ide.ui.dropdown.SimpleListElementAction;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
+import org.eclipse.che.ide.ui.dropdown.DropDownHeaderWidget;
+import org.eclipse.che.ide.ui.dropdown.DropDownListFactory;
+import org.eclipse.che.ide.ui.dropdown.SimpleListElementAction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -244,5 +244,11 @@ public class ChooseRunnerActionTest {
         action.addProjectRunners(projectEnvList);
 
         assertThat(action.selectEnvironment(), nullValue());
+    }
+
+    @Test
+    public void emptyDefaultRunnerShouldBeSet() throws Exception {
+        action.setEmptyDefaultRunner();
+        verify(dropDownHeaderWidget).selectElement(null, "");
     }
 }

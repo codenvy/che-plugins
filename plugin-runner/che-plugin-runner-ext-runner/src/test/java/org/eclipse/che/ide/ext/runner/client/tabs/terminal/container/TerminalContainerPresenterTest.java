@@ -48,6 +48,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Andrienko Alexander
+ * @author Dmitry Shnurenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class TerminalContainerPresenterTest {
@@ -138,9 +139,6 @@ public class TerminalContainerPresenterTest {
         RunnerApplicationStatusEventHandler handlerValue = statusEventHandlerArgumentCaptor.getValue();
         handlerValue.onRunnerStatusChanged(runner);
 
-        verify(terminal).setVisible(true);
-        verify(terminal).setUnavailableLabelVisible(false);
-
         verify(Scheduler.get()).scheduleDeferred(scheduledCommandArgumentCaptor.capture());
         ScheduledCommand schedulerValue = scheduledCommandArgumentCaptor.getValue();
         schedulerValue.execute();
@@ -160,8 +158,6 @@ public class TerminalContainerPresenterTest {
         RunnerApplicationStatusEventHandler handlerValue = statusEventHandlerArgumentCaptor.getValue();
         handlerValue.onRunnerStatusChanged(runner);
 
-        verify(terminal).setVisible(false);
-        verify(terminal).setUnavailableLabelVisible(true);
         verify(terminal, never()).setUrl(runner);
     }
 

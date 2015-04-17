@@ -31,6 +31,7 @@ import java.util.Set;
 
 /**
  * @author Andrey Plotnikov
+ * @@author Dmitry Shnurenko
  */
 public class TerminalImpl extends Composite implements Terminal {
 
@@ -39,6 +40,7 @@ public class TerminalImpl extends Composite implements Terminal {
 
     private static final TerminalImplUiBinder UI_BINDER        = GWT.create(TerminalImplUiBinder.class);
     private static final Set<Status>          LAUNCHING_STATUS = EnumSet.of(Status.IN_PROGRESS, Status.IN_QUEUE);
+    private static final Set<Status>          STOPPED_STATUS   = EnumSet.of(Status.FAILED, Status.STOPPED);
 
     @UiField
     Label unavailableLabel;
@@ -64,7 +66,12 @@ public class TerminalImpl extends Composite implements Terminal {
     @Override
     public void update(@Nullable Runner runner) {
         if (runner == null) {
-            updateTerminalContent(false, null);
+            updateTerminalContent(null);
+            return;
+        }
+
+        if (STOPPED_STATUS.contains(runner.getStatus())) {
+            showStub(locale.runnerNotReady());
             return;
         }
 
@@ -76,16 +83,22 @@ public class TerminalImpl extends Composite implements Terminal {
         }
 
         url = newTerminalUrl;
-        updateTerminalContent(runner.isAlive(), url);
+        updateTerminalContent(url);
     }
 
-    private void updateTerminalContent(boolean isVisible, @Nullable String url) {
-        unavailableLabel.setVisible(!isVisible);
+    private void showStub(@Nonnull String content) {
+        unavailableLabel.setText(content);
+        unavailableLabel.setVisible(true);
+        terminal.setVisible(false);
+    }
 
-        if (isVisible) {
+    private void updateTerminalContent(@Nullable String url) {
+        if (url != null) {
             terminal.setUrl(url);
         } else {
             removeUrl();
+
+            showStub(locale.terminalNotReady());
         }
     }
 
@@ -98,6 +111,10 @@ public class TerminalImpl extends Composite implements Terminal {
     /** {@inheritDoc} */
     @Override
     public void setUnavailableLabelVisible(boolean isVisible) {
+        if (isVisible) {
+            unavailableLabel.setText(locale.runnerNotReady());
+        }
+
         unavailableLabel.setVisible(isVisible);
     }
 
@@ -105,9 +122,16 @@ public class TerminalImpl extends Composite implements Terminal {
     @Override
     public void setUrl(@Nonnull Runner runner) {
         String terminalUrl = runner.getTerminalURL();
-        if (terminalUrl != null && terminalUrl.equals(url)) {
+
+        if (terminalUrl == null) {
+            showStub(locale.terminalNotReady());
             return;
         }
+
+        if (terminalUrl.equals(url)) {
+            return;
+        }
+
         url = terminalUrl;
         terminal.setUrl(terminalUrl);
     }

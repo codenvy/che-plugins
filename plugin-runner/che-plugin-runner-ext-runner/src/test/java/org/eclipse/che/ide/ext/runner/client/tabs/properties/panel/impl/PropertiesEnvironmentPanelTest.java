@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.impl;
 
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwtmockito.GwtMockitoTestRunner;
@@ -41,6 +40,7 @@ import org.eclipse.che.ide.collections.java.JsonArrayListAdapter;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.TestEditor;
+import org.eclipse.che.ide.ext.runner.client.actions.ChooseRunnerAction;
 import org.eclipse.che.ide.ext.runner.client.callbacks.AsyncCallbackBuilder;
 import org.eclipse.che.ide.ext.runner.client.callbacks.FailureCallback;
 import org.eclipse.che.ide.ext.runner.client.callbacks.SuccessCallback;
@@ -126,6 +126,8 @@ public class PropertiesEnvironmentPanelTest {
     private DialogFactory                              dialogFactory;
     @Mock
     private RunnerLocalizationConstant                 locale;
+    @Mock
+    private ChooseRunnerAction                         chooseRunnerAction;
     @Mock
     private GetProjectEnvironmentsAction               projectEnvironmentsAction;
     @Mock
@@ -297,6 +299,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    projectService,
                                                    eventBus,
                                                    appContext,
+                                                   chooseRunnerAction,
                                                    dialogFactory,
                                                    locale,
                                                    projectEnvironmentsAction,
@@ -807,6 +810,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    projectService,
                                                    eventBus,
                                                    appContext,
+                                                   chooseRunnerAction,
                                                    dialogFactory,
                                                    locale,
                                                    projectEnvironmentsAction,
@@ -914,6 +918,7 @@ public class PropertiesEnvironmentPanelTest {
                                                    projectService,
                                                    eventBus,
                                                    appContext,
+                                                   chooseRunnerAction,
                                                    dialogFactory,
                                                    locale,
                                                    projectEnvironmentsAction,
@@ -1035,6 +1040,7 @@ public class PropertiesEnvironmentPanelTest {
         presenter.onSwitcherChanged(false);
 
         verify(templatesContainer).setDefaultEnvironment(null);
+        verify(chooseRunnerAction).setEmptyDefaultRunner();
     }
 
     @Test

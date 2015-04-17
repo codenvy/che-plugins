@@ -82,9 +82,12 @@ public interface TemplatesView extends View<TemplatesView.ActionDelegate> {
      */
     void showDefaultEnvironmentInfo(@Nonnull Environment defaultEnvironment);
 
-    public interface ActionDelegate {
+    interface ActionDelegate {
 
         /** Performs some actions when user over mouse on default runner. */
         void onDefaultRunnerMouseOver();
+
+        /**Creates new environment from scratch.*/
+        void createNewEnvironment();
     }
 }

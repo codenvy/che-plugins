@@ -11,6 +11,8 @@
 package org.eclipse.che.ide.ext.runner.client.tabs.templates;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
@@ -71,6 +73,8 @@ public class TemplatesViewImpl extends Composite implements TemplatesView {
     SimplePanel       filterPanel;
     @UiField
     SimpleLayoutPanel defaultRunner;
+    @UiField
+    FlowPanel         createNewButton;
 
     @UiField(provided = true)
     final RunnerResources            resources;
@@ -112,6 +116,13 @@ public class TemplatesViewImpl extends Composite implements TemplatesView {
         this.defaultRunnerStub.addStyleName(resources.runnerCss().fontSizeTen());
 
         addDefaultRunnerInfoHandler();
+
+        createNewButton.addDomHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                delegate.createNewEnvironment();
+            }
+        }, ClickEvent.getType());
     }
 
     private void addDefaultRunnerInfoHandler() {

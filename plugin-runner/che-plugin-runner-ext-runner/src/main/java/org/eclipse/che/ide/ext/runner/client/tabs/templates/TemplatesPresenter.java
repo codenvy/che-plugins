@@ -16,11 +16,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
+import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.project.shared.dto.RunnerEnvironmentLeaf;
 import org.eclipse.che.api.project.shared.dto.RunnerEnvironmentTree;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.actions.ChooseRunnerAction;
 import org.eclipse.che.ide.ext.runner.client.callbacks.AsyncCallbackBuilder;
 import org.eclipse.che.ide.ext.runner.client.callbacks.FailureCallback;
@@ -32,10 +35,12 @@ import org.eclipse.che.ide.ext.runner.client.runneractions.impl.environments.Get
 import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
 import org.eclipse.che.ide.ext.runner.client.state.PanelState;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.container.PropertiesContainer;
+import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanelPresenter;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.environment.EnvironmentWidget;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.filterwidget.FilterWidget;
 import org.eclipse.che.ide.ext.runner.client.util.GetEnvironmentsUtil;
+import org.eclipse.che.ide.ext.runner.client.util.NameGenerator;
 import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.util.loging.Log;
@@ -48,6 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl.ROOT_FOLDER;
 import static org.eclipse.che.ide.ext.runner.client.state.State.RUNNERS;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
@@ -60,6 +66,7 @@ import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common
  */
 @Singleton
 public class TemplatesPresenter implements TemplatesContainer, FilterWidget.ActionDelegate, TemplatesView.ActionDelegate {
+    private static final String DOCKER_SCRIPT_NAME = "/Dockerfile";
 
     private final TemplatesView                           view;
     private final FilterWidget                            filter;
@@ -68,10 +75,12 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     private final GetProjectEnvironmentsAction            projectEnvironmentsAction;
     private final GetSystemEnvironmentsAction             systemEnvironmentsAction;
     private final GetEnvironmentsUtil                     environmentUtil;
+    private final RunnerResources                         resources;
     private final List<Environment>                       systemEnvironments;
     private final List<Environment>                       projectEnvironments;
     private final Map<Scope, List<Environment>>           environmentMap;
     private final PropertiesContainer                     propertiesContainer;
+    private final AsyncCallbackBuilder<ItemReference>     asyncCallbackBuilder;
     private final AppContext                              appContext;
     private final ProjectServiceClient                    projectService;
     private final AsyncCallbackBuilder<ProjectDescriptor> asyncDescriptorCallbackBuilder;
@@ -79,11 +88,14 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
     private final RunnerManagerView                       runnerManagerView;
     private final RunnerUtil                              runnerUtil;
     private final PanelState                              panelState;
+    private final NotificationManager                     notificationManager;
 
     private RunnerEnvironmentTree tree;
     private Environment           defaultEnvironment;
     private Environment           selectedEnvironment;
     private List<Environment>     previousProjectEnvironments;
+
+    private CurrentProject currentProject;
 
     @Inject
     public TemplatesPresenter(TemplatesView view,
@@ -95,8 +107,11 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
                               GetEnvironmentsUtil environmentUtil,
                               PropertiesContainer propertiesContainer,
                               SelectionManager selectionManager,
+                              AsyncCallbackBuilder<ItemReference> asyncCallbackBuilder,
                               RunnerManagerView runnerManagerView,
+                              NotificationManager notificationManager,
                               RunnerUtil runnerUtil,
+                              RunnerResources resources,
                               PanelState panelState,
                               ProjectServiceClient projectService,
                               AsyncCallbackBuilder<ProjectDescriptor> asyncDescriptorCallbackBuilder,
@@ -116,12 +131,15 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         this.environmentUtil = environmentUtil;
         this.propertiesContainer = propertiesContainer;
         this.appContext = appContext;
+        this.asyncCallbackBuilder = asyncCallbackBuilder;
+        this.notificationManager = notificationManager;
         this.runnerManagerView = runnerManagerView;
         this.runnerUtil = runnerUtil;
         this.panelState = panelState;
         this.projectService = projectService;
         this.asyncDescriptorCallbackBuilder = asyncDescriptorCallbackBuilder;
         this.chooseRunnerAction = chooseRunnerAction;
+        this.resources = resources;
 
         this.projectEnvironments = new ArrayList<>();
         this.systemEnvironments = new ArrayList<>();
@@ -372,6 +390,63 @@ public class TemplatesPresenter implements TemplatesContainer, FilterWidget.Acti
         if (defaultEnvironment != null) {
             view.showDefaultEnvironmentInfo(defaultEnvironment);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void createNewEnvironment() {
+        createSimpleEnvironment();
+    }
+
+    private void createSimpleEnvironment() {
+        currentProject = appContext.getCurrentProject();
+        if (currentProject == null) {
+            return;
+        }
+
+        final String fileName = NameGenerator.generateCustomEnvironmentName(environmentMap.get(PROJECT),
+                                                                            currentProject.getProjectDescription().getName());
+        String path = currentProject.getProjectDescription().getPath() + ROOT_FOLDER + fileName;
+
+        AsyncRequestCallback<ItemReference> callback = asyncCallbackBuilder.unmarshaller(ItemReference.class)
+                                                                           .success(new SuccessCallback<ItemReference>() {
+                                                                               @Override
+                                                                               public void onSuccess(ItemReference result) {
+                                                                                   createFile(resources.dockerTemplate().getText(),
+                                                                                              fileName);
+                                                                               }
+                                                                           })
+                                                                           .failure(new FailureCallback() {
+                                                                               @Override
+                                                                               public void onFailure(@Nonnull Throwable reason) {
+                                                                                   notificationManager.showError(reason.getMessage());
+                                                                               }
+                                                                           })
+                                                                           .build();
+
+        projectService.createFolder(path, callback);
+    }
+
+    private void createFile(@Nonnull String content, @Nonnull String fileName) {
+        String path = currentProject.getProjectDescription().getPath() + ROOT_FOLDER;
+
+        AsyncRequestCallback<ItemReference> callback =
+                asyncCallbackBuilder.unmarshaller(ItemReference.class)
+                                    .success(new SuccessCallback<ItemReference>() {
+                                        @Override
+                                        public void onSuccess(ItemReference result) {
+                                            projectEnvironmentsAction.perform();
+                                        }
+                                    })
+                                    .failure(new FailureCallback() {
+                                        @Override
+                                        public void onFailure(@Nonnull Throwable reason) {
+                                            Log.error(PropertiesPanelPresenter.class, reason.getMessage());
+                                        }
+                                    })
+                                    .build();
+
+        projectService.createFile(path, fileName + DOCKER_SCRIPT_NAME, content, null, callback);
     }
 
     /** {@inheritDoc} */

@@ -65,15 +65,6 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("runner.label.timeout.info")
     String runnerLabelTimeoutInfo();
 
-    @Key("messages.totalLessRequiredMemory")
-    String messagesTotalLessRequiredMemory(@Nonnegative int totalRAM, @Nonnegative int requestedRAM);
-
-    @Key("messages.availableLessRequiredMemory")
-    String messagesAvailableLessRequiredMemory(@Nonnegative int totalRAM, @Nonnegative int usedRAM, @Nonnegative int requestedRAM);
-
-    @Key("messages.totalLessOverrideMemory")
-    String messagesTotalLessOverrideMemory(@Nonnegative int overrideRAM, @Nonnegative int totalRAM);
-
     @Key("messages.overrideMemory")
     String messagesOverrideMemory();
 
@@ -292,4 +283,10 @@ public interface RunnerLocalizationConstant extends Messages {
 
     @Key("user.preferences.runners.shutdown.set.button")
     String userPreferencesRunnersShutdownSetButton();
+
+    @Key("terminal.not.ready")
+    String terminalNotReady();
+
+    @Key("template.create.new")
+    String templateCreateNew();
 }

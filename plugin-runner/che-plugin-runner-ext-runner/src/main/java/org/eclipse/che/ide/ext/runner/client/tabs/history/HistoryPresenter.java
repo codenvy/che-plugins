@@ -21,6 +21,7 @@ import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
 import org.eclipse.che.ide.ext.runner.client.tabs.common.item.RunnerItems;
 import org.eclipse.che.ide.ext.runner.client.tabs.console.container.ConsoleContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.history.runner.RunnerWidget;
+import org.eclipse.che.ide.ext.runner.client.tabs.terminal.container.TerminalContainer;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -39,15 +40,18 @@ public class HistoryPresenter implements HistoryPanel, RunnerWidget.ActionDelega
     private final WidgetFactory             widgetFactory;
     private final Map<Runner, RunnerWidget> runnerWidgets;
     private final SelectionManager          selectionManager;
-    private final ConsoleContainer consolePresenter;
+    private final ConsoleContainer          consolePresenter;
+    private final TerminalContainer         terminalContainer;
 
     @Inject
     public HistoryPresenter(HistoryView view,
                             WidgetFactory widgetFactory,
                             SelectionManager selectionManager,
-                            ConsoleContainer consolePresenter) {
+                            ConsoleContainer consolePresenter,
+                            TerminalContainer terminalContainer) {
         this.view = view;
         this.consolePresenter = consolePresenter;
+        this.terminalContainer = terminalContainer;
 
         this.selectionManager = selectionManager;
         this.widgetFactory = widgetFactory;
@@ -131,6 +135,11 @@ public class HistoryPresenter implements HistoryPanel, RunnerWidget.ActionDelega
         view.removeRunner(widget);
         runnerWidgets.remove(runner);
         consolePresenter.deleteConsoleByRunner(runner);
+
+        if (runnerWidgets.isEmpty()) {
+            terminalContainer.reset();
+            return;
+        }
 
         if (runner.equals(selectionManager.getRunner())) {
             selectFirst();

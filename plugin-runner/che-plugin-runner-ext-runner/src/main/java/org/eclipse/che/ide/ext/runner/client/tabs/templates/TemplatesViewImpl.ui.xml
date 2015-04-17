@@ -17,10 +17,36 @@
     <ui:with field="locale" type="org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant"/>
 
     <ui:style>
+        .button {
+            background-color: #256c9f;
+            width: 88px;
+            height: 12px;
+            cursor: pointer;
+            box-shadow: 0 0 0 1px #191c1e;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 10px;
+            padding-bottom: 4px;
+        }
+
+        .button:active {
+            background: #256c9f !important;
+            opacity: 0.4;
+        }
+
+        .buttonLabel {
+            float: left;
+            margin-top: 3px;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+            font-family: "Helvetica Neue", Regular, sans-serif;
+            font-size: 10px;
+        }
+
         .container {
             width: 100%;
             height: 100%;
-            margin-top: 6px;
+            margin-top: 10px;
             margin-left: 2px;
         }
 
@@ -54,11 +80,25 @@
         .projectDefaultLabel {
             margin-left: 3px;
         }
+
+        .plusLabel {
+            margin-left: 11px;
+            margin-right: 4px;
+            float : left;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            font-size: 10pt;
+        }
     </ui:style>
     <g:DockLayoutPanel unit="PX" addStyleNames="{style.container}">
         <!--default runner panel-->
-        <g:north size="12">
+        <g:north size="45">
             <g:FlowPanel>
+                <g:FlowPanel ui:field="createNewButton" addStyleNames="{style.button}">
+                    <g:Label text="+ " addStyleNames="{style.plusLabel}"/>
+                    <g:Label text="{locale.templateCreateNew}" addStyleNames="{style.buttonLabel}"/>
+                </g:FlowPanel>
+
                 <g:Label text="{locale.templateDefaultRunner}" addStyleNames="{resources.runnerCss.fontSizeTen}
                                                                               {style.projectDefaultLabel}"/>
             </g:FlowPanel>
