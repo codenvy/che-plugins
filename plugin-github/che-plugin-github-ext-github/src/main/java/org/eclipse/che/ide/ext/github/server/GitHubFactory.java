@@ -41,7 +41,7 @@ public class GitHubFactory {
      * @return connected GitHub API class
      * @throws IOException
      */
-    public GitHub connect() throws Exception {
+    public GitHub connect() throws ServerException, NotFoundException, UnauthorizedException {
         try {
             return GitHub.connectUsingOAuth(getToken(getUserId()));
         } catch (IOException e ) {
@@ -56,7 +56,7 @@ public class GitHubFactory {
      * @throws IOException
      * @deprecated Use getToken method from rest service
      */
-    public String getToken(String user) throws Exception {
+    public String getToken(String user) throws ServerException, NotFoundException {
         OAuthToken token = null;
         try {
             token = oauthTokenProvider.getToken("github", user);
@@ -65,7 +65,7 @@ public class GitHubFactory {
         }
         String oauthToken = token != null ? token.getToken() : null;
         if (oauthToken == null || oauthToken.isEmpty()) {
-            throw new NotFoundException("Token is empty");
+            throw new NotFoundException("Token not founded");
         }
         return oauthToken;
     }

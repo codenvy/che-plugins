@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.server.rest;
 
+import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.ide.ext.git.server.GitException;
 import org.eclipse.che.ide.ext.github.server.GitHubDTOFactory;
@@ -73,7 +74,8 @@ public class GitHubService {
     @GET
     @Path("repositories/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepository getUserRepository(@PathParam("user") String user, @PathParam("repository") String repository) throws Exception {
+    public GitHubRepository getUserRepository(@PathParam("user") String user, @PathParam("repository") String repository)
+            throws ApiException {
         try {
             return gitHubDTOFactory.createRepository(gitHubFactory.connect().getUser(user).getRepository(repository));
         } catch (IOException e) {
@@ -84,7 +86,7 @@ public class GitHubService {
     @GET
     @Path("list/user")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositoriesByUser(@QueryParam("username") String userName) throws Exception {
+    public GitHubRepositoryList listRepositoriesByUser(@QueryParam("username") String userName) throws ApiException {
         try {
             return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getUser(userName).listRepositories());
         } catch (IOException e) {
@@ -95,7 +97,7 @@ public class GitHubService {
     @GET
     @Path("list/org")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositoriesByOrganization(@QueryParam("organization") String organization) throws Exception {
+    public GitHubRepositoryList listRepositoriesByOrganization(@QueryParam("organization") String organization) throws ApiException {
         try {
             return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getOrganization(organization).listRepositories());
         } catch (IOException e) {
@@ -106,7 +108,7 @@ public class GitHubService {
     @GET
     @Path("list/account")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositoriesByAccount(@QueryParam("account") String account) throws Exception {
+    public GitHubRepositoryList listRepositoriesByAccount(@QueryParam("account") String account) throws ApiException {
         GitHub gitHub = gitHubFactory.connect();
         try {
             //First, try to retrieve organization repositories:
@@ -124,7 +126,7 @@ public class GitHubService {
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositories()  throws Exception  {
+    public GitHubRepositoryList listRepositories() throws ApiException {
         try {
             return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getMyself().listRepositories());
         } catch (IOException e) {
@@ -135,7 +137,7 @@ public class GitHubService {
     @GET
     @Path("forks/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList forks(@PathParam("user") String user, @PathParam("repository") String repository) throws Exception {
+    public GitHubRepositoryList forks(@PathParam("user") String user, @PathParam("repository") String repository) throws ApiException {
         GitHubRepositoryList gitHubRepositoryList;
         try {
             gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList();
@@ -166,7 +168,7 @@ public class GitHubService {
     @GET
     @Path("createfork/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepository fork(@PathParam("user") String user, @PathParam("repository") String repository) throws Exception {
+    public GitHubRepository fork(@PathParam("user") String user, @PathParam("repository") String repository) throws ApiException {
         try {
             return gitHubDTOFactory.createRepository(gitHubFactory.connect().getUser(user).getRepository(repository).fork());
         } catch (IOException e) {
@@ -180,7 +182,7 @@ public class GitHubService {
     public void commentIssue(@PathParam("user") String user,
                              @PathParam("repository") String repository,
                              @PathParam("issue") String issue,
-                             GitHubIssueCommentInput input) throws Exception {
+                             GitHubIssueCommentInput input) throws ApiException {
         try {
             gitHubFactory.connect().getUser(user).getRepository(repository).getIssue(Integer.getInteger(issue)).comment(input.getBody());
         } catch (IOException e) {
@@ -192,7 +194,7 @@ public class GitHubService {
     @Path("pullrequests/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequestList listPullRequestsByRepository(@PathParam("user") String user, @PathParam("repository") String repository)
-            throws Exception {
+            throws ApiException {
         try {
             return gitHubDTOFactory.createPullRequestsList(gitHubFactory.connect().getUser(user).getRepository(repository)
                                                                         .listPullRequests(GHIssueState.OPEN));
@@ -205,7 +207,7 @@ public class GitHubService {
     @Path("pullrequests/{user}/{repository}/{pullRequestId}")
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequestList getPullRequestsById(@PathParam("user") String user, @PathParam("repository") String repository, @PathParam("pullRequestId") String pullRequestId)
-            throws Exception {
+            throws ApiException {
         try {
             return gitHubDTOFactory.createPullRequestsList(gitHubFactory.connect().getUser(user).getRepository(repository)
                                                                         .getPullRequest(Integer.valueOf(pullRequestId)));
@@ -219,7 +221,7 @@ public class GitHubService {
     @Path("pullrequest/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequest createPullRequest(@PathParam("user") String user, @PathParam("repository") String repository, GitHubPullRequestCreationInput input)
-            throws Exception {
+            throws ApiException {
         try {
             return gitHubDTOFactory.createPullRequest(gitHubFactory.connect().getUser(user).getRepository(repository).createPullRequest(
                     input.getTitle(), input.getHead(), input.getBase(), input.getBody()));
@@ -231,7 +233,7 @@ public class GitHubService {
     @GET
     @Path("list/available")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, List<GitHubRepository>> availableRepositories() throws Exception {
+    public Map<String, List<GitHubRepository>> availableRepositories() throws ApiException {
         GitHub gitHub = gitHubFactory.connect();
 
         //Get users' repositories
@@ -269,7 +271,7 @@ public class GitHubService {
     @GET
     @Path("orgs")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<String> listOrganizations() throws Exception {
+    public List<String> listOrganizations() throws ApiException {
         List<String> organizations = new ArrayList<>();
 
         GHPersonSet<GHOrganization> myOrganizations;
@@ -289,7 +291,7 @@ public class GitHubService {
     @GET
     @Path("user")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubUser getUserInfo() throws Exception {
+    public GitHubUser getUserInfo() throws ApiException {
         try {
             return gitHubDTOFactory.createUser(gitHubFactory.connect().getMyself());
         } catch (IOException e) {
@@ -300,7 +302,7 @@ public class GitHubService {
     @GET
     @Path("collaborators/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collaborators collaborators(@PathParam("user") String user, @PathParam("repository") String repository) throws Exception {
+    public Collaborators collaborators(@PathParam("user") String user, @PathParam("repository") String repository) throws ApiException {
         try {
             return gitHubDTOFactory.createCollaborators(gitHubFactory.connect().getUser(user).getRepository(repository).getCollaborators());
         } catch (IOException e) {
@@ -315,17 +317,13 @@ public class GitHubService {
     @Deprecated
     @Path("token/{userid}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getToken(@PathParam("userid") String userId) throws Exception {
-        try {
-            return gitHubFactory.getToken(userId);
-        } catch (IOException e) {
-            throw new ServerException(e.getMessage());
-        }
+    public String getToken(@PathParam("userid") String userId) throws ApiException {
+        return gitHubFactory.getToken(userId);
     }
 
     @POST
     @Path("ssh/generate")
-    public void updateSSHKey() throws Exception {
+    public void updateSSHKey() throws ApiException {
         final String host = "github.com";
         SshKey publicKey;
 
