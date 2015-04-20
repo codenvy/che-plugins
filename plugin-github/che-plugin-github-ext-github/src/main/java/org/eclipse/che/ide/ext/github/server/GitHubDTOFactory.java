@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.github.server;
 
 import com.google.inject.Inject;
 
-import org.eclipse.che.api.core.UnauthorizedException;
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.github.shared.Collaborators;
 import org.eclipse.che.ide.ext.github.shared.GitHubPullRequest;
@@ -48,8 +47,7 @@ public class GitHubDTOFactory {
      * @return DTO object
      * @throws IOException
      */
-    public GitHubRepositoryList createRepositoriesList(PagedIterable<GHRepository> ghRepositoriesList)
-            throws IOException, UnauthorizedException {
+    public GitHubRepositoryList createRepositoriesList(PagedIterable<GHRepository> ghRepositoriesList) throws Exception {
         GitHubRepositoryList dtoRepositoriesList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
 
         List<GitHubRepository> dtoRepositories = new ArrayList<>();
@@ -69,7 +67,7 @@ public class GitHubDTOFactory {
      * @return DTO object
      * @throws IOException
      */
-    public GitHubRepositoryList createRepositoriesList(GHRepository ghRepository) throws IOException, UnauthorizedException {
+    public GitHubRepositoryList createRepositoriesList(GHRepository ghRepository) throws Exception {
         GitHubRepositoryList dtoRepositoriesList = DtoFactory.getInstance().createDto(GitHubRepositoryList.class);
 
         List<GitHubRepository> dtoRepositories = new ArrayList<>();
@@ -95,7 +93,7 @@ public class GitHubDTOFactory {
      * @return DTO object
      * @throws IOException
      */
-    public GitHubRepository createRepository(GHRepository ghRepository) throws IOException, UnauthorizedException {
+    public GitHubRepository createRepository(GHRepository ghRepository) throws Exception {
         GitHubRepository dtoRepository = DtoFactory.getInstance().createDto(GitHubRepository.class);
 
         dtoRepository.setName(ghRepository.getName());

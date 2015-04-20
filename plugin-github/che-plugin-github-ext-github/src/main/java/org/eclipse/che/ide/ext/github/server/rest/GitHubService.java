@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.server.rest;
 
-import org.eclipse.che.api.core.UnauthorizedException;
+import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.ide.ext.git.server.GitException;
 import org.eclipse.che.ide.ext.github.server.GitHubDTOFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubFactory;
@@ -29,8 +29,10 @@ import org.eclipse.che.ide.ext.ssh.server.SshKeyStoreException;
 
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHOrganization;
+import org.kohsuke.github.GHPersonSet;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
+import org.kohsuke.github.PagedIterable;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -71,30 +73,40 @@ public class GitHubService {
     @GET
     @Path("repositories/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepository getUserRepository(@PathParam("user") String user, @PathParam("repository") String repository)
-            throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createRepository(gitHubFactory.connect().getUser(user).getRepository(repository));
+    public GitHubRepository getUserRepository(@PathParam("user") String user, @PathParam("repository") String repository) throws Exception {
+        try {
+            return gitHubDTOFactory.createRepository(gitHubFactory.connect().getUser(user).getRepository(repository));
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @GET
     @Path("list/user")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositoriesByUser(@QueryParam("username") String userName) throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getUser(userName).listRepositories());
+    public GitHubRepositoryList listRepositoriesByUser(@QueryParam("username") String userName) throws Exception {
+        try {
+            return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getUser(userName).listRepositories());
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @GET
     @Path("list/org")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositoriesByOrganization(@QueryParam("organization") String organization)
-            throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getOrganization(organization).listRepositories());
+    public GitHubRepositoryList listRepositoriesByOrganization(@QueryParam("organization") String organization) throws Exception {
+        try {
+            return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getOrganization(organization).listRepositories());
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @GET
     @Path("list/account")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositoriesByAccount(@QueryParam("account") String account) throws IOException, UnauthorizedException {
+    public GitHubRepositoryList listRepositoriesByAccount(@QueryParam("account") String account) throws Exception {
         GitHub gitHub = gitHubFactory.connect();
         try {
             //First, try to retrieve organization repositories:
@@ -104,7 +116,7 @@ public class GitHubService {
             try {
                 return gitHubDTOFactory.createRepositoriesList(gitHub.getUser(account).listRepositories());
             } catch (IOException exception) {
-                throw ioException;
+                throw new ServerException(exception.getMessage());
             }
         }
     }
@@ -112,20 +124,39 @@ public class GitHubService {
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList listRepositories() throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getMyself().listRepositories());
+    public GitHubRepositoryList listRepositories()  throws Exception  {
+        try {
+            return gitHubDTOFactory.createRepositoriesList(gitHubFactory.connect().getMyself().listRepositories());
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @GET
     @Path("forks/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepositoryList forks(@PathParam("user") String user, @PathParam("repository") String repository)
-            throws IOException, UnauthorizedException {
-        GitHubRepositoryList gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList();
+    public GitHubRepositoryList forks(@PathParam("user") String user, @PathParam("repository") String repository) throws Exception {
+        GitHubRepositoryList gitHubRepositoryList;
+        try {
+            gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList();
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
 
-        for (GHRepository ghRepository : gitHubFactory.connect().getMyself().listRepositories()) {
+        PagedIterable<GHRepository> repositories;
+        try {
+            repositories = gitHubFactory.connect().getMyself().listRepositories();
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
+
+        for (GHRepository ghRepository : repositories) {
             if (ghRepository.isFork() && ghRepository.getName().equals(repository)) {
-                gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList(ghRepository);
+                try {
+                    gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList(ghRepository);
+                } catch (IOException e) {
+                    throw new ServerException(e.getMessage());
+                }
             }
         }
 
@@ -135,9 +166,12 @@ public class GitHubService {
     @GET
     @Path("createfork/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubRepository fork(@PathParam("user") String user, @PathParam("repository") String repository)
-            throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createRepository(gitHubFactory.connect().getUser(user).getRepository(repository).fork());
+    public GitHubRepository fork(@PathParam("user") String user, @PathParam("repository") String repository) throws Exception {
+        try {
+            return gitHubDTOFactory.createRepository(gitHubFactory.connect().getUser(user).getRepository(repository).fork());
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @POST
@@ -146,26 +180,38 @@ public class GitHubService {
     public void commentIssue(@PathParam("user") String user,
                              @PathParam("repository") String repository,
                              @PathParam("issue") String issue,
-                             GitHubIssueCommentInput input) throws IOException, UnauthorizedException {
-        gitHubFactory.connect().getUser(user).getRepository(repository).getIssue(Integer.getInteger(issue)).comment(input.getBody());
+                             GitHubIssueCommentInput input) throws Exception {
+        try {
+            gitHubFactory.connect().getUser(user).getRepository(repository).getIssue(Integer.getInteger(issue)).comment(input.getBody());
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @GET
     @Path("pullrequests/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequestList listPullRequestsByRepository(@PathParam("user") String user, @PathParam("repository") String repository)
-            throws IOException, UnauthorizedException {
-        return gitHubDTOFactory
-                .createPullRequestsList(gitHubFactory.connect().getUser(user).getRepository(repository).listPullRequests(GHIssueState.OPEN));
+            throws Exception {
+        try {
+            return gitHubDTOFactory.createPullRequestsList(gitHubFactory.connect().getUser(user).getRepository(repository)
+                                                                        .listPullRequests(GHIssueState.OPEN));
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @GET
     @Path("pullrequests/{user}/{repository}/{pullRequestId}")
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequestList getPullRequestsById(@PathParam("user") String user, @PathParam("repository") String repository, @PathParam("pullRequestId") String pullRequestId)
-            throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createPullRequestsList(
-                gitHubFactory.connect().getUser(user).getRepository(repository).getPullRequest(Integer.valueOf(pullRequestId)));
+            throws Exception {
+        try {
+            return gitHubDTOFactory.createPullRequestsList(gitHubFactory.connect().getUser(user).getRepository(repository)
+                                                                        .getPullRequest(Integer.valueOf(pullRequestId)));
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
 
     }
 
@@ -173,30 +219,48 @@ public class GitHubService {
     @Path("pullrequest/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
     public GitHubPullRequest createPullRequest(@PathParam("user") String user, @PathParam("repository") String repository, GitHubPullRequestCreationInput input)
-            throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createPullRequest(gitHubFactory.connect().getUser(user).getRepository(repository)
-                                                               .createPullRequest(input.getTitle(), input.getHead(), input.getBase(),
-                                                                                  input.getBody()));
+            throws Exception {
+        try {
+            return gitHubDTOFactory.createPullRequest(gitHubFactory.connect().getUser(user).getRepository(repository).createPullRequest(
+                    input.getTitle(), input.getHead(), input.getBase(), input.getBody()));
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @GET
     @Path("list/available")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, List<GitHubRepository>> availableRepositories() throws IOException, UnauthorizedException {
+    public Map<String, List<GitHubRepository>> availableRepositories() throws Exception {
         GitHub gitHub = gitHubFactory.connect();
 
         //Get users' repositories
-        GitHubRepositoryList gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList(gitHub.getMyself().listRepositories());
+        GitHubRepositoryList gitHubRepositoryList;
+        try {
+            gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList(gitHub.getMyself().listRepositories());
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
 
         Map<String, List<GitHubRepository>> repoList = new HashMap<>();
         repoList.put(getUserInfo().getLogin(), gitHubRepositoryList.getRepositories());
 
         //Get other repositories from all organizations that user's belong to
-        for (GHOrganization ghOrganization : gitHub.getMyself().getAllOrganizations()) {
+        GHPersonSet<GHOrganization> allOrganizations;
+        try {
+            allOrganizations = gitHub.getMyself().getAllOrganizations();
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
+
+        for (GHOrganization ghOrganization : allOrganizations) {
             String organizationName = ghOrganization.getLogin();
-            repoList.put(organizationName, gitHubDTOFactory.createRepositoriesList(
-                    gitHub.getOrganization(organizationName).listRepositories())
-                                                           .getRepositories());
+            try {
+                repoList.put(organizationName, gitHubDTOFactory.createRepositoriesList(
+                        gitHub.getOrganization(organizationName).listRepositories()).getRepositories());
+            } catch (IOException e) {
+                throw new ServerException(e.getMessage());
+            }
         }
 
         return repoList;
@@ -205,10 +269,17 @@ public class GitHubService {
     @GET
     @Path("orgs")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<String> listOrganizations() throws IOException, UnauthorizedException {
+    public List<String> listOrganizations() throws Exception {
         List<String> organizations = new ArrayList<>();
 
-        for (GHOrganization ghOrganization : gitHubFactory.connect().getMyself().getAllOrganizations()) {
+        GHPersonSet<GHOrganization> myOrganizations;
+        try {
+            myOrganizations = gitHubFactory.connect().getMyself().getAllOrganizations();
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
+
+        for (GHOrganization ghOrganization : myOrganizations) {
             organizations.add(ghOrganization.getLogin());
         }
 
@@ -218,16 +289,23 @@ public class GitHubService {
     @GET
     @Path("user")
     @Produces(MediaType.APPLICATION_JSON)
-    public GitHubUser getUserInfo() throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createUser(gitHubFactory.connect().getMyself());
+    public GitHubUser getUserInfo() throws Exception {
+        try {
+            return gitHubDTOFactory.createUser(gitHubFactory.connect().getMyself());
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @GET
     @Path("collaborators/{user}/{repository}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collaborators collaborators(@PathParam("user") String user, @PathParam("repository") String repository)
-            throws IOException, UnauthorizedException {
-        return gitHubDTOFactory.createCollaborators(gitHubFactory.connect().getUser(user).getRepository(repository).getCollaborators());
+    public Collaborators collaborators(@PathParam("user") String user, @PathParam("repository") String repository) throws Exception {
+        try {
+            return gitHubDTOFactory.createCollaborators(gitHubFactory.connect().getUser(user).getRepository(repository).getCollaborators());
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     /**
@@ -237,8 +315,12 @@ public class GitHubService {
     @Deprecated
     @Path("token/{userid}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getToken(@PathParam("userid") String userId) throws IOException {
-        return gitHubFactory.getToken(userId);
+    public String getToken(@PathParam("userid") String userId) throws Exception {
+        try {
+            return gitHubFactory.getToken(userId);
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
     }
 
     @POST

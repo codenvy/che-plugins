@@ -14,6 +14,8 @@ import com.google.inject.Inject;
 
 import org.eclipse.che.api.auth.oauth.OAuthTokenProvider;
 import org.eclipse.che.api.auth.shared.dto.OAuthToken;
+import org.eclipse.che.api.core.NotFoundException;
+import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.api.core.UnauthorizedException;
 import org.kohsuke.github.GitHub;
@@ -39,7 +41,7 @@ public class GitHubFactory {
      * @return connected GitHub API class
      * @throws IOException
      */
-    public GitHub connect() throws IOException, UnauthorizedException {
+    public GitHub connect() throws Exception {
         try {
             return GitHub.connectUsingOAuth(getToken(getUserId()));
         } catch (IOException e ) {
@@ -54,11 +56,16 @@ public class GitHubFactory {
      * @throws IOException
      * @deprecated Use getToken method from rest service
      */
-    public String getToken(String user) throws IOException {
-        OAuthToken token = oauthTokenProvider.getToken("github", user);
+    public String getToken(String user) throws Exception {
+        OAuthToken token = null;
+        try {
+            token = oauthTokenProvider.getToken("github", user);
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
+        }
         String oauthToken = token != null ? token.getToken() : null;
         if (oauthToken == null || oauthToken.isEmpty()) {
-            return "";
+            throw new NotFoundException("Token is empty");
         }
         return oauthToken;
     }
