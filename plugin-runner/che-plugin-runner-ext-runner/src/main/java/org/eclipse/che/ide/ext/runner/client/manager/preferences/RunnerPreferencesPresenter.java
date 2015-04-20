@@ -19,7 +19,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.preferences.AbstractPreferencePagePresenter;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
@@ -29,8 +28,6 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-
-import javax.annotation.Nonnull;
 
 /**
  * The presenter for managing user's runners settings,.
@@ -58,7 +55,7 @@ public class RunnerPreferencesPresenter extends AbstractPreferencePagePresenter 
                                   DtoFactory dtoFactory,
                                   DtoUnmarshallerFactory dtoUnmarshallerFactory,
                                   AccountServiceClient accountService) {
-        super(locale.userPreferencesRunnersShutdownPolicy(), locale.userPreferencesRunnersTitle(), null);
+        super(locale.userPreferencesRunnersTitle(), locale.userPreferencesWorkspace(appContext.getWorkspace().getName()), null);
         this.view = view;
         this.appContext = appContext;
         this.dtoFactory = dtoFactory;

@@ -275,8 +275,8 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("user.preferences.runners.title")
     String userPreferencesRunnersTitle();
 
-    @Key("user.preferences.runners.shutdown.policy")
-    String userPreferencesRunnersShutdownPolicy();
+    @Key("user.preferences.workspace")
+    String userPreferencesWorkspace(String workspace);
 
     @Key("user.preferences.runners.shutdown.value.title")
     String userPreferencesRunnersShutdownValueTitle();
