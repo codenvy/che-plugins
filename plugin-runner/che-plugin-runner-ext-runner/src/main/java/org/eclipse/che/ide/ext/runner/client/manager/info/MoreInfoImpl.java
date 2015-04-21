@@ -18,11 +18,17 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
+import org.eclipse.che.api.runner.dto.PortMapping;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 
 import javax.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerPresenter.TIMER_STUB;
 
@@ -39,16 +45,24 @@ public class MoreInfoImpl extends Composite implements MoreInfo {
 
     private static final MoreInfoPopupImplUiBinder UI_BINDER = GWT.create(MoreInfoPopupImplUiBinder.class);
 
+    public static final String PORT_STUB = " --- ";
+
     @UiField
-    Label started;
+    Label     started;
     @UiField
-    Label finished;
+    Label     finished;
     @UiField
-    Label timeout;
+    Label     timeout;
     @UiField
-    Label activeTime;
+    Label     activeTime;
     @UiField
-    Label ram;
+    Label     ram;
+    @UiField
+    Label     firstPort;
+    @UiField
+    Label     secondPort;
+    @UiField
+    Label     thirdPort;
 
     @UiField(provided = true)
     final RunnerResources            resources;
@@ -61,11 +75,13 @@ public class MoreInfoImpl extends Composite implements MoreInfo {
         this.locale = locale;
 
         initWidget(UI_BINDER.createAndBindUi(this));
+        clearPorts();
     }
 
     /** {@inheritDoc} */
     @Override
     public void update(@Nullable Runner runner) {
+        clearPorts();
         if (runner == null) {
             started.setText(TIMER_STUB);
             finished.setText(TIMER_STUB);
@@ -80,6 +96,48 @@ public class MoreInfoImpl extends Composite implements MoreInfo {
             activeTime.setText(runner.getActiveTime());
 
             ram.setText(runner.getRAM() + "MB");
+
+            ApplicationProcessDescriptor runnerDescriptor = runner.getDescriptor();
+            if (runnerDescriptor != null) {
+                setPorts(runnerDescriptor);
+            }
         }
+    }
+
+    private void setPorts(ApplicationProcessDescriptor runnerDescriptor) {
+        PortMapping portMapping = runnerDescriptor.getPortMapping();
+        if (portMapping == null) {
+            return;
+        }
+
+        Map<String, String> ports = portMapping.getPorts();
+        if (ports == null || ports.isEmpty()) {
+            return;
+        }
+
+        List<String> raws = new ArrayList<>(3);
+        for (String key : ports.keySet()) {
+            raws.add(key + PORT_STUB + ports.get(key));
+        }
+
+        for (int i = 0; i < raws.size(); i++) {
+            switch (i) {
+                case 0:
+                    firstPort.setText(raws.get(0));
+                    break;
+                case 1:
+                    secondPort.setText(raws.get(1));
+                    break;
+                case 2:
+                    thirdPort.setText(raws.get(2));
+                    break;
+            }
+        }
+    }
+
+    private void clearPorts() {
+        firstPort.setText(PORT_STUB);
+        secondPort.setText(PORT_STUB);
+        thirdPort.setText(PORT_STUB);
     }
 }

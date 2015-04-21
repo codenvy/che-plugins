@@ -298,7 +298,7 @@ public class RunnerManagerViewImplTest {
     @Test
     public void shouldShowMoreInfoPopup() {
         when(view.timeout.getAbsoluteLeft()).thenReturn(150);
-        when(view.timeout.getAbsoluteTop()).thenReturn(150);
+        when(view.timeout.getAbsoluteTop()).thenReturn(200);
 
         view.showMoreInfoPopup(runner);
 

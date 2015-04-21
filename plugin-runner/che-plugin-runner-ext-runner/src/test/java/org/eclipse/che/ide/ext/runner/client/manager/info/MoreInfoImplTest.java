@@ -12,13 +12,23 @@ package org.eclipse.che.ide.ext.runner.client.manager.info;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
+import org.eclipse.che.api.runner.dto.PortMapping;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.eclipse.che.ide.ext.runner.client.manager.info.MoreInfoImpl.PORT_STUB;
 import static org.eclipse.che.ide.ext.runner.client.manager.RunnerManagerPresenter.TIMER_STUB;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,6 +71,42 @@ public class MoreInfoImplTest {
         verify(widget.timeout).setText(TIMER_STUB);
         verify(widget.activeTime).setText(TIMER_STUB);
         verify(widget.ram).setText("0MB");
+    }
+
+    @Test
+    public void portsShouldBeClear() throws Exception {
+        reset(widget.firstPort);
+        reset(widget.secondPort);
+        reset(widget.thirdPort);
+
+        widget.update(null);
+
+        verify(widget.firstPort).setText(eq(PORT_STUB));
+        verify(widget.secondPort).setText(eq(PORT_STUB));
+        verify(widget.thirdPort).setText(eq(PORT_STUB));
+    }
+
+    @Test
+    public void portsShouldBeUpdated() throws Exception {
+        String port = "7777";
+        String raw = port + PORT_STUB + port;
+        Map<String, String> ports = new HashMap<>();
+        ports.put(port, port);
+        ApplicationProcessDescriptor runnerDescriptor = mock(ApplicationProcessDescriptor.class);
+        PortMapping portMapping = mock(PortMapping.class);
+        when(runnerDescriptor.getPortMapping()).thenReturn(portMapping);
+        when(runner.getDescriptor()).thenReturn(runnerDescriptor);
+        when(portMapping.getPorts()).thenReturn(ports);
+        reset(widget.firstPort);
+        reset(widget.secondPort);
+        reset(widget.thirdPort);
+
+        widget.update(runner);
+
+        verify(widget.firstPort).setText(eq(PORT_STUB));
+        verify(widget.secondPort).setText(eq(PORT_STUB));
+        verify(widget.thirdPort).setText(eq(PORT_STUB));
+        verify(widget.firstPort).setText(eq(raw));
     }
 
 }

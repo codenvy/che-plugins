@@ -61,7 +61,7 @@ public class RunnerManagerViewImpl extends BaseView<RunnerManagerView.ActionDele
     private static final String SPLITTER_STYLE_NAME      = "gwt-SplitLayoutPanel-HDragger";
 
     private static final int SHIFT_LEFT     = 100;
-    private static final int SHIFT_TOP      = 130;
+    private static final int SHIFT_TOP      = 180;
     private static final int SPLITTER_WIDTH = 2;
 
     @UiField(provided = true)

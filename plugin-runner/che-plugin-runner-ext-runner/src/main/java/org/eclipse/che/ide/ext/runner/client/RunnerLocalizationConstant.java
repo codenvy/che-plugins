@@ -138,6 +138,9 @@ public interface RunnerLocalizationConstant extends Messages {
     @Key("tooltip.body.time.active")
     String tooltipBodyTimeActive();
 
+    @Key("tooltip.body.port.mapping")
+    String tooltipBodyPortMapping();
+
     @Key("tooltip.body.ram")
     String tooltipBodyRam();
 
