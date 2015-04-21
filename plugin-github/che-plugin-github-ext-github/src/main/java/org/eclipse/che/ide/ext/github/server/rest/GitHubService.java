@@ -33,7 +33,6 @@ import org.kohsuke.github.GHOrganization;
 import org.kohsuke.github.GHPersonSet;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
-import org.kohsuke.github.PagedIterable;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -141,28 +140,16 @@ public class GitHubService {
         GitHubRepositoryList gitHubRepositoryList;
         try {
             gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList();
-        } catch (IOException e) {
-            throw new ServerException(e.getMessage());
-        }
 
-        PagedIterable<GHRepository> repositories;
-        try {
-            repositories = gitHubFactory.connect().getMyself().listRepositories();
-        } catch (IOException e) {
-            throw new ServerException(e.getMessage());
-        }
-
-        for (GHRepository ghRepository : repositories) {
-            if (ghRepository.isFork() && ghRepository.getName().equals(repository)) {
-                try {
+            for (GHRepository ghRepository : gitHubFactory.connect().getMyself().listRepositories()) {
+                if (ghRepository.isFork() && ghRepository.getName().equals(repository)) {
                     gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList(ghRepository);
-                } catch (IOException e) {
-                    throw new ServerException(e.getMessage());
+                    break;
                 }
-                break;
             }
+        } catch (IOException e) {
+            throw new ServerException(e.getMessage());
         }
-
         return gitHubRepositoryList;
     }
 
@@ -235,37 +222,24 @@ public class GitHubService {
     @Path("list/available")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, List<GitHubRepository>> availableRepositories() throws ApiException {
-        GitHub gitHub = gitHubFactory.connect();
-
-        //Get users' repositories
-        GitHubRepositoryList gitHubRepositoryList;
-        try {
-            gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList(gitHub.getMyself().listRepositories());
-        } catch (IOException e) {
-            throw new ServerException(e.getMessage());
-        }
-
         Map<String, List<GitHubRepository>> repoList = new HashMap<>();
-        repoList.put(getUserInfo().getLogin(), gitHubRepositoryList.getRepositories());
-
-        //Get other repositories from all organizations that user's belong to
-        GHPersonSet<GHOrganization> allOrganizations;
         try {
-            allOrganizations = gitHub.getMyself().getAllOrganizations();
+            GitHub gitHub = gitHubFactory.connect();
+
+            //Get users' repositories
+            GitHubRepositoryList gitHubRepositoryList = gitHubDTOFactory.createRepositoriesList(gitHub.getMyself().listRepositories());
+            repoList.put(getUserInfo().getLogin(), gitHubRepositoryList.getRepositories());
+
+            //Get other repositories from all organizations that user's belong to
+            for (GHOrganization ghOrganization : gitHub.getMyself().getAllOrganizations()) {
+                String organizationName = ghOrganization.getLogin();
+                repoList.put(organizationName, gitHubDTOFactory.createRepositoriesList(
+                        gitHub.getOrganization(organizationName).listRepositories())
+                                                               .getRepositories());
+            }
         } catch (IOException e) {
             throw new ServerException(e.getMessage());
         }
-
-        for (GHOrganization ghOrganization : allOrganizations) {
-            String organizationName = ghOrganization.getLogin();
-            try {
-                repoList.put(organizationName, gitHubDTOFactory.createRepositoriesList(
-                        gitHub.getOrganization(organizationName).listRepositories()).getRepositories());
-            } catch (IOException e) {
-                throw new ServerException(e.getMessage());
-            }
-        }
-
         return repoList;
     }
 
