@@ -159,6 +159,7 @@ public class GitHubService {
                 } catch (IOException e) {
                     throw new ServerException(e.getMessage());
                 }
+                break;
             }
         }
 
