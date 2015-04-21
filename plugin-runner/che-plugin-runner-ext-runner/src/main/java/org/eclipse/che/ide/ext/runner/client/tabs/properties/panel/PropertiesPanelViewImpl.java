@@ -79,17 +79,17 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
     FlowPanel buttonsPanel;
 
     @UiField
-    ListBox          ram;
+    ListBox   ram;
     @UiField
-    ListBox          scope;
+    ListBox   scope;
     @UiField
-    ListBox          boot;
+    ListBox   boot;
     @UiField
-    ListBox          shutdown;
+    ListBox   shutdown;
     @UiField
-    Switcher         projectDefault;
+    Switcher  projectDefault;
     @UiField
-    FlowPanel        projectDefaultPanel;
+    FlowPanel projectDefaultPanel;
 
 
     @UiField
@@ -409,6 +409,14 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
     @Override
     public void hideSwitcher() {
         projectDefaultPanel.setVisible(false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void incorrectName(boolean isCorrect) {
+        saveBtn.setEnable(!isCorrect);
+
+        name.getElement().getStyle().setBorderColor(isCorrect ? "#ffe400" : "#191c1e");
     }
 
     @UiHandler("name")

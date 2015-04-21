@@ -229,6 +229,14 @@ public interface PropertiesPanelView extends View<PropertiesPanelView.ActionDele
     /** Hides switcher for current panel. */
     void hideSwitcher();
 
+    /**
+     * Adds special elements on view when user input incorrect name of environment.
+     *
+     * @param isCorrect
+     *         <code>true</code> input is incorrect,<code>false</code> input is correct
+     */
+    void incorrectName(boolean isCorrect);
+
     interface ActionDelegate {
 
         /** Performs some actions in response to user's changing some configuration. */

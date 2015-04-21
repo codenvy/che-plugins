@@ -16,6 +16,7 @@ import com.google.gwt.regexp.shared.RegExp;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,21 +49,26 @@ public class NameGenerator {
      * add a number suffix like "Copy2 of", "Copy3 of", etc.
      */
     @Nonnull
-    public static String generateCopy(String name, List<String> existingNames) {
-        String baseName = name.replace("+", " ");
+    public static String generateCopy(@Nonnull String name, @Nonnull List<Environment> projectEnvironments) {
+        List<String> existingNames = new ArrayList<>();
 
-        // remove any copy prefix
-        baseName = removeCopyPrefix(baseName);
+        for (Environment environment : projectEnvironments) {
+            existingNames.add(environment.getName());
+        }
 
-        String computeName = "Copy of ".concat(baseName);
-        boolean alreadyExists = existingNames.contains(computeName);
+        name = removeCopyPrefix(name);
+
+        String copyName = "Copy of ".concat(name);
+        boolean alreadyExists = existingNames.contains(copyName);
         int index = 2;
         while (alreadyExists) {
-            computeName = "Copy".concat(String.valueOf(index)).concat(" of ").concat(baseName);
-            alreadyExists = existingNames.contains(computeName);
+            copyName = "Copy".concat(String.valueOf(index)).concat(" of ").concat(name);
+            alreadyExists = existingNames.contains(copyName);
             index++;
         }
-        return computeName;
+
+        //TODO copy name mustn't contain + or ++. It's variant for C++, but in future need add more suitable solving.
+        return copyName.endsWith("++") ? copyName.replace("++", "") : copyName;
     }
 
     /**

@@ -13,6 +13,8 @@ package org.eclipse.che.ide.ext.web.inject;
 import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 import org.eclipse.che.ide.api.filetypes.FileType;
+import org.eclipse.che.ide.collections.ArrayIterator;
+import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.web.html.editor.HtmlEditorConfiguration;
 import org.eclipse.che.ide.ext.web.js.editor.JsEditorConfigurationProvider;
 import org.eclipse.che.ide.ext.web.WebExtensionResource;
@@ -23,6 +25,8 @@ import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+
+import java.util.Arrays;
 
 /**
  * Adds custom binding for Editors.
@@ -71,6 +75,6 @@ public class WebModule extends AbstractGinModule {
     @Singleton
     @Named("PHPFileType")
     protected FileType providePHPFile(WebExtensionResource res) {
-        return new FileType("PHP file", res.phpFile(), MimeType.APPLICATION_X_PHP, "php");
+        return new FileType("PHP file", res.phpFile(), Collections.createArray(MimeType.APPLICATION_X_PHP, "text/x-php"), "php");
     }
 }

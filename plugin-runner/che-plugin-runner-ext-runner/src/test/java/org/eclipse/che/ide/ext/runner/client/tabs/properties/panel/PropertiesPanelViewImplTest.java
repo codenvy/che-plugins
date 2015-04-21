@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel;
 
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
@@ -91,6 +93,10 @@ public class PropertiesPanelViewImplTest {
     private EditorPartPresenter                editor;
     @Mock
     private ValueChangeEvent<Boolean>          changeEvent;
+    @Mock
+    private Element                            element;
+    @Mock
+    private Style                              style;
 
     @Captor
     private ArgumentCaptor<PropertyButtonWidget.ActionDelegate> captor;
@@ -129,17 +135,35 @@ public class PropertiesPanelViewImplTest {
         when(view.name.getText()).thenReturn(TEXT);
     }
 
-   /* @Test
+    @Test
     public void switcherValueShouldBeChanged() throws Exception {
-     *//*  // verify(switcher).addValueChangeHandler(valueChangeCaptor.capture());
+        view.changeSwitcherState(true);
 
-        valueChangeCaptor.getValue().onValueChange(changeEvent);*//*
-
-
-        verify(delegate).onSwitcherChanged(true);
-        verify(changeEvent).getValue();
+        verify(view.projectDefault).setValue(true);
     }
-*/
+
+    @Test
+    public void incorrectNameShouldBeInput() {
+        when(view.name.getElement()).thenReturn(element);
+        when(element.getStyle()).thenReturn(style);
+
+        view.incorrectName(true);
+
+        verify(saveButtonWidget).setEnable(false);
+        verify(style).setBorderColor("#ffe400");
+    }
+
+    @Test
+    public void correctNameShouldBeInput() {
+        when(view.name.getElement()).thenReturn(element);
+        when(element.getStyle()).thenReturn(style);
+
+        view.incorrectName(false);
+
+        verify(saveButtonWidget).setEnable(true);
+        verify(style).setBorderColor("#191c1e");
+    }
+
     @Test
     public void prepareActionShouldBePerformed() {
         ramItemsShouldBeAdded();

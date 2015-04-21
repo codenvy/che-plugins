@@ -12,7 +12,7 @@ package org.eclipse.che.env.local.client;
 
 import com.google.gwt.i18n.client.Messages;
 
-/** @author Andrey Plotnikov */
+/** @author Vitalii Parfonov */
 public interface LocalizationConstant extends Messages {
 
 
@@ -21,4 +21,15 @@ public interface LocalizationConstant extends Messages {
 
     @Key("che.projectOpened.title")
     String cheTabTitle(String projectName);
+
+    @Key("action.workspace.location")
+    @DefaultMessage("Root folder")
+    String actionWorkspaceLocation();
+
+    @Key("action.workspace.location.title")
+    @DefaultMessage("Che stores your projects in a folder.\n" +
+                    "Choose a workspace folder to use for this session.")
+    String actionWorkspaceLocationTitle();
+
+
 }

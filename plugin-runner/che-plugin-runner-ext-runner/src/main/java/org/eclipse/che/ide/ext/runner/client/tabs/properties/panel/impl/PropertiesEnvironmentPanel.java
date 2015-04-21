@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.impl;
 
 import com.google.gwt.http.client.URL;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -72,7 +73,8 @@ import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common
  */
 public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
 
-    private static final String CONFIGURATION_TYPE = "configuration.type";
+    private static       RegExp FILE_NAME             = RegExp.compile("^[A-Za-z0-9_\\s-\\.]+$");
+    private static final String CONFIGURATION_TYPE    = "configuration.type";
     private static final String DOCKER_SCRIPT_NAME    = "/Dockerfile";
     public static final  String ENVIRONMENT_ID_PREFIX = "project://";
 
@@ -199,8 +201,6 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
         }
     }
 
-
-
     private void getProjectEnvironmentDocker() {
         Unmarshallable<Array<ItemReference>> unmarshaller = unmarshallerFactory.newArrayUnmarshaller(ItemReference.class);
 
@@ -249,18 +249,9 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     /** {@inheritDoc} */
     @Override
     public void onCopyButtonClicked() {
-        // get projects env
-        Map<Scope, List<Environment>> envs = templatesContainer.getEnvironments();
-        List<Environment> projectEnvs = envs.get(Scope.PROJECT);
-        List<String> existingNames = new ArrayList<>();
-        if (projectEnvs != null) {
-            for (Environment env : projectEnvs) {
-                existingNames.add(env.getName());
-            }
-        }
-        // new name is based from existing one
-        final String fileName = NameGenerator.generateCopy(environment.getName(), existingNames);
+        List<Environment> projectEnvironments = templatesContainer.getProjectEnvironments();
 
+        final String fileName = NameGenerator.generateCopy(environment.getName(), projectEnvironments);
 
         String path = projectDescriptor.getPath() + ROOT_FOLDER + fileName;
 
@@ -371,6 +362,15 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     /** {@inheritDoc} */
     @Override
     public void onConfigurationChanged() {
+        view.incorrectName(false);
+
+        String name = view.getName();
+
+        if (!FILE_NAME.test(name)) {
+            view.incorrectName(true);
+            return;
+        }
+
         isParameterChanged = true;
 
         environment.setRam(view.getRam().getValue());
@@ -538,6 +538,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     /** {@inheritDoc} */
     @Override
     public void onCancelButtonClicked() {
+        view.incorrectName(false);
         isParameterChanged = false;
         Scope scope = environment.getScope();
 

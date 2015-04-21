@@ -86,7 +86,12 @@ import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.impl.P
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -150,7 +155,7 @@ public class PropertiesEnvironmentPanelTest {
     @Mock
     private Runner                                     runner;
     @Mock
-    private WorkspaceDescriptor                                currentWorkspace;
+    private WorkspaceDescriptor                        currentWorkspace;
     @Mock
     private CurrentProject                             currentProject;
     @Mock
@@ -842,6 +847,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableCancelButton(false);
         verify(view).setEnableDeleteButton(false);
 
+        verify(view).incorrectName(false);
         verify(environment).getId();
         verify(environment).setRam(MB_1024.getValue());
         verify(view).setName(TEXT);
@@ -861,6 +867,7 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).setEnableCancelButton(false);
         verify(view).setEnableDeleteButton(true);
 
+        verify(view).incorrectName(false);
         verify(environment).getName();
         verify(environment).getId();
         verify(environment).setRam(MB_1024.getValue());
@@ -1091,6 +1098,7 @@ public class PropertiesEnvironmentPanelTest {
     @Test
     public void configurationShouldBeChanged() throws Exception {
         when(view.getRam()).thenReturn(MB_512);
+        when(view.getName()).thenReturn(TEXT);
         when(environment.getScope()).thenReturn(PROJECT);
 
         presenter.onConfigurationChanged();
@@ -1100,6 +1108,29 @@ public class PropertiesEnvironmentPanelTest {
         verify(view).getRam();
         verify(view).setEnableSaveButton(true);
         verify(view).setEnableCancelButton(true);
+    }
+
+    @Test
+    public void nameShouldBeIncorrect() {
+        when(view.getName()).thenReturn("asd+/");
+
+        presenter.onConfigurationChanged();
+
+        verify(view).incorrectName(false);
+        verify(view).incorrectName(true);
+        verify(view, never()).getRam();
+    }
+
+    @Test
+    public void nameShouldBeCorrect() {
+        when(view.getRam()).thenReturn(MB_512);
+        when(view.getName()).thenReturn(TEXT);
+        when(environment.getScope()).thenReturn(PROJECT);
+
+        presenter.onConfigurationChanged();
+
+        verify(view).incorrectName(false);
+        verify(view, never()).incorrectName(true);
     }
 
     @Test

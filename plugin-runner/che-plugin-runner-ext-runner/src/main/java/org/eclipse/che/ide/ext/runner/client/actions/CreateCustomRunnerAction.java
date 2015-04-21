@@ -36,12 +36,12 @@ import org.eclipse.che.ide.util.loging.Log;
 import javax.annotation.Nonnull;
 
 import static org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl.ROOT_FOLDER;
-import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 
 /**
  * Action which allows user create environment from scratch.
  *
  * @author Valeriy Svydenko
+ * @author Dmitry Shnurenko
  */
 public class CreateCustomRunnerAction extends AbstractRunnerActions {
     private static final String DOCKER_SCRIPT_NAME = "/Dockerfile";
@@ -100,7 +100,7 @@ public class CreateCustomRunnerAction extends AbstractRunnerActions {
             return;
         }
 
-        final String fileName = NameGenerator.generateCustomEnvironmentName(templatesPresenter.getEnvironments().get(PROJECT),
+        final String fileName = NameGenerator.generateCustomEnvironmentName(templatesPresenter.getProjectEnvironments(),
                                                                             currentProject.getProjectDescription().getName());
         String path = currentProject.getProjectDescription().getPath() + ROOT_FOLDER + fileName;
 

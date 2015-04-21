@@ -10,15 +10,20 @@
  *******************************************************************************/
 package org.eclipse.che.env.local.client;
 
-import com.google.inject.Singleton;
+import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
-import org.eclipse.che.ide.api.extension.Extension;
+import java.util.Map;
 
 /**
  * @author Vitaly Parfonov
  */
-@Singleton
-@Extension(title = "Codenvy Local Env", version = "3.0.0")
-public class LocalEnvirounmentExtension {
+public interface WorkspaceToDirectoryMappingServiceClient {
+
+
+    public void setMountPath(String workspaceId, String mountPath, AsyncRequestCallback<Map<String, String>> callback);
+
+    public void removeMountPath(String workspaceId, AsyncRequestCallback<Map<String, String>> callback);
+
+    public void getDirectoryMapping(AsyncRequestCallback<Map<String, String>> callback);
 
 }

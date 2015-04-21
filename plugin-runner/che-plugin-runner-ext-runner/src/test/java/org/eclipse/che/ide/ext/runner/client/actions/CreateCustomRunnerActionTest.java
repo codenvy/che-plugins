@@ -45,6 +45,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -122,10 +123,10 @@ public class CreateCustomRunnerActionTest {
 
         List<Environment> projectEnvironments = Collections.singletonList(environment);
         Map<Scope, List<Environment>> environments = new EnumMap<>(Scope.class);
-        environments.put(Scope.PROJECT, projectEnvironments);
+        environments.put(PROJECT, projectEnvironments);
 
         when(appContext.getCurrentProject()).thenReturn(currentProject);
-        when(templatesPresenter.getEnvironments()).thenReturn(environments);
+        when(templatesPresenter.getProjectEnvironments()).thenReturn(environments.get(PROJECT));
 
         action = new CreateCustomRunnerAction(locale,
                                               appContext,

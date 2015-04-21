@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -29,20 +28,32 @@ import static org.mockito.Mockito.when;
  * @author Alexander Andrienko
  * @author Florent Benoit
  * @author Valeriy Svydenko
+ * @author Dmitry Shnurenko
  */
 @RunWith(GwtMockitoTestRunner.class)
 public class NameGeneratorTest {
+
+    private static final String HELLO       = "hello";
+    private static final String COPY_HELLO  = "Copy of hello";
+    private static final String COPY2_HELLO = "Copy2 of hello";
+    private static final String COPY3_HELLO = "Copy3 of hello";
+    private static final String COPY4_HELLO = "Copy4 of hello";
+
     @Mock
     private Environment environment1;
     @Mock
     private Environment environment2;
+    @Mock
+    private Environment environment3;
 
     /**
      * First copy is named 'copy of'
      */
     @Test
     public void generateFirstName() {
-        String generated = NameGenerator.generateCopy("hello", Collections.<String>emptyList());
+        when(environment1.getName()).thenReturn(HELLO);
+
+        String generated = NameGenerator.generateCopy(HELLO, Arrays.asList(environment1));
         String expectedName = "Copy of hello";
         assertEquals(expectedName, generated);
     }
@@ -52,11 +63,20 @@ public class NameGeneratorTest {
      */
     @Test
     public void generateAlreadyExistsFirstName() {
-        String existsName = "Copy of hello";
-        String generated = NameGenerator.generateCopy("hello", Arrays.asList(existsName));
-        String expectedName = "Copy2 of hello";
+        when(environment1.getName()).thenReturn(COPY_HELLO);
 
-        assertEquals(expectedName, generated);
+        String generated = NameGenerator.generateCopy(HELLO, Arrays.asList(environment1));
+
+        assertEquals(COPY2_HELLO, generated);
+    }
+
+    @Test
+    public void cutPlusPlusWhenCreateCopyFromCppEnvironment() {
+        when(environment1.getName()).thenReturn(HELLO + "++");
+
+        String generated = NameGenerator.generateCopy(HELLO, Arrays.asList(environment1));
+
+        assertEquals(COPY_HELLO, generated);
     }
 
     /**
@@ -64,12 +84,12 @@ public class NameGeneratorTest {
      */
     @Test
     public void generateAlreadyExistsTwiceName() {
-        String existsName = "Copy of hello";
-        String existsName2 = "Copy2 of hello";
-        String generated = NameGenerator.generateCopy("hello", Arrays.asList(existsName, existsName2));
-        String expectedName = "Copy3 of hello";
+        when(environment1.getName()).thenReturn(COPY_HELLO);
+        when(environment2.getName()).thenReturn(COPY2_HELLO);
 
-        assertEquals(expectedName, generated);
+        String generated = NameGenerator.generateCopy(HELLO, Arrays.asList(environment1, environment2));
+
+        assertEquals(COPY3_HELLO, generated);
     }
 
     /**
@@ -77,26 +97,13 @@ public class NameGeneratorTest {
      */
     @Test
     public void generateCopyOfCopy() {
-        String existsName = "Copy of hello";
-        String existsName2 = "Copy2 of hello";
-        String generated = NameGenerator.generateCopy("Copy of hello", Arrays.asList(existsName, existsName2));
-        String expectedName = "Copy3 of hello";
+        when(environment1.getName()).thenReturn(COPY_HELLO);
+        when(environment2.getName()).thenReturn(COPY2_HELLO);
+        when(environment3.getName()).thenReturn(COPY3_HELLO);
 
-        assertEquals(expectedName, generated);
-    }
+        String generated = NameGenerator.generateCopy(COPY3_HELLO, Arrays.asList(environment1, environment2, environment3));
 
-    /**
-     * Copying a copy should result in a new increment of a copy, not copy of copy
-     */
-    @Test
-    public void generateCopyOfCopy2() {
-        String existsName = "Copy of hello";
-        String existsName2 = "Copy2 of hello";
-        String existsName3 = "Copy3 of hello";
-        String generated = NameGenerator.generateCopy("Copy3 of hello", Arrays.asList(existsName, existsName2, existsName3));
-        String expectedName = "Copy4 of hello";
-
-        assertEquals(expectedName, generated);
+        assertEquals(COPY4_HELLO, generated);
     }
 
     /**
@@ -113,8 +120,8 @@ public class NameGeneratorTest {
      */
     @Test
     public void removeCopyPrefix() {
-        String name = NameGenerator.removeCopyPrefix("Copy of hello");
-        assertEquals("hello", name);
+        String name = NameGenerator.removeCopyPrefix(COPY_HELLO);
+        assertEquals(HELLO, name);
     }
 
     /**
@@ -122,8 +129,8 @@ public class NameGeneratorTest {
      */
     @Test
     public void removeCopy2Prefix() {
-        String name = NameGenerator.removeCopyPrefix("Copy2 of hello");
-        assertEquals("hello", name);
+        String name = NameGenerator.removeCopyPrefix(COPY2_HELLO);
+        assertEquals(HELLO, name);
     }
 
     /**
@@ -132,7 +139,7 @@ public class NameGeneratorTest {
     @Test
     public void removeCopy1234Prefix() {
         String name = NameGenerator.removeCopyPrefix("Copy1234 of hello");
-        assertEquals("hello", name);
+        assertEquals(HELLO, name);
     }
 
     @Test
