@@ -27,6 +27,7 @@
         <module>plugin-help</module>
         <module>plugin-builder</module>
         <module>plugin-runner</module>
+        <module>plugin-docker</module>
         <module>plugin-web</module>
         <module>plugin-java</module>
         <module>plugin-sdk</module>
