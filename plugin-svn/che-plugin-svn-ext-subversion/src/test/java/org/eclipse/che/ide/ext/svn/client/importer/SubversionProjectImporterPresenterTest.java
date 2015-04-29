@@ -151,17 +151,15 @@ public class SubversionProjectImporterPresenterTest {
      */
     @Test
     public void testValidProjectUrl() throws Exception {
-        final String projectUrl = "https://svn.apache.org/repos/asf/subversion/trunk";
-        final String projectName = "trunk";
+        final String projectUrl = "https://svn.apache.org/repos/asf/subversion/trunk/";
 
-        when(view.getProjectName()).thenReturn(projectName);
+        when(view.getProjectUrl()).thenReturn(projectUrl);
 
         presenter.onProjectUrlChanged();
 
-        verify(dataObject.getProject()).setName(eq(projectName));
-        verify(view).setNameErrorVisibility(anyBoolean());
+        verify(view).setProjectName(eq("trunk"));
         verify(dataObject.getSource().getProject()).setLocation(projectUrl);
-        verify(updateDelegate, times(2)).updateControls();
+        verify(updateDelegate).updateControls();
     }
 
     /**
