@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.svn.client.importer;
 
 import org.eclipse.che.ide.ui.Styles;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -32,24 +33,27 @@ import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
 
 /**
  * View implementation for the Subversion project importer.
+ *
+ * @author vzhukovskii@codenvy.com
  */
 public class SubversionProjectImporterViewImpl extends Composite implements SubversionProjectImporterView {
 
     interface SubversionProjectImporterViewImplUiBinder
-            extends UiBinder<DockLayoutPanel, SubversionProjectImporterViewImpl> {}
+            extends UiBinder<DockLayoutPanel, SubversionProjectImporterViewImpl> {
+    }
 
     private ActionDelegate delegate;
 
     @UiField(provided = true)
     Style       style;
     @UiField
-    Label labelUrlError;
+    Label       labelUrlError;
     @UiField
-    HTMLPanel descriptionArea;
+    HTMLPanel   descriptionArea;
     @UiField
-    TextBox projectName;
+    TextBox     projectName;
     @UiField
-    TextArea projectDescription;
+    TextArea    projectDescription;
     @UiField
     RadioButton projectPrivate;
     @UiField
@@ -64,8 +68,8 @@ public class SubversionProjectImporterViewImpl extends Composite implements Subv
     TextBox     password;
 
     @Inject
-    public SubversionProjectImporterViewImpl(final SubversionExtensionResources resources,
-                                             final SubversionProjectImporterViewImplUiBinder uiBinder) {
+    public SubversionProjectImporterViewImpl(SubversionExtensionResources resources,
+                                             SubversionProjectImporterViewImplUiBinder uiBinder) {
         style = resources.svnProjectImporterPageStyle();
         style.ensureInjected();
         initWidget(uiBinder.createAndBindUi(this));
@@ -73,17 +77,111 @@ public class SubversionProjectImporterViewImpl extends Composite implements Subv
         projectDescription.getElement().setAttribute("maxlength", "256");
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void setDelegate(@Nonnull ActionDelegate delegate) {
+        this.delegate = delegate;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setProjectUrl(@Nonnull String url) {
+        projectUrl.setText(url);
+        delegate.onProjectUrlChanged();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getProjectUrl() {
+        return this.projectUrl.getValue();
+    }
+
+    /** {@inheritDoc} */
+    @Nonnull
+    @Override
+    public String getProjectRelativePath() {
+        return this.projectRelativePath.getValue();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setNameErrorVisibility(boolean visible) {
+        if (visible) {
+            projectName.addStyleName(style.inputError());
+        } else {
+            projectName.removeStyleName(style.inputError());
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setProjectDescription(@Nonnull String text) {
+        projectDescription.setText(text);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getProjectDescription() {
+        return projectDescription.getText();
+    }
+
+    /** {@inheritDoc} */
+    @Nonnull
+    @Override
+    public String getProjectName() {
+        return projectName.getValue();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setProjectName(@Nonnull String projectName) {
+        this.projectName.setValue(projectName);
+        delegate.onProjectNameChanged();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setProjectVisibility(final boolean visible) {
+        projectPublic.setValue(visible);
+        projectPrivate.setValue(!visible);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean getProjectVisibility() {
+        return projectPrivate.getValue();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setUrlTextBoxFocused() {
+        projectUrl.setFocus(true);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getUserName() {
+        return username.getText();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getPassword() {
+        return password.getText();
+    }
+
     @UiHandler("projectName")
     void onProjectNameChanged(KeyUpEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
             return;
         }
-        delegate.projectNameChanged(projectName.getValue());
+        delegate.onProjectNameChanged();
     }
 
     @UiHandler("projectUrl")
+    @SuppressWarnings("unused")
     void onProjectUrlChanged(KeyUpEvent event) {
-        delegate.projectUrlChanged(projectUrl.getValue());
+        delegate.onProjectUrlChanged();
     }
 
     @UiHandler("projectRelativePath")
@@ -91,7 +189,7 @@ public class SubversionProjectImporterViewImpl extends Composite implements Subv
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
             return;
         }
-        delegate.projecRelativePathChanged(this.projectRelativePath.getValue());
+        delegate.onProjectRelativePathChanged();
     }
 
     @UiHandler("projectDescription")
@@ -99,118 +197,19 @@ public class SubversionProjectImporterViewImpl extends Composite implements Subv
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
             return;
         }
-        delegate.projectDescriptionChanged(projectDescription.getValue());
+        delegate.onProjectDescriptionChanged();
     }
 
     @UiHandler({"projectPublic", "projectPrivate"})
+    @SuppressWarnings("unused")
     void visibilityHandler(ValueChangeEvent<Boolean> event) {
-        delegate.projectVisibilityChanged(projectPublic.getValue());
+        delegate.onProjectVisibilityChanged();
     }
 
     @UiHandler({"username", "password"})
+    @SuppressWarnings("unused")
     void credentialChangeHandler(final ValueChangeEvent<String> event) {
-        delegate.credentialsChanged(this.username.getValue(), this.password.getValue());
-    }
-
-    @Override
-    public void setProjectUrl(@Nonnull String url) {
-        projectUrl.setText(url);
-        delegate.projectUrlChanged(url);
-    }
-
-    @Override
-    public String getProjectUrl() {
-        return this.projectUrl.getValue();
-    }
-
-    @Override
-    public void reset() {
-        projectUrl.setText("");
-        projectRelativePath.setText("trunk");
-        projectName.setText("");
-        projectDescription.setText("");
-        descriptionArea.clear();
-        projectPublic.setValue(true);
-        projectPrivate.setValue(false);
-        hideUrlError();
-        hideNameError();
-    }
-
-    @Nonnull
-    @Override
-    public String getProjectRelativePath() {
-        return this.projectRelativePath.getValue();
-    }
-
-    @Override
-    public void setProjectRelativePath(@Nonnull final String projectRelativePath) {
-        this.projectRelativePath.setValue(projectRelativePath);
-    }
-
-    @Override
-    public void showNameError() {
-        projectName.addStyleName(style.inputError());
-    }
-
-    @Override
-    public void hideNameError() {
-        projectName.removeStyleName(style.inputError());
-    }
-
-    @Override
-    public void showUrlError(@Nonnull String message) {
-        projectUrl.addStyleName(style.inputError());
-        labelUrlError.setText(message);
-    }
-
-    @Override
-    public void hideUrlError() {
-        projectUrl.removeStyleName(style.inputError());
-        labelUrlError.setText("");
-    }
-
-    @Override
-    public void setProjectDescription(@Nonnull String text) {
-        descriptionArea.getElement().setInnerText(text);
-    }
-
-    @Nonnull
-    @Override
-    public String getProjectName() {
-        return projectName.getValue();
-    }
-
-    @Override
-    public void setProjectName(@Nonnull String projectName) {
-        this.projectName.setValue(projectName);
-        delegate.projectNameChanged(projectName);
-    }
-
-    @Override
-    public void setProjectVisibility(final boolean visible) {
-        projectPublic.setValue(visible, false);
-        projectPrivate.setValue(!visible, false);
-    }
-
-    @Override
-    public void focusInUrlInput() {
-        projectUrl.setFocus(true);
-    }
-
-    @Override
-    public void setInputsEnableState(boolean isEnabled) {
-        projectName.setEnabled(isEnabled);
-        projectDescription.setEnabled(isEnabled);
-        projectUrl.setEnabled(isEnabled);
-
-        if (isEnabled) {
-            focusInUrlInput();
-        }
-    }
-
-    @Override
-    public void setDelegate(@Nonnull ActionDelegate delegate) {
-        this.delegate = delegate;
+        delegate.onCredentialsChanged();
     }
 
     public interface Style extends Styles {
@@ -236,5 +235,4 @@ public class SubversionProjectImporterViewImpl extends Composite implements Subv
 
         String horizontalLine();
     }
-
 }

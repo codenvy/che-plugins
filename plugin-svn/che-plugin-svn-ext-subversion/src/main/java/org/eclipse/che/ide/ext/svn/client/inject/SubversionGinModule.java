@@ -12,6 +12,8 @@ package org.eclipse.che.ide.ext.svn.client.inject;
 
 import org.eclipse.che.ide.ext.svn.client.commit.diff.DiffViewerView;
 import org.eclipse.che.ide.ext.svn.client.commit.diff.DiffViewerViewImpl;
+import org.eclipse.che.ide.ext.svn.client.importer.SubversionProjectImporterView;
+import org.eclipse.che.ide.ext.svn.client.importer.SubversionProjectImporterViewImpl;
 import org.eclipse.che.ide.ext.svn.client.log.ShowLogsView;
 import org.eclipse.che.ide.ext.svn.client.log.ShowLogsViewImpl;
 import org.eclipse.che.ide.ext.svn.client.move.MoveView;
@@ -69,6 +71,8 @@ public class SubversionGinModule extends AbstractGinModule {
 
         GinMultibinder.newSetBinder(binder(), ImportWizardRegistrar.class).addBinding()
                       .to(SubversionImportWizardRegistrar.class);
+
+        bind(SubversionProjectImporterView.class).to(SubversionProjectImporterViewImpl.class).in(Singleton.class);
 
         bind(RawOutputView.class).to(RawOutputViewImpl.class).in(Singleton.class);
         bind(UpdateToRevisionView.class).to(UpdateToRevisionViewImpl.class).in(Singleton.class);

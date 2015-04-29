@@ -14,16 +14,19 @@ import org.eclipse.che.api.project.shared.dto.ImportProject;
 import org.eclipse.che.api.project.shared.dto.NewProject;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
 import org.eclipse.che.ide.util.NameUtils;
+
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.che.ide.ext.svn.shared.ImportParameterKeys;
 
 /**
  * Handler for the Subversion Project Importer.
+ *
+ * @author vzhukovskii@codenvy.com
  */
 public class SubversionProjectImporterPresenter extends AbstractWizardPage<ImportProject>
         implements SubversionProjectImporterView.ActionDelegate {
@@ -31,104 +34,83 @@ public class SubversionProjectImporterPresenter extends AbstractWizardPage<Impor
     public static final String PUBLIC_VISIBILITY  = "public";
     public static final String PRIVATE_VISIBILITY = "private";
 
-    private final SubversionProjectImporterView view;
+    private SubversionProjectImporterView view;
 
     @Inject
-    public SubversionProjectImporterPresenter(final SubversionProjectImporterView view) {
+    public SubversionProjectImporterPresenter(SubversionProjectImporterView view) {
         this.view = view;
         this.view.setDelegate(this);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void projectNameChanged(final String name) {
-        dataObject.getProject().setName(name);
-        updateDelegate.updateControls();
-
-        validateProjectName(this.view);
-    }
-
-    private boolean validateProjectName(final SubversionProjectImporterView view) {
-        if (NameUtils.checkProjectName(view.getProjectName())) {
-            view.hideNameError();
-            return true;
-        } else {
-            view.showNameError();
-            return false;
-        }
-    }
-
-    @Override
-    public void projectUrlChanged(final String url) {
-        final String[] parts = url.trim().split("/");
-        final String projectName = parts[parts.length - 1];
-
-        this.view.setProjectName(projectName);
-
-        projectNameChanged(projectName);
-
-        final String fullUrl = buildFullUrl(url, this.view.getProjectRelativePath());
-        dataObject.getSource().getProject().setLocation(fullUrl);
-
-        updateDelegate.updateControls();
-    }
-
-    @Override
-    public void projecRelativePathChanged(final String value) {
-        final String fullUrl = buildFullUrl(this.view.getProjectUrl(), value);
-        dataObject.getSource().getProject().setLocation(fullUrl);
-    }
-
-    private String buildFullUrl(final String base, final String complement) {
-        String result = base;
-        if (complement != null && !complement.isEmpty()) {
-            if (!result.endsWith("/")) {
-                result = result + "/";
-            }
-            result = result + complement;
-        }
-        while (result.endsWith("/")) {
-            result = result.substring(0, result.length() - 2);
-        }
-        return result;
-    }
-
-    @Override
-    public void projectDescriptionChanged(final String projectDescription) {
-        dataObject.getProject().setDescription(projectDescription);
-        updateDelegate.updateControls();
-    }
-
-    @Override
-    public void projectVisibilityChanged(boolean visible) {
-        dataObject.getProject().setVisibility(visible ? PUBLIC_VISIBILITY : PRIVATE_VISIBILITY);
-        updateDelegate.updateControls();
-    }
-
-    @Override
-    public void go(final AcceptsOneWidget container) {
+    public void go(AcceptsOneWidget container) {
         final NewProject project = dataObject.getProject();
 
         view.setProjectName(project.getName());
         view.setProjectDescription(project.getDescription());
         view.setProjectVisibility(PUBLIC_VISIBILITY.equals(project.getVisibility()));
         view.setProjectUrl(dataObject.getSource().getProject().getLocation());
-//        view.setProjectRelativePath("trunk");
 
         container.setWidget(view);
 
-        view.setInputsEnableState(true);
-        view.focusInUrlInput();
+        view.setUrlTextBoxFocused();
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void credentialsChanged(final String username, final String password) {
-        Map<String, String> parameters = this.dataObject.getSource().getProject().getParameters();
-        if (parameters == null) {
-            parameters = new HashMap<String, String>();
-            this.dataObject.getSource().getProject().setParameters(parameters);
-        }
-        parameters.put(ImportParameterKeys.PARAMETER_USERNAME, username);
-        parameters.put(ImportParameterKeys.PARAMETER_PASSWORD, password);
+    public void onProjectNameChanged() {
+        dataObject.getProject().setName(view.getProjectName());
+        updateDelegate.updateControls();
+
+        view.setNameErrorVisibility(!NameUtils.checkProjectName(view.getProjectName()));
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void onProjectUrlChanged() {
+        if (Strings.isNullOrEmpty(view.getProjectUrl())) {
+            view.setProjectName("");
+            return;
+        }
+
+        String projectName = Iterables.getLast(Splitter.on("/").omitEmptyStrings().split(view.getProjectUrl()));
+        String calcUrl = getUrl(view.getProjectUrl(), view.getProjectRelativePath());
+
+        view.setProjectName(projectName);
+        dataObject.getSource().getProject().setLocation(calcUrl);
+        updateDelegate.updateControls();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onProjectRelativePathChanged() {
+        String calcUrl = getUrl(view.getProjectUrl(), view.getProjectRelativePath());
+        dataObject.getSource().getProject().setLocation(calcUrl);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onProjectDescriptionChanged() {
+        dataObject.getProject().setDescription(view.getProjectDescription());
+        updateDelegate.updateControls();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onProjectVisibilityChanged() {
+        dataObject.getProject().setVisibility(view.getProjectVisibility() ? PUBLIC_VISIBILITY : PRIVATE_VISIBILITY);
+        updateDelegate.updateControls();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onCredentialsChanged() {
+        dataObject.getSource().getProject().getParameters().put(ImportParameterKeys.PARAMETER_USERNAME, view.getUserName());
+        dataObject.getSource().getProject().getParameters().put(ImportParameterKeys.PARAMETER_PASSWORD, view.getPassword());
+    }
+
+    private String getUrl(String url, String relPath) {
+        return (url.endsWith("/") ? url.substring(0, url.length() - 1) : url) + (relPath.startsWith("/") ? relPath : relPath.concat("/"));
+    }
 }

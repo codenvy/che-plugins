@@ -11,103 +11,70 @@
 package org.eclipse.che.ide.ext.svn.client.importer;
 
 import org.eclipse.che.ide.api.mvp.View;
-import com.google.inject.ImplementedBy;
 
 /**
  * View interface for the Subversion project importer.
+ *
+ * @author vzhukovskii@codenvy.com
  */
-@ImplementedBy(SubversionProjectImporterViewImpl.class)
 public interface SubversionProjectImporterView extends View<SubversionProjectImporterView.ActionDelegate> {
 
+    /** Action handler for the view actions/controls. */
     public interface ActionDelegate {
         /** Performs any actions appropriate in response to the user having changed the project's name. */
-        void projectNameChanged(final String name);
+        void onProjectNameChanged();
 
         /** Performs any actions appropriate in response to the user having changed the project's URL. */
-        void projectUrlChanged(final String url);
+        void onProjectUrlChanged();
 
         /** Performs any actions appropriate in response to the user having changed the project's description. */
-        void projectDescriptionChanged(final String projectDescriptionValue);
+        void onProjectDescriptionChanged();
 
         /** Performs any actions appropriate in response to the user having changed the project's visibility. */
-        void projectVisibilityChanged(final boolean aPublic);
+        void onProjectVisibilityChanged();
 
         /** Performs any actions appropriate in response to the user having changed the relative path in the project. */
-        void projecRelativePathChanged(String value);
+        void onProjectRelativePathChanged();
 
-        void credentialsChanged(String value, String value2);
+        void onCredentialsChanged();
     }
 
-    /** Reset the page. */
-    void reset();
+    /** Set error marker. */
+    void setNameErrorVisibility(boolean visible);
 
-    /** Show the name error. */
-    void showNameError();
+    /** Set project description. */
+    void setProjectDescription(String text);
 
-    /** Hide the name error. */
-    void hideNameError();
+    /** Return project description. */
+    String getProjectDescription();
 
-    /** Show URL error. */
-    void showUrlError( String message);
-
-    /** Hide URL error. */
-    void hideUrlError();
-
-    /**
-     * @param text the project description
-     */
-    void setProjectDescription(final String text);
-
-    /**
-     * @param url the project's URL
-     *
-     */
+    /** Set project source URL. */
     void setProjectUrl(final String url);
 
-    /**
-     * Returns the project URL.
-     * 
-     * @return the project URL
-     */
+    /** Return project source URL. */
     String getProjectUrl();
 
-    /**
-     * @return the project's name
-     */
+    /** Return project name. */
     String getProjectName();
 
-    /**
-     * @param visible the project's visibility
-     */
-    void setProjectVisibility(final boolean visible);
+    /** Set project name. */
+    void setProjectName(String name);
 
-    /**
-     * @param name the project's name
-     */
-    void setProjectName(final String name);
+    /** Set project visibility. */
+    void setProjectVisibility(boolean visible);
 
-    /** Give focus to project's URL input. */
-    void focusInUrlInput();
+    /** Return project visibility. */
+    boolean getProjectVisibility();
 
-    /**
-     * Set the enable state of the inputs.
-     *
-     * @param isEnabled
-     *         <code>true</code> if enabled, <code>false</code> if disabled
-     */
-    void setInputsEnableState(final boolean isEnabled);
+    /** Set active window focus to url text box. */
+    void setUrlTextBoxFocused();
 
-    /**
-     * Return the project branch to import.
-     * 
-     * @return the branch
-     */
+    /** Return custom relative project path. */
     String getProjectRelativePath();
 
-    /**
-     * Sets the relative path in the project repository.
-     * 
-     * @param projectRelativePath the path
-     */
-    void setProjectRelativePath(String projectRelativePath);
+    /** Return user name. */
+    String getUserName();
+
+    /** Return user password. */
+    String getPassword();
 }
