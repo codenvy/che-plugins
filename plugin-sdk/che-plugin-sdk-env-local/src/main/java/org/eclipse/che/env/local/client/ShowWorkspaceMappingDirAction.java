@@ -12,6 +12,7 @@ package org.eclipse.che.env.local.client;
 
 import com.google.inject.Inject;
 
+import org.eclipse.che.env.local.client.lacation.WorkspaceLocationPresenter;
 import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
 
@@ -22,11 +23,10 @@ import org.eclipse.che.ide.api.action.ActionEvent;
  */
 public class ShowWorkspaceMappingDirAction extends Action {
 
-    private final WorkspaceMappingPresenter presenter;
-
+    private final WorkspaceLocationPresenter presenter;
 
     @Inject
-    public ShowWorkspaceMappingDirAction(WorkspaceMappingPresenter presenter, LocalizationConstant locale) {
+    public ShowWorkspaceMappingDirAction(WorkspaceLocationPresenter presenter, LocalizationConstant locale) {
         super(locale.actionWorkspaceLocation(), locale.actionWorkspaceLocationTitle());
         this.presenter = presenter;
     }
@@ -34,7 +34,7 @@ public class ShowWorkspaceMappingDirAction extends Action {
     /** {@inheritDoc} */
     @Override
     public void actionPerformed(ActionEvent e) {
-        presenter.showDialog();
+        presenter.show();
     }
 
 }

@@ -14,12 +14,6 @@ import com.google.gwt.i18n.client.Messages;
 
 /** @author Vitalii Parfonov */
 public interface LocalizationConstant extends Messages {
-
-
-    @Key("che.rootFolder.need.setup.dialog.title")
-    @DefaultMessage("Select a Workspace")
-    String rootFolderDialogTitleNeedSetup();
-
     @Key("che.rootFolder.change.dialog.title")
     @DefaultMessage("Change workspace location")
     String rootFolderDialogTitleChange();
@@ -43,5 +37,6 @@ public interface LocalizationConstant extends Messages {
                     "Choose a workspace folder to use for this session.")
     String actionWorkspaceLocationTitle();
 
-
+    @Key("workspace.location.description")
+    String workspaceLocationDescription();
 }

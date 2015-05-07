@@ -13,6 +13,7 @@ package org.eclipse.che.env.local.client;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.env.local.client.lacation.WorkspaceLocationPresenter;
 import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.action.IdeActions;
@@ -25,14 +26,13 @@ import org.eclipse.che.ide.api.extension.Extension;
 @Extension(title = "Che Local Env", version = "3.0.0")
 public class LocalEnvironmentExtension {
 
-    private ActionManager actionManager;
-
     @Inject
-    public LocalEnvironmentExtension(WorkspaceMappingPresenter presenter, ActionManager actionManager, ShowWorkspaceMappingDirAction action) {
-        this.actionManager = actionManager;
+    public LocalEnvironmentExtension(WorkspaceLocationPresenter presenter,
+                                     ActionManager actionManager,
+                                     ShowWorkspaceMappingDirAction action) {
         DefaultActionGroup fileGroup = (DefaultActionGroup)actionManager.getAction(IdeActions.GROUP_FILE);
         actionManager.registerAction("showWorkspaceMappingDirAction", action);
         fileGroup.add(action);
-        presenter.init();
+        presenter.show();
     }
 }

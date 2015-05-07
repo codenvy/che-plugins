@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (c) 2012-2015 Codenvy, S.A.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+      Codenvy, S.A. - initial API and implementation
+
+-->
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+    <ui:with field='locale' type='org.eclipse.che.env.local.client.LocalizationConstant'/>
+
+    <ui:style>
+        .workspaceLocation {
+            margin-left: 15px;
+            margin-right: 5px;
+        }
+
+        .workspaceDescription {
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .workspaceLocationLabel {
+            float: left;
+            margin-right: 10px;
+        }
+
+        .workspaceLocationField {
+            float: left;
+        }
+    </ui:style>
+
+    <g:DockLayoutPanel unit="PX" width="600px" height="100px">
+        <g:north size="100">
+            <g:FlowPanel addStyleNames="{style.workspaceLocation}">
+                <g:Label text="{locale.workspaceLocationDescription}" addStyleNames="{style.workspaceDescription}"/>
+                <g:FlowPanel height="25px">
+                    <g:Label text="{locale.rootFolderDialogLabel}" addStyleNames="{style.workspaceLocationLabel}"/>
+                    <g:TextBox ui:field="workspaceLocation" width="432px" height="14px" name="name"
+                               addStyleNames="{style.workspaceLocationField}" debugId="workspace-location"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:north>
+    </g:DockLayoutPanel>
+</ui:UiBinder>
