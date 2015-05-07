@@ -52,7 +52,7 @@ public class WorkspaceLocationPresenter implements WorkspaceLocationView.ActionD
             public void onSuccess(Map<String, String> result) {
                 String wsId = appContext.getWorkspace().getId();
                 if (result != null && !result.isEmpty()) {
-                    workspaceLocation = result.get("default");
+                    workspaceLocation = result.get("__default");
                     if (workspaceLocation == null || workspaceLocation.isEmpty()) {
                         workspaceLocation = result.get(wsId);
                     }
