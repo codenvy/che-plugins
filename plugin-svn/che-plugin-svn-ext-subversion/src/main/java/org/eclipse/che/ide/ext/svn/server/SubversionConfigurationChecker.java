@@ -98,6 +98,8 @@ public class SubversionConfigurationChecker {
 
     /**
      * Checks existing config file for global-ignore property filling and concatenate system default values need to proper work of Codenvy.
+     * <p/>
+     * .codenvy and .vfs directories should be added to global-ignore section in SVN configuration.
      *
      * @throws IOException
      *         if processing of config file was failed
@@ -155,7 +157,7 @@ public class SubversionConfigurationChecker {
      * @throws IOException
      *         if write was failed
      */
-    protected void updateConfigFile(String content, Path configFile) throws IOException {
+    private void updateConfigFile(String content, Path configFile) throws IOException {
         Files.write(configFile, content.getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
     }
 
