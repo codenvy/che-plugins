@@ -44,5 +44,7 @@ public class SubversionModule extends AbstractModule {
         bind(CredentialsProvider.class).to(PreferencesCredentialsProvider.class);
         bind(RepositoryUrlProvider.class).to(RepositoryUrlProviderImpl.class);
         bind(CurrentUserPreferencesAccess.class).to(CurrentUserPreferencesAccessImpl.class);
+
+        bind(SubversionConfigurationChecker.class).asEagerSingleton();
     }
 }
