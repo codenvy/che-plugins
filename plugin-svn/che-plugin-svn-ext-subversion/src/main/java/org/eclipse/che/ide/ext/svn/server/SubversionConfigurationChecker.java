@@ -75,16 +75,33 @@ public class SubversionConfigurationChecker {
         }
     }
 
+    /**
+     * Return loaded configuration file.
+     *
+     * @return configuration file
+     */
     protected Path getLoadedConfigFile() {
         return GLOBAL_SUBVERSION_CONFIG_FILE_PATH;
     }
 
+    /**
+     * Checks if Subversion configuration file exist and if none, then tries to create it.
+     *
+     * @throws IOException
+     *         if creation was failed
+     */
     protected void ensureExistingSvnConfigFile() throws IOException {
         if (Files.notExists(GLOBAL_SUBVERSION_CONFIG_FILE_PATH)) {
             Files.createFile(GLOBAL_SUBVERSION_CONFIG_FILE_PATH);
         }
     }
 
+    /**
+     * Checks existing config file for global-ignore property filling and concatenate system default values need to proper work of Codenvy.
+     *
+     * @throws IOException
+     *         if processing of config file was failed
+     */
     protected void checkAndUpdateConfigFile() throws IOException {
         List<String> subversionConfigContent = Files.readAllLines(GLOBAL_SUBVERSION_CONFIG_FILE_PATH, Charset.forName("UTF-8"));
 
@@ -128,10 +145,25 @@ public class SubversionConfigurationChecker {
         updateConfigFile(Joiner.on('\n').join(subversionConfigContent), GLOBAL_SUBVERSION_CONFIG_FILE_PATH);
     }
 
+    /**
+     * Writes content to file.
+     *
+     * @param content
+     *         file content
+     * @param configFile
+     *         file path
+     * @throws IOException
+     *         if write was failed
+     */
     protected void updateConfigFile(String content, Path configFile) throws IOException {
         Files.write(configFile, content.getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
     }
 
+    /**
+     * Return default excludes string.
+     *
+     * @return string which contains excludes
+     */
     protected String getDefaultExcludes() {
         return Joiner.on(' ').join(SUBVERSION_IGNORE_PATTERNS);
     }
