@@ -13,6 +13,8 @@ package org.eclipse.che.plugin.docker.client.connection;
 import org.eclipse.che.commons.lang.Pair;
 import org.eclipse.che.plugin.docker.client.DockerCertificates;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,7 +50,11 @@ public class TcpConnection extends DockerConnection {
         this(baseUri, certificates, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_READ_TIMEOUT);
     }
 
-    public TcpConnection(URI baseUri, DockerCertificates certificates, int connectionTimeout, int readTimeout) {
+    @Inject
+    public TcpConnection(@Named("docker.connection.tcp.base_uri") URI baseUri,
+                         DockerCertificates certificates,
+                         @Named("docker.connection.tcp.connection_timeout_millis") int connectionTimeoutMillisecond,
+                         @Named("docker.connection.tcp.read_timeout_millis") int readTimeoutMillisecond) {
         if ("https".equals(baseUri.getScheme())) {
             if (certificates == null) {
                 throw new IllegalArgumentException("Certificates are required for https connection.");
@@ -58,8 +64,8 @@ public class TcpConnection extends DockerConnection {
         }
         this.baseUri = baseUri;
         this.certificates = certificates;
-        this.connectionTimeout = connectionTimeout;
-        this.readTimeout = readTimeout;
+        this.connectionTimeout = connectionTimeoutMillisecond;
+        this.readTimeout = readTimeoutMillisecond;
     }
 
     @Override
