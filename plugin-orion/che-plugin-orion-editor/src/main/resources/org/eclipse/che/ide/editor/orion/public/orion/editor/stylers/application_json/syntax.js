@@ -9,12 +9,13 @@
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
 
-/*global define*/
+/*eslint-env browser, amd*/
 
 define("orion/editor/stylers/application_json/syntax", ["orion/editor/stylers/lib/syntax"], function(mLib) { //$NON-NLS-1$ //$NON-NLS-0$
 	var keywords = ["false", "true"]; //$NON-NLS-1$ //$NON-NLS-0$
 
-	var grammars = mLib.grammars;
+	var grammars = [];
+	grammars.push.apply(grammars, mLib.grammars);
 	grammars.push({
 		id: "orion.json", //$NON-NLS-0$
 		contentTypes: ["application/json"], //$NON-NLS-0$
@@ -31,7 +32,7 @@ define("orion/editor/stylers/application_json/syntax", ["orion/editor/stylers/li
 			{include: "orion.lib#number_hex"}, //$NON-NLS-0$
 			{
 				match: "\\b(?:" + keywords.join("|") + ")\\b", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
-				name: "keyword.control.json" //$NON-NLS-0$
+				name: "keyword.operator.json" //$NON-NLS-0$
 			}
 		]
 	});

@@ -10,11 +10,15 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.maven.client;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
-import org.eclipse.che.api.project.shared.dto.BuildersDescriptor;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
+import org.eclipse.che.ide.api.action.IdeActions;
 import org.eclipse.che.ide.api.constraints.Anchor;
 import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.event.FileEvent;
@@ -32,7 +36,6 @@ import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.java.client.dependenciesupdater.DependenciesUpdater;
 import org.eclipse.che.ide.extension.maven.client.actions.CreateMavenModuleAction;
-import org.eclipse.che.ide.extension.maven.client.actions.CustomBuildAction;
 import org.eclipse.che.ide.extension.maven.client.actions.UpdateDependencyAction;
 import org.eclipse.che.ide.extension.maven.client.event.BeforeModuleOpenEvent;
 import org.eclipse.che.ide.extension.maven.client.event.BeforeModuleOpenHandler;
@@ -43,14 +46,9 @@ import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.util.loging.Log;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
-
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.che.ide.api.action.IdeActions.GROUP_BUILD;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_BUILD_CONTEXT_MENU;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_FILE_NEW;
 
@@ -75,62 +73,57 @@ public class MavenExtension {
         archetypes =
                 Collections.createArray(new MavenArchetype("org.apache.maven.archetypes", "maven-archetype-quickstart", "RELEASE", null),
                                         new MavenArchetype("org.apache.maven.archetypes", "maven-archetype-webapp", "RELEASE", null),
-                                        new MavenArchetype("org.apache.openejb.maven", "tomee-webapp-archetype", "1.7.1", null),
-                                        new MavenArchetype("org.apache.cxf.archetype", "cxf-jaxws-javafirst", "RELEASE", null),
-                                        new MavenArchetype("org.apache.cxf.archetype", "cxf-jaxrs-service", "RELEASE", null));
+                                        new MavenArchetype("org.apache.openejb.maven", "tomee-webapp-archetype", "1.7.1", null));
     }
 
     public static Array<MavenArchetype> getAvailableArchetypes() {
         return archetypes;
     }
 
-    @Inject
-    private void bindEvents(final EventBus eventBus,
-                            final DependenciesUpdater dependenciesUpdater,
-                            final ProjectServiceClient projectServiceClient,
-                            final DtoUnmarshallerFactory dtoUnmarshallerFactory) {
-        eventBus.addHandler(BeforeModuleOpenEvent.TYPE, new BeforeModuleOpenHandler() {
-            @Override
-            public void onBeforeModuleOpen(BeforeModuleOpenEvent event) {
-                if (isValidForResolveDependencies(event.getModule().getProject().getData())) {
-                    dependenciesUpdater.updateDependencies(event.getModule().getData(), false);
-                }
-            }
-        });
-
-        eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
-            @Override
-            public void onProjectOpened(ProjectActionEvent event) {
-                ProjectDescriptor project = event.getProject();
-                if (isValidForResolveDependencies(project)) {
-                    dependenciesUpdater.updateDependencies(project, false);
-                }
-            }
-
-            @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
-            }
-        });
-    }
+//    @Inject
+//    private void bindEvents(final EventBus eventBus,
+//                            final DependenciesUpdater dependenciesUpdater,
+//                            final ProjectServiceClient projectServiceClient,
+//                            final DtoUnmarshallerFactory dtoUnmarshallerFactory) {
+//        eventBus.addHandler(BeforeModuleOpenEvent.TYPE, new BeforeModuleOpenHandler() {
+//            @Override
+//            public void onBeforeModuleOpen(BeforeModuleOpenEvent event) {
+//                if (isValidForResolveDependencies(event.getModule().getProject().getData())) {
+//                    dependenciesUpdater.updateDependencies(event.getModule().getData(), false);
+//                }
+//            }
+//        });
+//
+//        eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
+//            @Override
+//            public void onProjectOpened(ProjectActionEvent event) {
+//                ProjectDescriptor project = event.getProject();
+//                if (isValidForResolveDependencies(project)) {
+//                    dependenciesUpdater.updateDependencies(project, false);
+//                }
+//            }
+//
+//            @Override
+//            public void onProjectClosing(ProjectActionEvent event) {
+//            }
+//
+//            @Override
+//            public void onProjectClosed(ProjectActionEvent event) {
+//            }
+//        });
+//    }
 
     @Inject
     private void prepareActions(ActionManager actionManager,
-                                CustomBuildAction customBuildAction,
                                 UpdateDependencyAction updateDependencyAction,
                                 MavenLocalizationConstant mavenLocalizationConstants,
                                 CreateMavenModuleAction createMavenModuleAction) {
         // register actions
-        actionManager.registerAction(mavenLocalizationConstants.buildProjectControlId(), customBuildAction);
         actionManager.registerAction("updateDependency", updateDependencyAction);
         actionManager.registerAction("createMavenModule", createMavenModuleAction);
 
         // add actions in main menu
-        DefaultActionGroup buildMenuActionGroup = (DefaultActionGroup)actionManager.getAction(GROUP_BUILD);
-        buildMenuActionGroup.add(customBuildAction);
+        DefaultActionGroup buildMenuActionGroup = (DefaultActionGroup)actionManager.getAction(IdeActions.GROUP_CODE);
         buildMenuActionGroup.add(updateDependencyAction);
 
         DefaultActionGroup newGroup = (DefaultActionGroup)actionManager.getAction(GROUP_FILE_NEW);
@@ -151,8 +144,8 @@ public class MavenExtension {
 
     private boolean isValidForResolveDependencies(ProjectDescriptor project) {
         Map<String, List<String>> attr = project.getAttributes();
-        BuildersDescriptor builders = project.getBuilders();
-        return builders != null && "maven".equals(builders.getDefault()) &&
+//        BuildersDescriptor builders = project.getBuilders();
+        return /*builders != null && "maven".equals(builders.getDefault()) &&*/
                !(attr.containsKey(MavenAttributes.PACKAGING) && "pom".equals(attr.get(MavenAttributes.PACKAGING).get(0)));
     }
 }

@@ -25,7 +25,7 @@ public interface CodeMirrorResource extends ClientBundle {
     @Source({"cm_gutters.css", "org/eclipse/che/ide/api/ui/style.css"})
     CssResource gutterStyle();
 
-    @Source({"cm_simplescrollbars.css", "org/eclipse/che/ide/common/constants.css", "org/eclipse/che/ide/api/ui/style.css"})
+    @Source({"cm_simplescrollbars.css", "org/eclipse/che/ide/api/ui/style.css"})
     CssResource scrollStyle();
 
     @Source("org/eclipse/che/ide/texteditor/squiggle.gif")

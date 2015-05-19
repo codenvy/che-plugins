@@ -10,24 +10,23 @@
  *******************************************************************************/
 package org.eclipse.che.jdt.internal.codeassist;
 
-import org.eclipse.che.jdt.core.search.IJavaSearchConstants;
-import org.eclipse.che.jdt.core.search.IJavaSearchScope;
-import org.eclipse.che.jdt.core.search.SearchPattern;
-import org.eclipse.che.jdt.core.search.TypeNameMatch;
-import org.eclipse.che.jdt.core.search.TypeNameMatchRequestor;
-import org.eclipse.che.jdt.internal.codeassist.impl.Engine;
-import org.eclipse.che.jdt.internal.compiler.parser.SourceTypeConverter;
-import org.eclipse.che.jdt.internal.core.BinaryTypeConverter;
-import org.eclipse.che.jdt.internal.core.ClassFile;
-import org.eclipse.che.jdt.internal.core.JavaProject;
-import org.eclipse.che.jdt.internal.core.SearchableEnvironment;
-import org.eclipse.che.jdt.internal.core.SourceType;
-import org.eclipse.che.jdt.internal.core.SourceTypeElementInfo;
-import org.eclipse.che.jdt.internal.core.search.BasicSearchEngine;
-import org.eclipse.che.jdt.internal.core.search.TypeNameMatchRequestorWrapper;
-import org.eclipse.che.jdt.internal.core.search.indexing.IndexManager;
-import org.eclipse.che.jdt.internal.core.util.ASTNodeFinder;
-
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.core.search.TypeNameMatch;
+import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
+import org.eclipse.jdt.internal.codeassist.impl.Engine;
+import org.eclipse.jdt.internal.compiler.parser.SourceTypeConverter;
+import org.eclipse.jdt.internal.core.BinaryTypeConverter;
+import org.eclipse.jdt.internal.core.ClassFile;
+import org.eclipse.jdt.internal.core.JavaModelManager;
+import org.eclipse.jdt.internal.core.SearchableEnvironment;
+import org.eclipse.jdt.internal.core.SelectionRequestor;
+import org.eclipse.jdt.internal.core.SourceType;
+import org.eclipse.jdt.internal.core.SourceTypeElementInfo;
+import org.eclipse.jdt.internal.core.search.BasicSearchEngine;
+import org.eclipse.jdt.internal.core.search.TypeNameMatchRequestorWrapper;
+import org.eclipse.jdt.internal.core.util.ASTNodeFinder;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -69,7 +68,29 @@ import org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.env.AccessRestriction;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
-import org.eclipse.jdt.internal.compiler.lookup.*;
+import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
+import org.eclipse.jdt.internal.compiler.lookup.BaseTypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.Binding;
+import org.eclipse.jdt.internal.compiler.lookup.BlockScope;
+import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
+import org.eclipse.jdt.internal.compiler.lookup.CompilationUnitScope;
+import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
+import org.eclipse.jdt.internal.compiler.lookup.LocalTypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.LocalVariableBinding;
+import org.eclipse.jdt.internal.compiler.lookup.LookupEnvironment;
+import org.eclipse.jdt.internal.compiler.lookup.MemberTypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
+import org.eclipse.jdt.internal.compiler.lookup.MethodScope;
+import org.eclipse.jdt.internal.compiler.lookup.PackageBinding;
+import org.eclipse.jdt.internal.compiler.lookup.ParameterizedTypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.ProblemFieldBinding;
+import org.eclipse.jdt.internal.compiler.lookup.ProblemReasons;
+import org.eclipse.jdt.internal.compiler.lookup.ProblemReferenceBinding;
+import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
+import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.SyntheticMethodBinding;
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.jdt.internal.compiler.parser.Scanner;
 import org.eclipse.jdt.internal.compiler.parser.ScannerHelper;
 import org.eclipse.jdt.internal.compiler.parser.TerminalTokens;
@@ -78,8 +99,6 @@ import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemReporter;
 import org.eclipse.jdt.internal.compiler.util.HashtableOfObject;
 import org.eclipse.jdt.internal.compiler.util.ObjectVector;
-import org.eclipse.jdt.internal.core.JavaModelManager;
-import org.eclipse.jdt.internal.core.SelectionRequestor;
 import org.eclipse.jdt.internal.core.util.HashSetOfCharArrayArray;
 
 import java.util.ArrayList;
@@ -99,136 +118,21 @@ import java.util.Map;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public final class SelectionEngine extends Engine implements ISearchRequestor {
 	
-	private static class SelectionTypeNameMatchRequestorWrapper extends TypeNameMatchRequestorWrapper {
-		
-		class AcceptedType {
-			public int               modifiers;
-			public char[]            packageName;
-			public char[]            simpleTypeName;
-			public String            path;
-			public AccessRestriction access;
-
-			public AcceptedType(int modifiers, char[] packageName, char[] simpleTypeName, String path, AccessRestriction access) {
-				this.modifiers = modifiers;
-				this.packageName = packageName;
-				this.simpleTypeName = simpleTypeName;
-				this.path = path;
-				this.access = access;
-			}
-		}
-
-		private ImportReference[] importReferences;
-
-		private boolean importCachesNodeInitialized = false;
-		private ImportReference[] onDemandImportsNodeCache;
-		private int               onDemandImportsNodeCacheCount;
-		private char[][][]        importsNodeCache;
-		private int               importsNodeCacheCount;
-
-		private HashtableOfObject onDemandFound    = new HashtableOfObject();
-		private ObjectVector      notImportedFound = new ObjectVector();
-
-		public SelectionTypeNameMatchRequestorWrapper(TypeNameMatchRequestor requestor, IJavaSearchScope scope,
-													  ImportReference[] importReferences) {
-			super(requestor, scope);
-			this.importReferences = importReferences;
-		}
-
-		public void acceptType(int modifiers, char[] packageName, char[] simpleTypeName, char[][] enclosingTypeNames, String path,
-							   AccessRestriction access) {
-			if (enclosingTypeNames != null && enclosingTypeNames.length > 0) return;
-
-			if (!this.importCachesNodeInitialized) initializeImportNodeCaches();
-
-			char[] fullyQualifiedTypeName = CharOperation.concat(packageName, simpleTypeName, '.');
-
-			for (int i = 0; i < this.importsNodeCacheCount; i++) {
-				char[][] importName = this.importsNodeCache[i];
-				if (CharOperation.equals(importName[0], simpleTypeName)) {
-
-					if (CharOperation.equals(importName[1], fullyQualifiedTypeName)) {
-						super.acceptType(modifiers, packageName, simpleTypeName, enclosingTypeNames, path, access);
-					}
-					return;
-				}
-			}
-
-			for (int i = 0; i < this.onDemandImportsNodeCacheCount; i++) {
-				char[][] importName = this.onDemandImportsNodeCache[i].tokens;
-				char[] importFlatName = CharOperation.concatWith(importName, '.');
-
-				if (CharOperation.equals(importFlatName, packageName)) {
-
-					this.onDemandFound.put(simpleTypeName, simpleTypeName);
-					super.acceptType(modifiers, packageName, simpleTypeName, enclosingTypeNames, path, access);
-					return;
-				}
-			}
-
-
-			this.notImportedFound.add(new AcceptedType(modifiers, packageName, simpleTypeName, path, access));
-		}
-
-		public void acceptNotImported() {
-			int size = this.notImportedFound.size();
-			for (int i = 0; i < size; i++) {
-				AcceptedType acceptedType = (AcceptedType)this.notImportedFound.elementAt(i);
-
-				if (this.onDemandFound.get(acceptedType.simpleTypeName) == null) {
-					super.acceptType(
-							acceptedType.modifiers,
-							acceptedType.packageName,
-							acceptedType.simpleTypeName,
-							null,
-							acceptedType.path,
-							acceptedType.access);
-				}
-			}
-		}
-
-		public void initializeImportNodeCaches() {
-			int length = this.importReferences == null ? 0 : this.importReferences.length;
-
-			for (int i = 0; i < length; i++) {
-				ImportReference importReference = this.importReferences[i];
-				if ((importReference.bits & ASTNode.OnDemand) != 0) {
-					if (this.onDemandImportsNodeCache == null) {
-						this.onDemandImportsNodeCache = new ImportReference[length - i];
-					}
-					this.onDemandImportsNodeCache[this.onDemandImportsNodeCacheCount++] =
-							importReference;
-				} else {
-					if (this.importsNodeCache == null) {
-						this.importsNodeCache = new char[length - i][][];
-					}
-
-
-					this.importsNodeCache[this.importsNodeCacheCount++] = new char[][]{
-							importReference.tokens[importReference.tokens.length - 1],
-							CharOperation.concatWith(importReference.tokens, '.')
-					};
-				}
-			}
-
-			this.importCachesNodeInitialized = true;
-		}
-	}
-
 	public static boolean DEBUG = false;
 	public static boolean PERF  = false;
-
 	SelectionParser     parser;
 	ISelectionRequestor requestor;
-	private IndexManager indexManager;
-	private JavaProject javaProject;
 	WorkingCopyOwner owner;
-
 	boolean acceptedAnswer;
-
-	private int    actualSelectionStart;
+    int acceptedClassesCount;
+    int acceptedInterfacesCount;
+    int acceptedEnumsCount;
+    int acceptedAnnotationsCount;
+    boolean            noProposal = true;
+    CategorizedProblem problem    = null;
+    private int    actualSelectionStart;
 	private int    actualSelectionEnd;
 	private char[] selectedIdentifier;
-
 	private char[][][] acceptedClasses;
 	private int[]      acceptedClassesModifiers;
 	private char[][][] acceptedInterfaces;
@@ -237,14 +141,6 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 	private int[]      acceptedEnumsModifiers;
 	private char[][][] acceptedAnnotations;
 	private int[]      acceptedAnnotationsModifiers;
-	int acceptedClassesCount;
-	int acceptedInterfacesCount;
-	int acceptedEnumsCount;
-	int acceptedAnnotationsCount;
-
-	boolean            noProposal = true;
-	CategorizedProblem problem    = null;
-
 	/**
 	 * The SelectionEngine is responsible for computing the selected object.
 	 *
@@ -266,14 +162,11 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 			SearchableEnvironment nameEnvironment,
 			ISelectionRequestor requestor,
 			Map settings,
-			WorkingCopyOwner owner,
-			IndexManager indexManager, JavaProject javaProject) {
+            WorkingCopyOwner owner) {
 
 		super(settings);
 
 		this.requestor = requestor;
-		this.indexManager = indexManager;
-		this.javaProject = javaProject;
 		this.nameEnvironment = nameEnvironment;
 
 		ProblemReporter problemReporter =
@@ -527,6 +420,7 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 			this.acceptedEnumsCount = 0;
 		}
 	}
+
 	private boolean checkSelection(
 			char[] source,
 			int selectionStart,
@@ -543,7 +437,7 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 				null/*taskPriorities*/,
 				true /*taskCaseSensitive*/);
 		scanner.setSource(source);
-		
+
 		int lastIdentifierStart = -1;
 		int lastIdentifierEnd = -1;
 		char[] lastIdentifier = null;
@@ -639,16 +533,16 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 			if (selectionStart == selectionEnd) { // Widen the selection to scan -> || :: if needed. No unicode handling for now.
 				if (selectionStart > 0 && selectionEnd < source.length - 1) {
 					if ((source[selectionStart] == '>' && source[selectionStart - 1] == '-') ||
-							source[selectionStart] == ':' && source[selectionStart - 1] == ':') { 
-						selectionStart--;
+                        source[selectionStart] == ':' && source[selectionStart - 1] == ':') {
+                        selectionStart--;
 					} else {
 						if ((source[selectionStart] == '-' && source[selectionEnd + 1] == '>') ||
 								source[selectionStart] == ':' && source[selectionEnd + 1] == ':') {
 							selectionEnd++;
 						}
 					}
-				}  
-			} // there could be some innocuous widening, shouldn't matter.
+                }
+            } // there could be some innocuous widening, shouldn't matter.
 			scanner.resetTo(selectionStart, selectionEnd);
 
 			boolean expectingIdentifier = true;
@@ -679,8 +573,8 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 							this.actualSelectionStart = selectionStart;
 							this.actualSelectionEnd = selectionEnd;
 							this.selectedIdentifier = CharOperation.NO_CHAR;
-							return true;		
-						}
+                            return true;
+                        }
 						//$FALL-THROUGH$
 					case TerminalTokens.TokenNameDOT :
 						if (expectingIdentifier)
@@ -704,8 +598,8 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 							this.actualSelectionStart = selectionStart;
 							this.actualSelectionEnd = selectionEnd;
 							this.selectedIdentifier = CharOperation.NO_CHAR;
-							return true;		
-						}
+                            return true;
+                        }
 						return false;
 					default :
 						return false;
@@ -720,6 +614,7 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 		}
 		return false;
 	}
+
 	private boolean checkTypeArgument(Scanner scanner) {
 		int depth = 1;
 		int token;
@@ -790,7 +685,7 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 
 		return false;
 	}
-	
+
 	/*
 	 * find all types outside the project scope
 	 */
@@ -823,8 +718,8 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 					// implements interface method
 				}
 			};
-			
-			TypeNameMatchRequestor typeNameMatchRequestor = new TypeNameMatchRequestor() {
+
+            TypeNameMatchRequestor typeNameMatchRequestor = new TypeNameMatchRequestor() {
 				public void acceptTypeNameMatch(TypeNameMatch match) {
 					if (SelectionEngine.this.requestor instanceof SelectionRequestor) {
 						SelectionEngine.this.noProposal = false;
@@ -832,22 +727,22 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 					}
 				}
 			};
-			
-			IJavaSearchScope scope = BasicSearchEngine.createWorkspaceScope();
-			
-			SelectionTypeNameMatchRequestorWrapper requestorWrapper =
+
+            IJavaSearchScope scope = BasicSearchEngine.createWorkspaceScope();
+
+            SelectionTypeNameMatchRequestorWrapper requestorWrapper =
 				new SelectionTypeNameMatchRequestorWrapper(
-						typeNameMatchRequestor, 
-						scope,
+                        typeNameMatchRequestor,
+                        scope,
 						this.unitScope == null ? null : this.unitScope.referenceContext.imports);
-			
-			org.eclipse.jdt.core.ICompilationUnit[] workingCopies = this.owner == null ? null : JavaModelManager.getJavaModelManager()
+
+            org.eclipse.jdt.core.ICompilationUnit[] workingCopies = this.owner == null ? null : JavaModelManager.getJavaModelManager()
 																												.getWorkingCopies(
 																														this.owner, true/*add primary WCs*/);
-			
-			try {
-				new BasicSearchEngine(indexManager, javaProject).searchAllTypeNames(
-					null,
+
+            try {
+                new BasicSearchEngine().searchAllTypeNames(
+                        null,
 					SearchPattern.R_EXACT_MATCH,
 					prefix,
 					SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE,
@@ -865,7 +760,7 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 		}
 	}
 
-	public AssistParser getParser() {
+    public AssistParser getParser() {
 		return this.parser;
 	}
 
@@ -996,8 +891,8 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 					if ((this.unitScope = parsedUnit.scope)  != null) {
 						try {
 							this.lookupEnvironment.completeTypeBindings(parsedUnit, true);
-							
-							CompilationUnitDeclaration previousUnitBeingCompleted = this.lookupEnvironment.unitBeingCompleted;
+
+                            CompilationUnitDeclaration previousUnitBeingCompleted = this.lookupEnvironment.unitBeingCompleted;
 							this.lookupEnvironment.unitBeingCompleted = parsedUnit;
 							parsedUnit.scope.faultInTypes();
 							this.lookupEnvironment.unitBeingCompleted = previousUnitBeingCompleted;
@@ -1033,8 +928,8 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 				// accept qualified types only if no unqualified type was accepted
 				if(!this.acceptedAnswer) {
 					acceptQualifiedTypes();
-					
-					// accept types from all the workspace only if no type was found in the project scope
+
+                    // accept types from all the workspace only if no type was found in the project scope
 					if (this.noProposal) {
 						findAllTypes(this.selectedIdentifier);
 					}
@@ -1126,7 +1021,8 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 	private void selectFrom(Binding binding, CompilationUnitDeclaration parsedUnit, boolean isDeclaration) {
 		selectFrom(binding, parsedUnit, null, isDeclaration);
 	}
-	private void selectFrom(Binding binding, CompilationUnitDeclaration parsedUnit, ICompilationUnit unit, boolean isDeclaration) {
+
+    private void selectFrom(Binding binding, CompilationUnitDeclaration parsedUnit, ICompilationUnit unit, boolean isDeclaration) {
 		if(binding instanceof TypeVariableBinding) {
 			TypeVariableBinding typeVariableBinding = (TypeVariableBinding) binding;
 			Binding enclosingElement = typeVariableBinding.declaringElement;
@@ -1325,7 +1221,8 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 			this.acceptedAnswer = true;
 		}
 	}
-	/*
+
+    /*
 	 * Checks if a local declaration got selected in this method/initializer/field.
 	 */
 	private void selectLocalDeclaration(ASTNode node) {
@@ -1762,7 +1659,120 @@ public final class SelectionEngine extends Engine implements ISearchRequestor {
 				return InheritDocVisitor.CONTINUE;
 			}
 		}.visitInheritDoc(type);
-	}
+    }
+
+    private static class SelectionTypeNameMatchRequestorWrapper extends TypeNameMatchRequestorWrapper {
+
+        private ImportReference[] importReferences;
+        private boolean importCachesNodeInitialized = false;
+        private ImportReference[] onDemandImportsNodeCache;
+        private int               onDemandImportsNodeCacheCount;
+        private char[][][]        importsNodeCache;
+        private int               importsNodeCacheCount;
+        private HashtableOfObject onDemandFound    = new HashtableOfObject();
+        private ObjectVector      notImportedFound = new ObjectVector();
+
+        public SelectionTypeNameMatchRequestorWrapper(TypeNameMatchRequestor requestor, IJavaSearchScope scope,
+                                                      ImportReference[] importReferences) {
+            super(requestor, scope);
+            this.importReferences = importReferences;
+        }
+
+        public void acceptType(int modifiers, char[] packageName, char[] simpleTypeName, char[][] enclosingTypeNames, String path,
+                               AccessRestriction access) {
+            if (enclosingTypeNames != null && enclosingTypeNames.length > 0) return;
+
+            if (!this.importCachesNodeInitialized) initializeImportNodeCaches();
+
+            char[] fullyQualifiedTypeName = CharOperation.concat(packageName, simpleTypeName, '.');
+
+            for (int i = 0; i < this.importsNodeCacheCount; i++) {
+                char[][] importName = this.importsNodeCache[i];
+                if (CharOperation.equals(importName[0], simpleTypeName)) {
+
+                    if (CharOperation.equals(importName[1], fullyQualifiedTypeName)) {
+                        super.acceptType(modifiers, packageName, simpleTypeName, enclosingTypeNames, path, access);
+                    }
+                    return;
+                }
+            }
+
+            for (int i = 0; i < this.onDemandImportsNodeCacheCount; i++) {
+                char[][] importName = this.onDemandImportsNodeCache[i].tokens;
+                char[] importFlatName = CharOperation.concatWith(importName, '.');
+
+                if (CharOperation.equals(importFlatName, packageName)) {
+
+                    this.onDemandFound.put(simpleTypeName, simpleTypeName);
+                    super.acceptType(modifiers, packageName, simpleTypeName, enclosingTypeNames, path, access);
+                    return;
+                }
+            }
+
+
+            this.notImportedFound.add(new AcceptedType(modifiers, packageName, simpleTypeName, path, access));
+        }
+
+        public void acceptNotImported() {
+            int size = this.notImportedFound.size();
+            for (int i = 0; i < size; i++) {
+                AcceptedType acceptedType = (AcceptedType)this.notImportedFound.elementAt(i);
+
+                if (this.onDemandFound.get(acceptedType.simpleTypeName) == null) {
+                    super.acceptType(
+                            acceptedType.modifiers,
+                            acceptedType.packageName,
+                            acceptedType.simpleTypeName,
+                            null,
+                            acceptedType.path,
+                            acceptedType.access);
+                }
+            }
+        }
+
+        public void initializeImportNodeCaches() {
+            int length = this.importReferences == null ? 0 : this.importReferences.length;
+
+            for (int i = 0; i < length; i++) {
+                ImportReference importReference = this.importReferences[i];
+                if ((importReference.bits & ASTNode.OnDemand) != 0) {
+                    if (this.onDemandImportsNodeCache == null) {
+                        this.onDemandImportsNodeCache = new ImportReference[length - i];
+                    }
+                    this.onDemandImportsNodeCache[this.onDemandImportsNodeCacheCount++] =
+                            importReference;
+                } else {
+                    if (this.importsNodeCache == null) {
+                        this.importsNodeCache = new char[length - i][][];
+                    }
+
+
+                    this.importsNodeCache[this.importsNodeCacheCount++] = new char[][]{
+                            importReference.tokens[importReference.tokens.length - 1],
+                            CharOperation.concatWith(importReference.tokens, '.')
+                    };
+                }
+            }
+
+            this.importCachesNodeInitialized = true;
+        }
+
+        class AcceptedType {
+            public int               modifiers;
+            public char[]            packageName;
+            public char[]            simpleTypeName;
+            public String            path;
+            public AccessRestriction access;
+
+            public AcceptedType(int modifiers, char[] packageName, char[] simpleTypeName, String path, AccessRestriction access) {
+                this.modifiers = modifiers;
+                this.packageName = packageName;
+                this.simpleTypeName = simpleTypeName;
+                this.path = path;
+                this.access = access;
+            }
+        }
+    }
 
 	/**
 	 * Implements the "Algorithm for Inheriting Method Comments" as specified for

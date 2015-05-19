@@ -13,6 +13,7 @@ package org.eclipse.che.ide.editor.codemirror.client.minimap;
 import org.eclipse.che.ide.jseditor.client.document.Document;
 import org.eclipse.che.ide.jseditor.client.minimap.Minimap;
 import org.eclipse.che.ide.jseditor.client.text.TextPosition;
+import org.eclipse.che.ide.jseditor.client.texteditor.EditorWidget;
 
 /**
  * Implementation of miinimap for the right gutter.
@@ -25,8 +26,9 @@ public class MinimapPresenter implements MinimapView.Delegate, Minimap {
     private final MinimapView view;
 
     /**
-     * The associated document.
+     * The associated editor.
      */
+    private EditorWidget editor;
     private Document document;
 
     public MinimapPresenter(final MinimapView view) {
@@ -43,33 +45,30 @@ public class MinimapPresenter implements MinimapView.Delegate, Minimap {
             }
             int line = (int)longLine;
             this.document.setCursorPosition(new TextPosition(line, 0));
+            this.editor.setFocus();
         }
     }
 
-    public void setDocument(final Document document) {
-        this.document = document;
-    }
-
-    public void addMark(final int line, final String style) {
+    public void addMark(final int offset, final String style, String title) {
         if (this.document != null) {
             final int lineCount = this.document.getLineCount();
             if (lineCount == 0) {
                 return;
             }
-            final double ratio = (double)line / lineCount;
-            this.view.addMark(ratio, style, line);
+            final double ratio = (double)document.getPositionFromIndex(offset).getLine() / lineCount;
+            this.view.addMark(ratio, style, offset, title);
         }
     }
 
     @Override
-    public void addMark(final int line, final String style, final int level) {
+    public void addMark(final int offset, final String style, final int level, String title) {
         if (this.document != null) {
             final int lineCount = this.document.getLineCount();
             if (lineCount == 0) {
                 return;
             }
-            final double ratio = (double)line / lineCount;
-            this.view.addMark(ratio, style, line, level);
+            final double ratio = (double)document.getPositionFromIndex(offset).getLine() / lineCount;
+            this.view.addMark(ratio, style, offset, level, title);
         }
     }
 
@@ -83,9 +82,16 @@ public class MinimapPresenter implements MinimapView.Delegate, Minimap {
     }
 
     @Override
-    public void handleMarkClick(final int line) {
-        if (this.document != null) {
-            this.document.setCursorPosition(new TextPosition(line, 0));
+    public void handleMarkClick(final int offset) {
+        if (this.editor != null && document !=  null) {
+            TextPosition position = document.getPositionFromIndex(offset);
+            this.document.setCursorPosition(position);
+            editor.setFocus();
         }
+    }
+
+    public void setEditor(EditorWidget editor) {
+        this.editor = editor;
+        this.document = editor.getDocument();
     }
 }

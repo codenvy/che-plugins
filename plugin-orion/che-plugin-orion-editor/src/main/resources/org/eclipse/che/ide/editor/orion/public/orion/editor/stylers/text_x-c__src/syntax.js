@@ -9,8 +9,7 @@
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
 
-/*global define*/
-
+/*eslint-env browser, amd*/
 define("orion/editor/stylers/text_x-c__src/syntax", ["orion/editor/stylers/lib/syntax"], function(mLib) { //$NON-NLS-1$ //$NON-NLS-0$
 	var keywords = [
 		"alignas", "alignof", "asm", "and_eq", "and", "auto", //$NON-NLS-5$ //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
@@ -35,7 +34,8 @@ define("orion/editor/stylers/text_x-c__src/syntax", ["orion/editor/stylers/lib/s
 		"union", "unsigned", "using", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 		"virtual", "void", "volatile", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 		"wchar_t", "while", //$NON-NLS-1$ //$NON-NLS-0$
-		"xor_eq", "xor" //$NON-NLS-1$ //$NON-NLS-0$
+		"xor_eq", "xor", //$NON-NLS-1$ //$NON-NLS-0$
+		"_Bool", "_Complex", "_Imaginary" //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 	];
 
 	var directives = [
@@ -43,7 +43,8 @@ define("orion/editor/stylers/text_x-c__src/syntax", ["orion/editor/stylers/lib/s
 		"ifndef", "if", "include", "line", "pragma", "undef" //$NON-NLS-5$ //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 	];
 
-	var grammars = mLib.grammars;
+	var grammars = [];
+	grammars.push.apply(grammars, mLib.grammars);
 	grammars.push({
 		id: "orion.cpp", //$NON-NLS-0$
 		contentTypes: ["text/x-c++src", "text/x-c++"], //$NON-NLS-1$ //$NON-NLS-0$
@@ -64,13 +65,13 @@ define("orion/editor/stylers/text_x-c__src/syntax", ["orion/editor/stylers/lib/s
 			{include: "orion.lib#number_hex"}, //$NON-NLS-0$
 			{
 				match: "\\b(?:" + keywords.join("|") + ")\\b", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
-				name: "keyword.control.cpp" //$NON-NLS-0$
+				name: "keyword.operator.cpp" //$NON-NLS-0$
 			}
 		],
 		repository: {
 			directive: {
 				match: "(#\\s*(?:" + directives.join("|") + "))\\b",
-				name: "keyword.control.directive.c++"
+				name: "keyword.operator.directive.cpp"
 			}
 		}
 	});

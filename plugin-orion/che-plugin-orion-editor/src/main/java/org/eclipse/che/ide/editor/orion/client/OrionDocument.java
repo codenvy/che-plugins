@@ -10,19 +10,22 @@
  *******************************************************************************/
 package org.eclipse.che.ide.editor.orion.client;
 
+import com.google.web.bindery.event.shared.HandlerRegistration;
+
 import org.eclipse.che.ide.api.text.Region;
+import org.eclipse.che.ide.editor.orion.client.jso.ModelChangedEventOverlay;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionPixelPositionOverlay;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionSelectionOverlay;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionTextViewOverlay;
 import org.eclipse.che.ide.jseditor.client.document.AbstractEmbeddedDocument;
 import org.eclipse.che.ide.jseditor.client.document.EmbeddedDocument;
 import org.eclipse.che.ide.jseditor.client.events.CursorActivityHandler;
+import org.eclipse.che.ide.jseditor.client.events.DocumentChangeEvent;
 import org.eclipse.che.ide.jseditor.client.events.HasCursorActivityHandlers;
 import org.eclipse.che.ide.jseditor.client.position.PositionConverter;
 import org.eclipse.che.ide.jseditor.client.text.LinearRange;
 import org.eclipse.che.ide.jseditor.client.text.TextPosition;
 import org.eclipse.che.ide.jseditor.client.text.TextRange;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 
 /**
  * The implementation of {@link EmbeddedDocument} for Orion.
@@ -42,8 +45,35 @@ public class OrionDocument extends AbstractEmbeddedDocument {
         this.textViewOverlay = textViewOverlay;
         this.hasCursorActivityHandlers = hasCursorActivityHandlers;
         this.positionConverter = new OrionPositionConverter();
+        textViewOverlay.addEventListener("ModelChanged", new OrionTextViewOverlay.EventHandler<ModelChangedEventOverlay>() {
+            @Override
+            public void onEvent(ModelChangedEventOverlay parameter) {
+                fireDocumentChangeEvent(parameter);
+            }
+        }, true);
+
     }
 
+    private void fireDocumentChangeEvent(final ModelChangedEventOverlay param) {
+        int startOffset = param.start();
+        int addedCharCount = param.addedCharCount();
+        int removedCharCount = param.removedCharCount();
+        int length = 0;
+
+        if(addedCharCount != 0) {
+           //adding
+            length = addedCharCount;
+        } else if(removedCharCount != 0) {
+            //deleting
+            //TODO there may be bug
+            length = removedCharCount;
+            startOffset = startOffset - length;
+        }
+        String text = textViewOverlay.getModel().getText(startOffset, startOffset + length);
+
+        final DocumentChangeEvent event = new DocumentChangeEvent(this, startOffset, length, text);
+        getDocEventBus().fireEvent(event);
+    }
     @Override
     public TextPosition getPositionFromIndex(final int index) {
         final int line = this.textViewOverlay.getModel().getLineAtOffset(index);

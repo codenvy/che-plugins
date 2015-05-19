@@ -10,18 +10,19 @@
  *******************************************************************************/
 package org.eclipse.che.jdt;
 
+import com.google.inject.Singleton;
+
 import org.eclipse.che.commons.lang.IoUtil;
 import org.eclipse.che.jdt.dom.ASTNodes;
-import org.eclipse.che.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.che.jdt.javadoc.HTMLPrinter;
 import org.eclipse.che.jdt.javadoc.JavaDocLocations;
 import org.eclipse.che.jdt.javadoc.JavaElementLabels;
 import org.eclipse.che.jdt.javadoc.JavaElementLinks;
 import org.eclipse.che.jdt.javadoc.JavadocContentAccess2;
-import com.google.inject.Singleton;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotatable;
+import org.eclipse.jdt.core.ICodeAssist;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -29,6 +30,7 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IRegion;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -143,19 +145,40 @@ public class JavadocFinder {
         return imageName;
     }
 
-    public String findJavadoc4Handle(JavaProject project, String handle) {
-        IJavaElement javaElement = JavaElementLinks.parseURI(handle, project);
+    public String findJavadoc4Handle(IJavaProject project, String handle) {
+        IJavaElement javaElement = JavaElementLinks.parseURI(handle, (JavaProject)project);
         if (javaElement == null || !(javaElement instanceof IMember)) {
             return null;
         }
         return getJavadoc((IMember)javaElement);
     }
 
-    public String findJavadoc(JavaProject project, String fqn) throws JavaModelException {
+    public String findJavadoc(IJavaProject project, String fqn, int offset) throws JavaModelException {
 
         IMember member = null;
-        IJavaElement element = project.findElement(fqn, null);
-        if(element instanceof IMember) {
+        IType type = project.findType(fqn);
+        ICodeAssist codeAssist;
+//        IBuffer buffer;
+        if(type.isBinary()){
+            codeAssist = type.getClassFile();
+//            buffer = type.getClassFile().getBuffer();
+        } else {
+           codeAssist = type.getCompilationUnit();
+//            buffer = type.getCompilationUnit().getBuffer();
+        }
+
+//        DocumentAdapter adapter = new DocumentAdapter(buffer);
+//        org.eclipse.jface.text.IRegion region = JavaWordFinder.findWord(adapter, offset);
+        IJavaElement[] elements = null;
+        if(codeAssist != null) {
+            elements = codeAssist.codeSelect(/*region.getOffset(), region.getLength()*/ offset, 0);
+        }
+        IJavaElement element = null;
+        if(elements != null && elements.length > 0){
+            element = elements[0];
+        }
+
+        if(element != null && element instanceof IMember) {
             member = ((IMember)element);
         }
         if (member == null) {

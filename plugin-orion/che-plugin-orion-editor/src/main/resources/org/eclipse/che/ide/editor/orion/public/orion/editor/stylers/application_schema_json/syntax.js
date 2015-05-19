@@ -9,7 +9,7 @@
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
 
-/*global define*/
+/*eslint-env browser, amd*/
 
 define("orion/editor/stylers/application_schema_json/syntax", ["orion/editor/stylers/application_json/syntax"], function(mJSON) { //$NON-NLS-1$ //$NON-NLS-0$
 	var keywords = [
@@ -28,7 +28,8 @@ define("orion/editor/stylers/application_schema_json/syntax", ["orion/editor/sty
 		"uniqueItems" //$NON-NLS-0$
 	];
 
-	var grammars = mJSON.grammars;
+	var grammars = [];
+	grammars.push.apply(grammars, mJSON.grammars);
 	grammars.push({
 		id: "orion.json.schema", //$NON-NLS-0$
 		contentTypes: ["application/schema+json"], //$NON-NLS-0$
@@ -36,7 +37,7 @@ define("orion/editor/stylers/application_schema_json/syntax", ["orion/editor/sty
 			{include: "orion.json"}, //$NON-NLS-0$
 			{
 				match: "(?:\\$schema|(?:\\b(?:" + keywords.join("|") + ")))\\b", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
-				name: "keyword.control.schema.json" //$NON-NLS-0$
+				name: "keyword.operator.schema.json" //$NON-NLS-0$
 			}
 		]
 	});

@@ -9,8 +9,7 @@
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
 
-/*global define*/
-
+/*eslint-env browser, amd*/
 define("orion/editor/stylers/text_x-python/syntax", ["orion/editor/stylers/lib/syntax"], function(mLib) { //$NON-NLS-0$
 	var keywords = [
 		"and", "as", "assert", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
@@ -31,7 +30,8 @@ define("orion/editor/stylers/text_x-python/syntax", ["orion/editor/stylers/lib/s
 		"yield" //$NON-NLS-0$
 	];
 
-	var grammars = mLib.grammars;
+	var grammars = [];
+	grammars.push.apply(grammars, mLib.grammars);
 	grammars.push({
 		id: "orion.python", //$NON-NLS-0$
 		contentTypes: ["text/x-python"], //$NON-NLS-0$
@@ -63,7 +63,7 @@ define("orion/editor/stylers/text_x-python/syntax", ["orion/editor/stylers/lib/s
 			{include: "orion.lib#number_hex"}, //$NON-NLS-0$ 
 			{
 				match: "\\b(?:" + keywords.join("|") + ")\\b", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
-				name: "keyword.control.python" //$NON-NLS-0$
+				name: "keyword.operator.python" //$NON-NLS-0$
 			}
 		],
 		repository: {

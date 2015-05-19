@@ -10,17 +10,20 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeStructure;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
+import org.eclipse.che.ide.ext.java.client.projecttree.JavaSourceFolderUtil;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
-import org.eclipse.che.ide.ext.java.messages.JavadocHandleComputed;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
 import org.eclipse.che.ide.jseditor.client.text.LinearRange;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
@@ -28,9 +31,6 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.util.loging.Log;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * @author Evgen Vidolob
@@ -38,7 +38,6 @@ import com.google.inject.Singleton;
 @Singleton
 public class OpenDeclarationFinder {
 
-    private final JavaParserWorker       worker;
     private final EditorAgent            editorAgent;
     private final JavaNavigationService  service;
     private       DtoUnmarshallerFactory factory;
@@ -46,9 +45,8 @@ public class OpenDeclarationFinder {
     private       AppContext             context;
 
     @Inject
-    public OpenDeclarationFinder(JavaParserWorker worker, EditorAgent editorAgent, JavaNavigationService service,
+    public OpenDeclarationFinder(EditorAgent editorAgent, JavaNavigationService service,
                                  DtoUnmarshallerFactory factory, JavaNavigationService navigationService, AppContext context) {
-        this.worker = worker;
         this.editorAgent = editorAgent;
         this.service = service;
         this.factory = factory;
@@ -69,42 +67,50 @@ public class OpenDeclarationFinder {
         EmbeddedTextEditorPresenter editor = ((EmbeddedTextEditorPresenter)activeEditor);
         int offset = editor.getCursorOffset();
         final VirtualFile file = editor.getEditorInput().getFile();
-        worker.computeJavadocHandle(offset, file.getPath(), new JavaParserWorker.Callback<JavadocHandleComputed>() {
-            @Override
-            public void onCallback(JavadocHandleComputed result) {
-                if (result != null) {
-                    handle(result, file);
-                }
-            }
-        });
-    }
-
-    private void handle(JavadocHandleComputed result, VirtualFile file) {
-        if (result.getOffset() != -1 && result.isSource()) {
-           EditorPartPresenter editorPartPresenter = editorAgent.getActiveEditor();
-           fileOpened(editorPartPresenter, result.getOffset());
-        } else {
-            sendRequest(result.getKey(), file.getProject());
-        }
-    }
-
-    private void sendRequest(String bindingKey, ProjectNode project) {
         Unmarshallable<OpenDeclarationDescriptor> unmarshaller =
                 factory.newUnmarshaller(OpenDeclarationDescriptor.class);
-        service.findDeclaration(project.getPath(), bindingKey, new AsyncRequestCallback<OpenDeclarationDescriptor>(unmarshaller) {
-            @Override
-            protected void onSuccess(OpenDeclarationDescriptor result) {
-                if (result != null) {
-                    handleDescriptor(result);
-                }
-            }
+        service.findDeclaration(file.getProject().getPath(), JavaSourceFolderUtil.getFQNForFile(file), offset,
+                                new AsyncRequestCallback<OpenDeclarationDescriptor>(unmarshaller) {
+                                    @Override
+                                    protected void onSuccess(OpenDeclarationDescriptor result) {
+                                        if (result != null) {
+                                            handleDescriptor(result);
+                                        }
+                                    }
 
-            @Override
-            protected void onFailure(Throwable exception) {
-                Log.error(OpenDeclarationFinder.class, exception);
-            }
-        });
+                                    @Override
+                                    protected void onFailure(Throwable exception) {
+                                        Log.error(OpenDeclarationFinder.class, exception);
+                                    }
+                                });
     }
+
+//    private void handle(JavadocHandleComputed result, VirtualFile file) {
+//        if (result.getOffset() != -1 && result.isSource()) {
+//           EditorPartPresenter editorPartPresenter = editorAgent.getActiveEditor();
+//           fileOpened(editorPartPresenter, result.getOffset());
+//        } else {
+//            sendRequest(result.getKey(), file.getProject());
+//        }
+//    }
+
+//    private void sendRequest(String bindingKey, ProjectNode project) {
+//        Unmarshallable<OpenDeclarationDescriptor> unmarshaller =
+//                factory.newUnmarshaller(OpenDeclarationDescriptor.class);
+//        service.findDeclaration(project.getPath(), bindingKey, new AsyncRequestCallback<OpenDeclarationDescriptor>(unmarshaller) {
+//            @Override
+//            protected void onSuccess(OpenDeclarationDescriptor result) {
+//                if (result != null) {
+//                    handleDescriptor(result);
+//                }
+//            }
+//
+//            @Override
+//            protected void onFailure(Throwable exception) {
+//                Log.error(OpenDeclarationFinder.class, exception);
+//            }
+//        });
+//    }
 
     private void handleDescriptor(final OpenDeclarationDescriptor descriptor) {
         StringMap<EditorPartPresenter> openedEditors = editorAgent.getOpenedEditors();

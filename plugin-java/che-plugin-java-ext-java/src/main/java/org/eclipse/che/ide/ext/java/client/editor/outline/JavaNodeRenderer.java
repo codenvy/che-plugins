@@ -11,18 +11,14 @@
 package org.eclipse.che.ide.ext.java.client.editor.outline;
 
 import elemental.dom.Element;
-import elemental.html.DivElement;
 import elemental.html.SpanElement;
 
 import org.eclipse.che.ide.api.texteditor.outline.CodeBlock;
 import org.eclipse.che.ide.ext.java.client.JavaCss;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.jdt.core.dom.Modifier;
-import org.eclipse.che.ide.ext.java.messages.BlockTypes;
 import org.eclipse.che.ide.ui.tree.NodeRenderer;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
-import org.eclipse.che.ide.util.dom.Elements;
-import com.google.gwt.user.client.ui.UIObject;
 
 
 /**
@@ -50,51 +46,51 @@ public class JavaNodeRenderer implements NodeRenderer<CodeBlock> {
     @Override
     public SpanElement renderNodeContents(CodeBlock data) {
 
-        if (data instanceof JavaCodeBlock) {
-            SpanElement root = Elements.createSpanElement(css.outlineRoot());
-            DivElement icon = Elements.createDivElement(css.outlineIcon());
-            JavaCodeBlock block = (JavaCodeBlock)data;
-            SpanElement label = Elements.createSpanElement(css.outlineLabel());
-            if (BlockTypes.PACKAGE.getType().equals(block.getType())) {
-                Elements.addClassName(css.packageItem(), icon);
-            }
-            if (BlockTypes.IMPORTS.getType().equals(block.getType())) {
-                Elements.addClassName(css.imports(), icon);
-            } else if (BlockTypes.IMPORT.getType().equals(block.getType())) {
-                Elements.addClassName(css.importItem(), icon);
-            } else if (BlockTypes.CLASS.getType().equals(block.getType())) {
-                Elements.addClassName(css.classItem(), icon);
-            } else if (BlockTypes.INTERFACE.getType().equals(block.getType())) {
-                Elements.addClassName(css.interfaceItem(), icon);
-            } else if (BlockTypes.ENUM.getType().equals(block.getType())) {
-                Elements.addClassName(css.enumItem(), icon);
-            } else if (BlockTypes.ANNOTATION.getType().equals(block.getType())) {
-                Elements.addClassName(css.annotationItem(), icon);
-            } else if (BlockTypes.FIELD.getType().equals(block.getType())) {
-                Elements.addClassName(getFieldClass(block.getModifiers()), icon);
-            } else if (BlockTypes.METHOD.getType().equals(block.getType())) {
-                Elements.addClassName(getMethodClass(block.getModifiers()), icon);
-            }
-            label.setTextContent(block.getName());
-            UIObject.ensureDebugId((com.google.gwt.dom.client.Element)label, "outline-codeblock-" + block.getName());
-
-            root.appendChild(icon);
-            root.appendChild(label);
-            if (block.getJavaType() != null) {
-                SpanElement type = Elements.createSpanElement(css.fqnStyle());
-                type.setTextContent(" : " + block.getJavaType());
-                root.appendChild(type);
-            }
-
-            //      CssUtils.setClassNameEnabled(label, css.disabled(), !data.isEnabled());
-
-            // TODO: replace with test case
-            //      assert root.getChildNodes().item(LABEL_NODE_INDEX) == label;
-
-            return root;
-        } else {
+//        if (data instanceof JavaCodeBlock) {
+//            SpanElement root = Elements.createSpanElement(css.outlineRoot());
+//            DivElement icon = Elements.createDivElement(css.outlineIcon());
+//            JavaCodeBlock block = (JavaCodeBlock)data;
+//            SpanElement label = Elements.createSpanElement(css.outlineLabel());
+//            if (BlockTypes.PACKAGE.getType().equals(block.getType())) {
+//                Elements.addClassName(css.packageItem(), icon);
+//            }
+//            if (BlockTypes.IMPORTS.getType().equals(block.getType())) {
+//                Elements.addClassName(css.imports(), icon);
+//            } else if (BlockTypes.IMPORT.getType().equals(block.getType())) {
+//                Elements.addClassName(css.importItem(), icon);
+//            } else if (BlockTypes.CLASS.getType().equals(block.getType())) {
+//                Elements.addClassName(css.classItem(), icon);
+//            } else if (BlockTypes.INTERFACE.getType().equals(block.getType())) {
+//                Elements.addClassName(css.interfaceItem(), icon);
+//            } else if (BlockTypes.ENUM.getType().equals(block.getType())) {
+//                Elements.addClassName(css.enumItem(), icon);
+//            } else if (BlockTypes.ANNOTATION.getType().equals(block.getType())) {
+//                Elements.addClassName(css.annotationItem(), icon);
+//            } else if (BlockTypes.FIELD.getType().equals(block.getType())) {
+//                Elements.addClassName(getFieldClass(block.getModifiers()), icon);
+//            } else if (BlockTypes.METHOD.getType().equals(block.getType())) {
+//                Elements.addClassName(getMethodClass(block.getModifiers()), icon);
+//            }
+//            label.setTextContent(block.getName());
+//            UIObject.ensureDebugId((com.google.gwt.dom.client.Element)label, "outline-codeblock-" + block.getName());
+//
+//            root.appendChild(icon);
+//            root.appendChild(label);
+//            if (block.getJavaType() != null) {
+//                SpanElement type = Elements.createSpanElement(css.fqnStyle());
+//                type.setTextContent(" : " + block.getJavaType());
+//                root.appendChild(type);
+//            }
+//
+//            //      CssUtils.setClassNameEnabled(label, css.disabled(), !data.isEnabled());
+//
+//            // TODO: replace with test case
+//            //      assert root.getChildNodes().item(LABEL_NODE_INDEX) == label;
+//
+//            return root;
+//        } else {
             throw new UnsupportedOperationException("This NodeRenderer support only JavaCodeBlock!");
-        }
+//        }
     }
 
     /**

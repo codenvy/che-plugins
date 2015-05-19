@@ -50,7 +50,7 @@ public class ResourceChangedEvent implements IResourceChangeEvent {
 
     @Override
     public IResource getResource() {
-        throw new UnsupportedOperationException();
+        return  resourceDelta.getResource();
     }
 
     @Override

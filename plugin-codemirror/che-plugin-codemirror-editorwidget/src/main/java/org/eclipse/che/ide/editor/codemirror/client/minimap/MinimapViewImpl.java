@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.editor.codemirror.client.minimap;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-
 import elemental.client.Browser;
 import elemental.css.CSSStyleDeclaration.Cursor;
 import elemental.css.CSSStyleDeclaration.Position;
@@ -27,11 +24,15 @@ import elemental.html.ClientRect;
 import elemental.html.DivElement;
 import elemental.util.Mappable;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+
 public class MinimapViewImpl implements MinimapView {
 
     private static final String MARKER_HEIGHT = "3px";
 
-    private static final String DATASET_KEY_LINE = "line";
+    private static final String DATASET_KEY_LINE  = "line";
+    private static final String DATASET_KEY_TITLE = "title";
 
     /**
      * Minimal size of the minimap to react on clicks.
@@ -100,12 +101,12 @@ public class MinimapViewImpl implements MinimapView {
     }
 
     @Override
-    public void addMark(final double relativePos, final String style, final int line) {
-        addMark(relativePos, style, line, null);
+    public void addMark(final double relativePos, final String style, final int offset, String title) {
+        addMark(relativePos, style, offset, null, title);
     }
 
     @Override
-    public void addMark(final double relativePos, final String style, final int line, final Integer level) {
+    public void addMark(final double relativePos, final String style, final int offset, final Integer level, final String title) {
         changed();
         final DivElement mark = Browser.getDocument().createDivElement();
         mark.setClassName(style);
@@ -121,9 +122,13 @@ public class MinimapViewImpl implements MinimapView {
             mark.getStyle().setZIndex(level);
         }
 
-        mark.getDataset().setAt(DATASET_KEY_LINE, line);
-
+        mark.getDataset().setAt(DATASET_KEY_LINE, offset);
         this.offscreen.appendChild(mark);
+        if (title != null) {
+            mark.setTitle(title);
+        }
+
+
     }
 
     @Override
@@ -206,9 +211,9 @@ public class MinimapViewImpl implements MinimapView {
     private void handleMarkClick(final MouseEvent mouseEvt) {
         if (this.delegate != null) {
             final EventTarget target = mouseEvt.getCurrentTarget();
-            final Integer line = getLine(target);
-            if (line != null) {
-                this.delegate.handleMarkClick(line);
+            final Integer offset = getLine(target);
+            if (offset != null) {
+                this.delegate.handleMarkClick(offset);
             }
         }
     }

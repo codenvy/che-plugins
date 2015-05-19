@@ -10,24 +10,23 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
+import elemental.dom.Element;
+import elemental.js.dom.JsElement;
+
+import com.google.gwt.user.client.ui.Image;
+
+import org.eclipse.che.ide.api.text.annotation.Annotation;
+import org.eclipse.che.ide.ext.java.client.JavaResources;
+import org.eclipse.che.ide.ext.java.shared.dto.Problem;
+import org.eclipse.che.ide.runtime.Assert;
+import org.eclipse.che.ide.util.dom.Elements;
+import org.vectomatic.dom.svg.ui.SVGImage;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.vectomatic.dom.svg.ui.SVGImage;
-
-import org.eclipse.che.ide.api.text.annotation.Annotation;
-import org.eclipse.che.ide.ext.java.client.JavaResources;
-import org.eclipse.che.ide.ext.java.jdt.core.compiler.CategorizedProblem;
-import org.eclipse.che.ide.ext.java.jdt.core.compiler.IProblem;
-import org.eclipse.che.ide.runtime.Assert;
-import org.eclipse.che.ide.util.dom.Elements;
-import com.google.gwt.user.client.ui.Image;
-
-import elemental.dom.Element;
-import elemental.js.dom.JsElement;
-
-/** Annotation representing an <code>IProblem</code>. */
+/** Annotation representing an <code>Problem</code>. */
 public class ProblemAnnotation extends Annotation implements JavaAnnotation, QuickFixableAnnotation {
 
     public static final String ERROR_ANNOTATION_TYPE = "org.eclipse.jdt.ui.error"; //$NON-NLS-1$
@@ -62,13 +61,13 @@ public class ProblemAnnotation extends Annotation implements JavaAnnotation, Qui
     private static JsElement fgWarningElement = (new SVGImage(javaRes.markWarning())).getElement().cast();
     private static JsElement fgErrorElement = (new SVGImage(javaRes.markError())).getElement().cast();
     private List<JavaAnnotation> fOverlaids;
-    private IProblem fProblem;
+    private Problem fProblem;
     private Element fImageElement = null;
     private int fLayer = 0;
     private boolean fIsQuickFixable;
     private boolean fIsQuickFixableStateSet = false;
 
-    public ProblemAnnotation(IProblem problem) {
+    public ProblemAnnotation(Problem problem) {
 
         fProblem = problem;
 
@@ -138,7 +137,7 @@ public class ProblemAnnotation extends Annotation implements JavaAnnotation, Qui
 
     @Override
     public String[] getArguments() {
-        return isProblem() ? fProblem.getArguments() : null;
+        return isProblem() ? fProblem.getArguments().toArray(new String[fProblem.getArguments().size()]) : null;
     }
 
     @Override
@@ -150,6 +149,12 @@ public class ProblemAnnotation extends Annotation implements JavaAnnotation, Qui
     public boolean isProblem() {
         String type = getType();
         return WARNING_ANNOTATION_TYPE.equals(type) || ERROR_ANNOTATION_TYPE.equals(type);
+    }
+
+    @Override
+    public boolean isError() {
+        String type = getType();
+        return  ERROR_ANNOTATION_TYPE.equals(type);
     }
 
     @Override
@@ -190,9 +195,9 @@ public class ProblemAnnotation extends Annotation implements JavaAnnotation, Qui
 
     @Override
     public String getMarkerType() {
-        if (fProblem instanceof CategorizedProblem) {
-            return ((CategorizedProblem)fProblem).getMarkerType();
-        }
+//        if (fProblem instanceof CategorizedProblem) {
+//            return ((CategorizedProblem)fProblem).getMarkerType();
+//        }
         return null;
     }
 

@@ -14,22 +14,20 @@ import org.eclipse.che.ide.api.texteditor.outline.CodeBlock;
 import org.eclipse.che.ide.api.texteditor.outline.OutlineModel;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
-import org.eclipse.che.ide.ext.java.messages.impl.WorkerCodeBlock;
 
 /**
  * OutlineUpdater receive messages from worker and updates OutlineModel
  *
  * @author Evgen Vidolob
  */
-public class OutlineUpdater implements JavaParserWorker.WorkerCallback<WorkerCodeBlock> {
+public class OutlineUpdater /*implements JavaParserWorker.WorkerCallback<WorkerCodeBlock>*/ {
 
     private final OutlineModel  outlineModel;
     private final JavaCodeBlock root;
 
-    public OutlineUpdater(String filePath, OutlineModel outlineModel, JavaParserWorker worker) {
+    public OutlineUpdater(String filePath, OutlineModel outlineModel) {
         this.outlineModel = outlineModel;
-        worker.addOutlineUpdateHandler(filePath, this);
+//        worker.addOutlineUpdateHandler(filePath, this);
         root = JavaCodeBlock.make();
         root.setType(CodeBlock.ROOT_TYPE);
         root.setOffset(0);
@@ -37,20 +35,20 @@ public class OutlineUpdater implements JavaParserWorker.WorkerCallback<WorkerCod
         outlineModel.updateRoot(root);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void onResult(Array<WorkerCodeBlock> problems) {
-        Array<CodeBlock> blockArray = Collections.createArray();
-        for (WorkerCodeBlock jcb : problems.asIterable()) {
-            JavaCodeBlock codeBlock = jcb.cast();
-            codeBlock.setParent(root);
-            blockArray.add(codeBlock);
-            if (codeBlock.getChildren() != null) {
-                setParent(codeBlock, codeBlock.getChildren());
-            }
-        }
-        outlineModel.setRootChildren(blockArray);
-    }
+//    /** {@inheritDoc} */
+//    @Override
+//    public void onResult(Array<WorkerCodeBlock> problems) {
+//        Array<CodeBlock> blockArray = Collections.createArray();
+//        for (WorkerCodeBlock jcb : problems.asIterable()) {
+//            JavaCodeBlock codeBlock = jcb.cast();
+//            codeBlock.setParent(root);
+//            blockArray.add(codeBlock);
+//            if (codeBlock.getChildren() != null) {
+//                setParent(codeBlock, codeBlock.getChildren());
+//            }
+//        }
+//        outlineModel.setRootChildren(blockArray);
+//    }
 
 
     private void setParent(JavaCodeBlock parent, Array<CodeBlock> child) {

@@ -41,7 +41,7 @@ import java.util.Map;
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @since 2.0
  */
-public final class Modifier extends ASTNode implements IExtendedModifier {
+public final class Modifier /*extends ASTNode implements IExtendedModifier*/ {
 
     /**
      * Modifier keywords (typesafe enumeration).
@@ -193,14 +193,14 @@ public final class Modifier extends ASTNode implements IExtendedModifier {
      */
     public static final int FINAL = 0x0010;
 
-    /**
-     * The "keyword" structural property of this node type (type: {@link Modifier.ModifierKeyword}).
-     *
-     * @since 3.0
-     */
-    public static final SimplePropertyDescriptor KEYWORD_PROPERTY = new SimplePropertyDescriptor(Modifier.class,
-                                                                                                 "keyword", Modifier.ModifierKeyword.class,
-                                                                                                 MANDATORY); //$NON-NLS-1$
+//    /**
+//     * The "keyword" structural property of this node type (type: {@link Modifier.ModifierKeyword}).
+//     *
+//     * @since 3.0
+//     */
+//    public static final SimplePropertyDescriptor KEYWORD_PROPERTY = new SimplePropertyDescriptor(Modifier.class,
+//                                                                                                 "keyword", Modifier.ModifierKeyword.class,
+//                                                                                                 MANDATORY); //$NON-NLS-1$
 
     /**
      * "native" modifier constant (bit mask). Applicable only to methods.
@@ -223,8 +223,8 @@ public final class Modifier extends ASTNode implements IExtendedModifier {
      */
     public static final int PRIVATE = 0x0002;
 
-    /** A list of property descriptors (element type: {@link StructuralPropertyDescriptor}), or null if uninitialized. */
-    private static final List PROPERTY_DESCRIPTORS;
+//    /** A list of property descriptors (element type: {@link StructuralPropertyDescriptor}), or null if uninitialized. */
+//    private static final List PROPERTY_DESCRIPTORS;
 
     /**
      * "protected" modifier constant (bit mask). Applicable to types, methods, constructors, and fields.
@@ -275,12 +275,12 @@ public final class Modifier extends ASTNode implements IExtendedModifier {
      */
     public static final int VOLATILE = 0x0040;
 
-    static {
-        List properyList = new ArrayList(2);
-        createPropertyList(Modifier.class, properyList);
-        addProperty(KEYWORD_PROPERTY, properyList);
-        PROPERTY_DESCRIPTORS = reapPropertyList(properyList);
-    }
+//    static {
+//        List properyList = new ArrayList(2);
+//        createPropertyList(Modifier.class, properyList);
+//        addProperty(KEYWORD_PROPERTY, properyList);
+//        PROPERTY_DESCRIPTORS = reapPropertyList(properyList);
+//    }
 
     /**
      * Returns whether the given flags includes the "abstract" modifier. Applicable to types and methods.
@@ -414,17 +414,17 @@ public final class Modifier extends ASTNode implements IExtendedModifier {
         return (flags & VOLATILE) != 0;
     }
 
-    /**
-     * Returns a list of structural property descriptors for this node type. Clients must not modify the result.
-     *
-     * @param apiLevel
-     *         the API level; one of the <code>AST.JLS*</code> constants
-     * @return a list of property descriptors (element type: {@link StructuralPropertyDescriptor})
-     * @since 3.0
-     */
-    public static List propertyDescriptors(int apiLevel) {
-        return PROPERTY_DESCRIPTORS;
-    }
+//    /**
+//     * Returns a list of structural property descriptors for this node type. Clients must not modify the result.
+//     *
+//     * @param apiLevel
+//     *         the API level; one of the <code>AST.JLS*</code> constants
+//     * @return a list of property descriptors (element type: {@link StructuralPropertyDescriptor})
+//     * @since 3.0
+//     */
+//    public static List propertyDescriptors(int apiLevel) {
+//        return PROPERTY_DESCRIPTORS;
+//    }
 
     /**
      * The modifier keyword; defaults to an unspecified modifier.
@@ -433,239 +433,239 @@ public final class Modifier extends ASTNode implements IExtendedModifier {
      */
     private ModifierKeyword modifierKeyword = ModifierKeyword.PUBLIC_KEYWORD;
 
-    /**
-     * Creates a new unparented modifier node owned by the given AST. By default, the node has unspecified (but legal) modifier.
-     * <p>
-     * N.B. This constructor is package-private.
-     * </p>
-     *
-     * @param ast
-     *         the AST that is to own this node
-     * @since 3.0
-     */
-    Modifier(AST ast) {
-        super(ast);
-        unsupportedIn2();
-    }
-
-    /*
-     * (omit javadoc for this method) Method declared on ASTNode.
-     * @since 3.0
-     */
-    void accept0(ASTVisitor visitor) {
-        visitor.visit(this);
-        visitor.endVisit(this);
-    }
-
-    /*
-     * (omit javadoc for this method) Method declared on ASTNode.
-     * @since 3.0
-     */
-    ASTNode clone0(AST target) {
-        Modifier result = new Modifier(target);
-        result.setSourceRange(getStartPosition(), getLength());
-        result.setKeyword(getKeyword());
-        return result;
-    }
-
-    /**
-     * Returns the modifier keyword of this modifier node.
-     *
-     * @return the modifier keyword
-     * @since 3.0
-     */
-    public ModifierKeyword getKeyword() {
-        return this.modifierKeyword;
-    }
-
-    /*
-     * (omit javadoc for this method) Method declared on ASTNode.
-     * @since 3.0
-     */
-    final int getNodeType0() {
-        return MODIFIER;
-    }
-
-    /* (omit javadoc for this method) Method declared on ASTNode. */
-    final Object internalGetSetObjectProperty(SimplePropertyDescriptor property, boolean get, Object value) {
-        if (property == KEYWORD_PROPERTY) {
-            if (get) {
-                return getKeyword();
-            } else {
-                setKeyword((ModifierKeyword)value);
-                return null;
-            }
-        }
-        // allow default implementation to flag the error
-        return super.internalGetSetObjectProperty(property, get, value);
-    }
-
-    /* (omit javadoc for this method) Method declared on ASTNode. */
-    final List internalStructuralPropertiesForType(int apiLevel) {
-        return propertyDescriptors(apiLevel);
-    }
-
-    /**
-     * Answer true if the receiver is the abstract modifier, false otherwise.
-     *
-     * @return true if the receiver is the abstract modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isAbstract() {
-        return this.modifierKeyword == ModifierKeyword.ABSTRACT_KEYWORD;
-    }
-
-    /** @see IExtendedModifier#isAnnotation() */
-    public boolean isAnnotation() {
-        return false;
-    }
-
-    /**
-     * Answer true if the receiver is the final modifier, false otherwise.
-     *
-     * @return true if the receiver is the final modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isFinal() {
-        return this.modifierKeyword == ModifierKeyword.FINAL_KEYWORD;
-    }
-
-    /** @see IExtendedModifier#isModifier() */
-    public boolean isModifier() {
-        return true;
-    }
-
-    /**
-     * Answer true if the receiver is the native modifier, false otherwise.
-     *
-     * @return true if the receiver is the native modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isNative() {
-        return this.modifierKeyword == ModifierKeyword.NATIVE_KEYWORD;
-    }
-
-    /**
-     * Answer true if the receiver is the private modifier, false otherwise.
-     *
-     * @return true if the receiver is the private modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isPrivate() {
-        return this.modifierKeyword == ModifierKeyword.PRIVATE_KEYWORD;
-    }
-
-    /**
-     * Answer true if the receiver is the protected modifier, false otherwise.
-     *
-     * @return true if the receiver is the protected modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isProtected() {
-        return this.modifierKeyword == ModifierKeyword.PROTECTED_KEYWORD;
-    }
-
-    /**
-     * Answer true if the receiver is the public modifier, false otherwise.
-     *
-     * @return true if the receiver is the public modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isPublic() {
-        return this.modifierKeyword == ModifierKeyword.PUBLIC_KEYWORD;
-    }
-
-    /**
-     * Answer true if the receiver is the static modifier, false otherwise.
-     *
-     * @return true if the receiver is the static modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isStatic() {
-        return this.modifierKeyword == ModifierKeyword.STATIC_KEYWORD;
-    }
-
-    /**
-     * Answer true if the receiver is the strictfp modifier, false otherwise.
-     *
-     * @return true if the receiver is the strictfp modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isStrictfp() {
-        return this.modifierKeyword == ModifierKeyword.STRICTFP_KEYWORD;
-    }
-
-    /**
-     * Answer true if the receiver is the synchronized modifier, false otherwise.
-     *
-     * @return true if the receiver is the synchronized modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isSynchronized() {
-        return this.modifierKeyword == ModifierKeyword.SYNCHRONIZED_KEYWORD;
-    }
-
-    /**
-     * Answer true if the receiver is the transient modifier, false otherwise.
-     *
-     * @return true if the receiver is the transient modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isTransient() {
-        return this.modifierKeyword == ModifierKeyword.TRANSIENT_KEYWORD;
-    }
-
-    /**
-     * Answer true if the receiver is the volatile modifier, false otherwise.
-     *
-     * @return true if the receiver is the volatile modifier, false otherwise
-     * @since 3.2
-     */
-    public boolean isVolatile() {
-        return this.modifierKeyword == ModifierKeyword.VOLATILE_KEYWORD;
-    }
-
-    /*
-     * (omit javadoc for this method) Method declared on ASTNode.
-     * @since 3.0
-     */
-    int memSize() {
-        // treat ModifierKeyword as free
-        return BASE_NODE_SIZE + 1 * 4;
-    }
-
-    /**
-     * Sets the modifier keyword of this modifier node.
-     *
-     * @param modifierKeyord
-     *         the modifier keyword
-     * @throws IllegalArgumentException
-     *         if the argument is <code>null</code>
-     * @since 3.0
-     */
-    public void setKeyword(ModifierKeyword modifierKeyord) {
-        if (modifierKeyord == null) {
-            throw new IllegalArgumentException();
-        }
-        preValueChange(KEYWORD_PROPERTY);
-        this.modifierKeyword = modifierKeyord;
-        postValueChange(KEYWORD_PROPERTY);
-    }
-
-    /*
-     * (omit javadoc for this method) Method declared on ASTNode.
-     * @since 3.0
-     */
-    final boolean subtreeMatch0(ASTMatcher matcher, Object other) {
-        // dispatch to correct overloaded match method
-        return matcher.match(this, other);
-    }
-
-    /*
-     * (omit javadoc for this method) Method declared on ASTNode.
-     * @since 3.0
-     */
-    int treeSize() {
-        return memSize();
-    }
+//    /**
+//     * Creates a new unparented modifier node owned by the given AST. By default, the node has unspecified (but legal) modifier.
+//     * <p>
+//     * N.B. This constructor is package-private.
+//     * </p>
+//     *
+//     * @param ast
+//     *         the AST that is to own this node
+//     * @since 3.0
+//     */
+//    Modifier(AST ast) {
+//        super(ast);
+//        unsupportedIn2();
+//    }
+//
+//    /*
+//     * (omit javadoc for this method) Method declared on ASTNode.
+//     * @since 3.0
+//     */
+//    void accept0(ASTVisitor visitor) {
+//        visitor.visit(this);
+//        visitor.endVisit(this);
+//    }
+//
+//    /*
+//     * (omit javadoc for this method) Method declared on ASTNode.
+//     * @since 3.0
+//     */
+//    ASTNode clone0(AST target) {
+//        Modifier result = new Modifier(target);
+//        result.setSourceRange(getStartPosition(), getLength());
+//        result.setKeyword(getKeyword());
+//        return result;
+//    }
+//
+//    /**
+//     * Returns the modifier keyword of this modifier node.
+//     *
+//     * @return the modifier keyword
+//     * @since 3.0
+//     */
+//    public ModifierKeyword getKeyword() {
+//        return this.modifierKeyword;
+//    }
+//
+//    /*
+//     * (omit javadoc for this method) Method declared on ASTNode.
+//     * @since 3.0
+//     */
+//    final int getNodeType0() {
+//        return MODIFIER;
+//    }
+//
+//    /* (omit javadoc for this method) Method declared on ASTNode. */
+//    final Object internalGetSetObjectProperty(SimplePropertyDescriptor property, boolean get, Object value) {
+//        if (property == KEYWORD_PROPERTY) {
+//            if (get) {
+//                return getKeyword();
+//            } else {
+//                setKeyword((ModifierKeyword)value);
+//                return null;
+//            }
+//        }
+//        // allow default implementation to flag the error
+//        return super.internalGetSetObjectProperty(property, get, value);
+//    }
+//
+//    /* (omit javadoc for this method) Method declared on ASTNode. */
+//    final List internalStructuralPropertiesForType(int apiLevel) {
+//        return propertyDescriptors(apiLevel);
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the abstract modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the abstract modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isAbstract() {
+//        return this.modifierKeyword == ModifierKeyword.ABSTRACT_KEYWORD;
+//    }
+//
+//    /** @see IExtendedModifier#isAnnotation() */
+//    public boolean isAnnotation() {
+//        return false;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the final modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the final modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isFinal() {
+//        return this.modifierKeyword == ModifierKeyword.FINAL_KEYWORD;
+//    }
+//
+//    /** @see IExtendedModifier#isModifier() */
+//    public boolean isModifier() {
+//        return true;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the native modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the native modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isNative() {
+//        return this.modifierKeyword == ModifierKeyword.NATIVE_KEYWORD;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the private modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the private modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isPrivate() {
+//        return this.modifierKeyword == ModifierKeyword.PRIVATE_KEYWORD;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the protected modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the protected modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isProtected() {
+//        return this.modifierKeyword == ModifierKeyword.PROTECTED_KEYWORD;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the public modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the public modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isPublic() {
+//        return this.modifierKeyword == ModifierKeyword.PUBLIC_KEYWORD;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the static modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the static modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isStatic() {
+//        return this.modifierKeyword == ModifierKeyword.STATIC_KEYWORD;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the strictfp modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the strictfp modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isStrictfp() {
+//        return this.modifierKeyword == ModifierKeyword.STRICTFP_KEYWORD;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the synchronized modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the synchronized modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isSynchronized() {
+//        return this.modifierKeyword == ModifierKeyword.SYNCHRONIZED_KEYWORD;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the transient modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the transient modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isTransient() {
+//        return this.modifierKeyword == ModifierKeyword.TRANSIENT_KEYWORD;
+//    }
+//
+//    /**
+//     * Answer true if the receiver is the volatile modifier, false otherwise.
+//     *
+//     * @return true if the receiver is the volatile modifier, false otherwise
+//     * @since 3.2
+//     */
+//    public boolean isVolatile() {
+//        return this.modifierKeyword == ModifierKeyword.VOLATILE_KEYWORD;
+//    }
+//
+//    /*
+//     * (omit javadoc for this method) Method declared on ASTNode.
+//     * @since 3.0
+//     */
+//    int memSize() {
+//        // treat ModifierKeyword as free
+//        return BASE_NODE_SIZE + 1 * 4;
+//    }
+//
+//    /**
+//     * Sets the modifier keyword of this modifier node.
+//     *
+//     * @param modifierKeyord
+//     *         the modifier keyword
+//     * @throws IllegalArgumentException
+//     *         if the argument is <code>null</code>
+//     * @since 3.0
+//     */
+//    public void setKeyword(ModifierKeyword modifierKeyord) {
+//        if (modifierKeyord == null) {
+//            throw new IllegalArgumentException();
+//        }
+//        preValueChange(KEYWORD_PROPERTY);
+//        this.modifierKeyword = modifierKeyord;
+//        postValueChange(KEYWORD_PROPERTY);
+//    }
+//
+//    /*
+//     * (omit javadoc for this method) Method declared on ASTNode.
+//     * @since 3.0
+//     */
+//    final boolean subtreeMatch0(ASTMatcher matcher, Object other) {
+//        // dispatch to correct overloaded match method
+//        return matcher.match(this, other);
+//    }
+//
+//    /*
+//     * (omit javadoc for this method) Method declared on ASTNode.
+//     * @since 3.0
+//     */
+//    int treeSize() {
+//        return memSize();
+//    }
 }

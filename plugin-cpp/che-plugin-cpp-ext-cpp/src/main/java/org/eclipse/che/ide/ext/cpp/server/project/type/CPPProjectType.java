@@ -11,12 +11,7 @@
 package org.eclipse.che.ide.ext.cpp.server.project.type;
 
 import org.eclipse.che.api.project.server.type.ProjectType;
-import org.eclipse.che.api.project.shared.Constants;
 import org.eclipse.che.ide.ext.cpp.shared.ProjectAttributes;
-
-import java.util.Arrays;
-
-import static org.eclipse.che.ide.api.project.type.RunnerCategory.CPP;
 
 /**
  * @author Vitaly Parfonov
@@ -26,7 +21,6 @@ public class CPPProjectType extends ProjectType {
 
     public CPPProjectType() {
         super(ProjectAttributes.CPP_ID, ProjectAttributes.CPP_NAME, true, false);
-        addConstantDefinition(Constants.LANGUAGE, "language", ProjectAttributes.PROGRAMMING_LANGUAGE);
-        addRunnerCategories(Arrays.asList(CPP.toString()));
+        addConstantDefinition("language", "language", ProjectAttributes.PROGRAMMING_LANGUAGE);
     }
 }

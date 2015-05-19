@@ -23,19 +23,19 @@ package org.eclipse.che.jdt.internal.compiler.parser;
  *
  */
 
-import org.eclipse.che.jdt.internal.core.CompilationUnitElementInfo;
-import org.eclipse.che.jdt.internal.core.ImportDeclaration;
-import org.eclipse.che.jdt.internal.core.InitializerElementInfo;
-import org.eclipse.che.jdt.internal.core.JavaElement;
-import org.eclipse.che.jdt.internal.core.PackageFragment;
-import org.eclipse.che.jdt.internal.core.SourceAnnotationMethodInfo;
-import org.eclipse.che.jdt.internal.core.SourceField;
-import org.eclipse.che.jdt.internal.core.SourceFieldElementInfo;
-import org.eclipse.che.jdt.internal.core.SourceMethod;
-import org.eclipse.che.jdt.internal.core.SourceMethodElementInfo;
-import org.eclipse.che.jdt.internal.core.SourceType;
-import org.eclipse.che.jdt.internal.core.SourceTypeElementInfo;
-import org.eclipse.che.jdt.internal.core.util.Util;
+import org.eclipse.jdt.internal.core.CompilationUnitElementInfo;
+import org.eclipse.jdt.internal.core.ImportDeclaration;
+import org.eclipse.jdt.internal.core.InitializerElementInfo;
+import org.eclipse.jdt.internal.core.JavaElement;
+import org.eclipse.jdt.internal.core.PackageFragment;
+import org.eclipse.jdt.internal.core.SourceAnnotationMethodInfo;
+import org.eclipse.jdt.internal.core.SourceField;
+import org.eclipse.jdt.internal.core.SourceFieldElementInfo;
+import org.eclipse.jdt.internal.core.SourceMethod;
+import org.eclipse.jdt.internal.core.SourceMethodElementInfo;
+import org.eclipse.jdt.internal.core.SourceType;
+import org.eclipse.jdt.internal.core.SourceTypeElementInfo;
+import org.eclipse.jdt.internal.core.util.Util;
 
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;

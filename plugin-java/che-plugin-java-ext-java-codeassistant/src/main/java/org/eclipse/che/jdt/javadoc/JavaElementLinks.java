@@ -1,8 +1,8 @@
 package org.eclipse.che.jdt.javadoc;
 
-import org.eclipse.che.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.che.jdt.util.JavaModelUtil;
-import org.eclipse.che.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.core.JavaProject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
@@ -31,7 +31,7 @@ import java.net.URLEncoder;
 public class JavaElementLinks {
 
     private static final Logger LOG                      = LoggerFactory.getLogger(JavaElementLinks.class);
-    private static final char   LINK_BRACKET_REPLACEMENT = '\u2603';
+    public static final char   LINK_BRACKET_REPLACEMENT = '\u2603';
     /**
      * The link is composed of a number of segments, separated by LINK_SEPARATOR:
      * <p>
@@ -41,7 +41,7 @@ public class JavaElementLinks {
      * segments[3]: memberName<br>
      * segments[4...]: parameterTypeName (optional)
      */
-    private static final char   LINK_SEPARATOR           = '\u2602';
+    public static final char   LINK_SEPARATOR           = '\u2602';
 
     /**
      * Creates an {@link java.net.URI} with the given scheme for the given element.
@@ -160,10 +160,10 @@ public class JavaElementLinks {
 
     public static IJavaElement parseURI(String ssp, JavaProject project) {
 //        String ssp= uri.getSchemeSpecificPart();
-        String[] segments= ssp.split(String.valueOf(LINK_SEPARATOR), -1);
+        String[] segments= ssp.split(String.valueOf(LINK_SEPARATOR));
 
         // replace '[' manually, since URI confuses it for an IPv6 address as per RFC 2732:
-        IJavaElement element= JavaCore.create(segments[1].replace(LINK_BRACKET_REPLACEMENT, '['), project);
+        IJavaElement element= JavaCore.create(segments[1].replace(LINK_BRACKET_REPLACEMENT, '['));
 
         if (segments.length > 2) {
             String refTypeName= segments[2];

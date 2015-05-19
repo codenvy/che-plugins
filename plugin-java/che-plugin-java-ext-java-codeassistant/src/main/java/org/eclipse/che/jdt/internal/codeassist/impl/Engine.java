@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.jdt.internal.codeassist.impl;
 
-import org.eclipse.che.jdt.internal.core.NameLookup;
-import org.eclipse.che.jdt.internal.core.SearchableEnvironment;
-
+import org.eclipse.che.jdt.internal.compiler.parser.SourceTypeConverter;
+import org.eclipse.jdt.internal.core.NameLookup;
+import org.eclipse.jdt.internal.core.SearchableEnvironment;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.codeassist.impl.AssistOptions;
 import org.eclipse.jdt.internal.codeassist.impl.AssistParser;
@@ -40,7 +40,6 @@ import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
 import org.eclipse.jdt.internal.compiler.lookup.PackageBinding;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
-import org.eclipse.jdt.internal.compiler.parser.SourceTypeConverter;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
 
 import java.util.Map;
@@ -108,12 +107,12 @@ public abstract class Engine implements ITypeRequestor {
 				new CompilationResult(sourceTypes[0].getFileName(), 1, 1, this.compilerOptions.maxProblemsPerUnit);
 		CompilationUnitDeclaration unit =
 				SourceTypeConverter.buildCompilationUnit(
-						sourceTypes,//sourceTypes[0] is always toplevel here
-						SourceTypeConverter.FIELD_AND_METHOD // need field and methods
-						| SourceTypeConverter.MEMBER_TYPE, // need member types
-						// no need for field initialization
-						this.lookupEnvironment.problemReporter,
-						result);
+                        sourceTypes,//sourceTypes[0] is always toplevel here
+                        SourceTypeConverter.FIELD_AND_METHOD // need field and methods
+                        | SourceTypeConverter.MEMBER_TYPE, // need member types
+                        // no need for field initialization
+                        this.lookupEnvironment.problemReporter,
+                        result);
 
 		if (unit != null) {
 			this.lookupEnvironment.buildTypeBindings(unit, accessRestriction);

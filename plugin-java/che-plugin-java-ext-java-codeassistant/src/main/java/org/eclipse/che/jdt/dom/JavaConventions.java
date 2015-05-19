@@ -11,7 +11,7 @@
 
 package org.eclipse.che.jdt.dom;
 
-import org.eclipse.che.jdt.internal.core.util.Util;
+import org.eclipse.jdt.internal.core.util.Util;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;

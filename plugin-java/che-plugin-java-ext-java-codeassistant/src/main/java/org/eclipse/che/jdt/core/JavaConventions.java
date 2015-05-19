@@ -26,6 +26,7 @@ import org.eclipse.jdt.internal.compiler.parser.ScannerHelper;
 import org.eclipse.jdt.internal.compiler.parser.TerminalTokens;
 import org.eclipse.jdt.internal.core.JavaModelStatus;
 import org.eclipse.jdt.internal.core.util.Messages;
+import org.eclipse.jdt.internal.core.util.Util;
 
 import java.util.StringTokenizer;
 
@@ -147,7 +148,7 @@ public final class JavaConventions {
 		if (name == null) {
 			return new Status(IStatus.ERROR, org.eclipse.jdt.core.JavaCore.PLUGIN_ID, -1, Messages.convention_unit_nullName, null);
 		}
-        if (!org.eclipse.che.jdt.internal.core.util.Util.isJavaLikeFileName(name)) {
+        if (!org.eclipse.jdt.internal.core.util.Util.isJavaLikeFileName(name)) {
             return new Status(IStatus.ERROR, org.eclipse.jdt.core.JavaCore.PLUGIN_ID, -1, Messages.convention_unit_notJavaName, null);
 		}
 		String identifier;

@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.jseditor.java.client.editor;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 
 import org.eclipse.che.ide.api.text.Position;
 import org.eclipse.che.ide.collections.Collections;
@@ -19,27 +19,25 @@ import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.java.client.JavaCss;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.editor.ProblemAnnotation;
-import org.eclipse.che.ide.ext.java.jdt.core.IProblemRequestor;
-import org.eclipse.che.ide.ext.java.jdt.core.compiler.IProblem;
+import org.eclipse.che.ide.ext.java.shared.dto.Problem;
 import org.eclipse.che.ide.jseditor.client.annotation.AnnotationModel;
 import org.eclipse.che.ide.jseditor.client.annotation.AnnotationModelImpl;
 import org.eclipse.che.ide.jseditor.client.partition.DocumentPositionMap;
 import org.eclipse.che.ide.jseditor.client.texteditor.EditorResources;
 import org.eclipse.che.ide.jseditor.client.texteditor.EditorResources.EditorCss;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An annotation model for java sources.
  */
-public class JavaAnnotationModel extends AnnotationModelImpl implements AnnotationModel, IProblemRequestor {
-
-    private List<IProblem> reportedProblems;
-
-    private List<ProblemAnnotation> generatedAnnotations = new ArrayList<>();
+public class JavaAnnotationModel extends AnnotationModelImpl implements AnnotationModel, ProblemRequestor {
 
     private final JavaCss javaCss;
     private final EditorCss editorCss;
+    private List<Problem> reportedProblems;
+    private List<ProblemAnnotation> generatedAnnotations = new ArrayList<>();
 
     @AssistedInject
     public JavaAnnotationModel(@Assisted final DocumentPositionMap docPositionMap,
@@ -50,7 +48,7 @@ public class JavaAnnotationModel extends AnnotationModelImpl implements Annotati
         this.editorCss = editorResources.editorCss();
     }
 
-    protected Position createPositionFromProblem(final IProblem problem) {
+    protected Position createPositionFromProblem(final Problem problem) {
         int start = problem.getSourceStart();
         int end = problem.getSourceEnd();
 
@@ -74,7 +72,7 @@ public class JavaAnnotationModel extends AnnotationModelImpl implements Annotati
     }
 
     @Override
-    public void acceptProblem(final IProblem problem) {
+    public void acceptProblem(final Problem problem) {
         reportedProblems.add(problem);
     }
 
@@ -88,7 +86,7 @@ public class JavaAnnotationModel extends AnnotationModelImpl implements Annotati
         reportProblems(reportedProblems);
     }
 
-    private void reportProblems(final List<IProblem> problems) {
+    private void reportProblems(final List<Problem> problems) {
         boolean temporaryProblemsChanged = false;
 
         if (!generatedAnnotations.isEmpty()) {
@@ -99,7 +97,7 @@ public class JavaAnnotationModel extends AnnotationModelImpl implements Annotati
 
         if (reportedProblems != null && !reportedProblems.isEmpty()) {
 
-            for (final IProblem problem : reportedProblems) {
+            for (final Problem problem : reportedProblems) {
                 final Position position = createPositionFromProblem(problem);
 
                 if (position != null) {

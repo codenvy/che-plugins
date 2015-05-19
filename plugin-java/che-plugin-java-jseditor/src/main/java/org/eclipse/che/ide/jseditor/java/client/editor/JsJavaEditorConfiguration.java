@@ -108,10 +108,11 @@ public class JsJavaEditorConfiguration extends DefaultTextEditorConfiguration {
         return this.reconciler;
     }
 
-    @Override
-    public DocumentPartitioner getPartitioner() {
-        return this.partitioner;
-    }
+//    @Override
+//    @Nonnull
+//    public DocumentPartitioner getPartitioner() {
+//        return this.partitioner;
+//    }
 
     @Override
     public DocumentPositionMap getDocumentPositionMap() {
@@ -136,7 +137,8 @@ public class JsJavaEditorConfiguration extends DefaultTextEditorConfiguration {
     private Reconciler initReconciler(final ReconcilerFactory reconcilerFactory,
                                       final JavaReconcilerStrategy javaReconcilerStrategy) {
         final BasicIncrementalScheduler scheduler = new BasicIncrementalScheduler(userActivityManager, 50, 100);
-        final Reconciler reconciler = reconcilerFactory.create(DEFAULT_PARTITIONING, this.partitioner);
+        final Reconciler reconciler = reconcilerFactory.create(DEFAULT_PARTITIONING, getPartitioner());
+        reconciler.addReconcilingStrategy(DEFAULT_CONTENT_TYPE, javaReconcilerStrategy);
         reconciler.addReconcilingStrategy(DEFAULT_CONTENT_TYPE, javaReconcilerStrategy);
         return reconciler;
     }

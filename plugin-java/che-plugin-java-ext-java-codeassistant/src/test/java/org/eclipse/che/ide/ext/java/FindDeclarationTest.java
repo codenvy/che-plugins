@@ -10,14 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java;
 
+import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
 import org.eclipse.che.jdt.JavaNavigation;
 import org.eclipse.che.jdt.SourcesFromBytecodeGenerator;
-import org.eclipse.che.jdt.internal.core.JavaProject;
-import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
-
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -30,13 +26,15 @@ public class FindDeclarationTest extends BaseTest {
 
     @Test
     public void testFindClassIsNotNullOrEmpty() throws Exception {
-        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "Ljava/lang/String;");
+        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "java.lang.String", 3669);
         assertThat(declaration).isNotNull();
     }
 
+
+
     @Test
     public void testFindClassShouldReturnBinaryPath() throws Exception {
-        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "Ljava/lang/String;");
+        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "com.codenvy.test.MyClass", 855);
         assertThat(declaration).isNotNull();
         assertThat(declaration.getOffset()).isNotNull();
         assertThat(declaration.getLength()).isNotNull();
@@ -46,27 +44,20 @@ public class FindDeclarationTest extends BaseTest {
 
     @Test
     public void testFindClassShouldReturnSourcePath() throws Exception {
-        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "Lcom/codenvy/test/MyClass;");
+        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "com.codenvy.test.TestClass", 56);
         assertThat(declaration).isNotNull();
         assertThat(declaration.isBinary()).isFalse();
         assertThat(declaration.getPath()).isEqualTo("/test/src/main/java/com/codenvy/test/MyClass.java");
     }
 
     @Test
-    public void testFindClassShouldReturnSourcePathInMavenModule() throws Exception {
-        JavaProject project = new JavaProject(new File(getClass().getResource("/projects").getFile()), "/multimoduleProject/test", getClass().getResource("/temp").getPath(), "ws", options);
-        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "Lcom/codenvy/test/MyClass;");
+    public void testConstructorParam() throws Exception {
+        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "zzz.Z", 115);
         assertThat(declaration).isNotNull();
         assertThat(declaration.isBinary()).isFalse();
-        assertThat(declaration.getPath()).isEqualTo("/multimoduleProject/test/src/main/java/com/codenvy/test/MyClass.java");
+        assertThat(declaration.getOffset()).isEqualTo(75);
     }
 
-    @Test
-    public void findClassShouldReturnSourcePathInMavenModule() throws Exception {
-        JavaProject project = new JavaProject(new File(getClass().getResource("/projects").getFile()), "/multimoduleProject/test", getClass().getResource("/temp").getPath(), "ws", options);
-        OpenDeclarationDescriptor declaration = navigation.findDeclaration(project, "Lcom/codenvy/sub/ClassInSubModule;");
-        assertThat(declaration).isNotNull();
-        assertThat(declaration.isBinary()).isFalse();
-        assertThat(declaration.getPath()).isEqualTo("/multimoduleProject/subModule/src/main/java/com/codenvy/sub/ClassInSubModule.java");
-    }
+
+
 }

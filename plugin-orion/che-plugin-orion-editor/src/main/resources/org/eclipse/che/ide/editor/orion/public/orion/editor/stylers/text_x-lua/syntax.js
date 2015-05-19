@@ -9,8 +9,7 @@
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
 
-/*global define*/
-
+/*eslint-env browser, amd*/
 define("orion/editor/stylers/text_x-lua/syntax", ["orion/editor/stylers/lib/syntax"], function(mLib) { //$NON-NLS-1$ //$NON-NLS-0$
 	// from http://www.lua.org/ftp/refman-5.0.pdf
 	var keywords = [
@@ -53,7 +52,8 @@ define("orion/editor/stylers/text_x-lua/syntax", ["orion/editor/stylers/lib/synt
 		"_VERSION" //$NON-NLS-0$
 	];
 
-	var grammars = mLib.grammars;
+	var grammars = [];
+	grammars.push.apply(grammars, mLib.grammars);
 	grammars.push({
 		id: "orion.lua", //$NON-NLS-0$
 		contentTypes: ["text/x-luasrc", "text/x-lua"], //$NON-NLS-1$ //$NON-NLS-0$
@@ -76,7 +76,7 @@ define("orion/editor/stylers/text_x-lua/syntax", ["orion/editor/stylers/lib/synt
 			{include: "#reserved_underscore_capital"}, //$NON-NLS-0$
 			{
 				match: "\\b(?:" + keywords.join("|") + ")\\b", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
-				name: "keyword.control.lua" //$NON-NLS-0$
+				name: "keyword.operator.lua" //$NON-NLS-0$
 			}
 		],
 		repository: {

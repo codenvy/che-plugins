@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.editor.codemirrorjso.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Overlay class over Keymap CodeMirror objects.
@@ -45,8 +45,7 @@ public class CMKeymapOverlay extends JavaScriptObject {
 
     public final native <T> void addBinding(String keySpec, T thisInstance, CMKeyBindingAction<T> keyBindingAction) /*-{
         var keymapFun = function() {
-            var javaMethod = keyBindingAction.@org.eclipse.che.ide.editor.codemirrorjso.client.CMKeymapOverlay.CMKeyBindingAction::action(*);
-            javaMethod(thisInstance);
+            keyBindingAction.@org.eclipse.che.ide.editor.codemirrorjso.client.CMKeymapOverlay.CMKeyBindingAction::action(*)(thisInstance);
         }
         this[keySpec] = $entry(keymapFun);
     }-*/;

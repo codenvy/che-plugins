@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client;
 
-import org.eclipse.che.ide.ext.java.jdt.core.JavaConventions;
-import org.eclipse.che.ide.ext.java.jdt.core.JavaCore;
 import org.eclipse.che.ide.runtime.IStatus;
 import org.eclipse.che.ide.runtime.Status;
 
@@ -105,13 +103,17 @@ public class JavaUtils {
     }
 
     private static IStatus validateCompilationUnitName(String name) {
-        return JavaConventions.validateCompilationUnitName(name, JavaCore.getOption(JavaCore.COMPILER_SOURCE),
-                                                           JavaCore.getOption(JavaCore.COMPILER_COMPLIANCE));
+//        return JavaConventions.validateCompilationUnitName(name, JavaCore.getOption(JavaCore.COMPILER_SOURCE),
+//                                                           JavaCore.getOption(JavaCore.COMPILER_COMPLIANCE));
+        //TODO provide more simple way to check java names
+        return Status.OK_STATUS;
     }
 
     private static IStatus validatePackageName(String name) {
-        return JavaConventions.validatePackageName(name, JavaCore.getOption(JavaCore.COMPILER_SOURCE),
-                                                   JavaCore.getOption(JavaCore.COMPILER_COMPLIANCE));
+//        return JavaConventions.validatePackageName(name, JavaCore.getOption(JavaCore.COMPILER_SOURCE),
+//                                                   JavaCore.getOption(JavaCore.COMPILER_COMPLIANCE));
+        //TODO provide more simple way to check java names
+        return Status.OK_STATUS;
     }
 
 }

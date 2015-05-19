@@ -46,7 +46,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CheASTParser;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -61,6 +61,7 @@ import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
+import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -358,7 +359,7 @@ public class JavadocContentAccess2 {
 
     private static CompilationUnit createAST(IJavaElement element, String cuSource) {
         Assert.isNotNull(element);
-        ASTParser parser = ASTParser.newParser(AST.JLS8);
+        CheASTParser parser = CheASTParser.newParser(AST.JLS8);
 
         IJavaProject javaProject = element.getJavaProject();
         parser.setProject(javaProject);

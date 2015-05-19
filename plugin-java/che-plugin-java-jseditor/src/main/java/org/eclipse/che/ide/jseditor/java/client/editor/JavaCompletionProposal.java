@@ -12,31 +12,40 @@ package org.eclipse.che.ide.jseditor.java.client.editor;
 
 import elemental.dom.Element;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import org.eclipse.che.ide.api.icon.Icon;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
-import org.eclipse.che.ide.ext.java.messages.Change;
-import org.eclipse.che.ide.ext.java.messages.ProposalAppliedMessage;
+import org.eclipse.che.ide.ext.java.client.editor.JavaCodeAssistClient;
+import org.eclipse.che.ide.ext.java.shared.dto.Change;
+import org.eclipse.che.ide.ext.java.shared.dto.ProposalApplyResult;
+import org.eclipse.che.ide.ext.java.shared.dto.Region;
 import org.eclipse.che.ide.jseditor.client.codeassist.Completion;
 import org.eclipse.che.ide.jseditor.client.codeassist.CompletionProposal;
+import org.eclipse.che.ide.jseditor.client.codeassist.CompletionProposalExtension;
 import org.eclipse.che.ide.jseditor.client.document.EmbeddedDocument;
 import org.eclipse.che.ide.jseditor.client.text.LinearRange;
+import org.eclipse.che.ide.util.loging.Log;
+
+import java.util.List;
 
 /**
- * @author <a href="mailto:evidolob@codenvy.com">Evgen Vidolob</a>
+ * @author Evgen Vidolob
  */
-public class JavaCompletionProposal implements CompletionProposal {
+public class JavaCompletionProposal implements CompletionProposal, CompletionProposalExtension {
 
-    private final String id;
-    private final String display;
-    private final Icon icon;
-    private final JavaParserWorker worker;
+    private final int                  id;
+    private final String               display;
+    private final Icon                 icon;
+    private final JavaCodeAssistClient client;
+    private       String               sessionId;
 
-    public JavaCompletionProposal(final String id, final String display, final Icon icon, final JavaParserWorker worker) {
+    public JavaCompletionProposal(final int id, final String display, final Icon icon,
+                                  final JavaCodeAssistClient client, String sessionId) {
         this.id = id;
         this.display = display;
         this.icon = icon;
-        this.worker = worker;
+        this.client = client;
+        this.sessionId = sessionId;
     }
 
     /** {@inheritDoc} */
@@ -59,20 +68,30 @@ public class JavaCompletionProposal implements CompletionProposal {
 
     @Override
     public void getCompletion(final CompletionCallback callback) {
-        worker.applyCAProposal(id, new JavaParserWorker.Callback<ProposalAppliedMessage>() {
+        getCompletion(true, callback);
+    }
+
+    @Override
+    public void getCompletion(boolean insert, final CompletionCallback callback) {
+        client.applyProposal(sessionId, id, insert, new AsyncCallback<ProposalApplyResult>() {
             @Override
-            public void onCallback(final ProposalAppliedMessage message) {
-                callback.onCompletion(new CompletionImpl(message.changes(), message.selectionRegion()));
+            public void onFailure(Throwable caught) {
+                Log.error(JavaCompletionProposal.class, caught);
+            }
+
+            @Override
+            public void onSuccess(ProposalApplyResult result) {
+                callback.onCompletion(new CompletionImpl(result.getChanges(), result.getSelection()));
             }
         });
     }
 
     private class CompletionImpl implements Completion {
 
-        private final Array<Change> changes;
-        private final org.eclipse.che.ide.ext.java.messages.Region region;
+        private final List<Change> changes;
+        private final Region       region;
 
-        private CompletionImpl(final Array<Change> changes, final org.eclipse.che.ide.ext.java.messages.Region region) {
+        private CompletionImpl(final List<Change> changes, final Region region) {
             this.changes = changes;
             this.region = region;
         }
@@ -80,8 +99,8 @@ public class JavaCompletionProposal implements CompletionProposal {
         /** {@inheritDoc} */
         @Override
         public void apply(final EmbeddedDocument document) {
-            for (final Change change : changes.asIterable()) {
-                document.replace(change.offset(), change.length(), change.text());
+            for (final Change change : changes) {
+                document.replace(change.getOffset(), change.getLength(), change.getText());
             }
         }
 

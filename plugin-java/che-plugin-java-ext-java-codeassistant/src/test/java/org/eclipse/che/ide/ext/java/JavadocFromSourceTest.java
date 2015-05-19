@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.ext.java;
 
 import org.eclipse.che.jdt.JavadocFinder;
-
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -31,25 +30,25 @@ public class JavadocFromSourceTest extends BaseTest {
 
     @Test
     public void testJavadoc4Class() throws Exception {
-        String javadoc = finder.findJavadoc(project, "Lcom/codenvy/test/MyClass;");
+        String javadoc = finder.findJavadoc(project, "com.codenvy.test.MyClass", 686);
         assertThat(javadoc).isNotNull().contains("Test javadoc for class");
     }
 
     @Test
     public void testJavadoc4Method() throws Exception {
-        String javadoc = finder.findJavadoc(project, "Lcom/codenvy/test/MyClass;.myMethod()");
+        String javadoc = finder.findJavadoc(project, "com.codenvy.test.MyClass", 759);
         assertThat(javadoc).isNotNull().contains("My test method javadoc;");
     }
 
     @Test
     public void testJavadoc4StaticMethod() throws Exception {
-        String javadoc = finder.findJavadoc(project, "Lcom/codenvy/test/MyClass;.isValidName(Ljava.lang.String;)");
+        String javadoc = finder.findJavadoc(project, "com.codenvy.test.MyClass", 1359);
         assertThat(javadoc).isNotNull().contains("Verifies that the specified name is valid for our service");
     }
 
     @Test
     public void testJavadoc4Field() throws Exception {
-        String javadoc = finder.findJavadoc(project, "Lcom/codenvy/test/MyClass;.myField)Ljava.lang.String;");
+        String javadoc = finder.findJavadoc(project,"com.codenvy.test.MyClass", 862);
         assertThat(javadoc).isNotNull().contains("My test field javadoc.");
     }
 
@@ -70,8 +69,7 @@ public class JavadocFromSourceTest extends BaseTest {
     @Test
     public void methodHandleWithParam() throws JavaModelException, URISyntaxException, UnsupportedEncodingException {
         JavadocFinder finder = new JavadocFinder("test");
-        String javadoc = finder.findJavadoc(project, "Lcom/codenvy/test/MyClass;.greetServer(Ljava.lang.String;)Ljava.lang.String;|Ljava.lang.IllegalArgumentException;#input");
-        assertThat(javadoc).isNotNull().contains(
-                "Method with param and exception");
+        String javadoc = finder.findJavadoc(project, "com.codenvy.test.MyClass", 1639);
+        assertThat(javadoc).isNotNull().contains("Method with param and exception");
     }
 }

@@ -25,8 +25,6 @@ import org.eclipse.che.ide.ext.java.client.dependenciesupdater.JavaNameEnvironme
 import org.eclipse.che.ide.ext.java.client.dependenciesupdater.JavaNameEnvironmentServiceClientImpl;
 import org.eclipse.che.ide.ext.java.client.documentation.QuickDocPresenter;
 import org.eclipse.che.ide.ext.java.client.documentation.QuickDocumentation;
-import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
-import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorkerImpl;
 import org.eclipse.che.ide.ext.java.client.format.FormatController;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationServiceImpl;
@@ -44,7 +42,6 @@ public class JavaGinModule extends AbstractGinModule {
     /** {@inheritDoc} */
     @Override
     protected void configure() {
-        bind(JavaParserWorker.class).to(JavaParserWorkerImpl.class).in(Singleton.class);
         bind(FormatController.class).asEagerSingleton();
         bind(NewJavaSourceFileView.class).to(NewJavaSourceFileViewImpl.class).in(Singleton.class);
         bind(QuickDocumentation.class).to(QuickDocPresenter.class).in(Singleton.class);

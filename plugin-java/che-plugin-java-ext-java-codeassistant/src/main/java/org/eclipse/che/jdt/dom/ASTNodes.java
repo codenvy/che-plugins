@@ -1,6 +1,6 @@
 package org.eclipse.che.jdt.dom;
 
-import org.eclipse.che.jdt.javadoc.ASTProvider;
+import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.internal.corext.dom.GenericVisitor;
 
 /**
  * Internal helper methods that deal with {@link org.eclipse.jdt.core.dom.ASTNode}s:

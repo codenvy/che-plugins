@@ -50,9 +50,9 @@ public interface IResourceDelta extends org.eclipse.core.resources.IResourceDelt
      *
      * @return the affected resource (handle)
      */
+    @Deprecated
     public File getFile();
 
     @Override
-    @Deprecated
     IResource getResource();
 }

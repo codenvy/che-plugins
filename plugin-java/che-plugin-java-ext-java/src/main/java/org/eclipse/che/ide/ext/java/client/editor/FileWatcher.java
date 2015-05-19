@@ -10,20 +10,25 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
+import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
+import org.eclipse.che.ide.api.event.ActivePartChangedHandler;
 import org.eclipse.che.ide.api.event.ItemEvent;
 import org.eclipse.che.ide.api.event.ItemHandler;
 import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PropertyListener;
-import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Evgen Vidolob
@@ -32,10 +37,9 @@ import com.google.web.bindery.event.shared.EventBus;
 public class FileWatcher {
 
     @Inject
-    private JavaParserWorker worker;
-
-    @Inject
     private EditorAgent editorAgent;
+
+    private Set<EmbeddedTextEditorPresenter> editor2reconcile = new HashSet<>();
 
     @Inject
     private void handleFileOperations(EventBus eventBus) {
@@ -44,17 +48,29 @@ public class FileWatcher {
             public void onItem(ItemEvent event) {
                 if (event.getOperation() == ItemEvent.ItemOperation.DELETED) {
                     if (event.getItem() instanceof SourceFileNode) {
-                        String fqn = getFQN(((SourceFileNode)event.getItem()));
-                        worker.removeFqnFromCache(fqn);
                         reparseAllOpenedFiles();
                     } else if (event.getItem() instanceof PackageNode) {
-                        worker.removeFqnFromCache(((PackageNode)event.getItem()).getQualifiedName());
                         reparseAllOpenedFiles();
                     }
 
                 }
             }
         });
+        eventBus.addHandler(ActivePartChangedEvent.TYPE, new ActivePartChangedHandler() {
+            @Override
+            public void onActivePartChanged(ActivePartChangedEvent event) {
+                if (event.getActivePart() instanceof EmbeddedTextEditorPresenter) {
+                    if (editor2reconcile.contains(event.getActivePart())) {
+                        reParseEditor((EmbeddedTextEditorPresenter<?>)event.getActivePart());
+                    }
+                }
+            }
+        });
+    }
+
+    private void reParseEditor(EmbeddedTextEditorPresenter<?> editor) {
+        editor.refreshEditor();
+        editor2reconcile.remove(editor);
     }
 
 
@@ -64,32 +80,17 @@ public class FileWatcher {
             public void propertyChanged(PartPresenter source, int propId) {
                 if (propId == EditorPartPresenter.PROP_DIRTY) {
                     if (!editor.isDirty()) {
-                        VirtualFile file = editor.getEditorInput().getFile();
-                        String fqn = getFQN(file);
-                        worker.removeFqnFromCache(fqn);
                         reparseAllOpenedFiles();
+                        //remove just saved editor
+                        editor2reconcile.remove((EmbeddedTextEditorPresenter)editor);
                     }
                 }
             }
         };
         editor.addPropertyListener(propertyListener);
-        editor.addCloseHandler(new EditorPartPresenter.EditorPartCloseHandler() {
-            @Override
-            public void onClose(EditorPartPresenter editor) {
-                worker.fileClosed(editor.getEditorInput().getFile().getPath());
-            }
-        });
     }
 
-    private String getFQN(VirtualFile file) {
-        String packageName = "";
-        if(file instanceof SourceFileNode) {
-            if (((SourceFileNode)file).getParent() instanceof PackageNode) {
-                packageName = ((PackageNode)((SourceFileNode)file).getParent()).getQualifiedName() + '.';
-            }
-        }
-        return packageName + file.getName().substring(0, file.getName().indexOf('.'));
-    }
+
 
     private void reparseAllOpenedFiles() {
         editorAgent.getOpenedEditors().iterate(new StringMap.IterationCallback<EditorPartPresenter>() {
@@ -97,7 +98,7 @@ public class FileWatcher {
             public void onIteration(final String s, final EditorPartPresenter editorPartPresenter) {
                 if (editorPartPresenter instanceof EmbeddedTextEditorPresenter) {
                     final EmbeddedTextEditorPresenter< ? > editor = (EmbeddedTextEditorPresenter< ? >)editorPartPresenter;
-                    editor.refreshEditor();
+                    editor2reconcile.add(editor);
                 }
             }
         });

@@ -10,15 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.format;
 
-import org.eclipse.che.ide.api.event.ProjectActionEvent;
-import org.eclipse.che.ide.api.event.ProjectActionHandler;
-import org.eclipse.che.ide.collections.Jso;
-import org.eclipse.che.ide.collections.js.JsoStringMap;
-import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
-import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.eclipse.che.ide.util.loging.Log;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+
+import org.eclipse.che.ide.api.event.ProjectActionEvent;
+import org.eclipse.che.ide.api.event.ProjectActionHandler;
 
 /**
  * @author Roman Nikitenko
@@ -26,12 +22,11 @@ import com.google.web.bindery.event.shared.EventBus;
 public class FormatController {
 
     private FormatClientService service;
-    private JavaParserWorker    worker;
 
     @Inject
-    public FormatController(JavaParserWorker worker, FormatClientService formatClientService, EventBus eventBus) {
+    public FormatController(/*JavaParserWorker worker,*/ FormatClientService formatClientService, EventBus eventBus) {
         this.service = formatClientService;
-        this.worker = worker;
+//        this.worker = worker;
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
             public void onProjectOpened(ProjectActionEvent event) {
@@ -51,17 +46,17 @@ public class FormatController {
     }
 
     private void getFormattingCodenvySettings() {
-        service.formattingCodenvySettings(new AsyncRequestCallback<String>(new org.eclipse.che.ide.rest.StringUnmarshaller()) {
-            @Override
-            protected void onSuccess(String result) {
-                JsoStringMap<String> mapSettings = Jso.deserialize(result).cast();
-                worker.preferenceFormatSettings(mapSettings);
-            }
-
-            @Override
-            protected void onFailure(Throwable throwable) {
-                Log.error(getClass(), "Can not get formatting settings from file 'codenvy-codestyle-eclipse_.xml'");
-            }
-        });
+//        service.formattingCodenvySettings(new AsyncRequestCallback<String>(new org.eclipse.che.ide.rest.StringUnmarshaller()) {
+//            @Override
+//            protected void onSuccess(String result) {
+//                JsoStringMap<String> mapSettings = Jso.deserialize(result).cast();
+//                worker.preferenceFormatSettings(mapSettings);
+//            }
+//
+//            @Override
+//            protected void onFailure(Throwable throwable) {
+//                Log.error(getClass(), "Can not get formatting settings from file 'codenvy-codestyle-eclipse_.xml'");
+//            }
+//        });
     }
 }

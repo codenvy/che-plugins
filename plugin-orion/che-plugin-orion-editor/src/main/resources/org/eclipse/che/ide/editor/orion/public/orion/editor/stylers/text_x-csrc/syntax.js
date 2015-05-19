@@ -9,8 +9,7 @@
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
 
-/*global define*/
-
+/*eslint-env browser, amd*/
 define("orion/editor/stylers/text_x-csrc/syntax", ["orion/editor/stylers/lib/syntax"], function(mLib) { //$NON-NLS-1$ //$NON-NLS-0$
 	var keywords = [
 		"auto", //$NON-NLS-0$
@@ -20,14 +19,15 @@ define("orion/editor/stylers/text_x-csrc/syntax", ["orion/editor/stylers/lib/syn
 		"else", "enum", "extern", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 		"float", "for", //$NON-NLS-1$ //$NON-NLS-0$
 		"goto", //$NON-NLS-0$
-		"if", "int", //$NON-NLS-1$ //$NON-NLS-0$
+		"if", "inline", "int", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 		"long", //$NON-NLS-0$
 		"register", "return", //$NON-NLS-1$ //$NON-NLS-0$
 		"short", "signed", "sizeof", "static", "struct", "switch", //$NON-NLS-5$ //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 		"typedef", //$NON-NLS-0$
 		"union", "unsigned", //$NON-NLS-1$ //$NON-NLS-0$
 		"void", "volatile", //$NON-NLS-1$ //$NON-NLS-0$
-		"while" //$NON-NLS-0$
+		"while", //$NON-NLS-0$
+		"_Bool", "_Complex", "_Imaginary" //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 	];
 
 	var directives = [
@@ -35,7 +35,8 @@ define("orion/editor/stylers/text_x-csrc/syntax", ["orion/editor/stylers/lib/syn
 		"ifndef", "if", "include", "line", "pragma", "undef" //$NON-NLS-5$ //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
 	];
 
-	var grammars = mLib.grammars;
+	var grammars = [];
+	grammars.push.apply(grammars, mLib.grammars);
 	grammars.push({
 		id: "orion.c", //$NON-NLS-0$
 		contentTypes: ["text/x-csrc", "text/x-c"], //$NON-NLS-1$ //$NON-NLS-0$
@@ -56,13 +57,13 @@ define("orion/editor/stylers/text_x-csrc/syntax", ["orion/editor/stylers/lib/syn
 			{include: "orion.lib#number_hex"}, //$NON-NLS-0$
 			{
 				match: "\\b(?:" + keywords.join("|") + ")\\b", //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-0$
-				name: "keyword.control.c" //$NON-NLS-0$
+				name: "keyword.operator.c" //$NON-NLS-0$
 			}
 		],
 		repository: {
 			directive: {
 				match: "(#\\s*(?:" + directives.join("|") + "))\\b",
-				name: "keyword.control.directive.c"
+				name: "keyword.operator.directive.c"
 			}
 		}
 	});

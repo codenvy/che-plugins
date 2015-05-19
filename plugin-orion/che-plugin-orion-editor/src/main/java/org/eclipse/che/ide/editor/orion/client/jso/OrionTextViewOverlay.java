@@ -10,8 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.editor.orion.client.jso;
 
-import org.eclipse.che.ide.editor.orion.client.Action;
 import com.google.gwt.core.client.JavaScriptObject;
+
+import org.eclipse.che.ide.editor.orion.client.Action;
 
 public class OrionTextViewOverlay extends JavaScriptObject {
 
@@ -229,11 +230,4 @@ public class OrionTextViewOverlay extends JavaScriptObject {
         return this.getOffsetAtLocation(x, y);
     }-*/;
 
-    /**
-     * Returns the annotation model.
-     * @return the annotation model
-     */
-    public final native OrionAnnotationModelOverlay getAnnotationModel() /*-{
-        return this.getAnnotationModel();
-    }-*/;
 }

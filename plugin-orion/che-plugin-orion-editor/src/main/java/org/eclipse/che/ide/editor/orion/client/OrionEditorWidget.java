@@ -11,9 +11,29 @@
 package org.eclipse.che.ide.editor.orion.client;
 
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.json.client.JSONBoolean;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.resources.client.CssResource;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.ide.api.text.Region;
 import org.eclipse.che.ide.api.text.RegionImpl;
@@ -46,29 +66,10 @@ import org.eclipse.che.ide.jseditor.client.texteditor.CompositeEditorWidget;
 import org.eclipse.che.ide.jseditor.client.texteditor.EditorWidget;
 import org.eclipse.che.ide.jseditor.client.texteditor.LineStyler;
 import org.eclipse.che.ide.util.loging.Log;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.dom.client.HasChangeHandlers;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.json.client.JSONBoolean;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONString;
-import com.google.gwt.resources.client.CssResource;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-import com.google.web.bindery.event.shared.EventBus;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Orion implementation for {@link EditorWidget}.
@@ -84,30 +85,30 @@ public class OrionEditorWidget extends CompositeEditorWidget implements HasChang
     private static final Logger LOG = Logger.getLogger(OrionEditorWidget.class.getSimpleName());
 
     @UiField
-    SimplePanel                                    panel;
+    SimplePanel panel;
 
     /** The instance of the orion editor native element style. */
     @UiField
-    EditorElementStyle                             editorElementStyle;
+    EditorElementStyle editorElementStyle;
 
-    private final OrionEditorOverlay               editorOverlay;
-    private String                                 modeName;
-    private final KeyModeInstances                 keyModeInstances;
-    private final JavaScriptObject                 orionEditorModule;
-    private final KeymapPrefReader keymapPrefReader;
+    private final OrionEditorOverlay editorOverlay;
+    private       String             modeName;
+    private final KeyModeInstances   keyModeInstances;
+    private final JavaScriptObject   orionEditorModule;
+    private final KeymapPrefReader   keymapPrefReader;
 
     /** Component that handles undo/redo. */
     private final HandlesUndoRedo undoRedo;
 
-    private OrionDocument                       embeddedDocument;
+    private OrionDocument embeddedDocument;
 
-    private boolean                                changeHandlerAdded = false;
-    private boolean                                focusHandlerAdded  = false;
-    private boolean                                blurHandlerAdded   = false;
-    private boolean                                scrollHandlerAdded = false;
-    private boolean                                cursorHandlerAdded = false;
+    private boolean changeHandlerAdded = false;
+    private boolean focusHandlerAdded  = false;
+    private boolean blurHandlerAdded   = false;
+    private boolean scrollHandlerAdded = false;
+    private boolean cursorHandlerAdded = false;
 
-    private Keymap                                 keymap;
+    private Keymap keymap;
 
     @AssistedInject
     public OrionEditorWidget(final ModuleHolder moduleHolder,
@@ -144,6 +145,7 @@ public class OrionEditorWidget extends CompositeEditorWidget implements HasChang
             }
         });
         this.undoRedo = new OrionUndoRedo(this.editorOverlay.getUndoStack());
+        editorOverlay.setZoomRulerVisible(true);
     }
 
     @Override
@@ -163,6 +165,7 @@ public class OrionEditorWidget extends CompositeEditorWidget implements HasChang
         json.put("theme", new JSONObject(OrionTextThemeOverlay.getDefautTheme()));
         json.put("contentType", new JSONString(this.modeName));
         json.put("noComputeSize", JSONBoolean.getInstance(true));
+        json.put("showZoomRuler", JSONBoolean.getInstance(true));
 
         return json.getJavaScriptObject();
     }
@@ -427,8 +430,8 @@ public class OrionEditorWidget extends CompositeEditorWidget implements HasChang
     }
 
     public void onResize() {
-    	// redraw text and rulers
-    	// maybe just redrawing the text would be enough
+        // redraw text and rulers
+        // maybe just redrawing the text would be enough
         this.editorOverlay.getTextView().redraw();
     }
 

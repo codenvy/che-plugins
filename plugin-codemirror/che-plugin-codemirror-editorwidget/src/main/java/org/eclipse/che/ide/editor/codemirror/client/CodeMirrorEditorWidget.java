@@ -11,26 +11,38 @@
 package org.eclipse.che.ide.editor.codemirror.client;
 
 
-import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.BEFORE_SELECTION_CHANGE;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.BLUR;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.CHANGE;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.CURSOR_ACTIVITY;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.FOCUS;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.GUTTER_CLICK;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.SCROLL;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.VIEWPORT_CHANGE;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.AUTOCLOSE_BRACKETS;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.AUTOCLOSE_TAGS;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.FOLD_GUTTER;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.KEYMAP;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.MATCH_BRACKETS;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.READONLY;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.SHOW_CURSOR_WHEN_SELECTING;
-import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.STYLE_ACTIVE_LINE;
+import elemental.dom.DOMTokenList;
+import elemental.events.MouseEvent;
+import elemental.js.events.JsMouseEvent;
+import elemental.js.html.JsDivElement;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.gwt.core.client.Callback;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayMixed;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.HasBlurHandlers;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.event.dom.client.HasFocusHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.text.Region;
@@ -59,7 +71,6 @@ import org.eclipse.che.ide.editor.codemirrorjso.client.marks.CMTextMarkerOverlay
 import org.eclipse.che.ide.editor.codemirrorjso.client.options.CMEditorOptionsOverlay;
 import org.eclipse.che.ide.editor.codemirrorjso.client.options.CMMatchTagsConfig;
 import org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey;
-
 import org.eclipse.che.ide.jseditor.client.codeassist.AdditionalInfoCallback;
 import org.eclipse.che.ide.jseditor.client.codeassist.CompletionProposal;
 import org.eclipse.che.ide.jseditor.client.codeassist.CompletionResources;
@@ -99,38 +110,27 @@ import org.eclipse.che.ide.jseditor.client.texteditor.CompositeEditorWidget;
 import org.eclipse.che.ide.jseditor.client.texteditor.EditorWidget;
 import org.eclipse.che.ide.jseditor.client.texteditor.LineStyler;
 import org.eclipse.che.ide.util.loging.Log;
-import com.google.gwt.core.client.Callback;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayMixed;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.dom.client.HasBlurHandlers;
-import com.google.gwt.event.dom.client.HasChangeHandlers;
-import com.google.gwt.event.dom.client.HasFocusHandlers;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-import com.google.web.bindery.event.shared.EventBus;
 
-import elemental.dom.DOMTokenList;
-import elemental.events.MouseEvent;
-import elemental.js.events.JsMouseEvent;
-import elemental.js.html.JsDivElement;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.BEFORE_SELECTION_CHANGE;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.BLUR;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.CHANGE;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.CURSOR_ACTIVITY;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.FOCUS;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.GUTTER_CLICK;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.SCROLL;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.EventTypes.VIEWPORT_CHANGE;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.AUTOCLOSE_BRACKETS;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.AUTOCLOSE_TAGS;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.FOLD_GUTTER;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.KEYMAP;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.MATCH_BRACKETS;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.READONLY;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.SHOW_CURSOR_WHEN_SELECTING;
+import static org.eclipse.che.ide.editor.codemirrorjso.client.options.OptionKey.STYLE_ACTIVE_LINE;
 
 /**
  * The CodeMirror implementation of {@link EditorWidget}.
@@ -139,432 +139,432 @@ import elemental.js.html.JsDivElement;
  */
 public class CodeMirrorEditorWidget extends CompositeEditorWidget implements 
                                                                              /* handler interfaces */
-                                                                             HasBeforeSelectionChangeHandlers,
-                                                                             HasBlurHandlers,
-                                                                             HasChangeHandlers,
-                                                                             HasCursorActivityHandlers,
-                                                                             HasFocusHandlers,
-                                                                             HasGutterClickHandlers,
-                                                                             HasScrollHandlers,
-                                                                             HasViewPortChangeHandlers,
+                                                                                     HasBeforeSelectionChangeHandlers,
+                                                                                     HasBlurHandlers,
+                                                                                     HasChangeHandlers,
+                                                                                     HasCursorActivityHandlers,
+                                                                                     HasFocusHandlers,
+                                                                                     HasGutterClickHandlers,
+                                                                                     HasScrollHandlers,
+                                                                                     HasViewPortChangeHandlers,
                                                                              /* capabilities */
-                                                                             HasMinimap,
-                                                                             HasGutter
-                                                                             {
+                                                                                     HasMinimap,
+                                                                                     HasGutter {
 
-                                                                                 private static final String TAB_SIZE_OPTION = "tabSize";
+    private static final String TAB_SIZE_OPTION = "tabSize";
 
-                                                                                 /** The UI binder instance. */
-                                                                                 private static final CodeMirrorEditorWidgetUiBinder
-                                                                                         UIBINDER =
-                                                                                         GWT.create(CodeMirrorEditorWidgetUiBinder.class);
+    /** The UI binder instance. */
+    private static final CodeMirrorEditorWidgetUiBinder
+            UIBINDER =
+            GWT.create(CodeMirrorEditorWidgetUiBinder.class);
 
-                                                                                 /** The logger. */
-                                                                                 private static final Logger LOG = Logger.getLogger(
-                                                                                         CodeMirrorEditorWidget.class.getSimpleName());
+    /** The logger. */
+    private static final Logger LOG = Logger.getLogger(
+            CodeMirrorEditorWidget.class.getSimpleName());
 
-                                                                                 /** The prefix for mode specific style overrides. */
-                                                                                 private static final String CODEMIRROR_MODE_STYLE_PREFIX =
-                                                                                         "cm-mode";
+    /** The prefix for mode specific style overrides. */
+    private static final String CODEMIRROR_MODE_STYLE_PREFIX =
+            "cm-mode";
 
-                                                                                 @UiField
-                                                                                 SimplePanel panel;
+    @UiField
+    SimplePanel panel;
 
-                                                                                 @UiField
-                                                                                 Element rightGutter;
+    @UiField
+    Element rightGutter;
 
-                                                                                 /** The native editor object. */
-                                                                                 private final CMEditorOverlay editorOverlay;
+    /** The native editor object. */
+    private final CMEditorOverlay editorOverlay;
 
 
-                                                                                 /** The EmbeddededDocument instance. */
-                                                                                 private       CodeMirrorDocument embeddedDocument;
-                                                                                 /** The position converter instance. */
-                                                                                 private final PositionConverter  positionConverter;
+    /** The EmbeddededDocument instance. */
+    private       CodeMirrorDocument embeddedDocument;
+    /** The position converter instance. */
+    private final PositionConverter  positionConverter;
 
-                                                                                 private final CodeMirrorOverlay codeMirror;
+    private final CodeMirrorOverlay codeMirror;
 
-                                                                                 /** Component that handles undo/redo. */
-                                                                                 private final HandlesUndoRedo undoRedo;
-                                                                                 /** Component that handles line styling. */
-                                                                                 private       LineStyler      lineStyler;
+    /** Component that handles undo/redo. */
+    private final HandlesUndoRedo undoRedo;
+    /** Component that handles line styling. */
+    private       LineStyler      lineStyler;
 
-                                                                                 /** Component to read the keymap preference. */
-                                                                                 private final KeymapPrefReader keymapPrefReader;
+    /** Component to read the keymap preference. */
+    private final KeymapPrefReader keymapPrefReader;
 
-                                                                                 // flags to know if an event type has already be added
-                                                                                 // to the native editor
-                                                                                 private boolean changeHandlerAdded          = false;
-                                                                                 private boolean focusHandlerAdded           = false;
-                                                                                 private boolean blurHandlerAdded            = false;
-                                                                                 private boolean scrollHandlerAdded          = false;
-                                                                                 private boolean cursorHandlerAdded          = false;
-                                                                                 private boolean beforeSelectionHandlerAdded = false;
-                                                                                 private boolean viewPortHandlerAdded        = false;
-                                                                                 private boolean gutterClickHandlerAdded     = false;
+    // flags to know if an event type has already be added
+    // to the native editor
+    private boolean changeHandlerAdded          = false;
+    private boolean focusHandlerAdded           = false;
+    private boolean blurHandlerAdded            = false;
+    private boolean scrollHandlerAdded          = false;
+    private boolean cursorHandlerAdded          = false;
+    private boolean beforeSelectionHandlerAdded = false;
+    private boolean viewPortHandlerAdded        = false;
+    private boolean gutterClickHandlerAdded     = false;
 
-                                                                                 /** The 'generation', marker to ask if changes where
-                                                                                  * done since if was set. */
-                                                                                 private int generationMarker;
+    /** The 'generation', marker to ask if changes where
+     * done since if was set. */
+    private int generationMarker;
 
-                                                                                 private Keymap keymap;
+    private Keymap keymap;
 
-                                                                                 private final ShowCompletion showCompletion;
+    private final ShowCompletion showCompletion;
 
-                                                                                 private CMKeymapOverlay keyBindings;
+    private CMKeymapOverlay keyBindings;
 
-                                                                                 private String mode;
+    private String mode;
 
-                                                                                 /**
-                                                                                  * The minimap.
-                                                                                  */
-                                                                                 private final MinimapPresenter minimap;
+    /**
+     * The minimap.
+     */
+    private final MinimapPresenter minimap;
 
-                                                                                 /**
-                                                                                  * The gutter.
-                                                                                  */
-                                                                                 private final Gutter gutter;
+    /**
+     * The gutter.
+     */
+    private final Gutter gutter;
 
-                                                                                 private final RequireJsLoader requirejs;
+    private final RequireJsLoader requirejs;
 
-                                                                                 /**
-                                                                                  * The base path of codemirror resources.
-                                                                                  */
-                                                                                 private final String codemirrorBasePath;
+    /**
+     * The base path of codemirror resources.
+     */
+    private final String codemirrorBasePath;
 
-                                                                                 @AssistedInject
-                                                                                 public CodeMirrorEditorWidget(
-                                                                                         final ModuleHolder moduleHolder,
-                                                                                         final EventBus eventBus,
-                                                                                         final KeymapPrefReader keymapPrefReader,
-                                                                                         final CompletionResources completionResources,
-                                                                                         final EditorAgent editorAgent,
-                                                                                         @Assisted final List<String> editorModes,
-                                                                                         final RequireJsLoader requirejs,
-                                                                                         final MinimapFactory minimapFactory,
-                                                                                         final BasePathConstant basePathConstant) {
-                                                                                     initWidget(UIBINDER.createAndBindUi(this));
+    @AssistedInject
+    public CodeMirrorEditorWidget(
+            final ModuleHolder moduleHolder,
+            final EventBus eventBus,
+            final KeymapPrefReader keymapPrefReader,
+            final CompletionResources completionResources,
+            final EditorAgent editorAgent,
+            @Assisted final List<String> editorModes,
+            final RequireJsLoader requirejs,
+            final MinimapFactory minimapFactory,
+            final BasePathConstant basePathConstant) {
+        initWidget(UIBINDER.createAndBindUi(this));
 
-                                                                                     this.keymapPrefReader = keymapPrefReader;
-                                                                                     this.requirejs = requirejs;
-                                                                                     this.showCompletion = new ShowCompletion(this,
-                                                                                                                              completionResources
-                                                                                                                                      .completionCss());
-                                                                                     this.codemirrorBasePath = basePathConstant.basePath();
+        this.keymapPrefReader = keymapPrefReader;
+        this.requirejs = requirejs;
+        this.showCompletion = new ShowCompletion(this,
+                                                 completionResources
+                                                         .completionCss());
+        this.codemirrorBasePath = basePathConstant.basePath();
 
-                                                                                     this.codeMirror = moduleHolder.getModule(
-                                                                                             CodeMirrorEditorExtension
-                                                                                                     .CODEMIRROR_MODULE_KEY)
-                                                                                                                   .cast();
+        this.codeMirror = moduleHolder.getModule(
+                CodeMirrorEditorExtension
+                        .CODEMIRROR_MODULE_KEY)
+                                      .cast();
 
-                                                                                     this.editorOverlay = this.codeMirror
-                                                                                             .createEditor(this.panel.getElement(),
-                                                                                                           getConfiguration());
-                                                                                     this.editorOverlay.setSize("100%", "100%");
-                                                                                     this.editorOverlay.refresh();
+        this.editorOverlay = this.codeMirror
+                .createEditor(this.panel.getElement(),
+                              getConfiguration());
+        this.editorOverlay.setSize("100%", "100%");
+        this.editorOverlay.refresh();
 
-                                                                                     this.positionConverter =
-                                                                                             new CodemirrorPositionConverter(
-                                                                                                     this.editorOverlay);
+        this.positionConverter =
+                new CodemirrorPositionConverter(
+                        this.editorOverlay);
 
-                                                                                     this.minimap = minimapFactory.createMinimap(
-                                                                                             rightGutter.<JsDivElement>cast());
-                                                                                     this.minimap.setDocument(getDocument());
+        this.minimap = minimapFactory.createMinimap(
+                rightGutter.<JsDivElement>cast());
+        this.minimap.setEditor(this);
 
-                                                                                     this.gutter = new CodemirrorGutter(this.codeMirror,
-                                                                                                                        this.editorOverlay);
 
-                                                                                     // just first choice for the moment
-                                                                                     if (editorModes != null && !editorModes.isEmpty()) {
-                                                                                         setMode(editorModes.get(0));
-                                                                                     }
+        this.gutter = new CodemirrorGutter(this.codeMirror,
+                                           this.editorOverlay);
 
-                                                                                     initKeyBindings();
+        // just first choice for the moment
+        if (editorModes != null && !editorModes.isEmpty()) {
+            setMode(editorModes.get(0));
+        }
 
-                                                                                     setupKeymap();
-                                                                                     eventBus.addHandler(KeymapChangeEvent.TYPE,
-                                                                                                         new KeymapChangeHandler() {
+        initKeyBindings();
 
-                                                                                                             @Override
-                                                                                                             public void onKeymapChanged(
-                                                                                                                     final KeymapChangeEvent event) {
-                                                                                                                 final String
-                                                                                                                         editorTypeKey =
-                                                                                                                         event.getEditorTypeKey();
-                                                                                                                 if (CodeMirrorEditorExtension.CODEMIRROR_EDITOR_KEY
-                                                                                                                         .equals(editorTypeKey)) {
-                                                                                                                     setupKeymap();
-                                                                                                                 }
-                                                                                                             }
-                                                                                                         });
-                                                                                     this.generationMarker = this.editorOverlay.getDoc()
-                                                                                                                               .changeGeneration(
-                                                                                                                                       true);
+        setupKeymap();
+        eventBus.addHandler(KeymapChangeEvent.TYPE,
+                            new KeymapChangeHandler() {
 
-                                                                                     // configure the save command to launch the save action
-                                                                                     // so the alternate keybinding save shortcut work (for example :w in vim)
-                                                                                     this.codeMirror.commands().put("save", CMCommandOverlay
-                                                                                             .create(new CMCommandOverlay.CommandFunction() {
-                                                                                                 @Override
-                                                                                                 public void execCommand(
-                                                                                                         final CMEditorOverlay editor) {
-                                                                                                     editorAgent.getActiveEditor().doSave();
-                                                                                                 }
-                                                                                             }));
+                                @Override
+                                public void onKeymapChanged(
+                                        final KeymapChangeEvent event) {
+                                    final String
+                                            editorTypeKey =
+                                            event.getEditorTypeKey();
+                                    if (CodeMirrorEditorExtension.CODEMIRROR_EDITOR_KEY
+                                            .equals(editorTypeKey)) {
+                                        setupKeymap();
+                                    }
+                                }
+                            });
+        this.generationMarker = this.editorOverlay.getDoc()
+                                                  .changeGeneration(
+                                                          true);
 
-                                                                                     buildKeybindingInfo();
-                                                                                     this.undoRedo = new CodeMirrorUndoRedo(
-                                                                                             this.editorOverlay.getDoc());
-                                                                                 }
+        // configure the save command to launch the save action
+        // so the alternate keybinding save shortcut work (for example :w in vim)
+        this.codeMirror.commands().put("save", CMCommandOverlay
+                .create(new CMCommandOverlay.CommandFunction() {
+                    @Override
+                    public void execCommand(
+                            final CMEditorOverlay editor) {
+                        editorAgent.getActiveEditor().doSave();
+                    }
+                }));
 
-                                                                                 private void initKeyBindings() {
+        buildKeybindingInfo();
+        this.undoRedo = new CodeMirrorUndoRedo(this.editorOverlay.getDoc(), this);
 
-                                                                                     this.keyBindings = CMKeymapOverlay.create();
+    }
 
-                                                                                     this.keyBindings.addBinding("Shift-Ctrl-K", this,
-                                                                                                                 new CMKeyBindingAction<CodeMirrorEditorWidget>() {
+    private void initKeyBindings() {
 
-                                                                                                                     public void action(
-                                                                                                                             final CodeMirrorEditorWidget editorWidget) {
-                                                                                                                         LOG.fine(
-                                                                                                                                 "Keybindings help binding used.");
-                                                                                                                         editorWidget
-                                                                                                                                 .keybindingHelp();
-                                                                                                                     }
-                                                                                                                 });
+        this.keyBindings = CMKeymapOverlay.create();
 
-                                                                                     this.editorOverlay.addKeyMap(this.keyBindings);
-                                                                                 }
+        this.keyBindings.addBinding("Shift-Ctrl-K", this,
+                                    new CMKeyBindingAction<CodeMirrorEditorWidget>() {
 
-                                                                                 @Override
-                                                                                 public String getValue() {
-                                                                                     return this.editorOverlay.getValue();
-                                                                                 }
+                                        public void action(
+                                                final CodeMirrorEditorWidget editorWidget) {
+                                            LOG.fine(
+                                                    "Keybindings help binding used.");
+                                            editorWidget
+                                                    .keybindingHelp();
+                                        }
+                                    });
 
-                                                                                 @Override
-                                                                                 public void setValue(final String newValue) {
-                                                                                     this.editorOverlay.setValue(newValue);
-                                                                                     // reset history, else the setValue is undo-able
-                                                                                     this.editorOverlay.getDoc().clearHistory();
-                                                                                     this.generationMarker = this.editorOverlay.getDoc()
-                                                                                                                               .changeGeneration(
-                                                                                                                                       true);
-                                                                                     LOG.fine("Set value - state clean=" +
-                                                                                              editorOverlay.getDoc()
-                                                                                                           .isClean(getGenerationMarker())
-                                                                                              + " (generation=" + getGenerationMarker() +
-                                                                                              ").");
-                                                                                 }
+        this.editorOverlay.addKeyMap(this.keyBindings);
+    }
 
-                                                                                 private CMEditorOptionsOverlay getConfiguration() {
-                                                                                     final CMEditorOptionsOverlay options =
-                                                                                             CMEditorOptionsOverlay.create();
+    @Override
+    public String getValue() {
+        return this.editorOverlay.getValue();
+    }
 
-                                                                                     // show line numbers
-                                                                                     options.setLineNumbers(true);
+    @Override
+    public void setValue(final String newValue) {
+        this.editorOverlay.setValue(newValue);
+        // reset history, else the setValue is undo-able
+        this.editorOverlay.getDoc().clearHistory();
+        this.generationMarker = this.editorOverlay.getDoc()
+                                                  .changeGeneration(
+                                                          true);
+        LOG.fine("Set value - state clean=" +
+                 editorOverlay.getDoc()
+                              .isClean(getGenerationMarker())
+                 + " (generation=" + getGenerationMarker() +
+                 ").");
+    }
 
-                                                                                     // set a theme
-                                                                                     options.setTheme("codenvy");
+    private CMEditorOptionsOverlay getConfiguration() {
+        final CMEditorOptionsOverlay options =
+                CMEditorOptionsOverlay.create();
 
-                                                                                     // autoclose brackets/tags, match brackets/tags
-                                                                                     options.setProperty(AUTOCLOSE_BRACKETS, true);
-                                                                                     options.setProperty(MATCH_BRACKETS, true);
-                                                                                     options.setProperty(AUTOCLOSE_TAGS, true);
+        // show line numbers
+        options.setLineNumbers(true);
 
-                                                                                     // folding
-                                                                                     options.setProperty(FOLD_GUTTER, true);
+        // set a theme
+        options.setTheme("codenvy");
 
-                                                                                     // gutters - define 2 : line and fold
-                                                                                     final JsArrayString gutters =
-                                                                                             JsArray.createArray(4).cast();
-                                                                                     gutters.push(
-                                                                                             CodemirrorGutter.CODE_MIRROR_GUTTER_BREAKPOINTS);
-                                                                                     gutters.push(
-                                                                                             CodemirrorGutter.CODE_MIRROR_GUTTER_ANNOTATIONS);
-                                                                                     gutters.push(
-                                                                                             CodemirrorGutter.CODE_MIRROR_GUTTER_LINENUMBERS);
-                                                                                     gutters.push(
-                                                                                             CodemirrorGutter.CODE_MIRROR_GUTTER_FOLDGUTTER);
-                                                                                     options.setGutters(gutters);
+        // autoclose brackets/tags, match brackets/tags
+        options.setProperty(AUTOCLOSE_BRACKETS, true);
+        options.setProperty(MATCH_BRACKETS, true);
+        options.setProperty(AUTOCLOSE_TAGS, true);
 
-                                                                                     // highlight matching tags
-                                                                                     final CMMatchTagsConfig matchTagsConfig =
-                                                                                             CMMatchTagsConfig.create();
-                                                                                     matchTagsConfig.setBothTags(true);
-                                                                                     options.setProperty(OptionKey.MATCH_TAGS,
-                                                                                                         matchTagsConfig);
+        // folding
+        options.setProperty(FOLD_GUTTER, true);
 
-                                                                                     // highlight active line
-                                                                                     options.setProperty(STYLE_ACTIVE_LINE, true);
+        // gutters - define 2 : line and fold
+        final JsArrayString gutters =
+                JsArray.createArray(4).cast();
+        gutters.push(
+                CodemirrorGutter.CODE_MIRROR_GUTTER_BREAKPOINTS);
+        gutters.push(
+                CodemirrorGutter.CODE_MIRROR_GUTTER_ANNOTATIONS);
+        gutters.push(
+                CodemirrorGutter.CODE_MIRROR_GUTTER_LINENUMBERS);
+        gutters.push(
+                CodemirrorGutter.CODE_MIRROR_GUTTER_FOLDGUTTER);
+        options.setGutters(gutters);
 
-                                                                                     // activate continueComments addon
-                                                                                     options.setProperty(OptionKey.CONTINUE_COMMENT, true);
+        // highlight matching tags
+        final CMMatchTagsConfig matchTagsConfig =
+                CMMatchTagsConfig.create();
+        matchTagsConfig.setBothTags(true);
+        options.setProperty(OptionKey.MATCH_TAGS,
+                            matchTagsConfig);
+
+        // highlight active line
+        options.setProperty(STYLE_ACTIVE_LINE, true);
+
+        // activate continueComments addon
+        options.setProperty(OptionKey.CONTINUE_COMMENT, true);
 
         /* simple and overlay style scrollbar fix appearance on firefox */
-                                                                                     options.setScrollbarStyle("simple");
+        options.setScrollbarStyle("simple");
 
-                                                                                     return options;
-                                                                                 }
+        return options;
+    }
 
-                                                                                 protected void autoComplete() {
-                                                                                     this.editorOverlay.showHint();
-                                                                                 }
+    protected void autoComplete() {
+        this.editorOverlay.showHint();
+    }
 
-                                                                                 public void setMode(final String modeDesc) {
-                                                                                     LOG.fine("Setting editor mode : " + modeDesc);
-                                                                                     this.mode = modeDesc;
+    public void setMode(final String modeDesc) {
+        LOG.fine("Setting editor mode : " + modeDesc);
+        this.mode = modeDesc;
 
-                                                                                     String actualFileType = modeDesc;
-                                                                                     // special-casing dockerfile
-                                                                                     if ("text/x-dockerfile-config".equals(modeDesc)) {
-                                                                                         actualFileType = "text/x-dockerfile";
-                                                                                     }
+        String actualFileType = modeDesc;
+        // special-casing dockerfile
+        if ("text/x-dockerfile-config".equals(modeDesc)) {
+            actualFileType = "text/x-dockerfile";
+        }
 
-                                                                                     final CMModeInfoOverlay modeInfo =
-                                                                                             this.codeMirror.findModeByMIME(actualFileType);
-                                                                                     if (modeInfo != null) {
-                                                                                         if (!modePresent(modeInfo.getMode())) {
-                                                                                             loadMode(modeInfo.getMode(), actualFileType);
-                                                                                         } else {
-                                                                                             this.editorOverlay
-                                                                                                     .setOption("mode", actualFileType);
-                                                                                         }
+        final CMModeInfoOverlay modeInfo =
+                this.codeMirror.findModeByMIME(actualFileType);
+        if (modeInfo != null) {
+            if (!modePresent(modeInfo.getMode())) {
+                loadMode(modeInfo.getMode(), actualFileType);
+            } else {
+                this.editorOverlay
+                        .setOption("mode", actualFileType);
+            }
 
-                                                                                         // try to add mode specific style
-                                                                                         final String modeName = modeInfo.getMode();
-                                                                                         final DOMTokenList classes =
-                                                                                                 this.editorOverlay.getWrapperElement()
-                                                                                                                   .getClassList();
-                                                                                         classes.add(CODEMIRROR_MODE_STYLE_PREFIX + "-" +
-                                                                                                     modeName);
-                                                                                     }
-                                                                                 }
+            // try to add mode specific style
+            final String modeName = modeInfo.getMode();
+            final DOMTokenList classes =
+                    this.editorOverlay.getWrapperElement()
+                                      .getClassList();
+            classes.add(CODEMIRROR_MODE_STYLE_PREFIX + "-" +
+                        modeName);
+        }
+    }
 
-                                                                                 private boolean modePresent(final String modeName) {
-                                                                                     if (modeName == null) {
-                                                                                         return false;
-                                                                                     }
-                                                                                     final JsArrayString modeNames =
-                                                                                             this.codeMirror.modeNames();
-                                                                                     for (int i = 0; i < modeNames.length(); i++) {
-                                                                                         if (modeName.equals(modeNames.get(i))) {
-                                                                                             return true;
-                                                                                         }
-                                                                                     }
-                                                                                     return false;
-                                                                                 }
+    private boolean modePresent(final String modeName) {
+        if (modeName == null) {
+            return false;
+        }
+        final JsArrayString modeNames =
+                this.codeMirror.modeNames();
+        for (int i = 0; i < modeNames.length(); i++) {
+            if (modeName.equals(modeNames.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-                                                                                 private void loadMode(final String modeName,
-                                                                                                       final String mime) {
-                                                                                     this.requirejs.require(
-                                                                                             new Callback<JavaScriptObject[], Throwable>() {
+    private void loadMode(final String modeName,
+                          final String mime) {
+        this.requirejs.require(
+                new Callback<JavaScriptObject[], Throwable>() {
 
-                                                                                                 @Override
-                                                                                                 public void onSuccess(
-                                                                                                         final JavaScriptObject[] result) {
-                                                                                                     if (result != null) {
-                                                                                                         editorOverlay
-                                                                                                                 .setOption("mode", mime);
-                                                                                                     } else {
-                                                                                                         Log.warn(
-                                                                                                                 CodeMirrorEditorWidget.class,
-                                                                                                                 "Require result is null.");
-                                                                                                     }
-                                                                                                 }
+                    @Override
+                    public void onSuccess(
+                            final JavaScriptObject[] result) {
+                        if (result != null) {
+                            editorOverlay
+                                    .setOption("mode", mime);
+                        } else {
+                            Log.warn(
+                                    CodeMirrorEditorWidget.class,
+                                    "Require result is null.");
+                        }
+                    }
 
-                                                                                                 @Override
-                                                                                                 public void onFailure(
-                                                                                                         final Throwable reason) {
-                                                                                                     Log.warn(CodeMirrorEditorWidget.class,
-                                                                                                              "Require " + modeName +
-                                                                                                              " mode failed.");
-                                                                                                 }
-                                                                                             }, new String[]{
-                                                                                             codemirrorBasePath + "lib/codemirror",
-                                                                                             codemirrorBasePath + "mode/" + modeName + "/" +
-                                                                                             modeName});
-                                                                                 }
+                    @Override
+                    public void onFailure(
+                            final Throwable reason) {
+                        Log.warn(CodeMirrorEditorWidget.class,
+                                 "Require " + modeName +
+                                 " mode failed.");
+                    }
+                }, new String[]{
+                        codemirrorBasePath + "lib/codemirror",
+                        codemirrorBasePath + "mode/" + modeName + "/" +
+                        modeName});
+    }
 
-                                                                                 @Override
-                                                                                 public String getMode() {
-                                                                                     return this.mode;
-                                                                                 }
+    @Override
+    public String getMode() {
+        return this.mode;
+    }
 
-                                                                                 public void selectVimKeymap() {
-                                                                                     if (CodeMirrorKeymaps.isVimLoaded()) {
-                                                                                         doSelectVimKeymap();
-                                                                                     } else {
-                                                                                         this.requirejs.require(
-                                                                                                 new Callback<JavaScriptObject[], Throwable>() {
-                                                                                                     @Override
-                                                                                                     public void onSuccess(
-                                                                                                             final JavaScriptObject[] result) {
-                                                                                                         doSelectVimKeymap();
-                                                                                                     }
+    public void selectVimKeymap() {
+        if (CodeMirrorKeymaps.isVimLoaded()) {
+            doSelectVimKeymap();
+        } else {
+            this.requirejs.require(
+                    new Callback<JavaScriptObject[], Throwable>() {
+                        @Override
+                        public void onSuccess(
+                                final JavaScriptObject[] result) {
+                            doSelectVimKeymap();
+                        }
 
-                                                                                                     @Override
-                                                                                                     public void onFailure(
-                                                                                                             final Throwable reason) {
-                                                                                                         Window.alert(
-                                                                                                                 "Could not load vim keymap, reverting to the default");
-                                                                                                     }
-                                                                                                 }, new String[]{
-                                                                                                 codemirrorBasePath + "lib/codemirror",
-                                                                                                 codemirrorBasePath + "keymap/vim"});
-                                                                                     }
-                                                                                 }
+                        @Override
+                        public void onFailure(
+                                final Throwable reason) {
+                            Window.alert(
+                                    "Could not load vim keymap, reverting to the default");
+                        }
+                    }, new String[]{
+                            codemirrorBasePath + "lib/codemirror",
+                            codemirrorBasePath + "keymap/vim"});
+        }
+    }
 
-                                                                                 private void doSelectVimKeymap() {
-                                                                                     this.editorOverlay.setOption(KEYMAP, CodeMirrorKeymaps
-                                                                                             .getNativeMapping(CodeMirrorKeymaps.VIM));
-                                                                                 }
+    private void doSelectVimKeymap() {
+        this.editorOverlay.setOption(KEYMAP, CodeMirrorKeymaps
+                .getNativeMapping(CodeMirrorKeymaps.VIM));
+    }
 
-                                                                                 public void selectEmacsKeymap() {
-                                                                                     if (CodeMirrorKeymaps.isEmacsLoaded()) {
-                                                                                         doSelectEmacsKeymap();
-                                                                                     } else {
-                                                                                         this.requirejs.require(
-                                                                                                 new Callback<JavaScriptObject[], Throwable>() {
-                                                                                                     @Override
-                                                                                                     public void onSuccess(
-                                                                                                             final JavaScriptObject[] result) {
-                                                                                                         doSelectEmacsKeymap();
-                                                                                                     }
+    public void selectEmacsKeymap() {
+        if (CodeMirrorKeymaps.isEmacsLoaded()) {
+            doSelectEmacsKeymap();
+        } else {
+            this.requirejs.require(
+                    new Callback<JavaScriptObject[], Throwable>() {
+                        @Override
+                        public void onSuccess(
+                                final JavaScriptObject[] result) {
+                            doSelectEmacsKeymap();
+                        }
 
-                                                                                                     @Override
-                                                                                                     public void onFailure(
-                                                                                                             final Throwable reason) {
-                                                                                                         Window.alert(
-                                                                                                                 "Could not load emacs keymap, reverting to the default");
-                                                                                                     }
-                                                                                                 }, new String[]{
-                                                                                                 codemirrorBasePath + "lib/codemirror",
-                                                                                                 codemirrorBasePath + "keymap/emacs"});
-                                                                                     }
-                                                                                 }
+                        @Override
+                        public void onFailure(
+                                final Throwable reason) {
+                            Window.alert(
+                                    "Could not load emacs keymap, reverting to the default");
+                        }
+                    }, new String[]{
+                            codemirrorBasePath + "lib/codemirror",
+                            codemirrorBasePath + "keymap/emacs"});
+        }
+    }
 
-                                                                                 private void doSelectEmacsKeymap() {
-                                                                                     this.editorOverlay.setOption(KEYMAP, CodeMirrorKeymaps
-                                                                                             .getNativeMapping(CodeMirrorKeymaps.EMACS));
-                                                                                 }
+    private void doSelectEmacsKeymap() {
+        this.editorOverlay.setOption(KEYMAP, CodeMirrorKeymaps
+                .getNativeMapping(CodeMirrorKeymaps.EMACS));
+    }
 
-                                                                                 public void selectSublimeKeymap() {
-                                                                                     if (CodeMirrorKeymaps.isSublimeLoaded()) {
-                                                                                         doSelectSublimeKeymap();
-                                                                                     } else {
-                                                                                         this.requirejs.require(
-                                                                                                 new Callback<JavaScriptObject[], Throwable>() {
-                                                                                                     @Override
-                public void onSuccess(final JavaScriptObject[] result) {
-                    doSelectSublimeKeymap();
-                }
+    public void selectSublimeKeymap() {
+        if (CodeMirrorKeymaps.isSublimeLoaded()) {
+            doSelectSublimeKeymap();
+        } else {
+            this.requirejs.require(
+                    new Callback<JavaScriptObject[], Throwable>() {
+                        @Override
+                        public void onSuccess(final JavaScriptObject[] result) {
+                            doSelectSublimeKeymap();
+                        }
 
-                @Override
-                public void onFailure(final Throwable reason) {
-                    Window.alert("Could not load sublime keymap, reverting to the default");
-                }
-            }, new String[]{codemirrorBasePath + "lib/codemirror",
-                            codemirrorBasePath + "keymap/sublime"});
+                        @Override
+                        public void onFailure(final Throwable reason) {
+                            Window.alert("Could not load sublime keymap, reverting to the default");
+                        }
+                    }, new String[]{codemirrorBasePath + "lib/codemirror",
+                                    codemirrorBasePath + "keymap/sublime"});
         }
     }
 
@@ -1044,7 +1044,7 @@ public class CodeMirrorEditorWidget extends CompositeEditorWidget implements
 
     /**
      * Returns the editor overlay instance.
-     * 
+     *
      * @return the editor overlay
      */
     CMEditorOverlay getEditorOverlay() {
@@ -1053,7 +1053,7 @@ public class CodeMirrorEditorWidget extends CompositeEditorWidget implements
 
     /**
      * Return the CodeMirror object.
-     * 
+     *
      * @return the CodeMirror
      */
     CodeMirrorOverlay getCodeMirror() {

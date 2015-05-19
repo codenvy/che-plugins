@@ -10,50 +10,46 @@
  *******************************************************************************/
 package org.eclipse.che.ide.jseditor.java.client.editor;
 
-import org.eclipse.che.ide.api.text.BadLocationException;
-import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
-import org.eclipse.che.ide.ext.java.jdt.text.edits.TextEdit;
-import org.eclipse.che.ide.ext.java.jdt.text.Document;
-import org.eclipse.che.ide.jseditor.java.client.document.FormatterDocument;
-import org.eclipse.che.ide.jseditor.client.formatter.ContentFormatter;
-import org.eclipse.che.ide.util.loging.Log;
 import com.google.inject.Inject;
+
+import org.eclipse.che.ide.ext.java.jdt.text.Document;
+import org.eclipse.che.ide.jseditor.client.formatter.ContentFormatter;
 
 /**
  * ContentFormatter implementation
  *
  * @author Roman Nikitenko
  */
-public class JavaFormatter implements ContentFormatter, JavaParserWorker.Callback<TextEdit> {
+public class JavaFormatter implements ContentFormatter {
 
-    private JavaParserWorker javaParserWorker;
     private Document document;
 
     @Inject
-    public JavaFormatter(JavaParserWorker javaParserWorker) {
-        this.javaParserWorker = javaParserWorker;
+    public JavaFormatter(/*JavaParserWorker javaParserWorker*/) {
+//        this.javaParserWorker = javaParserWorker;
     }
 
     @Override
     public void format(org.eclipse.che.ide.jseditor.client.document.Document document) {
-        this.document = new FormatterDocument(document);
-
-        int offset = document.getSelectedLinearRange().getStartOffset();
-        int length = document.getSelectedLinearRange().getLength();
-
-        if (length > 0 && offset >= 0) {
-            javaParserWorker.format(offset, length, document.getContents(), this);
-        } else {
-            javaParserWorker.format(0, document.getContentsCharCount(), document.getContents(), this);
-        }
+//        this.document = new FormatterDocument(document);
+//
+//        int offset = document.getSelectedLinearRange().getStartOffset();
+//        int length = document.getSelectedLinearRange().getLength();
+//
+//        if (length > 0 && offset >= 0) {
+//            javaParserWorker.format(offset, length, document.getContents(), this);
+//        } else {
+//            javaParserWorker.format(0, document.getContentsCharCount(), document.getContents(), this);
+//        }
+        throw new UnsupportedOperationException("format is not supported");
     }
 
-    @Override
-    public void onCallback(TextEdit edit) {
-        try {
-            edit.apply(document);
-        } catch (BadLocationException e) {
-            Log.error(getClass(), e);
-        }
-    }
+//    @Override
+//    public void onCallback(TextEdit edit) {
+//        try {
+//            edit.apply(document);
+//        } catch (BadLocationException e) {
+//            Log.error(getClass(), e);
+//        }
+//    }
 }

@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-plugin-java-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.10.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-java-jdt-core-repack</artifactId>
     <packaging>jar</packaging>
@@ -26,6 +26,7 @@
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>org.eclipse.jdt.core</artifactId>
             <version>${org.eclipse.jdt.core.version}</version>
+            <!--<scope>provided</scope>-->
         </dependency>
     </dependencies>
     <build>
@@ -78,6 +79,21 @@
                                 <unzip dest="${project.build.outputDirectory}" src="${project.build.directory}/packager-conf/jar/org.eclipse.jdt.core-${org.eclipse.jdt.core.version}.jar">
                                     <patternset>
                                         <exclude name="**/META-INF/**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/util/Util**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaProject.class" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaModelManager**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/ClasspathEntry**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaModelOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/SourceMapper**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/ChangeClasspathOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/SetContainerOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/ReconcileWorkingCopyOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/DeltaProcessingState**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/DeltaProcessor**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/BecomeWorkingCopyOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/core/JavaConventions**" />
+
+                                        <!--<exclude name="**/org/eclipse/jdt/internal/core/**" />-->
                                     </patternset>
                                 </unzip>
                                 <!--jar basedir="${project.build.directory}/packager-conf/jar/org.eclipse.jdt.core" destfile="${project.build.directory}/packager-conf/jar-repack/org.eclipse.jdt.core-${org.eclipse.jdt.core.version}.jar" /-->

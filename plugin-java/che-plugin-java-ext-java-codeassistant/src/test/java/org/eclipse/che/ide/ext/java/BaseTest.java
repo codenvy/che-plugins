@@ -10,11 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java;
 
-import org.eclipse.che.jdt.internal.core.JavaProject;
-
+import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.che.jdt.javadoc.JavaElementLinks;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.codeassist.impl.AssistOptions;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
+import org.eclipse.jdt.internal.core.JavaModelManager;
+import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.junit.After;
 import org.junit.Before;
 
@@ -28,20 +31,16 @@ import java.util.Map;
 public class BaseTest {
 
     protected static Map<String, String> options = new HashMap<>();
-    protected static JavaProject         project;
+    protected static JavaProject project;
+    protected static final String wsPath = BaseTest.class.getResource("/projects").getFile();
+    protected static ResourcesPlugin plugin = new ResourcesPlugin(wsPath + "/index", BaseTest.class.getResource("/projects").getFile());
+    protected static JavaPlugin javaPlugin = new JavaPlugin(wsPath + "/set");
 
-
-
-    @Before
-    public void setUp() throws Exception {
-        project = new JavaProject(new File(BaseTest.class.getResource("/projects").getFile()), "/test",BaseTest.class.getResource("/temp").getPath(),
-                                  "ws", options);
+    static {
+        plugin.start();
+        javaPlugin.start();
     }
 
-    @After
-    public void tearDown() throws Exception {
-        project.close();
-    }
 
     public BaseTest() {
         options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_7);
@@ -61,8 +60,23 @@ public class BaseTest {
 
     protected static String getHandldeForRtJarStart() {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        javaHome = javaHome.replaceAll("/","\\\\/");
-        return "☂/" + javaHome;
+        javaHome = javaHome.replaceAll("/", "\\\\/");
+        return String.valueOf(JavaElementLinks.LINK_SEPARATOR) + "=test/" + javaHome;
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        project = (JavaProject)JavaModelManager.getJavaModelManager().getJavaModel().getJavaProject("/test");
+    }
+
+    @After
+    public void closeProject() throws Exception {
+        File pref = new File(wsPath + "/test/.codenvy/project.preferences");
+        project.close();
+        if(pref.exists()){
+            pref.delete();
+        }
+
     }
 
 

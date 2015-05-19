@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.jseditor.java.client;
 
+import com.google.inject.name.Named;
+
 import org.eclipse.che.ide.api.editor.EditorRegistry;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.api.filetypes.FileType;
-import org.eclipse.che.ide.jseditor.java.client.editor.JsJavaEditorProvider;
-
 import org.eclipse.che.ide.ext.java.client.JavaResources;
-import com.google.inject.name.Named;
+import org.eclipse.che.ide.jseditor.java.client.editor.JsJavaEditorProvider;
 
 import javax.inject.Inject;
 
@@ -28,11 +28,12 @@ public class JavaJsEditorExtension {
                                  final @Named("JavaFileType") FileType javaFile,
                                  final @Named("JavaClassFileType") FileType classFile,
                                  final JsJavaEditorProvider javaEditorProvider,
-                                 final JavaResources javaResources) {
+                                 final JavaResources javaResources, Resources resources) {
         // register editor provider
         editorRegistry.registerDefaultEditor(javaFile, javaEditorProvider);
         editorRegistry.registerDefaultEditor(classFile, javaEditorProvider);
 
         javaResources.css().ensureInjected();
+        resources.css().ensureInjected();
     }
 }

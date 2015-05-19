@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
-import org.eclipse.che.ide.ext.java.jdt.core.compiler.CategorizedProblem;
-import org.eclipse.che.ide.ext.java.jdt.core.dom.CompilationUnit;
 
 import java.util.Iterator;
 
@@ -103,6 +101,14 @@ public interface JavaAnnotation {
      * @return <code>true</code> if it is a problem annotation
      */
     boolean isProblem();
+
+    /**
+     * Tells whether this annotation is a error
+     * annotation.
+     *
+     * @return <code>true</code> if it is a error annotation
+     */
+    boolean isError();
 
     /**
      * Returns the problem arguments or <code>null</code> if no problem arguments can be evaluated.

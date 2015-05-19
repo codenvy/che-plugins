@@ -27,7 +27,7 @@ public interface JavaNavigationService {
      * @param keyBinding binding key
      * @param callback
      */
-    void findDeclaration(String projectPath, String keyBinding, AsyncRequestCallback<OpenDeclarationDescriptor> callback);
+    void findDeclaration(String projectPath, String fqn, int offset, AsyncRequestCallback<OpenDeclarationDescriptor> callback);
 
 
     /**

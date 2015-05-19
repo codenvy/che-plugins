@@ -22,7 +22,6 @@ import org.eclipse.che.api.project.server.handlers.ProjectHandlerRegistry;
 import org.eclipse.che.api.project.server.type.AttributeValue;
 import org.eclipse.che.api.project.server.type.ProjectType;
 import org.eclipse.che.api.project.server.type.ProjectTypeRegistry;
-import org.eclipse.che.api.project.shared.Builders;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemRegistry;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemUser;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemUserContext;
@@ -32,7 +31,6 @@ import org.eclipse.che.ide.extension.maven.server.projecttype.handler.GeneratorS
 import org.eclipse.che.ide.extension.maven.server.projecttype.handler.MavenProjectGenerator;
 import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
 import org.eclipse.che.ide.maven.tools.Model;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,7 +93,6 @@ public class MavenProjectTypeTest {
         ProjectType pt = pm.getProjectTypeRegistry().getProjectType("maven");
 
         Assert.assertNotNull(pt);
-        Assert.assertEquals(pt.getDefaultBuilder(), "maven");
         Assert.assertTrue(pt.getAttributes().size() > 0);
         Assert.assertTrue(pt.isTypeOf("java"));
 
@@ -113,12 +110,10 @@ public class MavenProjectTypeTest {
         //attributes.put(MavenAttributes., new AttributeValue("jar"));
 
         Project project = pm.createProject(workspace, "myProject",
-                                           new ProjectConfig("my config", "maven", attributes, null, new Builders("maven"), null),
+                                           new ProjectConfig("my config", "maven", attributes, null, null),
                                            null, "public");
 
         ProjectConfig config = project.getConfig();
-
-        Assert.assertEquals(config.getBuilders().getDefault(), "maven");
 
 //        System.out.println(" >>>" + config.getAttributes().get(MavenAttributes.ARTIFACT_ID).getString() + " "+
 //                        attributes.get(MavenAttributes.ARTIFACT_ID).getString());
@@ -154,11 +149,11 @@ public class MavenProjectTypeTest {
         attributes.put(MavenAttributes.PACKAGING, new AttributeValue("jar"));
 
         pm.createProject(workspace, "testEstimate",
-                         new ProjectConfig("my config", "maven", attributes, null, new Builders("maven"), null),
+                         new ProjectConfig("my config", "maven", attributes, null, null),
                          null, "public");
 
         pm.createProject(workspace, "testEstimateBad",
-                         new ProjectConfig("my config", "blank", null, null, null, null),
+                         new ProjectConfig("my config", "blank", null, null, null),
                          null, "public");
 
         Map<String, AttributeValue> out = pm.estimateProject(workspace, "testEstimate", "maven");

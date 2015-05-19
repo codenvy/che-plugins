@@ -32,7 +32,7 @@ public class OrionAnnotationOverlay extends JavaScriptObject {
     }-*/;
 
     public final native void setStart(int offset) /*-{
-        this.start = start;
+        this.start = offset;
     }-*/;
 
     public final native int getEnd() /*-{
@@ -40,7 +40,7 @@ public class OrionAnnotationOverlay extends JavaScriptObject {
     }-*/;
 
     public final native void setEnd(int offset) /*-{
-        this.end = end;
+        this.end = offset;
     }-*/;
 
     public final native String getHtml() /*-{
@@ -89,5 +89,9 @@ public class OrionAnnotationOverlay extends JavaScriptObject {
 
     public final native void setLineStyle(OrionStyleOverlay style) /*-{
         this.lineStyle = style;
+    }-*/;
+
+    public static native OrionAnnotationOverlay create() /*-{
+        return {};
     }-*/;
 }

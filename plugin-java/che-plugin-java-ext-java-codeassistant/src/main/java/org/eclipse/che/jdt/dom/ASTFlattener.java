@@ -12,6 +12,7 @@ package org.eclipse.che.jdt.dom;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.internal.corext.dom.GenericVisitor;
 
 import java.util.Iterator;
 import java.util.List;

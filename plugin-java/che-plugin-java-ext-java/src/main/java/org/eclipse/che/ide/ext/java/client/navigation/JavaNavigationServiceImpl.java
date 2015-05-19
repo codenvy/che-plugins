@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.navigation;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
-import com.google.gwt.http.client.URL;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 /**
  * @author Evgen Vidolob
@@ -41,9 +41,9 @@ public class JavaNavigationServiceImpl implements JavaNavigationService {
     }
 
     @Override
-    public void findDeclaration(String projectPath, String keyBinding, AsyncRequestCallback<OpenDeclarationDescriptor> callback) {
+    public void findDeclaration(String projectPath, String fqn, int offset, AsyncRequestCallback<OpenDeclarationDescriptor> callback) {
         String url =
-                restContext + "/navigation/" + workspaceId + "/find-declaration?projectpath=" + projectPath + "&bindingkey=" + URL.encodeQueryString(keyBinding);
+                restContext + "/navigation/" + workspaceId + "/find-declaration?projectpath=" + projectPath + "&fqn=" + fqn + "&offset=" + offset;
         requestFactory.createGetRequest(url).send(callback);
     }
 

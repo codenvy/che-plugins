@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
-import org.eclipse.che.ide.ext.java.jdt.core.compiler.IProblem;
 
 /**
  * QuickFixResolver 

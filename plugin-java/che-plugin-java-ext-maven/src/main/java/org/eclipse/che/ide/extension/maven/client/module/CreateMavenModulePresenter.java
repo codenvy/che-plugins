@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.maven.client.module;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
-import org.eclipse.che.api.project.shared.dto.BuildersDescriptor;
 import org.eclipse.che.api.project.shared.dto.GeneratorDescription;
 import org.eclipse.che.api.project.shared.dto.NewProject;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
@@ -24,9 +27,6 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.util.NameUtils;
 import org.eclipse.che.ide.util.loging.Log;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -95,7 +95,6 @@ public class CreateMavenModulePresenter implements CreateMavenModuleView.ActionD
         NewProject newProject = dtoFactory.createDto(NewProject.class);
         newProject.setType(MAVEN_ID);
         newProject.setVisibility(parentProject.getProjectDescription().getVisibility());
-        newProject.setBuilders(dtoFactory.createDto(BuildersDescriptor.class).withDefault("maven"));
 
         Map<String, List<String>> attributes = new HashMap<>();
         attributes.put(ARTIFACT_ID, Arrays.asList(artifactId));

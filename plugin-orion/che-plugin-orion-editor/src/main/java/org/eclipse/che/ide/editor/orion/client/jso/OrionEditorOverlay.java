@@ -128,4 +128,17 @@ public class OrionEditorOverlay extends JavaScriptObject {
     public final native void reportStatus(String message, String type, boolean accessible) /*-{
         this.reportStatus(message, type, accessible);
     }-*/;
+
+    /**
+     * Returns the annotation model.
+     * @return the annotation model
+     */
+    public final native OrionAnnotationModelOverlay getAnnotationModel() /*-{
+        return this.getAnnotationModel();
+    }-*/;
+
+    public final native void setZoomRulerVisible(boolean visible) /*-{
+        this.setZoomRulerVisible(visible);
+    }-*/;
+
 }

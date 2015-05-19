@@ -61,7 +61,14 @@
 .orionCodenvy .meta.annotation.currentLine {
     background-color: editorCurrentLineColor !important;
 }
+.orionCodenvy .annotation {
+    color: smeta;
+}
 .orionCodenvy .keyword {
+    color: keyword;
+    font-weight: normal;
+}
+.orionCodenvy .constant {
     color: keyword;
     font-weight: normal;
 }
@@ -69,7 +76,7 @@
     color: string;
 }
 .orionCodenvy .comment {
-    color: comment;
+    color: #808080;
 }
 .orionCodenvy .comment.block.documentation {
     color: comment;
@@ -122,4 +129,21 @@
 .orionCodenvy .textViewFindCloseButton:hover {
 	/* from Core.css gwt:TextButton:hover */
     border: 1px solid tabBorder;
+}
+
+.textviewSelection, .orionCodenvy .textviewSelection{
+    background:rgb(180,213,255);
+}
+.orionCodenvy .textviewSelectionUnfocused{
+    background-color: gray;
+}
+
+.orionCodenvy .textviewContent ::-moz-selection{
+    background:rgb(180,213,255);
+}
+.orionCodenvy .textviewContent ::selection{
+    background:rgb(180,213,255);
+}
+.orionCodenvy .textviewRightRuler{
+    border-left: 1px solid tabBorder;
 }

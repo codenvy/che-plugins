@@ -10,12 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.format;
 
+import com.google.inject.Inject;
+
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
 import org.eclipse.che.ide.rest.RestContext;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * @author Roman Nikitenko

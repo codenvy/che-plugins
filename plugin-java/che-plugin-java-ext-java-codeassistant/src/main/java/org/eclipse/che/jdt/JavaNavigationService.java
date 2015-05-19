@@ -10,12 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.jdt;
 
-import org.eclipse.che.jdt.internal.core.JavaProject;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
-
+import org.eclipse.jdt.internal.core.JavaModel;
+import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 
 import javax.inject.Inject;
@@ -32,12 +33,10 @@ import java.util.List;
  */
 @Path("navigation/{ws-id}")
 public class JavaNavigationService {
+    JavaModel MODEL = JavaModelManager.getJavaModelManager().getJavaModel();
 
     @PathParam("ws-id")
     private String wsId;
-
-    @Inject
-    private JavaProjectService service;
 
     @Inject
     private JavaNavigation navigation;
@@ -45,22 +44,18 @@ public class JavaNavigationService {
     @GET
     @Path("find-declaration")
     @Produces("application/json")
-    public OpenDeclarationDescriptor findDeclaration(@QueryParam("projectpath") String projectPath, @QueryParam("bindingkey") String bindingKey)
+    public OpenDeclarationDescriptor findDeclaration(@QueryParam("projectpath") String projectPath, @QueryParam("fqn") String fqn,
+                                                     @QueryParam("offset") int offset)
             throws JavaModelException {
-        JavaProject project = service.getOrCreateJavaProject(wsId, projectPath);
-        if(bindingKey.contains(";.")){
-            String fqn = bindingKey.substring(0, bindingKey.indexOf(";."));
-            String bodyDeclaration = bindingKey.substring(bindingKey.indexOf(";."));
-            bindingKey = fqn + bodyDeclaration.replaceAll("/",".");
-        }
-        return navigation.findDeclaration(project, bindingKey);
+        IJavaProject project = MODEL.getJavaProject(projectPath);
+        return navigation.findDeclaration(project, fqn, offset);
     }
 
     @GET
     @Path("libraries")
     @Produces("application/json")
     public List<Jar> getExternalLibraries(@QueryParam("projectpath") String projectPath) throws JavaModelException {
-        JavaProject project = service.getOrCreateJavaProject(wsId, projectPath);
+        IJavaProject project = MODEL.getJavaProject(projectPath);
         return navigation.getProjectDependecyJars(project);
     }
 
@@ -69,7 +64,7 @@ public class JavaNavigationService {
     @Produces("application/json")
     public List<JarEntry> getLibraryChildren(@QueryParam("projectpath") String projectPath, @QueryParam("root") int rootId)
             throws JavaModelException {
-        JavaProject project = service.getOrCreateJavaProject(wsId, projectPath);
+        IJavaProject project = MODEL.getJavaProject(projectPath);
         return navigation.getPackageFragmentRootContent(project, rootId);
     }
 
@@ -78,7 +73,7 @@ public class JavaNavigationService {
     @Produces("application/json")
     public List<JarEntry> getChildren(@QueryParam("projectpath") String projectPath, @QueryParam("path") String path,
                                       @QueryParam("root") int rootId) throws JavaModelException {
-        JavaProject project = service.getOrCreateJavaProject(wsId, projectPath);
+        IJavaProject project = MODEL.getJavaProject(projectPath);
         return navigation.getChildren(project, rootId, path);
     }
 
@@ -86,7 +81,7 @@ public class JavaNavigationService {
     @Path("content")
     public Response getContent(@QueryParam("projectpath") String projectPath, @QueryParam("path") String path,
                                @QueryParam("root") int rootId) throws CoreException {
-        JavaProject project = service.getOrCreateJavaProject(wsId, projectPath);
+        IJavaProject project = MODEL.getJavaProject(projectPath);
         String content = navigation.getContent(project, rootId, path);
         return Response.ok().entity(content).build();
     }
@@ -95,7 +90,7 @@ public class JavaNavigationService {
     @Path("entry")
     public JarEntry getEntry(@QueryParam("projectpath") String projectPath, @QueryParam("path") String path,
                                @QueryParam("root") int rootId) throws CoreException {
-        JavaProject project = service.getOrCreateJavaProject(wsId, projectPath);
+        IJavaProject project = MODEL.getJavaProject(projectPath);
         return navigation.getEntry(project, rootId, path);
     }
 }

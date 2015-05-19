@@ -22,9 +22,9 @@ public interface MinimapView {
      */
     void setDelegate(Delegate delegate);
 
-    void addMark(double ratio, String style, int line);
+    void addMark(double ratio, String style, int offset, String title);
 
-    void addMark(double relativePos, String style, int line, Integer level);
+    void addMark(double relativePos, String style, int offset, Integer level, String title);
 
     void clearMarks();
 
@@ -42,6 +42,6 @@ public interface MinimapView {
          */
         void handleClick(double verticalPosition);
 
-        void handleMarkClick(int line);
+        void handleMarkClick(int offset);
     }
 }

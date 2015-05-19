@@ -10,14 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.jdt;
 
-import org.eclipse.che.api.core.ServerException;
-import org.eclipse.che.api.core.notification.EventService;
-import org.eclipse.che.api.core.notification.EventSubscriber;
-import org.eclipse.che.api.vfs.server.observation.VirtualFileEvent;
-import org.eclipse.che.commons.lang.IoUtil;
-import org.eclipse.che.jdt.core.resources.ResourceChangedEvent;
-import org.eclipse.che.jdt.internal.core.JavaProject;
-import org.eclipse.che.vfs.impl.fs.LocalFSMountStrategy;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -26,6 +18,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import org.eclipse.che.api.core.notification.EventService;
+import org.eclipse.che.api.core.notification.EventSubscriber;
+import org.eclipse.che.api.vfs.server.observation.VirtualFileEvent;
+import org.eclipse.che.commons.lang.IoUtil;
+import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.che.vfs.impl.fs.LocalFSMountStrategy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.codeassist.impl.AssistOptions;
@@ -71,13 +69,14 @@ public class JavaProjectService {
         options.put(CompilerOptions.OPTION_ReportUnusedLocal, CompilerOptions.WARNING);
         options.put(CompilerOptions.OPTION_TaskTags, CompilerOptions.WARNING);
         options.put(CompilerOptions.OPTION_ReportUnusedPrivateMember, CompilerOptions.WARNING);
-        options.put(CompilerOptions.OPTION_SuppressWarnings, CompilerOptions.DISABLED);
+        options.put(CompilerOptions.OPTION_SuppressWarnings, CompilerOptions.ENABLED);
         options.put(JavaCore.COMPILER_TASK_TAGS, "TODO,FIXME,XXX");
         options.put(JavaCore.COMPILER_PB_UNUSED_PARAMETER_INCLUDE_DOC_COMMENT_REFERENCE, JavaCore.ENABLED);
         options.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.ENABLED);
         options.put(JavaCore.COMPILER_ANNOTATION_NULL_ANALYSIS, JavaCore.ENABLED);
         options.put(CompilerOptions.OPTION_Process_Annotations, JavaCore.ENABLED);
         options.put(CompilerOptions.OPTION_GenerateClassFiles, JavaCore.ENABLED);
+
         cache = CacheBuilder.newBuilder().expireAfterAccess(4, TimeUnit.HOURS).removalListener(
                 new RemovalListener<String, JavaProject>() {
                     @Override
@@ -91,24 +90,25 @@ public class JavaProjectService {
     }
 
     public JavaProject getOrCreateJavaProject(String wsId, String projectPath) {
-        String key = wsId + projectPath;
-        JavaProject project = cache.getIfPresent(key);
-        if (project != null) {
-            return project;
-        }
-        File mountPath;
-        try {
-            mountPath = fsMountStrategy.getMountPath(wsId);
-        } catch (ServerException e) {
-            throw new RuntimeException(e);
-        }
-        JavaProject javaProject = new JavaProject(mountPath, projectPath, tempDir, wsId, new HashMap<>(options));
-        cache.put(key, javaProject);
-        if (!projectInWs.containsKey(wsId)) {
-            projectInWs.put(wsId, new CopyOnWriteArraySet<String>());
-        }
-        projectInWs.get(wsId).add(projectPath);
-        return javaProject;
+//        String key = wsId + projectPath;
+//        JavaProject project = cache.getIfPresent(key);
+//        if (project != null) {
+//            return project;
+//        }
+//        File mountPath;
+//        try {
+//            mountPath = fsMountStrategy.getMountPath(wsId);
+//        } catch (ServerException e) {
+//            throw new RuntimeException(e);
+//        }
+//        JavaProject javaProject = new JavaProject(mountPath, projectPath, tempDir, wsId, new HashMap<>(options));
+//        cache.put(key, javaProject);
+//        if (!projectInWs.containsKey(wsId)) {
+//            projectInWs.put(wsId, new CopyOnWriteArraySet<String>());
+//        }
+//        projectInWs.get(wsId).add(projectPath);
+//        return javaProject;
+        throw new UnsupportedOperationException();
     }
 
     public boolean isProjectDependencyExist(String wsId, String projectPath) {
@@ -157,43 +157,46 @@ public class JavaProjectService {
 
         @Override
         public void onEvent(VirtualFileEvent event) {
-            final VirtualFileEvent.ChangeType eventType = event.getType();
-            final String eventWorkspace = event.getWorkspaceId();
-            final String eventPath = event.getPath();
-            try {
-                if (eventType == VirtualFileEvent.ChangeType.DELETED) {
-                    JavaProject javaProject = cache.getIfPresent(eventWorkspace + eventPath);
-                    if (javaProject != null) {
-                        removeProject(eventWorkspace, eventPath);
-                        return;
-                    } else if (event.isFolder()) {
-                        if (isProjectDependencyExist(eventWorkspace, eventPath)) {
-                            deleteDependencyDirectory(eventWorkspace, eventPath);
-                            return;
-                        }
-                    }
-                }
-                if (projectInWs.containsKey(eventWorkspace)) {
-                    for (String path : projectInWs.get(eventWorkspace)) {
-                        if (eventPath.startsWith(path)) {
-                            JavaProject javaProject = cache.getIfPresent(eventWorkspace + path);
-                            if (javaProject != null) {
-                                try {
-                                    javaProject.getJavaModelManager().deltaState.resourceChanged(
-                                            new ResourceChangedEvent(fsMountStrategy.getMountPath(eventWorkspace), event));
-                                    javaProject.creteNewNameEnvironment();
-                                } catch (ServerException e) {
-                                    LOG.warn("Can't update java model", e);
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            } catch (Throwable t) {
-                //catch all exceptions that may be happened
-                LOG.warn("Can't update java model", t);
-            }
+//            final VirtualFileEvent.ChangeType eventType = event.getType();
+//            final String eventWorkspace = event.getWorkspaceId();
+//            final String eventPath = event.getPath();
+//            try {
+//            JavaModelManager.getJavaModelManager().deltaState.resourceChanged(
+//                    new ResourceChangedEvent(fsMountStrategy.getMountPath(eventWorkspace), event));
+//
+//
+//                if (eventType == VirtualFileEvent.ChangeType.DELETED) {
+//                    JavaProject javaProject = cache.getIfPresent(eventWorkspace + eventPath);
+//                    if (javaProject != null) {
+//                        removeProject(eventWorkspace, eventPath);
+//                        return;
+//                    } else if (event.isFolder()) {
+//                        if (isProjectDependencyExist(eventWorkspace, eventPath)) {
+//                            deleteDependencyDirectory(eventWorkspace, eventPath);
+//                            return;
+//                        }
+//                    }
+//                }
+//                if (projectInWs.containsKey(eventWorkspace)) {
+//                    for (String path : projectInWs.get(eventWorkspace)) {
+//                        if (eventPath.startsWith(path)) {
+//                            JavaProject javaProject = cache.getIfPresent(eventWorkspace + path);
+//                            if (javaProject != null) {
+////                                try {
+//
+////                                    javaProject.creteNewNameEnvironment();
+////                                } catch (ServerException e) {
+////                                    LOG.error("Can't update java model", e);
+////                                }
+//                            }
+//                            break;
+//                        }
+//                    }
+//                }
+//            } catch (Throwable t) {
+//                //catch all exceptions that may be happened
+//                LOG.error("Can't update java model", t);
+//            }
         }
     }
 }

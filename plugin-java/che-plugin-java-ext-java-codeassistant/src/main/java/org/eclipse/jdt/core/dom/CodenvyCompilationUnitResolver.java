@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.jdt.core.dom;
 
-import org.eclipse.che.jdt.internal.core.SourceTypeElementInfo;
+import org.eclipse.jdt.internal.core.SourceTypeElementInfo;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;

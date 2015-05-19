@@ -50,4 +50,8 @@ public class OrionStyleOverlay extends JavaScriptObject {
     public final native void setStyle(JavaScriptObject style) /*-{
         this.style = style;
     }-*/;
+
+    public static native OrionStyleOverlay create() /*-{
+        return {};
+    }-*/;
 }

@@ -11,8 +11,6 @@
 package org.eclipse.che.jdt.javadoc;
 
 import org.eclipse.che.jdt.util.JavaModelUtil;
-import org.eclipse.che.jdt.internal.corext.CorextMessages;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
@@ -32,6 +30,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.internal.corext.CorextMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

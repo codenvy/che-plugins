@@ -238,7 +238,7 @@ public class DatabaseMetadataEntityDTORenderer implements NodeRenderer<DatabaseM
     public interface Resources extends Tree.Resources, PartStackUIResources {
 
         /** Returns the CSS resource for the datasource explorer tree. */
-        @Source({"DatabaseMetadataEntityDTORenderer.css", "org/eclipse/che/ide/common/constants.css",
+        @Source({"DatabaseMetadataEntityDTORenderer.css", "org/eclipse/che/ide/ui/constants.css",
                  "org/eclipse/che/ide/api/ui/style.css"})
         DatabaseMetadataEntityDTORenderer.Css getCss();
 

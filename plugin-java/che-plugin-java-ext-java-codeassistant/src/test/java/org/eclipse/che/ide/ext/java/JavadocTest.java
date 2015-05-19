@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.java;
 
 import org.eclipse.che.jdt.JavadocFinder;
+import org.eclipse.che.jdt.javadoc.JavaElementLinks;
 import org.eclipse.che.jdt.javadoc.JavadocContentAccess2;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
@@ -49,7 +50,7 @@ public class JavadocTest extends BaseTest {
 
     @Test
     public void findObjectDoc() throws JavaModelException {
-        String javadoc = finder.findJavadoc(project, "Ljava/lang/Object;");
+        String javadoc = finder.findJavadoc(project, "java.lang.Object", 514);
         Assert.assertNotNull(javadoc);
         assertThat(javadoc).isNotNull().isNotEmpty().contains("Class <code>Object</code> is the root of the class hierarchy.");
     }
@@ -75,7 +76,7 @@ public class JavadocTest extends BaseTest {
     }
 
     @Test
-    public void binaryFieldDoc() throws JavaModelException {
+    public void binaryFieldDoc() throws JavaModelException, URISyntaxException {
         IType type = project.findType("java.util.ArrayList");
         assertThat(type).isNotNull();
         IField field = type.getField("size");
@@ -94,25 +95,25 @@ public class JavadocTest extends BaseTest {
 
     @Test
     public void binaryHandle() throws JavaModelException, URISyntaxException, UnsupportedEncodingException {
-        testDoc("<java.lang(String.class☃String☂java.lang.StringBuffer",
+        testDoc("<java.lang(String.class"+JavaElementLinks.LINK_BRACKET_REPLACEMENT+"String"+JavaElementLinks.LINK_SEPARATOR +"java.lang.StringBuffer",
                 "A thread-safe, mutable sequence of characters.");
     }
 
     @Test
     public void binaryHandleMethod() throws JavaModelException, URISyntaxException, UnsupportedEncodingException {
-        testDoc("<java.nio.charset(CharsetDecoder.class☃CharsetDecoder☂☂replaceWith☂java.lang.String",
+        testDoc("<java.nio.charset(CharsetDecoder.class"+JavaElementLinks.LINK_BRACKET_REPLACEMENT+"CharsetDecoder"+JavaElementLinks.LINK_SEPARATOR +JavaElementLinks.LINK_SEPARATOR +"replaceWith"+JavaElementLinks.LINK_SEPARATOR +"java.lang.String",
                 "Changes this decoder's replacement value.");
     }
 
     @Test
     public void exceptionMethod() throws JavaModelException, URISyntaxException, UnsupportedEncodingException {
-        testDoc("<java.lang(Throwable.class☃Throwable~Throwable~Ljava.lang.String;~Ljava.lang.Throwable;~Z~Z☂☂getStackTrace",
+        testDoc("<java.lang(Throwable.class"+JavaElementLinks.LINK_BRACKET_REPLACEMENT+"Throwable~Throwable~Ljava.lang.String;~Ljava.lang.Throwable;~Z~Z"+JavaElementLinks.LINK_SEPARATOR +JavaElementLinks.LINK_SEPARATOR +"getStackTrace",
                 "Provides programmatic access to the stack trace information printed by");
     }
 
     @Test
     public void getContextClassLoadingMethod() throws JavaModelException, URISyntaxException, UnsupportedEncodingException {
-        testDoc("<java.nio.charset.spi(CharsetProvider.class☃CharsetProvider☂java.lang.Thread☂getContextClassLoader☂",
+        testDoc("<java.nio.charset.spi(CharsetProvider.class"+JavaElementLinks.LINK_BRACKET_REPLACEMENT+"CharsetProvider"+JavaElementLinks.LINK_SEPARATOR +"java.lang.Thread"+JavaElementLinks.LINK_SEPARATOR +"getContextClassLoader" +JavaElementLinks.LINK_SEPARATOR,
                 "Returns the context ClassLoader for this Thread.");
     }
 

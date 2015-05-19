@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>codenvy-ide-parent</artifactId>
-        <groupId>org.eclipse.che.core</groupId>
+        <groupId>com.codenvy.ide</groupId>
         <version>1.0.0-TEST-SNAPSHOT</version>
     </parent>
     <artifactId>codenvy-ide-client</artifactId>

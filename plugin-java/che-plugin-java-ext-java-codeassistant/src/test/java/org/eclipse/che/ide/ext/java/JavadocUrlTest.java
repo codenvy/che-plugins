@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.java;
 
 import org.eclipse.che.jdt.JavadocFinder;
 import org.eclipse.che.jdt.javadoc.JavaElementLinks;
-
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -65,19 +64,4 @@ public class JavadocUrlTest extends BaseTest {
         assertThat(element).isNotNull().isEqualTo(method);
     }
 
-    @Test
-    public void methodHandleUri() throws JavaModelException, URISyntaxException, UnsupportedEncodingException {
-        JavadocFinder finder = new JavadocFinder("test");
-        String javadoc = finder.findJavadoc(project, "Ljava/lang/String;.startsWith(Ljava.lang.String;I)");
-        assertThat(javadoc).isNotNull().contains(
-                "Tests if the substring of this string beginning");
-    }
-
-    @Test
-    public void methodHandleUri2() throws JavaModelException, URISyntaxException, UnsupportedEncodingException {
-        JavadocFinder finder = new JavadocFinder("test");
-        String javadoc = finder.findJavadoc(project, "Ljava/lang/String;.split(Ljava.lang.String;)");
-        assertThat(javadoc).isNotNull().contains(
-                "Splits this string around matches");
-    }
 }

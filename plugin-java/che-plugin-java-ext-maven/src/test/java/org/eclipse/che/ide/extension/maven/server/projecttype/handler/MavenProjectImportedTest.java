@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.maven.server.projecttype.handler;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.multibindings.Multibinder;
+
 import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.project.server.DefaultProjectManager;
 import org.eclipse.che.api.project.server.FolderEntry;
@@ -24,11 +29,6 @@ import org.eclipse.che.api.vfs.server.VirtualFileSystemRegistry;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemUser;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemUserContext;
 import org.eclipse.che.api.vfs.server.impl.memory.MemoryFileSystemProvider;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.multibindings.Multibinder;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -148,7 +148,6 @@ public class MavenProjectImportedTest {
         assertNotNull(projectManager.getProject(workspace, "test").getConfig());
         assertNotNull(projectManager.getProject(workspace, "test").getConfig().getTypeId());
         Assert.assertEquals("maven", projectManager.getProject(workspace, "test").getConfig().getTypeId());
-        assertNotNull(projectManager.getProject(workspace, "test").getConfig().getBuilders());
     }
 
 

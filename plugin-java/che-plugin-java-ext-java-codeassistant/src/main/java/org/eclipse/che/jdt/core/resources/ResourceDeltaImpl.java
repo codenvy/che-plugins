@@ -13,12 +13,14 @@ package org.eclipse.che.jdt.core.resources;
 
 import org.eclipse.che.api.vfs.server.observation.VirtualFileEvent;
 
+import org.eclipse.che.core.internal.resources.ResourcesPlugin;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 import java.io.File;
 
@@ -133,7 +135,8 @@ public class ResourceDeltaImpl implements IResourceDelta {
 
     @Override
     public IResource getResource() {
-        throw new UnsupportedOperationException();
+        return ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(event.getPath()));
+//        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -10,31 +10,21 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.server.projecttype;
 
-import org.eclipse.che.api.project.server.type.ProjectType;
-import org.eclipse.che.ide.ext.java.shared.Constants;
 import com.google.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-
-import static org.eclipse.che.ide.api.project.type.RunnerCategory.JAVA;
+import org.eclipse.che.api.project.server.type.ProjectType;
+import org.eclipse.che.ide.ext.java.shared.Constants;
 
 /**
  * @author gazarenkov
  * @author Dmitry Shnurenko
  */
 public class JavaProjectType extends ProjectType {
-    private static final Logger LOG = LoggerFactory.getLogger(JavaProjectType.class);
-
     @Inject
     public JavaProjectType() {
         super("java", "Java", true, false);
         addConstantDefinition(Constants.LANGUAGE, "language", "java");
         addConstantDefinition(Constants.LANGUAGE_VERSION, "language version", "1.6");
-        addRunnerCategories(Arrays.asList(JAVA.toString()));
+//        addRunnerCategories(Arrays.asList(JAVA.toString()));
     }
-
 }
-

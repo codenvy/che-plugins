@@ -28,4 +28,7 @@ public interface MavenResources extends ClientBundle {
 
     @Source("maven.svg")
     SVGResource maven();
+
+    @Source("command/maven-command-type.svg")
+    SVGResource mavenCommandType();
 }

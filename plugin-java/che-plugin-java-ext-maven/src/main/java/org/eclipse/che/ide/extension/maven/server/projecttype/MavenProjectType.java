@@ -10,18 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.maven.server.projecttype;
 
+import com.google.inject.Inject;
+
 import org.eclipse.che.api.project.server.type.ProjectType;
 import org.eclipse.che.ide.ext.java.server.projecttype.JavaProjectType;
 import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
-import com.google.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
-import java.util.Arrays;
-
-import static org.eclipse.che.ide.api.project.type.RunnerCategory.JAVA;
 
 /**
  * @author Evgen Vidolob
@@ -29,13 +24,11 @@ import static org.eclipse.che.ide.api.project.type.RunnerCategory.JAVA;
  */
 @Singleton
 public class MavenProjectType extends ProjectType {
-    private static final Logger LOG = LoggerFactory.getLogger(MavenProjectType.class);
 
     @Inject
-    public MavenProjectType(MavenValueProviderFactory mavenValueProviderFactory,
-                            JavaProjectType javaProjectType) {
-
+    public MavenProjectType(MavenValueProviderFactory mavenValueProviderFactory, JavaProjectType javaProjectType) {
         super(MavenAttributes.MAVEN_ID, MavenAttributes.MAVEN_NAME, true, false);
+
         addVariableDefinition(MavenAttributes.GROUP_ID, "", false, mavenValueProviderFactory);
         addVariableDefinition(MavenAttributes.ARTIFACT_ID, "", true, mavenValueProviderFactory);
         addVariableDefinition(MavenAttributes.VERSION, "", false, mavenValueProviderFactory);
@@ -45,10 +38,7 @@ public class MavenProjectType extends ProjectType {
         addVariableDefinition(MavenAttributes.PACKAGING, "", false, mavenValueProviderFactory);
         addVariableDefinition(MavenAttributes.SOURCE_FOLDER, "", false, mavenValueProviderFactory);
         addVariableDefinition(MavenAttributes.TEST_SOURCE_FOLDER, "", false, mavenValueProviderFactory);
-        addRunnerCategories(Arrays.asList(JAVA.toString()));
 
         addParent(javaProjectType);
-        setDefaultBuilder("maven");
     }
-
 }

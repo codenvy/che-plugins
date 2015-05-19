@@ -16,44 +16,46 @@
     <parent>
         <artifactId>maven-depmgt-pom</artifactId>
         <groupId>org.eclipse.che.depmgt</groupId>
-        <version>1.21.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <groupId>org.eclipse.che.plugin</groupId>
     <artifactId>che-plugin-parent</artifactId>
-    <version>3.10.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Che Plugin :: Parent</name>
     <modules>
-        <module>plugin-builder</module>
-        <module>plugin-runner</module>
+        <!--<module>plugin-builder</module>-->
+        <!--<module>plugin-runner</module>-->
+        <module>plugin-docker</module>
         <module>plugin-web</module>
+        <module>plugin-machine</module>
         <module>plugin-java</module>
         <module>plugin-sdk</module>
         <module>plugin-codemirror</module>
         <module>plugin-orion</module>
-        <module>plugin-php</module>
+        <!--<module>plugin-php</module>-->
         <module>plugin-ssh</module>
         <module>plugin-git</module>
         <module>plugin-github</module>
-        <module>plugin-datasource</module>
-        <module>plugin-angularjs</module>
-        <module>plugin-bower</module>
-        <module>plugin-gulp</module>
-        <module>plugin-grunt</module>
-        <module>plugin-npm</module>
-        <module>plugin-yeoman</module>
-        <module>plugin-cpp</module>
-        <module>plugin-ruby</module>
-        <module>plugin-go</module>
-        <module>plugin-python</module>
-        <module>plugin-tour</module>
+        <!--<module>plugin-datasource</module>-->
+        <!--<module>plugin-angularjs</module>-->
+        <!--<module>plugin-bower</module>-->
+        <!--<module>plugin-gulp</module>-->
+        <!--<module>plugin-grunt</module>-->
+        <!--<module>plugin-npm</module>-->
+        <!--<module>plugin-yeoman</module>-->
+        <!--<module>plugin-cpp</module>-->
+        <!--<module>plugin-ruby</module>-->
+        <!--<module>plugin-go</module>-->
+        <!--<module>plugin-python</module>-->
+        <!--<module>plugin-tour</module>-->
         <module>plugin-svn</module>
     </modules>
     <scm>
-        <connection>scm:git:git@github.com:codenvy/che-plugins.git</connection>
-        <developerConnection>scm:git:git@github.com:codenvy/che-plugins.git</developerConnection>
-        <tag>3.9.0</tag>
-        <url>https://github.com/codenvy/che-plugins</url>
+        <connection>scm:git:git@github.com:codenvy/che-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:codenvy/che-plugin.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/codenvy/che-plugin</url>
     </scm>
     <properties>
         <dto-generator-out-directory>${project.build.directory}/generated-sources/dto/</dto-generator-out-directory>

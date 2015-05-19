@@ -21,23 +21,25 @@ import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.JarEntry.JarEntryType;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
-import org.eclipse.che.jdt.internal.core.JarEntryDirectory;
-import org.eclipse.che.jdt.internal.core.JarEntryFile;
-import org.eclipse.che.jdt.internal.core.JarEntryResource;
-import org.eclipse.che.jdt.internal.core.JarPackageFragmentRoot;
-import org.eclipse.che.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.core.JarEntryDirectory;
+import org.eclipse.jdt.internal.core.JarEntryFile;
+import org.eclipse.jdt.internal.core.JarEntryResource;
+import org.eclipse.jdt.internal.core.JarPackageFragmentRoot;
 import org.eclipse.che.jdt.javadoc.JavaElementLabels;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IClassFile;
+import org.eclipse.jdt.core.ICodeAssist;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJarEntryResource;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,13 +165,34 @@ public class JavaNavigation {
         return found;
     }
 
-    public OpenDeclarationDescriptor findDeclaration(JavaProject project, String bindingKey) throws JavaModelException {
-        IJavaElement originalElement = project.findElement(bindingKey, null);
+    public OpenDeclarationDescriptor findDeclaration(IJavaProject project, String fqn, int offset) throws JavaModelException {
+        IJavaElement originalElement = null;
+        IType type = project.findType(fqn);
+        ICodeAssist codeAssist;
+//        IBuffer buffer;
+        if(type.isBinary()){
+            codeAssist = type.getClassFile();
+//            buffer = type.getClassFile().getBuffer();
+        } else {
+            codeAssist = type.getCompilationUnit();
+//            buffer = type.getCompilationUnit().getBuffer();
+        }
+
+//        DocumentAdapter adapter = new DocumentAdapter(buffer);
+//        org.eclipse.jface.text.IRegion region = JavaWordFinder.findWord(adapter, offset);
+        IJavaElement[] elements = null;
+        if(codeAssist != null) {
+            elements = codeAssist.codeSelect(/*region.getOffset(), region.getLength()*/ offset, 0);
+        }
+
+        if(elements != null && elements.length > 0){
+            originalElement = elements[0];
+        }
         IJavaElement element = originalElement;
         while (element != null) {
             if (element instanceof ICompilationUnit) {
                 ICompilationUnit unit = ((ICompilationUnit)element).getPrimary();
-                return compilationUnitNavigation(unit, originalElement, project.getWorkspacePath());
+                return compilationUnitNavigation(unit, originalElement);
             }
 
             if (element instanceof IClassFile) {
@@ -180,7 +203,7 @@ public class JavaNavigation {
         return null;
     }
 
-    public List<Jar> getProjectDependecyJars(JavaProject project) throws JavaModelException {
+    public List<Jar> getProjectDependecyJars(IJavaProject project) throws JavaModelException {
         List<Jar> jars = new ArrayList<>();
         for (IPackageFragmentRoot fragmentRoot : project.getAllPackageFragmentRoots()) {
             if (fragmentRoot instanceof JarPackageFragmentRoot) {
@@ -194,7 +217,7 @@ public class JavaNavigation {
         return jars;
     }
 
-    public List<JarEntry> getPackageFragmentRootContent(JavaProject project, int hash) throws JavaModelException {
+    public List<JarEntry> getPackageFragmentRootContent(IJavaProject project, int hash) throws JavaModelException {
         IPackageFragmentRoot packageFragmentRoot = getPackageFragmentRoot(project, hash);
 
         if (packageFragmentRoot == null) {
@@ -206,7 +229,7 @@ public class JavaNavigation {
         return convertToJarEntry(rootContent, packageFragmentRoot);
     }
 
-    private IPackageFragmentRoot getPackageFragmentRoot(JavaProject project, int hash) throws JavaModelException {
+    private IPackageFragmentRoot getPackageFragmentRoot(IJavaProject project, int hash) throws JavaModelException {
         IPackageFragmentRoot[] roots = project.getAllPackageFragmentRoots();
         IPackageFragmentRoot packageFragmentRoot = null;
         for (IPackageFragmentRoot root : roots) {
@@ -399,11 +422,11 @@ public class JavaNavigation {
         return dto;
     }
 
-    private OpenDeclarationDescriptor compilationUnitNavigation(ICompilationUnit unit, IJavaElement element, String workspacePath)
+    private OpenDeclarationDescriptor compilationUnitNavigation(ICompilationUnit unit, IJavaElement element)
             throws JavaModelException {
         OpenDeclarationDescriptor dto = DtoFactory.getInstance().createDto(OpenDeclarationDescriptor.class);
         String absolutePath = unit.getPath().toOSString();
-        dto.setPath(absolutePath.substring(workspacePath.length()));
+        dto.setPath(absolutePath);
         dto.setBinary(false);
         if (element instanceof ISourceReference) {
             ISourceRange nameRange = ((ISourceReference)element).getNameRange();
@@ -433,7 +456,7 @@ public class JavaNavigation {
         return null;
     }
 
-    public List<JarEntry> getChildren(JavaProject project, int rootId, String path) throws JavaModelException {
+    public List<JarEntry> getChildren(IJavaProject project, int rootId, String path) throws JavaModelException {
         IPackageFragmentRoot root = getPackageFragmentRoot(project, rootId);
         if (root == null) {
             return NO_ENTRIES;
@@ -463,7 +486,7 @@ public class JavaNavigation {
         return NO_ENTRIES;
     }
 
-    public String getContent(JavaProject project, int rootId, String path) throws CoreException {
+    public String getContent(IJavaProject project, int rootId, String path) throws CoreException {
         IPackageFragmentRoot root = getPackageFragmentRoot(project, rootId);
         if (root == null) {
             return null;
@@ -486,7 +509,7 @@ public class JavaNavigation {
                     }
                 } finally {
                     if (jar != null) {
-                        jarPackageFragmentRoot.closeJar(jar);
+                        JavaModelManager.getJavaModelManager().closeZipFile(jar);
                     }
                 }
             }
@@ -546,7 +569,7 @@ public class JavaNavigation {
         return null;
     }
 
-    public JarEntry getEntry(JavaProject project, int rootId, String path) throws CoreException {
+    public JarEntry getEntry(IJavaProject project, int rootId, String path) throws CoreException {
         IPackageFragmentRoot root = getPackageFragmentRoot(project, rootId);
         if (root == null) {
             return null;
@@ -567,7 +590,7 @@ public class JavaNavigation {
                 }
             } finally {
                 if (jar != null) {
-                    jarPackageFragmentRoot.closeJar(jar);
+                    JavaModelManager.getJavaModelManager().closeZipFile(jar);
                 }
             }
 

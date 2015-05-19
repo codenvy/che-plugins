@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-plugin-java-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.10.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-java-runner-webapps</artifactId>
     <packaging>jar</packaging>
@@ -78,7 +78,7 @@
                         <configuration>
                             <tasks>
                                 <!-- Unzip Tomcat package -->
-                                <mkdir dir="${project.build.directory}/classes/tomcat-bundle" />
+                                <mkdir dir="${project.build.directory}/classes/tomcat-bundle"/>
                                 <unzip dest="${project.build.directory}/classes/tomcat-bundle" src="${project.build.directory}/classes/tomcat.zip">
                                     <patternset>
                                         <exclude name="**/webapps/**" />

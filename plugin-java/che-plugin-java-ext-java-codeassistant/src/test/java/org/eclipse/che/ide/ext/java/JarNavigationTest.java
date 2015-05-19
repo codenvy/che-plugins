@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java;
 
-import org.eclipse.che.jdt.JavaNavigation;
-import org.eclipse.che.jdt.SourcesFromBytecodeGenerator;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
-
+import org.eclipse.che.jdt.JavaNavigation;
+import org.eclipse.che.jdt.SourcesFromBytecodeGenerator;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.junit.Test;
 
@@ -39,7 +38,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testPackageFragmentContent() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getPackageFragmentRootContent(project, root.hashCode());
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").contains("META-INF", "java", "javax");
         assertThat(rootContent).onProperty("path").contains("/META-INF");
@@ -48,7 +47,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testDoNotIncludeDefaultEmptyPackage() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/ext/zipfs.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getPackageFragmentRootContent(project, root.hashCode());
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").excludes("(default package)");
         assertThat(rootContent).onProperty("path").contains("/META-INF");
@@ -57,7 +56,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testNonJavaElement() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/ext/zipfs.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getPackageFragmentRootContent(project, root.hashCode());
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").contains("META-INF");
         assertThat(rootContent).onProperty("path").contains("/META-INF");
@@ -66,7 +65,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testNonJavaFolder() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/ext/zipfs.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getChildren(project, root.hashCode(), "/META-INF");
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").contains("services", "MANIFEST.MF");
     }
@@ -74,7 +73,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testNonJavaFile() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/ext/zipfs.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getChildren(project, root.hashCode(), "/META-INF/services");
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").containsExactly("java.nio.file.spi.FileSystemProvider");
     }
@@ -82,7 +81,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testJavaPackage() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getChildren(project, root.hashCode(), "java");
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").contains("lang", "io", "util", "net", "nio");
     }
@@ -90,7 +89,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testPackageCollapsing() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getChildren(project, root.hashCode(), "org");
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").contains("omg", "w3c.dom", "xml.sax");
     }
@@ -98,7 +97,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testClassFile() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getChildren(project, root.hashCode(), "java.lang");
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").contains("Object.class", "String.class", "Integer.class");
     }
@@ -106,7 +105,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testClassFileFQN() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getChildren(project, root.hashCode(), "java.lang");
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("path").contains("java.lang.Object", "java.lang.String", "java.lang.Integer");
     }
@@ -114,7 +113,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testDoesNotReturnInnerClasses() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> rootContent = navigation.getChildren(project, root.hashCode(), "java.lang");
         assertThat(rootContent).isNotNull().isNotEmpty().onProperty("name").excludes("Character$Subset.class");
     }
@@ -122,7 +121,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testJavaSource() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         String content = navigation.getContent(project, root.hashCode(), "java.lang.Object");
         assertThat(content).isNotNull().isNotEmpty().contains("public class Object");
     }
@@ -130,7 +129,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testNonJavaFileContent() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/ext/zipfs.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         String content = navigation.getContent(project, root.hashCode(), "/META-INF/services/java.nio.file.spi.FileSystemProvider");
         assertThat(content).isNotNull().isNotEmpty().contains("");
     }
@@ -138,7 +137,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testExternalJar() throws Exception {
         String javaHome = getClass().getResource("/temp").getPath() + "/ws/test/gwt-user.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> content = navigation.getPackageFragmentRootContent(project, root.hashCode());
         assertThat(content).isNotNull().isNotEmpty().onProperty("name").contains("com.google", "javax", "org", "META-INF", "about.html");
     }
@@ -146,7 +145,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testSortJarEntries() throws Exception {
         String javaHome = getClass().getResource("/temp").getPath() + "/ws/test/gwt-user.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> content = navigation.getPackageFragmentRootContent(project, root.hashCode());
         assertThat(content).isNotNull().isNotEmpty().onProperty("name").containsSequence("about_files","com.google", "javax", "org", "META-INF", "about.html", "plugin.properties");
     }
@@ -154,7 +153,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testSortJarEntriesWithClasses() throws Exception {
         String javaHome = getClass().getResource("/temp").getPath() + "/ws/test/gwt-user.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         List<JarEntry> content = navigation.getChildren(project, root.hashCode(), "org.hibernate.validator");
         assertThat(content).isNotNull().isNotEmpty().onProperty("name").containsSequence("engine","HibernateValidationMessageResolver.class", "ValidationMessages.class", "HibernateValidator.gwt.xml", "README.txt");
     }
@@ -162,7 +161,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testExternalJarFileContentInRoot() throws Exception {
         String javaHome = getClass().getResource("/temp").getPath() + "/ws/test/gwt-user.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         String content = navigation.getContent(project, root.hashCode(), "/about.html");
         assertThat(content).isNotNull().contains("<p>The Eclipse Foundation makes available all content in this plug-in");
     }
@@ -170,7 +169,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testFileContentInPackage() throws Exception {
         String javaHome = getClass().getResource("/temp").getPath() + "/ws/test/gwt-user.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         String content = navigation.getContent(project, root.hashCode(), "/com/google/gwt/user/User.gwt.xml");
         assertThat(content).isNotNull().contains("<!-- Combines all user facilities into a single module for convenience.     -->")
                            .contains("<!-- Most new code should inherit this module.                              -->")
@@ -180,7 +179,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testGetFileBypath() throws Exception {
         String javaHome = getClass().getResource("/temp").getPath() + "/ws/test/gwt-user.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         JarEntry entry = navigation.getEntry(project, root.hashCode(), "/com/google/gwt/user/User.gwt.xml");
         assertThat(entry).isNotNull();
         assertThat(entry.getType()).isEqualTo(JarEntry.JarEntryType.FILE);
@@ -191,7 +190,7 @@ public class JarNavigationTest extends BaseTest {
     @Test
     public void testGetClassByPath() throws Exception {
         String javaHome = System.getProperty("java.home") + "/lib/rt.jar";
-        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome));
+        IPackageFragmentRoot root = project.getPackageFragmentRoot(new File(javaHome).getPath());
         JarEntry entry = navigation.getEntry(project, root.hashCode(), "java.lang.Object");
         assertThat(entry).isNotNull();
         assertThat(entry.getType()).isEqualTo(JarEntry.JarEntryType.CLASS_FILE);

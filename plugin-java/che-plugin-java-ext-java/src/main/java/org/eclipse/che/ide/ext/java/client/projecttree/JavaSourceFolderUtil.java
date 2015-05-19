@@ -10,11 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.projecttree;
 
-import org.eclipse.che.api.project.shared.dto.BuildersDescriptor;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
+import org.eclipse.che.ide.ext.java.client.projecttree.nodes.JarClassNode;
+import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
+import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,22 +29,23 @@ public class JavaSourceFolderUtil {
     public static boolean isSourceFolder(ItemReference item, ProjectNode projectNode) {
         if ("folder".equals(item.getType())) {
             ProjectDescriptor projectDescriptor = projectNode.getData();
-            BuildersDescriptor builders = projectDescriptor.getBuilders();
+            //TODO only maven now
+//            BuildersDescriptor builders = projectDescriptor.getBuilders();
             Map<String, List<String>> attributes = projectDescriptor.getAttributes();
-            if (builders != null) {
+//            if (builders != null) {
                 boolean isSrcDir = false;
                 boolean isTestDir = false;
 
-                if (attributes.containsKey(builders.getDefault() + ".source.folder")) {
-                    isSrcDir = (projectDescriptor.getPath() + "/" + attributes.get(builders.getDefault() + ".source.folder").get(0)).equals(item.getPath());
+                if (attributes.containsKey(/*builders.getDefault() +*/ "maven.source.folder")) {
+                    isSrcDir = (projectDescriptor.getPath() + "/" + attributes.get(/*builders.getDefault() + */"maven.source.folder").get(0)).equals(item.getPath());
                 }
 
-                if (attributes.containsKey(builders.getDefault() + ".test.source.folder")) {
-                    isTestDir = (projectDescriptor.getPath() + "/" + attributes.get(builders.getDefault() + ".test.source.folder").get(0)).equals(item.getPath());
+                if (attributes.containsKey(/*builders.getDefault() + */"maven.test.source.folder")) {
+                    isTestDir = (projectDescriptor.getPath() + "/" + attributes.get(/*builders.getDefault() + */"maven.test.source.folder").get(0)).equals(item.getPath());
                 }
 
                 return isSrcDir || isTestDir;
-            }
+//            }
         }
 
         return false;
@@ -54,17 +58,18 @@ public class JavaSourceFolderUtil {
     public static List<String> getSourceFolders(TreeNode<?> node) {
         final ProjectNode project = node.getProject();
         Map<String, List<String>> attributes = project.getData().getAttributes();
-        final String builderName = project.getData().getBuilders().getDefault();
+        //TODO only maven now
+//        final String builderName = project.getData().getBuilders().getDefault();
         List<String> mySourceFolders = new LinkedList<>();
 
-        List<String> sourceFolders = attributes.get(builderName + ".source.folder");
+        List<String> sourceFolders = attributes.get(/*builderName + */"maven.source.folder");
         if (sourceFolders != null) {
             for (String sourceFolder : sourceFolders) {
                 mySourceFolders.add(project.getPath() + '/' + sourceFolder + '/');
             }
         }
 
-        List<String> testSourceFolders = attributes.get(builderName + ".test.source.folder");
+        List<String> testSourceFolders = attributes.get(/*builderName + */"maven.test.source.folder");
         if (testSourceFolders != null) {
             for (String testSourceFolder : testSourceFolders) {
                 mySourceFolders.add(project.getPath() + '/' + testSourceFolder + '/');
@@ -72,5 +77,23 @@ public class JavaSourceFolderUtil {
         }
 
         return mySourceFolders;
+    }
+
+    public static String getFQNForFile(VirtualFile file){
+        String packageName = "";
+        if (file instanceof SourceFileNode) {
+            if (((SourceFileNode)file).getParent() instanceof PackageNode) {
+                packageName = ((PackageNode)((SourceFileNode)file).getParent()).getQualifiedName();
+            }
+            if(!packageName.isEmpty()){
+                packageName = packageName + ".";
+            }
+           return packageName + file.getName().substring(0, file.getName().lastIndexOf('.'));
+        }
+
+        if(file instanceof JarClassNode){
+            return file.getPath();
+        }
+        return file.getName().substring(0, file.getName().lastIndexOf('.'));
     }
 }

@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.jdt;
 
-import org.eclipse.che.jdt.internal.core.JavaProject;
-
+import org.eclipse.jdt.internal.core.JavaModelManager;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -34,29 +33,21 @@ public class JavadocService {
     @PathParam("ws-id")
     private String wsId;
 
-    @Inject
-    private JavaProjectService service;
-
     @Path("find")
     @GET
     @Produces("text/html")
-    public String findJavadoc(@QueryParam("fqn") String fqn, @QueryParam("projectpath") String projectPath, @Context UriInfo uriInfo) throws JavaModelException {
-        JavaProject project = service.getOrCreateJavaProject(wsId, projectPath);
+    public String findJavadoc(@QueryParam("fqn") String fqn, @QueryParam("projectpath") String projectPath,
+                              @QueryParam("offset") int offset, @Context UriInfo uriInfo) throws JavaModelException {
+        IJavaProject project = JavaModelManager.getJavaModelManager().getJavaModel().getJavaProject(projectPath);
         String urlPart = getUrlPart(projectPath, uriInfo.getBaseUriBuilder());
-        if(fqn.contains(";.")){
-            String name = fqn.substring(0, fqn.indexOf(";."));
-            String bodyDeclaration = fqn.substring(fqn.indexOf(";."));
-            fqn = name + bodyDeclaration.replaceAll("/",".");
-        }
-
-        return new JavadocFinder(urlPart).findJavadoc(project, fqn);
+        return new JavadocFinder(urlPart).findJavadoc(project, fqn, offset);
     }
 
     @Path("get")
     @Produces("text/html")
     @GET
     public String get(@QueryParam("handle") String handle, @QueryParam("projectpath") String projectPath, @Context UriInfo uriInfo) {
-        JavaProject project = service.getOrCreateJavaProject(wsId, projectPath);
+        IJavaProject project = JavaModelManager.getJavaModelManager().getJavaModel().getJavaProject(projectPath);
         String urlPart = getUrlPart(projectPath, uriInfo.getBaseUriBuilder());
         return new JavadocFinder(urlPart).findJavadoc4Handle(project, handle);
     }
