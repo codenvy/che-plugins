@@ -149,6 +149,7 @@ public class HistoryPresenter implements HistoryPanel, RunnerWidget.ActionDelega
         if (runnerWidgets.isEmpty()) {
             runnerManagerView.setEnableReRunButton(false);
             terminalContainer.reset();
+            selectionManager.setRunner(null);
             return;
         }
 

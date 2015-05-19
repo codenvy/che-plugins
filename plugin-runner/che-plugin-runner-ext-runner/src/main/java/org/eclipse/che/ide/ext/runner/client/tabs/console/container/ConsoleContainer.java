@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.console.container;
 
+import com.google.inject.ImplementedBy;
+
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.tabs.common.TabPresenter;
-import com.google.inject.ImplementedBy;
 
 import javax.annotation.Nonnull;
 
@@ -20,6 +21,7 @@ import javax.annotation.Nonnull;
  * The common representation of console container widget. This widget provides an ability to manager many console widgets for every runner.
  *
  * @author Andrey Plotnikov
+ * @author Valeriy Svydenko
  */
 @ImplementedBy(ConsoleContainerPresenter.class)
 public interface ConsoleContainer extends TabPresenter {
@@ -72,5 +74,13 @@ public interface ConsoleContainer extends TabPresenter {
 
     /** Deletes console by Runner. */
     void deleteConsoleByRunner(@Nonnull Runner runner);
+
+    /**
+     * Changes visibility of the dummy label.
+     *
+     * @param visible
+     *         visible state that needs to be applied
+     */
+    void setVisibleDummyContent(boolean visible);
 
 }

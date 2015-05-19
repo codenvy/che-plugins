@@ -788,8 +788,13 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     private void runnerSelected() {
         selectedRunner = selectionManager.getRunner();
         if (selectedRunner == null) {
+            showDummyContentOfPanels(true);
+
+            propertiesContainer.reset();
             return;
         }
+
+        showDummyContentOfPanels(false);
 
         if (SPLITTER_OFF.equals(panelState.getSplitterState())) {
             rightPropertiesContainer.showTab(selectedRunner.getActiveTab());
@@ -804,6 +809,12 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
         update(selectedRunner);
 
         updateRunnerTimer();
+    }
+
+    private void showDummyContentOfPanels(boolean isVisible) {
+        terminalContainer.setVisibleDummyContent(isVisible);
+        consoleContainer.setVisibleDummyContent(isVisible);
+        propertiesContainer.setVisibleDummyContent(isVisible);
     }
 
     private void environmentSelected() {

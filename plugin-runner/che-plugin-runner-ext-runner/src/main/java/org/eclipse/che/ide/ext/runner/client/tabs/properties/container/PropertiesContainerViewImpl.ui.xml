@@ -14,7 +14,18 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
     <ui:with field="resources" type="org.eclipse.che.ide.ext.runner.client.RunnerResources"/>
+    <ui:with field="locale" type="org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant"/>
 
-    <g:SimpleLayoutPanel ui:field="mainPanel" addStyleNames="{resources.runnerCss.fullSize}"/>
+    <ui:style>
+        .mainBackground {
+            background: #373737;
+        }
+    </ui:style>
+
+    <g:FlowPanel addStyleNames="{resources.runnerCss.fullSize} {style.mainBackground}">
+        <g:Label ui:field="noRunnerLabel" text="{locale.noActiveRunner}"
+                 addStyleNames="{resources.runnerCss.fullSize} {resources.runnerCss.unAvailableMessage}"/>
+        <g:SimpleLayoutPanel ui:field="mainPanel" addStyleNames="{resources.runnerCss.fullSize}"/>
+    </g:FlowPanel>
 
 </ui:UiBinder>

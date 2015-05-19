@@ -10,20 +10,21 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.console.container;
 
-import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
-import org.eclipse.che.ide.ext.runner.client.RunnerResources;
-import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
-import org.eclipse.che.ide.ext.runner.client.tabs.console.button.ConsoleButton;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
+import org.eclipse.che.ide.ext.runner.client.RunnerResources;
+import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
+import org.eclipse.che.ide.ext.runner.client.tabs.console.button.ConsoleButton;
 import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.annotation.Nonnull;
@@ -42,6 +43,8 @@ public class ConsoleContainerViewImpl extends Composite implements ConsoleContai
     SimplePanel mainPanel;
     @UiField
     FlowPanel   buttons;
+    @UiField
+    Label       noRunnerLabel;
     @UiField(provided = true)
     final RunnerResources resources;
 
@@ -119,4 +122,9 @@ public class ConsoleContainerViewImpl extends Composite implements ConsoleContai
         btnWrapText.setCheckedStatus(isChecked);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void setVisibleDummyContent(boolean visible) {
+        noRunnerLabel.setVisible(visible);
+    }
 }

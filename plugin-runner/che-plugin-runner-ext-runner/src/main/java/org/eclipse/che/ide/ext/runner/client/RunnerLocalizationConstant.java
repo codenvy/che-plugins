@@ -307,4 +307,7 @@ public interface RunnerLocalizationConstant extends Messages {
 
     @Key("message.runner.in.queue")
     String messageRunnerInQueue();
+
+    @Key("no.active.runner")
+    String noActiveRunner();
 }

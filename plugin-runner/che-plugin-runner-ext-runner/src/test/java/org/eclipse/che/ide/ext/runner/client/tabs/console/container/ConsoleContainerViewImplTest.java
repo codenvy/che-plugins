@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.console.container;
 
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwtmockito.GwtMockitoTestRunner;
+
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
 import org.eclipse.che.ide.ext.runner.client.tabs.console.button.ConsoleButton;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwtmockito.GwtMockitoTestRunner;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -143,5 +143,12 @@ public class ConsoleContainerViewImplTest {
         view.selectWrapTextButton(false);
 
         verify(button1).setCheckedStatus(false);
+    }
+
+    @Test
+    public void dummyContentShouldBeShowed() throws Exception {
+        view.setVisibleDummyContent(true);
+
+        verify(view.noRunnerLabel).setVisible(true);
     }
 }

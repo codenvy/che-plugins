@@ -16,6 +16,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -37,6 +38,8 @@ public class TerminalContainerViewImpl extends Composite implements TerminalCont
     FlowPanel mainPanel;
     @UiField(provided = true)
     final RunnerResources resources;
+    @UiField
+    Label noRunnerLabel;
 
     @Inject
     public TerminalContainerViewImpl(RunnerResources resources) {
@@ -61,6 +64,12 @@ public class TerminalContainerViewImpl extends Composite implements TerminalCont
     @Override
     public void removeWidget(@Nonnull IsWidget terminal) {
         mainPanel.remove(terminal);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setVisibleDummyContent(boolean isVisible) {
+        noRunnerLabel.setVisible(isVisible);
     }
 
 }

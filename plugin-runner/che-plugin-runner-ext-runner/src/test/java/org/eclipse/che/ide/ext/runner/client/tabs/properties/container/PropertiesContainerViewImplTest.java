@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.properties.container;
 
-import org.eclipse.che.ide.ext.runner.client.RunnerResources;
-import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanel;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.ext.runner.client.RunnerResources;
+import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -40,5 +40,12 @@ public class PropertiesContainerViewImplTest {
         view.showWidget(panel);
 
         verify(panel).go(view.mainPanel);
+    }
+
+    @Test
+    public void dummyContentShouldBeShowed() throws Exception {
+        view.setVisibleDummyContent(true);
+
+        verify(view.noRunnerLabel).setVisible(true);
     }
 }

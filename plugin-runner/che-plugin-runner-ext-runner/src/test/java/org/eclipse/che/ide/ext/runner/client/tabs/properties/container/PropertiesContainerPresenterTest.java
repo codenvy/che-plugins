@@ -62,7 +62,7 @@ public class PropertiesContainerPresenterTest {
     @Mock
     private Environment     environment;
     @Mock
-    private CurrentProject currentProject;
+    private CurrentProject  currentProject;
 
     private PropertiesContainerPresenter presenter;
 
@@ -87,7 +87,7 @@ public class PropertiesContainerPresenterTest {
 
         presenter.show((Runner)null);
 
-        verify(view).showWidget(stabPanel);
+        verify(view).clear();
 
         verifyNoMoreInteractions(widgetFactory, currentPanel, view);
     }
@@ -258,6 +258,13 @@ public class PropertiesContainerPresenterTest {
         presenter.show(environment);
 
         verify(widgetFactory, times(2)).createPropertiesPanel(environment);
+    }
+
+    @Test
+    public void dummyContentShouldBeShowed() throws Exception {
+        presenter.setVisibleDummyContent(true);
+
+        verify(view).setVisibleDummyContent(true);
     }
 
 }

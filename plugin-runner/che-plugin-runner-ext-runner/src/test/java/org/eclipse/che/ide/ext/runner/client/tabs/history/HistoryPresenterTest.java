@@ -127,7 +127,7 @@ public class HistoryPresenterTest {
     }
 
     @Test
-    public void OneRunnerFromTwoRunnerShouldAreOnSelect() {
+    public void oneRunnerFromTwoRunnerShouldAreOnSelect() {
         historyPresenter.addRunner(runner);
         historyPresenter.addRunner(runner2);
         reset(runnerWidget);
@@ -210,6 +210,7 @@ public class HistoryPresenterTest {
         verify(terminalContainer).reset();
         verify(runnerManagerView).setEnableReRunButton(false);
         verify(selectionManager, never()).getRunner();
+        verify(selectionManager).setRunner(null);
     }
 
     @Test

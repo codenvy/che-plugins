@@ -44,4 +44,12 @@ public interface PropertiesContainer extends TabPresenter {
 
     /** Cleans the data of the history panel. */
     void reset();
+
+    /**
+     * Changes visibility of the dummy label.
+     *
+     * @param visible
+     *         visible state that needs to be applied
+     */
+    void setVisibleDummyContent(boolean visible);
 }

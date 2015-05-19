@@ -10,14 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.console.container;
 
-import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
-import org.eclipse.che.ide.ext.runner.client.models.Runner;
-import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
-import org.eclipse.che.ide.ext.runner.client.tabs.console.panel.Console;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.ext.runner.client.inject.factories.WidgetFactory;
+import org.eclipse.che.ide.ext.runner.client.models.Runner;
+import org.eclipse.che.ide.ext.runner.client.selection.SelectionManager;
+import org.eclipse.che.ide.ext.runner.client.tabs.console.panel.Console;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +25,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.eclipse.che.ide.ext.runner.client.selection.Selection.ENVIRONMENT;
+import static org.eclipse.che.ide.ext.runner.client.selection.Selection.RUNNER;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -33,8 +35,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.eclipse.che.ide.ext.runner.client.selection.Selection.ENVIRONMENT;
-import static org.eclipse.che.ide.ext.runner.client.selection.Selection.RUNNER;
 
 /**
  * @author Andrienko Alexander
@@ -288,5 +288,12 @@ public class ConsoleContainerPresenterTest {
 
         verify(widgetFactory).createConsole(runner);
         verify(view).showWidget(console);
+    }
+
+    @Test
+    public void dummyContentShouldBeShowed() throws Exception {
+        presenter.setVisibleDummyContent(true);
+
+        verify(view).setVisibleDummyContent(true);
     }
 }

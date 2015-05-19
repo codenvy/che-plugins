@@ -73,7 +73,7 @@ public class PropertiesContainerPresenter implements PropertiesContainer,
     @Override
     public void show(@Nullable Runner runner) {
         if (runner == null) {
-            view.showWidget(stubPanel);
+            view.clear();
             return;
         }
 
@@ -113,6 +113,7 @@ public class PropertiesContainerPresenter implements PropertiesContainer,
     @Override
     public void reset() {
         runnerPanels.clear();
+        view.clear();
     }
 
     /** {@inheritDoc} */
@@ -156,5 +157,11 @@ public class PropertiesContainerPresenter implements PropertiesContainer,
     @Override
     public void onPanelRemoved(@Nonnull Environment environment) {
         environmentsPanels.remove(environment);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setVisibleDummyContent(boolean visible) {
+        view.setVisibleDummyContent(visible);
     }
 }

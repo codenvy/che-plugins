@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.console.container;
 
-import org.eclipse.che.ide.api.mvp.View;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.ImplementedBy;
+
+import org.eclipse.che.ide.api.mvp.View;
 
 import javax.annotation.Nonnull;
 
@@ -20,6 +21,7 @@ import javax.annotation.Nonnull;
  * The abstract representation of console container widget UI part.
  *
  * @author Andrey Plotnikov
+ * @author Valeriy Svydenko
  */
 @ImplementedBy(ConsoleContainerViewImpl.class)
 public interface ConsoleContainerView extends View<ConsoleContainerView.ActionDelegate> {
@@ -47,6 +49,14 @@ public interface ConsoleContainerView extends View<ConsoleContainerView.ActionDe
      *         visible state that needs to be applied
      */
     void setVisible(boolean visible);
+
+    /**
+     * Changes visibility of the dummy label.
+     *
+     * @param visible
+     *         visible state that needs to be applied
+     */
+    void setVisibleDummyContent(boolean visible);
 
     /**
      * Select 'Wrap Text' button.

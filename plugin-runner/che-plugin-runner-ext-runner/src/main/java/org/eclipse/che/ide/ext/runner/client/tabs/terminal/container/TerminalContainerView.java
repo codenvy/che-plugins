@@ -49,6 +49,15 @@ public interface TerminalContainerView extends View<TerminalContainerView.Action
      */
     void setVisible(boolean visible);
 
+
+    /**
+     * Changes visibility of the dummy label.
+     *
+     * @param visible
+     *         visible state that needs to be applied
+     */
+    void setVisibleDummyContent(boolean visible);
+
     interface ActionDelegate {
     }
 

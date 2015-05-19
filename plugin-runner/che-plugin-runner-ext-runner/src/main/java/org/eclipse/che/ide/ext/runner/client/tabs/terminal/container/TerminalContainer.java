@@ -43,4 +43,12 @@ public interface TerminalContainer extends TabPresenter {
      *         instance of Runner which contains iframe with terminal
      */
     void removeTerminalUrl(@Nonnull Runner runner);
+
+    /**
+     * Changes visibility of the dummy label.
+     *
+     * @param visible
+     *         visible state that needs to be applied
+     */
+    void setVisibleDummyContent(boolean visible);
 }

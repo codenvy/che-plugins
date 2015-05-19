@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.terminal.container;
 
-import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -46,6 +46,13 @@ public class TerminalContainerViewImplTest {
         view.removeWidget(terminal);
 
         verify(view.mainPanel).remove(terminal);
+    }
+
+    @Test
+    public void dummyContentShouldBeShowed() throws Exception {
+        view.setVisibleDummyContent(true);
+
+        verify(view.noRunnerLabel).setVisible(true);
     }
 
 }

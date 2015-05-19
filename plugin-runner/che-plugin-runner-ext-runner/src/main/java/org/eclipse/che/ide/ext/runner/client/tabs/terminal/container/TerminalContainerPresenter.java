@@ -177,4 +177,10 @@ public class TerminalContainerPresenter implements TerminalContainer,
             terminal.setUnavailableLabelVisible(true);
         }
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setVisibleDummyContent(boolean isVisible) {
+        view.setVisibleDummyContent(isVisible);
+    }
 }

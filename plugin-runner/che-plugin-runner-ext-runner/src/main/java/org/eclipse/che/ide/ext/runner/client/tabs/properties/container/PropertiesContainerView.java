@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.properties.container;
 
+import com.google.inject.ImplementedBy;
+
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPanel;
-
-import com.google.inject.ImplementedBy;
 
 import javax.annotation.Nonnull;
 
@@ -38,6 +38,18 @@ public interface PropertiesContainerView extends View<PropertiesContainerView.Ac
      *         properties panel that needs to be shown
      */
     void showWidget(@Nonnull PropertiesPanel panel);
+
+
+    /** Removes all widgets from container */
+    void clear();
+
+    /**
+     * Changes visibility of the dummy label.
+     *
+     * @param visible
+     *         visible state that needs to be applied
+     */
+    void setVisibleDummyContent(boolean visible);
 
     interface ActionDelegate {
     }
