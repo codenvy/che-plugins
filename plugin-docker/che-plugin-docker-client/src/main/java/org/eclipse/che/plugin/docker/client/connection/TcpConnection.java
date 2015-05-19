@@ -42,8 +42,8 @@ public class TcpConnection extends DockerConnection {
         this(baseUri, null, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_READ_TIMEOUT);
     }
 
-    public TcpConnection(URI baseUri, int connectionTimeout, int readTimeout) {
-        this(baseUri, null, connectionTimeout, readTimeout);
+    public TcpConnection(URI baseUri, int connectionTimeoutMs, int readTimeoutMs) {
+        this(baseUri, null, connectionTimeoutMs, readTimeoutMs);
     }
 
     public TcpConnection(URI baseUri, DockerCertificates certificates) {
@@ -53,8 +53,8 @@ public class TcpConnection extends DockerConnection {
     @Inject
     public TcpConnection(@Named("docker.connection.tcp.base_uri") URI baseUri,
                          DockerCertificates certificates,
-                         @Named("docker.connection.tcp.connection_timeout_millis") int connectionTimeoutMillisecond,
-                         @Named("docker.connection.tcp.read_timeout_millis") int readTimeoutMillisecond) {
+                         @Named("docker.connection.tcp.connection_timeout_ms") int connectionTimeoutMs,
+                         @Named("docker.connection.tcp.read_timeout_ms") int readTimeoutMs) {
         if ("https".equals(baseUri.getScheme())) {
             if (certificates == null) {
                 throw new IllegalArgumentException("Certificates are required for https connection.");
@@ -64,8 +64,8 @@ public class TcpConnection extends DockerConnection {
         }
         this.baseUri = baseUri;
         this.certificates = certificates;
-        this.connectionTimeout = connectionTimeoutMillisecond;
-        this.readTimeout = readTimeoutMillisecond;
+        this.connectionTimeout = connectionTimeoutMs;
+        this.readTimeout = readTimeoutMs;
     }
 
     @Override
