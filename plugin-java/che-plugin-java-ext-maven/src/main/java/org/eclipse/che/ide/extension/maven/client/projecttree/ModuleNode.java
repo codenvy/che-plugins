@@ -20,11 +20,15 @@ import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.editor.EditorAgent;
+import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.collections.Array;
+import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.extension.maven.client.event.BeforeModuleOpenEvent;
+import org.eclipse.che.ide.part.editor.EditorPartStackPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 
@@ -35,7 +39,9 @@ import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
  */
 public class ModuleNode extends MavenProjectNode {
 
-    private final AppContext appContext;
+    private final AppContext               appContext;
+    private final EditorPartStackPresenter editorPartStackPresenter;
+    private final EditorAgent              editorAgent;
 
     @Inject
     public ModuleNode(@Assisted TreeNode<?> parent,
@@ -45,9 +51,13 @@ public class ModuleNode extends MavenProjectNode {
                       ProjectServiceClient projectServiceClient,
                       DtoUnmarshallerFactory dtoUnmarshallerFactory,
                       IconRegistry iconRegistry,
-                      AppContext appContext) {
+                      AppContext appContext,
+                      EditorPartStackPresenter editorPartStackPresenter,
+                      EditorAgent editorAgent) {
         super(parent, data, treeStructure, eventBus, projectServiceClient, dtoUnmarshallerFactory);
         this.appContext = appContext;
+        this.editorPartStackPresenter = editorPartStackPresenter;
+        this.editorAgent = editorAgent;
         setDisplayIcon(iconRegistry.getIcon("maven.module").getSVGImage());
     }
 
@@ -69,6 +79,14 @@ public class ModuleNode extends MavenProjectNode {
                     @Override
                     public void onRenamed() {
                         callback.onRenamed();
+
+                        StringMap<EditorPartPresenter> editors = editorAgent.getOpenedEditors();
+                        Array<EditorPartPresenter> openedEditors = editors.getValues();
+
+                        for (EditorPartPresenter editor : openedEditors.asIterable()) {
+                            editorPartStackPresenter.removePart(editor);
+                        }
+
                         eventBus.fireEvent(new RefreshProjectTreeEvent(ModuleNode.this.getParent()));
                     }
 
