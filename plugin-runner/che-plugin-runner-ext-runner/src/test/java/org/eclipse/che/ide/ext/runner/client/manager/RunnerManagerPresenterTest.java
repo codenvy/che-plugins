@@ -1223,9 +1223,9 @@ public class RunnerManagerPresenterTest {
 
         verify(selectionManager).getRunner();
 
-        verify(terminalContainer).setVisibleDummyContent(true);
-        verify(consoleContainer).setVisibleDummyContent(true);
-        verify(propertiesContainer).setVisibleDummyContent(true);
+        verify(terminalContainer).setVisibleNoRunnerLabel(true);
+        verify(consoleContainer).setVisibleNoRunnerLabel(true);
+        verify(propertiesContainer).setVisibleNoRunnerLabel(true);
 
         verifyNoMoreInteractions(history, rightPropertiesContainer, view);
     }
@@ -1364,9 +1364,9 @@ public class RunnerManagerPresenterTest {
     private void verifyRunnerSelected() {
         verify(history).selectRunner(runner);
 
-        verify(terminalContainer).setVisibleDummyContent(false);
-        verify(consoleContainer).setVisibleDummyContent(false);
-        verify(propertiesContainer).setVisibleDummyContent(false);
+        verify(terminalContainer).setVisibleNoRunnerLabel(false);
+        verify(consoleContainer).setVisibleNoRunnerLabel(false);
+        verify(propertiesContainer).setVisibleNoRunnerLabel(false);
 
         //update
         verify(history).update(runner);

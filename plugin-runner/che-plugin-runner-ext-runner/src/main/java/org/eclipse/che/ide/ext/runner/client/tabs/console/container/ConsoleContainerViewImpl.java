@@ -124,7 +124,7 @@ public class ConsoleContainerViewImpl extends Composite implements ConsoleContai
 
     /** {@inheritDoc} */
     @Override
-    public void setVisibleDummyContent(boolean visible) {
+    public void setVisibleNoRunnerLabel(boolean visible) {
         noRunnerLabel.setVisible(visible);
     }
 }

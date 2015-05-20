@@ -179,7 +179,7 @@ public class ConsoleContainerPresenter implements ConsoleContainer,
 
     /** {@inheritDoc} */
     @Override
-    public void setVisibleDummyContent(boolean visible) {
-        view.setVisibleDummyContent(visible);
+    public void setVisibleNoRunnerLabel(boolean visible) {
+        view.setVisibleNoRunnerLabel(visible);
     }
 }

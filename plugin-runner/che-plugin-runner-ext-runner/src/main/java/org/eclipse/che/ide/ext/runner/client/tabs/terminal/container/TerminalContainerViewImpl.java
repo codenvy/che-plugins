@@ -68,7 +68,7 @@ public class TerminalContainerViewImpl extends Composite implements TerminalCont
 
     /** {@inheritDoc} */
     @Override
-    public void setVisibleDummyContent(boolean isVisible) {
+    public void setVisibleNoRunnerLabel(boolean isVisible) {
         noRunnerLabel.setVisible(isVisible);
     }
 

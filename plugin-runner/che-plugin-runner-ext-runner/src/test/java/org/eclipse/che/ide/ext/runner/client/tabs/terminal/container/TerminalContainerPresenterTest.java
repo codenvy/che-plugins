@@ -287,8 +287,8 @@ public class TerminalContainerPresenterTest {
 
     @Test
     public void dummyContentShouldBeShowed() throws Exception {
-        presenter.setVisibleDummyContent(true);
+        presenter.setVisibleNoRunnerLabel(true);
 
-        verify(view).setVisibleDummyContent(true);
+        verify(view).setVisibleNoRunnerLabel(true);
     }
 }

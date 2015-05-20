@@ -44,7 +44,7 @@ public class PropertiesContainerViewImplTest {
 
     @Test
     public void dummyContentShouldBeShowed() throws Exception {
-        view.setVisibleDummyContent(true);
+        view.setVisibleNoRunnerLabel(true);
 
         verify(view.noRunnerLabel).setVisible(true);
     }

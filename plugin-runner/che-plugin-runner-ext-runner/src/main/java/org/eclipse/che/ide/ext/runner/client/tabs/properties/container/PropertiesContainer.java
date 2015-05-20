@@ -46,10 +46,10 @@ public interface PropertiesContainer extends TabPresenter {
     void reset();
 
     /**
-     * Changes visibility of the dummy label.
+     * Changes visibility of the no runner label.
      *
      * @param visible
      *         visible state that needs to be applied
      */
-    void setVisibleDummyContent(boolean visible);
+    void setVisibleNoRunnerLabel(boolean visible);
 }

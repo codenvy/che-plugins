@@ -68,7 +68,7 @@ public class PropertiesContainerViewImpl extends Composite implements Properties
 
     /** {@inheritDoc} */
     @Override
-    public void setVisibleDummyContent(boolean visible) {
+    public void setVisibleNoRunnerLabel(boolean visible) {
         noRunnerLabel.setVisible(visible);
     }
 }

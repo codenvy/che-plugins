@@ -180,7 +180,7 @@ public class TerminalContainerPresenter implements TerminalContainer,
 
     /** {@inheritDoc} */
     @Override
-    public void setVisibleDummyContent(boolean isVisible) {
-        view.setVisibleDummyContent(isVisible);
+    public void setVisibleNoRunnerLabel(boolean isVisible) {
+        view.setVisibleNoRunnerLabel(isVisible);
     }
 }
