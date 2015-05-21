@@ -284,9 +284,7 @@ public class GitProjectImporterTest {
         Map<String, String> parameters = new HashMap<>(2);
         parameters.put("keepDirectory", "src");
         gitProjectImporter.importSources(folder, gitRepo.getAbsolutePath(), parameters, new SystemOutLineConsumerFactory());
-        // content of src folder copied
-        Assert.assertEquals(1, folder.getChildren().size());
-        Assert.assertNotNull(folder.getChild("hello.c"));
+        Assert.assertEquals(2, folder.getChildren().size());
     }
 
     @Test

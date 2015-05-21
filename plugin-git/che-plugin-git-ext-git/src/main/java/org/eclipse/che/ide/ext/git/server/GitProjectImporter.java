@@ -129,7 +129,7 @@ public class GitProjectImporter implements ProjectImporter {
                     sparsecheckout(git, location, branch == null ? "master" : branch, keepDirectory, dtoFactory);
                     // Copy content of directory to the project folder.
                     final File projectDir = new File(localPath);
-                    IoUtil.copy(new File(temp, keepDirectory), projectDir, IoUtil.ANY_FILTER);
+                    IoUtil.copy(git.getWorkingDir(), projectDir, IoUtil.ANY_FILTER);
                 } finally {
                     FileCleaner.addFile(temp);
                 }
