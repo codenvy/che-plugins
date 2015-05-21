@@ -1,15 +1,13 @@
-/**
- * ****************************************************************************
+/*******************************************************************************
  * Copyright (c) 2012-2015 Codenvy, S.A.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * <p/>
+ *
  * Contributors:
- * Codenvy, S.A. - initial API and implementation
- * *****************************************************************************
- */
+ *   Codenvy, S.A. - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
 import org.eclipse.che.api.core.NotFoundException;
@@ -19,8 +17,8 @@ import org.eclipse.che.api.machine.server.InvalidInstanceSnapshotException;
 import org.eclipse.che.api.machine.server.InvalidRecipeException;
 import org.eclipse.che.api.machine.server.MachineException;
 import org.eclipse.che.api.machine.server.UnsupportedRecipeException;
+import org.eclipse.che.api.machine.server.spi.InstanceKey;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
-import org.eclipse.che.api.machine.server.spi.InstanceSnapshotKey;
 import org.eclipse.che.api.machine.shared.Recipe;
 import org.eclipse.che.commons.lang.IoUtil;
 import org.eclipse.che.plugin.docker.client.DockerConnector;
@@ -142,9 +140,9 @@ public class DockerInstanceProvider implements InstanceProvider {
     }
 
     @Override
-    public DockerInstance createInstance(InstanceSnapshotKey instanceSnapshotKey, final LineConsumer creationLogsOutput)
+    public DockerInstance createInstance(InstanceKey instanceKey, final LineConsumer creationLogsOutput)
             throws NotFoundException, InvalidInstanceSnapshotException, MachineException {
-        final DockerInstanceSnapshotKey dockerInstanceKey = new DockerInstanceSnapshotKey(instanceSnapshotKey);
+        final DockerInstanceKey dockerInstanceKey = new DockerInstanceKey(instanceKey);
         final String repository = dockerInstanceKey.getRepository();
         final String imageId = dockerInstanceKey.getImageId();
         if (repository == null || imageId == null) {
@@ -180,10 +178,10 @@ public class DockerInstanceProvider implements InstanceProvider {
     }
 
     @Override
-    public void removeInstanceSnapshot(InstanceSnapshotKey instanceSnapshotKey) throws MachineException {
+    public void removeInstanceSnapshot(InstanceKey instanceKey) throws MachineException {
         // use registry API directly because docker doesn't have such API yet
         // https://github.com/docker/docker-registry/issues/45
-        final DockerInstanceSnapshotKey dockerImageKey = new DockerInstanceSnapshotKey(instanceSnapshotKey);
+        final DockerInstanceKey dockerImageKey = new DockerInstanceKey(instanceKey);
         String registry = dockerImageKey.getRegistry();
         String repository = dockerImageKey.getRepository();
         if (registry == null || repository == null) {

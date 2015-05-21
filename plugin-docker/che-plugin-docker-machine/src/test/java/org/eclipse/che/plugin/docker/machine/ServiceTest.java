@@ -88,7 +88,7 @@ public class ServiceTest {
 
     // set in method {@link saveSnapshotTest}
     // used in methods {@link createMachineFromSnapshotTest} and {@link removeSnapshotTest}
-    private DockerInstanceSnapshotKey pushedImage;
+    private DockerInstanceKey pushedImage;
 
     private SnapshotStorage   snapshotStorage;
     private MemberDao         memberDao;
@@ -225,7 +225,7 @@ public class ServiceTest {
         when(snapshotStorage.getSnapshot(SNAPSHOT_ID)).thenReturn(snapshot);
         when(snapshot.getInstanceType()).thenReturn("docker");
         when(snapshot.getWorkspaceId()).thenReturn("wsId");
-        when(snapshot.getInstanceSnapshotKey()).thenReturn(pushedImage);
+        when(snapshot.getInstanceKey()).thenReturn(pushedImage);
         when(snapshot.getOwner()).thenReturn(USER);
 
         final MachineDescriptor machine = machineService
@@ -284,12 +284,12 @@ public class ServiceTest {
         // that allows check operation result
         final SnapshotImpl snapshot = machineManager.save(machine.getId(), USER, "label","test description");
 
-        for (int i = 0; snapshot.getInstanceSnapshotKey() == null && i < 10; ++i) {
+        for (int i = 0; snapshot.getInstanceKey() == null && i < 10; ++i) {
             Thread.sleep(500);
         }
-        assertNotNull(snapshot.getInstanceSnapshotKey());
+        assertNotNull(snapshot.getInstanceKey());
 
-        final DockerInstanceSnapshotKey imageKey = (DockerInstanceSnapshotKey)snapshot.getInstanceSnapshotKey();
+        final DockerInstanceKey imageKey = (DockerInstanceKey)snapshot.getInstanceKey();
 
         final boolean pullIsSuccessful = pull(imageKey.getRepository(), imageKey.getTag(), imageKey.getRegistry());
 
@@ -307,7 +307,7 @@ public class ServiceTest {
         when(snapshotStorage.getSnapshot(SNAPSHOT_ID)).thenReturn(snapshot);
         when(snapshot.getInstanceType()).thenReturn("docker");
         when(snapshot.getOwner()).thenReturn(USER);
-        when(snapshot.getInstanceSnapshotKey()).thenReturn(pushedImage);
+        when(snapshot.getInstanceKey()).thenReturn(pushedImage);
 
         machineService.removeSnapshot(SNAPSHOT_ID);
 
