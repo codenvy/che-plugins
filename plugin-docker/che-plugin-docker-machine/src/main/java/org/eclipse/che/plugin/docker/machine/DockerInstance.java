@@ -23,7 +23,7 @@ import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.core.util.ValueHolder;
 import org.eclipse.che.api.machine.server.MachineException;
-import org.eclipse.che.api.machine.server.spi.ImageKey;
+import org.eclipse.che.api.machine.server.spi.InstanceKey;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceMetadata;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
@@ -131,7 +131,7 @@ public class DockerInstance implements Instance {
     }
 
     @Override
-    public ImageKey saveToImage(String owner, String label) throws MachineException {
+    public InstanceKey saveToSnapshot(String owner, String label) throws MachineException {
         try {
             final String repository = generateRepository();
             String comment = String.format("Suspended at %1$ta %1$tb %1$td %1$tT %1$tZ %1$tY", System.currentTimeMillis());
@@ -153,7 +153,7 @@ public class DockerInstance implements Instance {
                     }
                 }
             });
-            return new DockerImageKey(repository, null, imageId, registry);
+            return new DockerInstanceKey(repository, null, imageId, registry);
         } catch (IOException e) {
             throw new MachineException(e);
         } catch (InterruptedException e) {

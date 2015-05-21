@@ -14,20 +14,24 @@ import org.eclipse.che.plugin.docker.client.DockerConnector;
 import org.eclipse.che.plugin.docker.client.DockerFileException;
 import org.eclipse.che.plugin.docker.client.Dockerfile;
 import org.eclipse.che.plugin.docker.client.DockerfileParser;
+import org.eclipse.che.plugin.docker.client.Exec;
+import org.eclipse.che.plugin.docker.client.LogMessage;
+import org.eclipse.che.plugin.docker.client.LogMessageProcessor;
 import org.eclipse.che.plugin.docker.client.ProgressLineFormatterImpl;
 import org.eclipse.che.plugin.docker.client.ProgressMonitor;
+import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
+import org.eclipse.che.plugin.docker.client.json.HostConfig;
 import org.eclipse.che.plugin.docker.client.json.ProgressStatus;
 
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.util.FileCleaner;
 import org.eclipse.che.api.core.util.LineConsumer;
-import org.eclipse.che.api.machine.server.InvalidImageException;
+import org.eclipse.che.api.machine.server.InvalidInstanceSnapshotException;
 import org.eclipse.che.api.machine.server.InvalidRecipeException;
 import org.eclipse.che.api.machine.server.MachineException;
 import org.eclipse.che.api.machine.server.UnsupportedRecipeException;
-import org.eclipse.che.api.machine.server.spi.Image;
-import org.eclipse.che.api.machine.server.spi.ImageKey;
-import org.eclipse.che.api.machine.server.spi.ImageProvider;
+import org.eclipse.che.api.machine.server.spi.InstanceKey;
+import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.api.machine.shared.Recipe;
 import org.eclipse.che.commons.lang.IoUtil;
 import org.slf4j.Logger;
@@ -49,13 +53,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Docker implementation of {@link ImageProvider}
+ * Docker implementation of {@link InstanceProvider}
  *
  * @author andrew00x
+ * @author Alexander Garagatyi
  */
 @Singleton
-public class DockerImageProvider implements ImageProvider {
-    private static final Logger LOG = LoggerFactory.getLogger(DockerImageProvider.class);
+public class DockerInstanceProvider implements InstanceProvider {
+    private static final Logger LOG = LoggerFactory.getLogger(DockerInstanceProvider.class);
 
     private final DockerConnector   docker;
     private final String            registry;
@@ -63,9 +68,9 @@ public class DockerImageProvider implements ImageProvider {
     private final Set<String>       supportedRecipeTypes;
 
     @Inject
-    public DockerImageProvider(DockerConnector docker,
-                               @Named("machine.docker.registry") String registry,
-                               DockerNodeFactory dockerNodeFactory) {
+    public DockerInstanceProvider(DockerConnector docker,
+                                  @Named("machine.docker.registry") String registry,
+                                  DockerNodeFactory dockerNodeFactory) {
         this.docker = docker;
         this.registry = registry;
         this.dockerNodeFactory = dockerNodeFactory;
@@ -85,7 +90,7 @@ public class DockerImageProvider implements ImageProvider {
     }
 
     @Override
-    public Image createImage(Recipe recipe, final LineConsumer creationLogsOutput)
+    public DockerInstance createInstance(Recipe recipe, final LineConsumer creationLogsOutput, String workspaceId, boolean bindWorkspace)
             throws UnsupportedRecipeException, InvalidRecipeException, MachineException {
         final Dockerfile dockerfile = getDockerFile(recipe);
         if (dockerfile.getImages().isEmpty()) {
@@ -93,6 +98,7 @@ public class DockerImageProvider implements ImageProvider {
         }
         File workDir = null;
         try {
+            // build docker image
             workDir = Files.createTempDirectory(null).toFile();
             final File dockerfileFile = new File(workDir, "Dockerfile");
             dockerfile.writeDockerfile(dockerfileFile);
@@ -113,12 +119,14 @@ public class DockerImageProvider implements ImageProvider {
             // don't need repository for now
             final String dockerImage = docker.buildImage(null, progressMonitor, files.toArray(new File[files.size()]));
 
-            // don't need repository, registry, tag for now
+            return createInstance(dockerImage, creationLogsOutput, workspaceId, bindWorkspace);
+
+            /*// don't need repository, registry, tag for now
             return new DockerImage(docker,
                                    registry,
                                    dockerNodeFactory,
-                                   new DockerImageKey(null, null, dockerImage, null),
-                                   creationLogsOutput);
+                                   new DockerInstanceSnapshotKey(null, null, dockerImage, null),
+                                   creationLogsOutput);*/
         } catch (IOException | InterruptedException e) {
             throw new MachineException(e.getMessage(), e);
         } finally {
@@ -129,17 +137,20 @@ public class DockerImageProvider implements ImageProvider {
     }
 
     @Override
-    public Image createImage(ImageKey imageKey, final LineConsumer creationLogsOutput)
-            throws NotFoundException, InvalidImageException, MachineException {
-        final DockerImageKey dockerImageKey = new DockerImageKey(imageKey);
-        final String repository = dockerImageKey.getRepository();
-        final String imageId = dockerImageKey.getImageId();
+    public DockerInstance createInstance(final InstanceKey instanceKey,
+                                         final LineConsumer creationLogsOutput,
+                                         final String workspaceId,
+                                         final boolean bindWorkspace)
+            throws NotFoundException, InvalidInstanceSnapshotException, MachineException {
+        final DockerInstanceKey dockerInstanceKey = new DockerInstanceKey(instanceKey);
+        final String repository = dockerInstanceKey.getRepository();
+        final String imageId = dockerInstanceKey.getImageId();
         if (repository == null || imageId == null) {
             throw new MachineException("Machine creation failed. Image attributes are not valid");
         }
         try {
             final ProgressLineFormatterImpl progressLineFormatter = new ProgressLineFormatterImpl();
-            docker.pull(repository, dockerImageKey.getTag(), dockerImageKey.getRegistry(), new ProgressMonitor() {
+            docker.pull(repository, dockerInstanceKey.getTag(), dockerInstanceKey.getRegistry(), new ProgressMonitor() {
                 @Override
                 public void updateProgress(ProgressStatus currentProgressStatus) {
                     try {
@@ -150,25 +161,27 @@ public class DockerImageProvider implements ImageProvider {
                 }
             });
 
-            return new DockerImage(docker,
+            return createInstance(imageId, creationLogsOutput, workspaceId, bindWorkspace);
+
+            /*return new DockerImage(docker,
                                    registry,
                                    dockerNodeFactory,
-                                   new DockerImageKey(repository,
-                                                      dockerImageKey.getTag(),
+                                   new DockerInstanceSnapshotKey(repository,
+                                                      dockerInstanceKey.getTag(),
                                                                          imageId,
-                                                      dockerImageKey.getRegistry()),
+                                                      dockerInstanceKey.getRegistry()),
 
-                                   creationLogsOutput);
+                                   creationLogsOutput);*/
         } catch (IOException | InterruptedException e) {
             throw new MachineException(e.getLocalizedMessage(), e);
         }
     }
 
     @Override
-    public void removeImage(ImageKey imageKey) throws MachineException {
+    public void removeInstanceSnapshot(InstanceKey instanceKey) throws MachineException {
         // use registry API directly because docker doesn't have such API yet
         // https://github.com/docker/docker-registry/issues/45
-        final DockerImageKey dockerImageKey = new DockerImageKey(imageKey);
+        final DockerInstanceKey dockerImageKey = new DockerInstanceKey(instanceKey);
         String registry = dockerImageKey.getRegistry();
         String repository = dockerImageKey.getRepository();
         if (registry == null || repository == null) {
@@ -214,5 +227,57 @@ public class DockerImageProvider implements ImageProvider {
         }
         throw new InvalidRecipeException("Unable build docker based machine, recipe isn't set or doesn't provide Dockerfile and " +
                                          "no Dockerfile found in the list of files attached to this builder.");
+    }
+
+    private DockerInstance createInstance(String imageId, LineConsumer outputConsumer, String workspaceId, boolean bindWorkspace)
+            throws MachineException {
+        try {
+            final ContainerConfig config = new ContainerConfig().withImage(imageId)
+                                                                .withMemorySwap(-1)
+                                                                .withExposedPorts(Collections.singletonMap("4300", Collections
+                                                                        .<String, String>emptyMap()));
+
+            LOG.debug("Creating container from image {}", imageId);
+
+            final String containerId = docker.createContainer(config, null).getId();
+
+            LOG.debug("Container {} has been created successfully", containerId);
+
+            final DockerNode node = dockerNodeFactory.createNode(containerId);
+            String hostProjectsFolder = node.getProjectsFolder();
+
+            if (bindWorkspace) {
+                node.bindWorkspace(workspaceId);
+            }
+
+            LOG.debug("Starting container {}", containerId);
+            docker.startContainer(containerId,
+                                  new HostConfig().withPublishAllPorts(true)
+                                                  .withBinds(String.format("%s:%s", hostProjectsFolder, "/projects"),
+                                                             "/usr/local/codenvy/terminal:/usr/local/codenvy/terminal"),//TODO add :ro
+                                  new LogMessagePrinter(outputConsumer));
+            LOG.debug("Container {} has been started successfully", containerId);
+
+            startTerminal(containerId);
+
+            return new DockerInstance(docker, registry, containerId, outputConsumer, node);
+        } catch (IOException e) {
+            throw new MachineException(e);
+        }
+    }
+
+    private void startTerminal(final String container) {
+        try {
+            final Exec exec = docker.createExec(container, true, "/bin/bash", "-c",
+                                                "/usr/local/codenvy/terminal/terminal -addr :4300 -cmd /bin/sh -static /usr/local/codenvy/terminal/");
+            docker.startExec(exec.getId(), new LogMessageProcessor() {
+                @Override
+                public void process(LogMessage logMessage) {
+                    LOG.error(String.format("Terminal error in container %s. %s", container, logMessage.getContent()));
+                }
+            });
+        } catch (IOException e) {
+            LOG.error(e.getLocalizedMessage(), e);
+        }
     }
 }

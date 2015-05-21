@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine.local;
 
-import org.eclipse.che.plugin.docker.machine.DockerImageProvider;
+import org.eclipse.che.plugin.docker.machine.DockerInstanceProvider;
 import org.eclipse.che.plugin.docker.machine.DockerNodeFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.eclipse.che.api.machine.server.MachineService;
 import org.eclipse.che.api.machine.server.SnapshotStorage;
-import org.eclipse.che.api.machine.server.spi.ImageProvider;
+import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 
 /**
  * The Module for Local Docker components
@@ -32,7 +32,7 @@ public class LocalDockerModule extends AbstractModule {
         bind(SnapshotStorage.class).to(DummySnapshotStorage.class);
         bind(DockerNodeFactory.class).to(LocalDockerNodeFactory.class);
         bind(MachineService.class);
-        Multibinder.newSetBinder(binder(), ImageProvider.class).addBinding().to(DockerImageProvider.class);
+        Multibinder.newSetBinder(binder(), InstanceProvider.class).addBinding().to(DockerInstanceProvider.class);
 
     }
 }

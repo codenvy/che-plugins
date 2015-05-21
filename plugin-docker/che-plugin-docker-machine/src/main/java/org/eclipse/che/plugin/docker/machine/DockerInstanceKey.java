@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
-import org.eclipse.che.api.machine.server.spi.ImageKey;
+import org.eclipse.che.api.machine.server.spi.InstanceKey;
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.dto.shared.JsonStringMap;
 
@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * @author andrew00x
  */
-public class DockerImageKey implements ImageKey {
+public class DockerInstanceKey implements InstanceKey {
     public static final String REPOSITORY = "repository";
     public static final String TAG        = "tag";
     public static final String ID         = "id";
@@ -31,15 +31,15 @@ public class DockerImageKey implements ImageKey {
 
     private final Map<String, String> fields;
 
-    public DockerImageKey(ImageKey imageKey) {
+    public DockerInstanceKey(InstanceKey instanceKey) {
         fields = new HashMap<>(4);
-        fields.put(REPOSITORY, imageKey.getFields().get(REPOSITORY));
-        fields.put(TAG, imageKey.getFields().get(TAG));
-        fields.put(ID, imageKey.getFields().get(ID));
-        fields.put(REGISTRY, imageKey.getFields().get(REGISTRY));
+        fields.put(REPOSITORY, instanceKey.getFields().get(REPOSITORY));
+        fields.put(TAG, instanceKey.getFields().get(TAG));
+        fields.put(ID, instanceKey.getFields().get(ID));
+        fields.put(REGISTRY, instanceKey.getFields().get(REGISTRY));
     }
 
-    public DockerImageKey(String repository, String tag, String id, String registry) {
+    public DockerInstanceKey(String repository, String tag, String id, String registry) {
         fields = new HashMap<>(4);
         fields.put(REPOSITORY, repository);
         fields.put(TAG, tag);
@@ -80,7 +80,7 @@ public class DockerImageKey implements ImageKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DockerImageKey that = (DockerImageKey)o;
+        DockerInstanceKey that = (DockerInstanceKey)o;
 
         if (fields != null ? !fields.equals(that.fields) : that.fields != null) return false;
 

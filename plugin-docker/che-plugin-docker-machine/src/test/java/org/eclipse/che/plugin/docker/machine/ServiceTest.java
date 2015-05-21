@@ -23,7 +23,7 @@ import org.eclipse.che.api.machine.server.MachineService;
 import org.eclipse.che.api.machine.server.recipe.RecipeImpl;
 import org.eclipse.che.api.machine.server.SnapshotImpl;
 import org.eclipse.che.api.machine.server.SnapshotStorage;
-import org.eclipse.che.api.machine.server.spi.ImageProvider;
+import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.api.machine.shared.MachineState;
 import org.eclipse.che.api.machine.shared.dto.CommandDescriptor;
 import org.eclipse.che.api.machine.shared.dto.CreateMachineFromRecipe;
@@ -88,7 +88,7 @@ public class ServiceTest {
 
     // set in method {@link saveSnapshotTest}
     // used in methods {@link createMachineFromSnapshotTest} and {@link removeSnapshotTest}
-    private DockerImageKey pushedImage;
+    private DockerInstanceKey pushedImage;
 
     private SnapshotStorage   snapshotStorage;
     private MemberDao         memberDao;
@@ -96,7 +96,7 @@ public class ServiceTest {
     private DockerNode        dockerNode;
     private MachineRegistry   machineRegistry;
     private DockerConnector   docker;
-    private ImageProvider     dockerImageProvider;
+    private InstanceProvider  dockerInstanceProvider;
     private MachineManager    machineManager;
     private MachineService    machineService;
     private String            registryContainerId;
@@ -143,10 +143,10 @@ public class ServiceTest {
 
         eventService = mock(EventService.class);
 
-        dockerImageProvider = new DockerImageProvider(docker, "localhost:5000", dockerNodeFactory);
+        dockerInstanceProvider = new DockerInstanceProvider(docker, "localhost:5000", dockerNodeFactory);
 
         machineManager = new MachineManager(snapshotStorage,
-                                            Collections.singleton(dockerImageProvider),
+                                            Collections.singleton(dockerInstanceProvider),
                                             machineRegistry,
                                             "/tmp",
                                             eventService);
@@ -219,9 +219,9 @@ public class ServiceTest {
 
         SnapshotImpl snapshot = mock(SnapshotImpl.class);
         when(snapshotStorage.getSnapshot(SNAPSHOT_ID)).thenReturn(snapshot);
-        when(snapshot.getImageType()).thenReturn("docker");
+        when(snapshot.getInstanceType()).thenReturn("docker");
         when(snapshot.getWorkspaceId()).thenReturn("wsId");
-        when(snapshot.getImageKey()).thenReturn(pushedImage);
+        when(snapshot.getInstanceKey()).thenReturn(pushedImage);
         when(snapshot.getOwner()).thenReturn(USER);
 
         final MachineDescriptor machine = machineService
@@ -280,12 +280,12 @@ public class ServiceTest {
         // that allows check operation result
         final SnapshotImpl snapshot = machineManager.save(machine.getId(), USER, "label","test description");
 
-        for (int i = 0; snapshot.getImageKey() == null && i < 10; ++i) {
+        for (int i = 0; snapshot.getInstanceKey() == null && i < 10; ++i) {
             Thread.sleep(500);
         }
-        assertNotNull(snapshot.getImageKey());
+        assertNotNull(snapshot.getInstanceKey());
 
-        final DockerImageKey imageKey = (DockerImageKey)snapshot.getImageKey();
+        final DockerInstanceKey imageKey = (DockerInstanceKey)snapshot.getInstanceKey();
 
         final boolean pullIsSuccessful = pull(imageKey.getRepository(), imageKey.getTag(), imageKey.getRegistry());
 
@@ -301,9 +301,9 @@ public class ServiceTest {
     public void removeSnapshotTest() throws Exception {
         SnapshotImpl snapshot = mock(SnapshotImpl.class);
         when(snapshotStorage.getSnapshot(SNAPSHOT_ID)).thenReturn(snapshot);
-        when(snapshot.getImageType()).thenReturn("docker");
+        when(snapshot.getInstanceType()).thenReturn("docker");
         when(snapshot.getOwner()).thenReturn(USER);
-        when(snapshot.getImageKey()).thenReturn(pushedImage);
+        when(snapshot.getInstanceKey()).thenReturn(pushedImage);
 
         machineService.removeSnapshot(SNAPSHOT_ID);
 
