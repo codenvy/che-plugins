@@ -56,6 +56,7 @@ import java.util.Set;
  * Docker implementation of {@link InstanceProvider}
  *
  * @author andrew00x
+ * @author Alexander Garagatyi
  */
 @Singleton
 public class DockerInstanceProvider implements InstanceProvider {
@@ -89,7 +90,7 @@ public class DockerInstanceProvider implements InstanceProvider {
     }
 
     @Override
-    public DockerInstance createInstance(Recipe recipe, final LineConsumer creationLogsOutput)
+    public DockerInstance createInstance(Recipe recipe, final LineConsumer creationLogsOutput, String workspaceId, boolean bindWorkspace)
             throws UnsupportedRecipeException, InvalidRecipeException, MachineException {
         final Dockerfile dockerfile = getDockerFile(recipe);
         if (dockerfile.getImages().isEmpty()) {
@@ -118,7 +119,7 @@ public class DockerInstanceProvider implements InstanceProvider {
             // don't need repository for now
             final String dockerImage = docker.buildImage(null, progressMonitor, files.toArray(new File[files.size()]));
 
-            return createInstance(dockerImage, creationLogsOutput);
+            return createInstance(dockerImage, creationLogsOutput, workspaceId, bindWorkspace);
 
             /*// don't need repository, registry, tag for now
             return new DockerImage(docker,
@@ -136,7 +137,10 @@ public class DockerInstanceProvider implements InstanceProvider {
     }
 
     @Override
-    public DockerInstance createInstance(InstanceSnapshotKey instanceSnapshotKey, final LineConsumer creationLogsOutput)
+    public DockerInstance createInstance(final InstanceSnapshotKey instanceSnapshotKey,
+                                         final LineConsumer creationLogsOutput,
+                                         final String workspaceId,
+                                         final boolean bindWorkspace)
             throws NotFoundException, InvalidInstanceSnapshotException, MachineException {
         final DockerInstanceSnapshotKey dockerInstanceKey = new DockerInstanceSnapshotKey(instanceSnapshotKey);
         final String repository = dockerInstanceKey.getRepository();
@@ -157,7 +161,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                 }
             });
 
-            return createInstance(imageId, creationLogsOutput);
+            return createInstance(imageId, creationLogsOutput, workspaceId, bindWorkspace);
 
             /*return new DockerImage(docker,
                                    registry,
@@ -225,7 +229,8 @@ public class DockerInstanceProvider implements InstanceProvider {
                                          "no Dockerfile found in the list of files attached to this builder.");
     }
 
-    private DockerInstance createInstance(String imageId, LineConsumer outputConsumer) throws MachineException {
+    private DockerInstance createInstance(String imageId, LineConsumer outputConsumer, String workspaceId, boolean bindWorkspace)
+            throws MachineException {
         try {
             final ContainerConfig config = new ContainerConfig().withImage(imageId)
                                                                 .withMemorySwap(-1)
@@ -240,6 +245,10 @@ public class DockerInstanceProvider implements InstanceProvider {
 
             final DockerNode node = dockerNodeFactory.createNode(containerId);
             String hostProjectsFolder = node.getProjectsFolder();
+
+            if (bindWorkspace) {
+                node.bindWorkspace(workspaceId);
+            }
 
             LOG.debug("Starting container {}", containerId);
             docker.startContainer(containerId,

@@ -20,7 +20,8 @@ import org.eclipse.che.api.machine.shared.ProjectBinding;
  */
 public interface DockerNode {
     /**
-     * Bind project to docker container
+     * Bind project to docker container.<br>
+     * Project can't be bound/unbound if workspace is bound already, and vice versa.
      *
      * @param workspaceId
      *         workspace that owns project to bind
@@ -32,7 +33,8 @@ public interface DockerNode {
     void bindProject(String workspaceId, ProjectBinding project) throws MachineException;
 
     /**
-     * Unbind project from docker container
+     * Unbind project from docker container.<br>
+     * Project can't be bound/unbound if workspace is bound already, and vice versa.
      *
      * @param workspaceId
      *         workspace that owns project to unbind
@@ -42,6 +44,15 @@ public interface DockerNode {
      *         if error occur
      */
     void unbindProject(String workspaceId, ProjectBinding project) throws MachineException;
+
+    /**
+     * Bind the whole workspace with specified id.<br>
+     * Project can't be bound/unbound if workspace is bound already, and vice versa.
+     *
+     * @param workspaceId id of workspace to bind
+     * @throws MachineException if error occurs on binding
+     */
+    void bindWorkspace(String workspaceId) throws MachineException;
 
     /**
      * Get path of folder on docker node that will contain bound projects
