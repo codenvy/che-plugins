@@ -30,7 +30,7 @@ import org.eclipse.che.api.machine.server.InvalidInstanceSnapshotException;
 import org.eclipse.che.api.machine.server.InvalidRecipeException;
 import org.eclipse.che.api.machine.server.MachineException;
 import org.eclipse.che.api.machine.server.UnsupportedRecipeException;
-import org.eclipse.che.api.machine.server.spi.InstanceSnapshotKey;
+import org.eclipse.che.api.machine.server.spi.InstanceKey;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.api.machine.shared.Recipe;
 import org.eclipse.che.commons.lang.IoUtil;
@@ -137,12 +137,12 @@ public class DockerInstanceProvider implements InstanceProvider {
     }
 
     @Override
-    public DockerInstance createInstance(final InstanceSnapshotKey instanceSnapshotKey,
+    public DockerInstance createInstance(final InstanceKey instanceKey,
                                          final LineConsumer creationLogsOutput,
                                          final String workspaceId,
                                          final boolean bindWorkspace)
             throws NotFoundException, InvalidInstanceSnapshotException, MachineException {
-        final DockerInstanceSnapshotKey dockerInstanceKey = new DockerInstanceSnapshotKey(instanceSnapshotKey);
+        final DockerInstanceKey dockerInstanceKey = new DockerInstanceKey(instanceKey);
         final String repository = dockerInstanceKey.getRepository();
         final String imageId = dockerInstanceKey.getImageId();
         if (repository == null || imageId == null) {
@@ -178,10 +178,10 @@ public class DockerInstanceProvider implements InstanceProvider {
     }
 
     @Override
-    public void removeInstanceSnapshot(InstanceSnapshotKey instanceSnapshotKey) throws MachineException {
+    public void removeInstanceSnapshot(InstanceKey instanceKey) throws MachineException {
         // use registry API directly because docker doesn't have such API yet
         // https://github.com/docker/docker-registry/issues/45
-        final DockerInstanceSnapshotKey dockerImageKey = new DockerInstanceSnapshotKey(instanceSnapshotKey);
+        final DockerInstanceKey dockerImageKey = new DockerInstanceKey(instanceKey);
         String registry = dockerImageKey.getRegistry();
         String repository = dockerImageKey.getRepository();
         if (registry == null || repository == null) {
