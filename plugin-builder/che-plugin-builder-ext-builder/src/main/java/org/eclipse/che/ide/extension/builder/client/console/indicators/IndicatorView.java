@@ -86,7 +86,7 @@ public class IndicatorView extends Composite {
                 dataAnchor.setText(value);
             }
             dataAnchor.setHref(value);
-            dataAnchor.setTarget("_blank");
+            dataAnchor.setTarget("_self");
         } else {
             dataLabel.setText(value);
         }
