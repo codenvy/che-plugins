@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.svn.server;
 
 import com.google.common.base.Joiner;
 
+import org.eclipse.che.api.project.server.Constants
 import org.eclipse.che.commons.lang.NameGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +78,7 @@ public class SubversionConfigurationCheckerTest {
         List<String> configContent = Files.readAllLines(loadedConfigFile, Charset.forName("UTF-8"));
 
         String expectedContent = "[miscellany]\n" +
-                                 "global-ignores = .codenvy .vfs";
+                                 "global-ignores = " + Constants.CODENVY_DIR + ".vfs";
 
         assertEquals(expectedContent, Joiner.on('\n').join(configContent));
     }
