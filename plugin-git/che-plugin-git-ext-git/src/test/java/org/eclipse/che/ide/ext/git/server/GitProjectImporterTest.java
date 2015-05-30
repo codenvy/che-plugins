@@ -13,6 +13,7 @@ package org.eclipse.che.ide.ext.git.server;
 import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.core.util.LineConsumerFactory;
+import org.eclipse.che.api.project.server.Constants;
 import org.eclipse.che.api.project.server.FileEntry;
 import org.eclipse.che.api.project.server.FolderEntry;
 import org.eclipse.che.api.project.server.ProjectImporter;
@@ -259,7 +260,7 @@ public class GitProjectImporterTest {
         Revision commit = commits.get(0); // get first commit
 
         FolderEntry folder = new FolderEntry("my-vfs", vfs.getMountPoint().getRoot().createFolder("project"));
-        folder.createFolder(".codenvy");
+        folder.createFolder(Constants.CODENVY_DIR);
         Map<String, String> parameters = new HashMap<>(2);
         parameters.put("commitId", commit.getId());
         gitProjectImporter.importSources(folder, gitRepo.getAbsolutePath(), parameters, new SystemOutLineConsumerFactory());

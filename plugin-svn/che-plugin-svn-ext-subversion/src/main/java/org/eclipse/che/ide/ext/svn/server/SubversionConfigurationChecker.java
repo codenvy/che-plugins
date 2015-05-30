@@ -19,6 +19,8 @@ import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.che.api.project.server.Constants;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -36,7 +38,7 @@ import java.util.Set;
  * <p/>
  * Here we check that we have correct setting for svn ignore.
  * Must be ignored files:
- * <pre>.codenvy
+ * <pre>Constants.CODENVY_DIR
  *  .vfs</pre>
  * like system files for Codenvy.
  *
@@ -48,7 +50,7 @@ public class SubversionConfigurationChecker {
     private static final Set<String> SUBVERSION_IGNORE_PATTERNS = new LinkedHashSet<>();
 
     static {
-        SUBVERSION_IGNORE_PATTERNS.add(".codenvy");
+        SUBVERSION_IGNORE_PATTERNS.add(Constants.CODENVY_DIR);
         SUBVERSION_IGNORE_PATTERNS.add(".vfs");
     }
 
@@ -100,7 +102,7 @@ public class SubversionConfigurationChecker {
     /**
      * Checks existing config file for global-ignore property filling and concatenate system default values need to proper work of Codenvy.
      * <p/>
-     * .codenvy and .vfs directories should be added to global-ignore section in SVN configuration.
+     * .che and .vfs directories should be added to global-ignore section in SVN configuration.
      *
      * @throws IOException
      *         if processing of config file was failed

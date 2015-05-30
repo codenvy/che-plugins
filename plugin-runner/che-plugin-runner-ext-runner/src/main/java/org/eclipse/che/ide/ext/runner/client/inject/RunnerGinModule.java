@@ -107,6 +107,6 @@ public class RunnerGinModule extends AbstractGinModule {
     @Named("envFolderPath")
     @Singleton
     protected String provideEnvironmentsFolderRelPath() {
-        return ".codenvy/runners/environments";
+        return ".che/runners/environments";
     }
 }

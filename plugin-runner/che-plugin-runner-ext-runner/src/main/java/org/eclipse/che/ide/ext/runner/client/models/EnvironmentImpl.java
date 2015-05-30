@@ -38,7 +38,7 @@ import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common
  */
 public class EnvironmentImpl implements Environment {
 
-    public static final String ROOT_FOLDER = "/.codenvy/runners/environments/";
+    public static final String ROOT_FOLDER = "/.che/runners/environments/";
 
     private final RunnerEnvironment   runnerEnvironment;
     private final String              path;
