@@ -38,7 +38,7 @@ public class AddTest extends BaseTest {
         assertTrue(command.getLines().contains("testAdd"));
     }
 
-    @Test(expectedExceptions = GitException.class)
+    @Test(expectedExceptions = GitException.class, groups = "nojgit")
     public void testNoAddWithWrongFilePattern() throws GitException {
         getConnection().add(newDTO(AddRequest.class).withFilepattern(ImmutableList.of("otherFile")).withUpdate(false));
     }

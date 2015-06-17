@@ -16,6 +16,7 @@ import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitConnection;
 import org.eclipse.che.ide.ext.git.server.GitConnectionFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
+import org.eclipse.che.ide.ext.git.server.ServerTestConfiguration;
 import org.eclipse.che.ide.ext.git.server.nativegit.commands.EmptyGitCommand;
 import org.eclipse.che.ide.ext.git.server.nativegit.commands.ListFilesCommand;
 import org.eclipse.che.ide.ext.git.shared.AddRequest;
@@ -28,6 +29,7 @@ import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
+import org.testng.annotations.Parameters;
 
 import java.io.File;
 import java.io.FileReader;
@@ -38,6 +40,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.eclipse.che.api.core.util.LineConsumerFactory.NULL;
@@ -46,6 +50,7 @@ import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.delete;
 import static java.nio.file.Files.exists;
 import static java.nio.file.Files.write;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -63,20 +68,29 @@ public abstract class BaseTest {
     private GitUser              user;
     private GitConnection        connection;
     private Path                 target;
+    /**
+     * The test parameter 'configClass' tells the tests which implementation if ServerTestConfiguration to
+     * instantiate. The configuration instance provides the correct implementation of GitConnectionFactory,
+     * basically allowing the flexibility of externally choosing which git connection to run the tests on.
+     */
+    private ServerTestConfiguration config;
 
     @Mock
     private CredentialsLoader loader;
 
     @BeforeMethod
-    public void initRepository() throws Exception {
+	@Parameters({ ServerTestConfiguration.CLASS_NAME_PARAM })
+    public void initRepository(String configClass) throws Exception {
         final File repository = getTarget().resolve("repository").toFile();
         if (!repository.exists()) {
             assertTrue(repository.mkdir());
         }
         init(repository);
+        // Intantiate a configuration object
+		config = (ServerTestConfiguration) Class.forName(configClass).newInstance();
         //setup connection
         user = newDTO(GitUser.class).withName("test_name").withEmail("test@email");
-        connectionFactory = new NativeGitConnectionFactory(null, loader, null);
+        connectionFactory = config.createConnectionFactory(loader);
         connection = connectionFactory.getConnection(repository, user, NULL);
         addFile(repository.toPath(), "README.txt", CONTENT);
         connection.add(newDTO(AddRequest.class).withFilepattern(Arrays.asList("README.txt")));
@@ -198,5 +212,11 @@ public abstract class BaseTest {
                 fail("Cache not contains " + fName);
             }
         }
+    }
+    
+    protected static <T extends Comparable<T>> void assertUnorderedEquals(Collection<T> actual, List<T> expectedSorted) {
+        List<T> sortedActual = new ArrayList<T>(actual);
+        Collections.sort(sortedActual);
+        assertEquals(sortedActual, expectedSorted);
     }
 }

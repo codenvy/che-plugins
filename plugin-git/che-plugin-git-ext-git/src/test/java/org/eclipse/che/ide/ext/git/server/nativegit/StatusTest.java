@@ -50,7 +50,7 @@ public class StatusTest extends BaseTest {
 
         final Status status = getConnection().status(SHORT);
 
-        assertEquals(status.getUntracked(), asList("a", "b"));
+        assertUnorderedEquals(status.getUntracked(), asList("a", "b"));
         assertTrue(status.getAdded().isEmpty());
         assertTrue(status.getChanged().isEmpty());
         assertTrue(status.getConflicting().isEmpty());
@@ -84,7 +84,7 @@ public class StatusTest extends BaseTest {
 
         final Status status = getConnection().status(SHORT);
 
-        assertEquals(status.getAdded(), asList("a", "b"));
+        assertUnorderedEquals(status.getAdded(), asList("a", "b"));
         assertEquals(status.getUntracked(), asList("c"));
         assertTrue(status.getChanged().isEmpty());
         assertTrue(status.getConflicting().isEmpty());
@@ -174,7 +174,7 @@ public class StatusTest extends BaseTest {
         assertTrue(status.getUntrackedFolders().isEmpty());
     }
 
-    @Test
+	@Test(groups = "nojgit")
     public void testMissing() throws Exception {
         addFile("a", "content of a");
         //add "a"
@@ -184,6 +184,8 @@ public class StatusTest extends BaseTest {
 
         final Status status = getConnection().status(SHORT);
 
+        // TODO native git behaves incorrectly here. In standard git, if a file is added to the index and later
+        // deleted from the file system then it should appear in both the 'added' and 'missing' status lists
         assertEquals(status.getMissing(), asList("a"));
         assertTrue(status.getAdded().isEmpty());
         assertTrue(status.getChanged().isEmpty());
@@ -193,7 +195,28 @@ public class StatusTest extends BaseTest {
         assertTrue(status.getUntrackedFolders().isEmpty());
     }
 
-    @Test
+	@Test(groups = "nonativegit")
+    public void testMissing_JGit() throws Exception {
+        addFile("a", "content of a");
+        //add "a"
+        getConnection().add(newDTO(AddRequest.class).withFilepattern(asList("a")));
+        //delete "a"
+        deleteFile("a");
+
+        final Status status = getConnection().status(SHORT);
+
+        // TODO native git behaves incorrectly here. In standard git, if a file is added to the index and later
+        // deleted from the file system then it should appear in both the 'added' and 'missing' status lists
+        assertEquals(status.getMissing(), asList("a"));
+        assertEquals(status.getAdded(), asList("a"));
+        assertTrue(status.getChanged().isEmpty());
+        assertTrue(status.getConflicting().isEmpty());
+        assertTrue(status.getRemoved().isEmpty());
+        assertTrue(status.getUntracked().isEmpty());
+        assertTrue(status.getUntrackedFolders().isEmpty());
+    }
+
+	@Test(groups = "nojgit")
     public void testRemovedFromFilesSystem() throws Exception {
         addFile("a", "a content");
         addFile("b", "b content");
@@ -206,11 +229,35 @@ public class StatusTest extends BaseTest {
 
         final Status status = getConnection().status(SHORT);
 
+        // TODO native git behaves incorrectly here. In standard git, if a committed file is deleted from the
+        // file system then it should appear the 'missing' status list only
         assertEquals(status.getRemoved(), asList("a"));
         assertTrue(status.getAdded().isEmpty());
         assertTrue(status.getChanged().isEmpty());
         assertTrue(status.getConflicting().isEmpty());
         assertTrue(status.getMissing().isEmpty());
+        assertTrue(status.getUntracked().isEmpty());
+        assertTrue(status.getUntrackedFolders().isEmpty());
+    }
+
+	@Test(groups = "nonativegit")
+    public void testRemovedFromFilesSystem_JGit() throws Exception {
+        addFile("a", "a content");
+        addFile("b", "b content");
+        //add "a" and "b"
+        getConnection().add(newDTO(AddRequest.class).withFilepattern(asList("a", "b")));
+        //commit "a" and "b"
+        getConnection().commit(newDTO(CommitRequest.class).withMessage("add 2 test files"));
+        //delete "a"
+        deleteFile("a");
+
+        final Status status = getConnection().status(SHORT);
+
+        assertTrue(status.getRemoved().isEmpty());
+        assertTrue(status.getAdded().isEmpty());
+        assertTrue(status.getChanged().isEmpty());
+        assertTrue(status.getConflicting().isEmpty());
+        assertEquals(status.getMissing(), asList("a"));
         assertTrue(status.getUntracked().isEmpty());
         assertTrue(status.getUntrackedFolders().isEmpty());
     }

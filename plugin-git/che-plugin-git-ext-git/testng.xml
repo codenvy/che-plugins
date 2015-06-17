@@ -1,0 +1,39 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="TestAll">
+
+    <test name="ClientTests">
+        <parameter name="configClass" value="org.eclipse.che.ide.ext.git.server.jgit.JGitTestConfiguration" />
+        <packages>
+            <package name="org.eclipse.che.ide.ext.git.client.*" />
+        </packages>
+    </test>
+
+    <!-- Server tests are executed twice, once for each implementation of GitConnection -->
+
+    <test name="ServerTests_NativeGit">
+        <parameter name="configClass"
+            value="org.eclipse.che.ide.ext.git.server.nativegit.NativeGitServerTestConfiguration" />
+        <packages>
+            <package name="org.eclipse.che.ide.ext.git.server.*" />
+        </packages>
+        <groups>
+            <run>
+                <exclude name="nonativegit" />
+            </run>
+        </groups>
+    </test>
+
+    <test name="ServerTests_JGit">
+        <parameter name="configClass" value="org.eclipse.che.ide.ext.git.server.jgit.JGitServerTestConfiguration" />
+        <packages>
+            <package name="org.eclipse.che.ide.ext.git.server.*" />
+        </packages>
+        <groups>
+            <run>
+                <exclude name="nojgit" />
+            </run>
+        </groups>
+    </test>
+
+</suite>
