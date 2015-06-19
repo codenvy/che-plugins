@@ -21,10 +21,11 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
+import org.eclipse.che.ide.api.event.UpdateTreeNodeChildrenEvent;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.api.project.tree.generic.ItemNode;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.tree.generic.UpdateTreeNodeDataIterable;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.extension.maven.client.event.BeforeModuleOpenEvent;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -37,7 +38,7 @@ import org.eclipse.che.ide.util.loging.Log;
  *
  * @author Artem Zatsarynnyy
  */
-public class ModuleNode extends MavenProjectNode {
+public class ModuleNode extends MavenProjectNode implements UpdateTreeNodeDataIterable {
 
     private final AppContext appContext;
 
@@ -70,33 +71,38 @@ public class ModuleNode extends MavenProjectNode {
             @Override
             protected void onSuccess(Void result) {
                 final String parentPath = ((StorableNode)getParent()).getPath();
-                Unmarshallable<Array<ProjectDescriptor>> unmarshaller = dtoUnmarshallerFactory.newArrayUnmarshaller(ProjectDescriptor.class);
+                Unmarshallable<ProjectDescriptor> unmarshaller = dtoUnmarshallerFactory.newUnmarshaller(ProjectDescriptor.class);
 
-                projectServiceClient.getModules(parentPath, new AsyncRequestCallback<Array<ProjectDescriptor>>(unmarshaller) {
+                projectServiceClient.getProject(parentPath + "/" + newName, new AsyncRequestCallback<ProjectDescriptor>(unmarshaller) {
                     @Override
-                    protected void onSuccess(Array<ProjectDescriptor> items) {
-                        for (ProjectDescriptor item : items.asIterable()) {
-                            if (newName.equals(item.getName())) {
-                                Log.info(getClass(), item.getPath() + " path");
-                                setData(item);
-                                break;
-                            }
-                        }
+                    protected void onSuccess(ProjectDescriptor projectDescriptor) {
+                        setData(projectDescriptor);
 
-                        updateModule(ModuleNode.this);
-
-                        ModuleNode.super.rename(newName, new RenameCallback() {
+                        AsyncCallback<Void> asyncCallback = new AsyncCallback<Void>() {
                             @Override
-                            public void onRenamed() {
-                                callback.onRenamed();
-                                eventBus.fireEvent(new RefreshProjectTreeEvent(ModuleNode.this.getParent()));
+                            public void onSuccess(Void aVoid) {
+                                ModuleNode.super.rename(newName, new RenameCallback() {
+                                    @Override
+                                    public void onRenamed() {
+                                        callback.onRenamed();
+
+                                        eventBus.fireEvent(new RefreshProjectTreeEvent(ModuleNode.this.getParent()));
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable caught) {
+                                        callback.onFailure(caught);
+                                    }
+                                });
                             }
 
                             @Override
-                            public void onFailure(Throwable caught) {
-                                callback.onFailure(caught);
+                            public void onFailure(Throwable throwable) {
+                                Log.error(getClass(), "Error update children " + throwable);
                             }
-                        });
+                        };
+
+                        eventBus.fireEvent(new UpdateTreeNodeChildrenEvent(ModuleNode.this, asyncCallback));
                     }
 
                     @Override
@@ -113,59 +119,22 @@ public class ModuleNode extends MavenProjectNode {
         });
     }
 
-    private void updateModule(final TreeNode treeNode) {
-        String path = ((StorableNode)treeNode).getPath();
+    /** {@inheritDoc} */
+    public void updateData(final AsyncCallback<Void> asyncCallback, String updatedParentNodePath) {
+        String path = ((StorableNode)getParent()).getPath() + "/" + getName();
+        Log.error(getClass(), path);
 
-        Unmarshallable<Array<ItemReference>> unmarshaller = dtoUnmarshallerFactory.newArrayUnmarshaller(ItemReference.class);
-
-        projectServiceClient.getChildren(path, new AsyncRequestCallback<Array<ItemReference>>(unmarshaller) {
+        Unmarshallable<ProjectDescriptor> unmarshaller = dtoUnmarshallerFactory.newUnmarshaller(ProjectDescriptor.class);
+        projectServiceClient.getProject(path, new AsyncRequestCallback<ProjectDescriptor>(unmarshaller) {
             @Override
-            protected void onSuccess(Array<ItemReference> result) {
-                for (final TreeNode<?> node : getChildren().asIterable()) {
-                    if (node instanceof ItemNode) {
-                        ItemNode itemNode = (ItemNode)node;
-                        for (ItemReference itemReference : result.asIterable()) {
-                            if (itemReference.getName().equals(itemNode.getName())) {
-                                String oldPath = itemNode.getPath();
-
-                                itemNode.setData(itemReference);
-                                itemNode.onNodeRenamed(oldPath);
-                            }
-                        }
-                    }
-                }
+            protected void onSuccess(ProjectDescriptor result) {
+                setData(result);
+                asyncCallback.onSuccess(null);
             }
 
             @Override
             protected void onFailure(Throwable exception) {
-
-            }
-        });
-
-
-        Unmarshallable<Array<ProjectDescriptor>> unmarshaller2 = dtoUnmarshallerFactory.newArrayUnmarshaller(ProjectDescriptor.class);
-
-        projectServiceClient.getModules(path, new AsyncRequestCallback<Array<ProjectDescriptor>>(unmarshaller2) {
-            @Override
-            protected void onSuccess(Array<ProjectDescriptor> result) {
-                for (final TreeNode<?> node : ((ModuleNode)treeNode).getChildren().asIterable()) {
-                    if (node instanceof ModuleNode) {
-                        ModuleNode moduleNode = (ModuleNode)node;
-                        for (ProjectDescriptor descriptor: result.asIterable()) {
-                            if (descriptor.getName().equals(moduleNode.getName())) {
-                                moduleNode.setData(descriptor);
-
-                                updateModule(moduleNode);
-                            }
-                        }
-                    }
-
-                }
-            }
-
-            @Override
-            protected void onFailure(Throwable exception) {
-
+                asyncCallback.onFailure(exception);
             }
         });
     }
