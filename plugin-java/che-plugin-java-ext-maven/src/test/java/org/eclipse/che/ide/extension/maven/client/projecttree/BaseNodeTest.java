@@ -18,12 +18,13 @@ import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeSettings;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+
+import com.google.gwtmockito.GwtMockitoTestRunner;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /** @author Artem Zatsarynnyy */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(GwtMockitoTestRunner.class)
 public abstract class BaseNodeTest {
     protected static final String PROJECT_PATH = "/project";
     @Mock
