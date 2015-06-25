@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.server.nativegit.commands;
 
+import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
 import org.eclipse.che.ide.ext.git.shared.GitUser;
+import org.eclipse.che.ide.ext.git.shared.PullResult;
 
 import java.io.File;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ public class PullCommand extends GitCommand<Void> {
     private String  remote;
     private String  refSpec;
     private GitUser author;
+    private PullResult pullResult;
 
     public PullCommand(File repository) {
         super(repository);
@@ -53,6 +56,18 @@ public class PullCommand extends GitCommand<Void> {
             setCommandEnvironment(environment);
         }
         start();
+        pullResult = DtoFactory.getInstance().createDto(PullResult.class);
+        if (lines.getFirst().startsWith("Already")) {
+            pullResult.setAlreadyUpToDate(true);
+            pullResult.setCommandOutput(lines.getFirst());
+        } else  {
+            pullResult.setAlreadyUpToDate(false);
+            StringBuilder output = new StringBuilder();
+            for (String line : lines) {
+                output.append(line + "\n");
+            }
+            pullResult.setCommandOutput(output.toString());
+        }
         return null;
     }
 
@@ -84,5 +99,9 @@ public class PullCommand extends GitCommand<Void> {
     public PullCommand setAuthor(GitUser author) {
         this.author = author;
         return this;
+    }
+
+    public PullResult getPoolResult() {
+        return pullResult;
     }
 }

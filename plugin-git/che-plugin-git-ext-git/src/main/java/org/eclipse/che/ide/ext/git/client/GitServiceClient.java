@@ -18,6 +18,8 @@ import org.eclipse.che.ide.ext.git.shared.DiffRequest;
 import org.eclipse.che.ide.ext.git.shared.GitUrlVendorInfo;
 import org.eclipse.che.ide.ext.git.shared.LogResponse;
 import org.eclipse.che.ide.ext.git.shared.MergeResult;
+import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.ext.git.shared.RepoInfo;
 import org.eclipse.che.ide.ext.git.shared.ResetRequest;
@@ -263,7 +265,7 @@ public interface GitServiceClient {
      * @throws WebSocketException
      */
     void pull(@Nonnull ProjectDescriptor project, @Nonnull String refSpec, @Nonnull String remote,
-              @Nonnull AsyncRequestCallback<Void> callback);
+              @Nonnull AsyncRequestCallback<PullResult> callback);
 
     /**
      * Push changes from local repository to remote one (sends request over WebSocket).
@@ -282,7 +284,7 @@ public interface GitServiceClient {
      * @throws WebSocketException
      */
     void push(@Nonnull ProjectDescriptor project, @Nonnull List<String> refSpec, @Nonnull String remote, boolean force,
-              @Nonnull AsyncRequestCallback<Void> callback);
+              @Nonnull AsyncRequestCallback<PushResponse> callback);
 
     /**
      * Clones one remote repository to local one (over WebSocket).

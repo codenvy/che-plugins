@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.server.nativegit.commands;
 
+import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
+import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PushResponse;
 
 import java.io.File;
 import java.util.List;
@@ -20,7 +23,7 @@ import java.util.List;
  *
  * @author Eugene Voevodin
  */
-public class PushCommand extends GitCommand<Void> {
+public class PushCommand extends GitCommand<PushResponse> {
 
     private List<String> refSpec;
     private String   remote;
@@ -32,7 +35,7 @@ public class PushCommand extends GitCommand<Void> {
 
     /** @see GitCommand#execute() */
     @Override
-    public Void execute() throws GitException {
+    public PushResponse execute() throws GitException {
         remote = remote == null ? "origin" : remote;
         reset();
         commandLine.add("push");

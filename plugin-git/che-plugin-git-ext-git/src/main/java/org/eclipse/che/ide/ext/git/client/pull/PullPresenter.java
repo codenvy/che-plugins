@@ -25,6 +25,7 @@ import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.ext.git.shared.Branch;
+import org.eclipse.che.ide.ext.git.shared.PullResult;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -131,7 +132,7 @@ public class PullPresenter implements PullView.ActionDelegate {
                                         protected void onSuccess(Array<Branch> result) {
                                             if (LIST_REMOTE.equals(remoteMode)) {
                                                 view.setRemoteBranches(branchSearcher.getRemoteBranchesToDisplay(view.getRepositoryName(),
-                                                                                                             result));
+                                                                                                                 result));
                                                 getBranches(LIST_LOCAL);
                                             } else {
                                                 view.setLocalBranches(branchSearcher.getLocalBranchesToDisplay(result));
@@ -168,11 +169,16 @@ public class PullPresenter implements PullView.ActionDelegate {
             openedEditors.add(partPresenter);
         }
 
-        gitServiceClient.pull(project.getRootProject(), getRefs(), remoteName, new AsyncRequestCallback<Void>() {
+        gitServiceClient.pull(project.getRootProject(), getRefs(), remoteName,
+                              new AsyncRequestCallback<PullResult>(dtoUnmarshallerFactory.newUnmarshaller(PullResult.class)) {
             @Override
-            protected void onSuccess(Void aVoid) {
-                notificationManager.showInfo(constant.pullSuccess(remoteUrl));
-                refreshProject(openedEditors);
+            protected void onSuccess(PullResult result) {
+                if (result.getAlreadyUpToDate()){
+                    notificationManager.showInfo(result.getCommandOutput());
+                } else {
+                    notificationManager.showInfo(constant.pullSuccess(remoteUrl));
+                    refreshProject(openedEditors);
+                }
             }
 
             @Override

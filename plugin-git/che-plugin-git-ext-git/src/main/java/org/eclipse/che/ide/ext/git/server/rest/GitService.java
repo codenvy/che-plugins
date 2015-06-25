@@ -23,6 +23,8 @@ import org.eclipse.che.api.vfs.shared.PropertyFilter;
 import org.eclipse.che.api.vfs.shared.dto.Item;
 import org.eclipse.che.dto.server.DtoFactory;
 
+import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.vfs.impl.fs.VirtualFileImpl;
 import org.eclipse.che.ide.ext.git.server.Config;
 import org.eclipse.che.ide.ext.git.server.GitConnection;
@@ -312,10 +314,10 @@ public class GitService {
     @Path("pull")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void pull(PullRequest request) throws ApiException {
+    public PullResult pull(PullRequest request) throws ApiException {
         GitConnection gitConnection = getGitConnection();
         try {
-            gitConnection.pull(request);
+            return gitConnection.pull(request);
         } finally {
             gitConnection.close();
         }
@@ -324,10 +326,10 @@ public class GitService {
     @Path("push")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void push(PushRequest request) throws ApiException {
+    public PushResponse push(PushRequest request) throws ApiException {
         GitConnection gitConnection = getGitConnection();
         try {
-            gitConnection.push(request);
+            return gitConnection.push(request);
         } finally {
             gitConnection.close();
         }

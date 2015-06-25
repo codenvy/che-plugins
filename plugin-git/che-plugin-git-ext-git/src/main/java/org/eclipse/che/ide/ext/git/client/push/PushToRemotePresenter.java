@@ -22,6 +22,7 @@ import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.ext.git.shared.Branch;
+import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -260,10 +261,15 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
     @Override
     public void onPushClicked() {
         final String repository = view.getRepository();
-        service.push(project.getRootProject(), getRefs(), repository, false, new AsyncRequestCallback<Void>() {
+        service.push(project.getRootProject(), getRefs(), repository, false,
+                     new AsyncRequestCallback<PushResponse>(dtoUnmarshallerFactory.newUnmarshaller(PushResponse.class)) {
             @Override
-            protected void onSuccess(Void result) {
-                notificationManager.showInfo(constant.pushSuccess(repository));
+            protected void onSuccess(PushResponse result) {
+                if (result.getEverythingUpToDate()){
+                    notificationManager.showInfo(result.getCommandOutput());
+                } else {
+                    notificationManager.showInfo(constant.pushSuccess(repository));
+                }
             }
 
             @Override

@@ -8,13 +8,21 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.ide.ext.git.server.nativegit;
+package org.eclipse.che.ide.ext.git.shared;
+
+import org.eclipse.che.dto.shared.DTO;
 
 /**
- * @author Eugene Voevodin
+ * @author Igor Vinokur
  */
-public class AlreadyUpToDateException extends RuntimeException {
-    public AlreadyUpToDateException(String message) {
-        super(message);
-    }
+@DTO
+public interface PullResult {
+
+    boolean getAlreadyUpToDate();
+
+    void setAlreadyUpToDate(boolean alreadyUpToDate);
+
+    String getCommandOutput();
+
+    void setCommandOutput(String commandOutput);
 }
