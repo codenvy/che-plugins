@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-plugin-datasource-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.10.1-SNAPSHOT</version>
+        <version>3.10.2-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-datasource-ssl-socket-factory</artifactId>
     <name>Che Plugin :: Datasource :: SSL Socket factory</name>

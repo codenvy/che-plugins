@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-plugin-grunt-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.10.1-SNAPSHOT</version>
+        <version>3.10.2-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-grunt-builder</artifactId>
     <packaging>jar</packaging>
