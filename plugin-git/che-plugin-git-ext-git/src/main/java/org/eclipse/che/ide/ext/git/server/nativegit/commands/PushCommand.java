@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.server.nativegit.commands;
 
+import com.google.common.base.Joiner;
+
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
 import org.eclipse.che.ide.ext.git.shared.PushResponse;
@@ -53,11 +55,8 @@ public class PushCommand extends GitCommand<Void> {
             pushResponse.setCommandOutput(lines.getLast());
         } else  {
             pushResponse.setEverythingUpToDate(false);
-            StringBuilder output = new StringBuilder();
-            for (String line : lines) {
-                output.append(line + "\n");
-            }
-            pushResponse.setCommandOutput(output.toString());
+            Joiner joiner = Joiner.on("\n");
+            pushResponse.setCommandOutput(joiner.join(lines.listIterator()));
         }
         return null;
     }

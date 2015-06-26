@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.server.nativegit.commands;
 
+import com.google.common.base.Joiner;
+
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
 import org.eclipse.che.ide.ext.git.shared.GitUser;
@@ -62,11 +64,8 @@ public class PullCommand extends GitCommand<Void> {
             pullResult.setCommandOutput(lines.getLast());
         } else  {
             pullResult.setAlreadyUpToDate(false);
-            StringBuilder output = new StringBuilder();
-            for (String line : lines) {
-                output.append(line + "\n");
-            }
-            pullResult.setCommandOutput(output.toString());
+            Joiner joiner = Joiner.on("\n");
+            pullResult.setCommandOutput(joiner.join(lines.listIterator()));
         }
         return null;
     }
