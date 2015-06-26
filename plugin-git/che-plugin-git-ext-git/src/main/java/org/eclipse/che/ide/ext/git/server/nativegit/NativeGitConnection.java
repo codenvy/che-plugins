@@ -469,7 +469,7 @@ public class NativeGitConnection implements GitConnection {
 
         executeRemoteCommand(pullCommand, remoteUri);
 
-        return pullCommand.getPoolResult();
+        return pullCommand.getPullResponse();
     }
 
     @Override
