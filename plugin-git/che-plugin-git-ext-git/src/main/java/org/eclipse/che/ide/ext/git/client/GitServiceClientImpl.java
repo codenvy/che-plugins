@@ -37,7 +37,7 @@ import org.eclipse.che.ide.ext.git.shared.LogResponse;
 import org.eclipse.che.ide.ext.git.shared.MergeRequest;
 import org.eclipse.che.ide.ext.git.shared.MergeResult;
 import org.eclipse.che.ide.ext.git.shared.PullRequest;
-import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.PushRequest;
 import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
@@ -411,7 +411,7 @@ public class GitServiceClientImpl implements GitServiceClient {
     /** {@inheritDoc} */
     @Override
     public void pull(@Nonnull ProjectDescriptor project, @Nonnull String refSpec, @Nonnull String remote,
-                     @Nonnull AsyncRequestCallback<PullResult> callback) {
+                     @Nonnull AsyncRequestCallback<PullResponse> callback) {
         PullRequest pullRequest = dtoFactory.createDto(PullRequest.class).withRemote(remote).withRefSpec(refSpec);
         String url = baseHttpUrl + PULL + "?projectPath=" + project.getPath();
         asyncRequestFactory.createPostRequest(url, pullRequest).send(callback);

@@ -25,7 +25,7 @@ import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.ext.git.shared.Branch;
-import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -170,9 +170,9 @@ public class PullPresenter implements PullView.ActionDelegate {
         }
 
         gitServiceClient.pull(project.getRootProject(), getRefs(), remoteName,
-                              new AsyncRequestCallback<PullResult>(dtoUnmarshallerFactory.newUnmarshaller(PullResult.class)) {
+                              new AsyncRequestCallback<PullResponse>(dtoUnmarshallerFactory.newUnmarshaller(PullResponse.class)) {
             @Override
-            protected void onSuccess(PullResult result) {
+            protected void onSuccess(PullResponse result) {
                 if (result.isAlreadyUpToDate()){
                     notificationManager.showInfo(result.getCommandOutput());
                 } else {

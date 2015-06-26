@@ -23,7 +23,7 @@ import org.eclipse.che.api.vfs.shared.PropertyFilter;
 import org.eclipse.che.api.vfs.shared.dto.Item;
 import org.eclipse.che.dto.server.DtoFactory;
 
-import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.vfs.impl.fs.VirtualFileImpl;
 import org.eclipse.che.ide.ext.git.server.Config;
@@ -314,7 +314,7 @@ public class GitService {
     @Path("pull")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public PullResult pull(PullRequest request) throws ApiException {
+    public PullResponse pull(PullRequest request) throws ApiException {
         GitConnection gitConnection = getGitConnection();
         try {
             return gitConnection.pull(request);

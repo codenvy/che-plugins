@@ -16,7 +16,7 @@ import org.eclipse.che.dto.shared.DTO;
  * @author Igor Vinokur
  */
 @DTO
-public interface PullResult {
+public interface PullResponse {
 
     /** @return true if nothing to pull */
     boolean isAlreadyUpToDate();

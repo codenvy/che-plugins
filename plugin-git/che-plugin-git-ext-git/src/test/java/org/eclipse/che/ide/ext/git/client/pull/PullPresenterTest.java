@@ -25,7 +25,7 @@ import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.ext.git.shared.Branch;
-import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class PullPresenterTest extends BaseTest {
     @Mock
     private BranchSearcher      branchSearcher;
     @Mock
-    private PullResult          pullResult;
+    private PullResponse        pullResponse;
 
     @InjectMocks
     private PullPresenter presenter;
@@ -274,10 +274,10 @@ public class PullPresenterTest extends BaseTest {
                 Object[] arguments = invocation.getArguments();
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[3];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
-                onSuccess.invoke(callback, pullResult);
+                onSuccess.invoke(callback, pullResponse);
                 return callback;
             }
-        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResult>)anyObject());
+        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResponse>)anyObject());
 
         presenter.showDialog();
         presenter.onPullClicked();
@@ -306,13 +306,13 @@ public class PullPresenterTest extends BaseTest {
                 onFailure.invoke(callback, exception);
                 return callback;
             }
-        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResult>)anyObject());
+        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResponse>)anyObject());
         when(exception.getMessage()).thenReturn("error Message");
 
         presenter.showDialog();
         presenter.onPullClicked();
 
-        verify(service).pull(eq(rootProjectDescriptor), anyString(), eq(REPOSITORY_NAME), (AsyncRequestCallback<PullResult>)anyObject());
+        verify(service).pull(eq(rootProjectDescriptor), anyString(), eq(REPOSITORY_NAME), (AsyncRequestCallback<PullResponse>)anyObject());
         verify(view).close();
         verify(notificationManager).showError(anyString());
     }
@@ -331,7 +331,7 @@ public class PullPresenterTest extends BaseTest {
                 onFailure.invoke(callback, exception);
                 return callback;
             }
-        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResult>)anyObject());
+        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResponse>)anyObject());
 
         presenter.showDialog();
         presenter.onPullClicked();

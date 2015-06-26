@@ -15,7 +15,7 @@ import com.google.common.base.Joiner;
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
 import org.eclipse.che.ide.ext.git.shared.GitUser;
-import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PullResponse;
 
 import java.io.File;
 import java.util.HashMap;
@@ -28,10 +28,10 @@ import java.util.Map;
  */
 public class PullCommand extends GitCommand<Void> {
 
-    private String  remote;
-    private String  refSpec;
-    private GitUser author;
-    private PullResult pullResult;
+    private String       remote;
+    private String       refSpec;
+    private GitUser      author;
+    private PullResponse pullResponse;
 
     public PullCommand(File repository) {
         super(repository);
@@ -58,14 +58,14 @@ public class PullCommand extends GitCommand<Void> {
             setCommandEnvironment(environment);
         }
         start();
-        pullResult = DtoFactory.getInstance().createDto(PullResult.class);
+        pullResponse = DtoFactory.getInstance().createDto(PullResponse.class);
         if (lines.getLast().startsWith("Already")) {
-            pullResult.setAlreadyUpToDate(true);
-            pullResult.setCommandOutput(lines.getLast());
+            pullResponse.setAlreadyUpToDate(true);
+            pullResponse.setCommandOutput(lines.getLast());
         } else  {
-            pullResult.setAlreadyUpToDate(false);
+            pullResponse.setAlreadyUpToDate(false);
             Joiner joiner = Joiner.on("\n");
-            pullResult.setCommandOutput(joiner.join(lines.listIterator()));
+            pullResponse.setCommandOutput(joiner.join(lines.listIterator()));
         }
         return null;
     }
@@ -101,10 +101,10 @@ public class PullCommand extends GitCommand<Void> {
     }
 
     /**
-     * Get pull result information
-     * @return PullResult DTO
+     * Get pull response information
+     * @return PullResponse DTO
      */
-    public PullResult getPoolResult() {
-        return pullResult;
+    public PullResponse getPoolResult() {
+        return pullResponse;
     }
 }

@@ -31,7 +31,7 @@ import org.eclipse.che.ide.ext.git.shared.MergeRequest;
 import org.eclipse.che.ide.ext.git.shared.MergeResult;
 import org.eclipse.che.ide.ext.git.shared.MoveRequest;
 import org.eclipse.che.ide.ext.git.shared.PullRequest;
-import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.PushRequest;
 import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
@@ -258,7 +258,7 @@ public interface GitConnection extends Closeable {
      *         if remote configuration is invalid
      * @see PullRequest
      */
-    PullResult pull(PullRequest request) throws GitException, UnauthorizedException;
+    PullResponse pull(PullRequest request) throws GitException, UnauthorizedException;
 
     /**
      * Send changes from local repository to remote one.

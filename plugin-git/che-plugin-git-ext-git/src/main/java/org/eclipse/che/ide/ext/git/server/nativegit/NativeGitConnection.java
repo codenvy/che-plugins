@@ -54,7 +54,7 @@ import org.eclipse.che.ide.ext.git.shared.MergeRequest;
 import org.eclipse.che.ide.ext.git.shared.MergeResult;
 import org.eclipse.che.ide.ext.git.shared.MoveRequest;
 import org.eclipse.che.ide.ext.git.shared.PullRequest;
-import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.PushRequest;
 import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
@@ -445,7 +445,7 @@ public class NativeGitConnection implements GitConnection {
     }
 
     @Override
-    public PullResult pull(PullRequest request) throws GitException, UnauthorizedException {
+    public PullResponse pull(PullRequest request) throws GitException, UnauthorizedException {
         PullCommand pullCommand;
         String remoteUri;
         try {

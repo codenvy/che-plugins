@@ -18,7 +18,7 @@ import org.eclipse.che.ide.ext.git.shared.DiffRequest;
 import org.eclipse.che.ide.ext.git.shared.GitUrlVendorInfo;
 import org.eclipse.che.ide.ext.git.shared.LogResponse;
 import org.eclipse.che.ide.ext.git.shared.MergeResult;
-import org.eclipse.che.ide.ext.git.shared.PullResult;
+import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.ext.git.shared.RepoInfo;
@@ -265,7 +265,7 @@ public interface GitServiceClient {
      * @throws WebSocketException
      */
     void pull(@Nonnull ProjectDescriptor project, @Nonnull String refSpec, @Nonnull String remote,
-              @Nonnull AsyncRequestCallback<PullResult> callback);
+              @Nonnull AsyncRequestCallback<PullResponse> callback);
 
     /**
      * Push changes from local repository to remote one (sends request over WebSocket).
