@@ -12,11 +12,15 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 /**
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: BranchListRequest.java 22811 2011-03-22 07:28:35Z andrew00x $
  */
 @DTO
+@ApiModel
 public interface BranchListRequest extends GitRequest {
     /**
      * Show both remote and local branches. <br/>
@@ -31,6 +35,7 @@ public interface BranchListRequest extends GitRequest {
     public static final String LIST_LOCAL  = null;
 
     /** @return branches list mode */
+    @ApiModelProperty(allowableValues="[a,r,null]")
     String getListMode();
     
     void setListMode(String listMode);

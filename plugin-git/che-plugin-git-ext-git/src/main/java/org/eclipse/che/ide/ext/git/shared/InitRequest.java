@@ -12,6 +12,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 
 
 /**
@@ -19,9 +22,11 @@ import org.eclipse.che.dto.shared.DTO;
  *
  * @author andrew00x
  */
+@ApiModel
 @DTO
 public interface InitRequest extends GitRequest {
     /** @return working directory for new git repository */
+	@ApiModelProperty("The working directory for the new git repository")
     String getWorkingDir();
 
     void setWorkingDir(String workingDir);
@@ -29,6 +34,7 @@ public interface InitRequest extends GitRequest {
     InitRequest withWorkingDir(String workingDir);
     
     /** @return <code>true</code> then bare repository created */
+    @ApiModelProperty("If true then a bare repository will be created")
     boolean isBare();
     
     void setBare(boolean bare);
@@ -36,6 +42,7 @@ public interface InitRequest extends GitRequest {
     InitRequest withBare(boolean bare);
 
     /** @return <code>true</code> then all files in newly initialized repository will be commited with "init" message  */
+    @ApiModelProperty("If true then all files in the newly initialized repository's work directory will be committed with an 'init' message")
     boolean isInitCommit();
 
     void setInitCommit(boolean initCommit);

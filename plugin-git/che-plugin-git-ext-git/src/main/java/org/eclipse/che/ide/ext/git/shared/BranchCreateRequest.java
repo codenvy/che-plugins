@@ -12,6 +12,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 /**
  * Request to create new branch.
  *
@@ -19,8 +22,10 @@ import org.eclipse.che.dto.shared.DTO;
  * @version $Id: BranchCreateRequest.java 22811 2011-03-22 07:28:35Z andrew00x $
  */
 @DTO
+@ApiModel
 public interface BranchCreateRequest extends GitRequest {
     /** @return name of branch to be created */
+	@ApiModelProperty("name of the branch to be created")
     String getName();
     
     void setName(String name);
@@ -28,6 +33,7 @@ public interface BranchCreateRequest extends GitRequest {
     BranchCreateRequest withName(String name);
 
     /** @return name of a commit at which to start the new branch. If <code>null</code> the HEAD will be used */
+    @ApiModelProperty("name of a commit at which to start the new branch. If <code>null</code> the HEAD will be used")
     String getStartPoint();
     
     void setStartPoint(String startPoint);

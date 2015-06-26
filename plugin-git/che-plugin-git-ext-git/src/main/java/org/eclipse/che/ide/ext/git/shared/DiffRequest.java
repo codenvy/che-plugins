@@ -12,6 +12,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -27,6 +30,7 @@ import java.util.List;
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: DiffRequest.java 22817 2011-03-22 09:17:52Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface DiffRequest extends GitRequest {
     /** Type of diff output. */
@@ -65,6 +69,7 @@ public interface DiffRequest extends GitRequest {
     }
 
     /** @return filter of file to show diff. It may be either list of file names or name of directory to show all files under them */
+    @ApiModelProperty("filter of file to show diff. It may be either list of file names or name of directory to show all files under them")
     List<String> getFileFilter();
     
     void setFileFilter(List<String> fileFilter);
@@ -72,6 +77,7 @@ public interface DiffRequest extends GitRequest {
     DiffRequest withFileFilter(List<String> fileFilter);
 
     /** @return type of diff output */
+    @ApiModelProperty(value="The type of diff to get", allowableValues="[NAME_ONLY, NAME_STATUS, RAW]")
     DiffType getType();
     
     void setType(DiffType type);
@@ -79,6 +85,7 @@ public interface DiffRequest extends GitRequest {
     DiffRequest withType(DiffType type);
 
     /** @return <code>true</code> if renames must not be showing in diff result */
+    @ApiModelProperty("if true then don't show renames in the diff result")
     boolean isNoRenames();
     
     void setNoRenames(boolean isNoRenames);
@@ -86,6 +93,7 @@ public interface DiffRequest extends GitRequest {
     DiffRequest withNoRenames(boolean noRenames);
 
     /** @return limit of showing renames in diff output. This attribute has sense if {@link #noRenames} is <code>false</code> */
+    @ApiModelProperty("Limit of showing renames in the diff output (if noRenames is false)")
     int getRenameLimit();
     
     void setRenameLimit(int renameLimit);
@@ -93,6 +101,7 @@ public interface DiffRequest extends GitRequest {
     DiffRequest withRenameLimit(int renameLimit);
 
     /** @return first commit to view changes */
+    @ApiModelProperty("First commit to view changes")
     String getCommitA();
     
     void setCommitA(String commitA);
@@ -100,6 +109,7 @@ public interface DiffRequest extends GitRequest {
     DiffRequest withCommitA(String commitA);
 
     /** @return second commit to view changes */
+    @ApiModelProperty("Second commit to view changes")
     String getCommitB();
     
     void setCommitB(String commitB);
@@ -110,6 +120,7 @@ public interface DiffRequest extends GitRequest {
      * @return if <code>false</code> (default) view changes between {@link #commitA} and working tree otherwise between {@link #commitA}
      *         and index
      */
+    @ApiModelProperty("if false (default) view changes between commitA and working tree otherwise between commitA and index")
     boolean isCached();
     
     void setCached(boolean isCached);

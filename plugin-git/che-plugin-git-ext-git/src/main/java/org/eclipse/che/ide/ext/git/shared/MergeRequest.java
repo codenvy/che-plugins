@@ -12,15 +12,20 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 /**
  * Request to merge {@link #commit} with HEAD.
  *
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: MergeRequest.java 22811 2011-03-22 07:28:35Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface MergeRequest extends GitRequest {
     /** @return commit to merge */
+	@ApiModelProperty("The commit to merge")
     String getCommit();
     
     void setCommit(String commit);

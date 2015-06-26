@@ -13,6 +13,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -21,9 +24,11 @@ import java.util.List;
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: PushRequest.java 22817 2011-03-22 09:17:52Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface PushRequest extends GitRequest {
     /** @return list of refspec to push */
+	@ApiModelProperty("The list of refspecs to push")
     List<String> getRefSpec();
     
     void setRefSpec(List<String> refSpec);
@@ -31,6 +36,7 @@ public interface PushRequest extends GitRequest {
     PushRequest withRefSpec(List<String> refspec);
 
     /** @return remote repository. URI or name is acceptable. If not specified then 'origin' will be used */
+    @ApiModelProperty("remote repository. URI or name is acceptable. If not specified then 'origin' will be used")
     String getRemote();
     
     void setRemote(String remote);
@@ -38,6 +44,7 @@ public interface PushRequest extends GitRequest {
     PushRequest withRemote(String remote);
     
     /** @return force or not push operation */
+    @ApiModelProperty("True to force the push operation")
     boolean isForce();
     
     void setForce(boolean isForce);
@@ -45,6 +52,7 @@ public interface PushRequest extends GitRequest {
     PushRequest withForce(boolean force);
 
     /** @return time (in seconds) to wait without data transfer occurring before aborting pushing data to remote repository */
+    @ApiModelProperty("time (in seconds) to wait without data transfer occurring before aborting pushing data to remote repository")
     int getTimeout();
     
     void setTimeout(int timeout);

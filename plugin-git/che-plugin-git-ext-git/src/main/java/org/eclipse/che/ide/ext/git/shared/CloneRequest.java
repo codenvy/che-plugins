@@ -12,6 +12,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -20,8 +23,10 @@ import java.util.List;
  * @author andrew00x
  */
 @DTO
+@ApiModel
 public interface CloneRequest extends GitRequest {
     /** @return URI of repository to be cloned */
+	@ApiModelProperty("URI of repository to be cloned")
     String getRemoteUri();
     
     void setRemoteUri(String remoteUri);
@@ -29,6 +34,7 @@ public interface CloneRequest extends GitRequest {
     CloneRequest withRemoteUri(String remoteUri);
 
     /** @return list of remote branches to fetch in cloned repository */
+    @ApiModelProperty("list of remote branches to fetch in cloned repository")
     List<String> getBranchesToFetch();
     
     void setBranchesToFetch(List<String> branchesToFetch);
@@ -36,6 +42,7 @@ public interface CloneRequest extends GitRequest {
     CloneRequest withBranchesToFetch(List<String> branchesToFetch);
 
     /** @return work directory for cloning */
+    @ApiModelProperty("work directory for cloning")
     String getWorkingDir();
 
     void setWorkingDir(String workingDir);
@@ -43,6 +50,7 @@ public interface CloneRequest extends GitRequest {
     CloneRequest withWorkingDir(String workingDir);
 
     /** @return remote name. If <code>null</code> then 'origin' will be used */
+    @ApiModelProperty("remote name. If <code>null</code> then 'origin' will be used")
     String getRemoteName();
     
     void setRemoteName(String remoteName);
@@ -53,6 +61,7 @@ public interface CloneRequest extends GitRequest {
      * @return time (in seconds) to wait without data transfer occurring before aborting fetching data from remote repository. If 0 then
      *         default timeout may be used. This is implementation specific
      */
+    @ApiModelProperty("Time in seconds to wait without data transfer occurring before aborting the operation.If 0 then default timeout is used")
     int getTimeout();
     
     void setTimeout(int timeout);
