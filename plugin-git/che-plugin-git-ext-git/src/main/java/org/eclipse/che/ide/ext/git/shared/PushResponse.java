@@ -19,7 +19,7 @@ import org.eclipse.che.dto.shared.DTO;
 public interface PushResponse {
 
     /** @return true if nothing to push */
-    boolean getEverythingUpToDate();
+    boolean isEverythingUpToDate();
 
     /** Set true if nothing to push */
     void setEverythingUpToDate(boolean alreadyUpToDate);

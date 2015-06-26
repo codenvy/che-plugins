@@ -19,7 +19,7 @@ import org.eclipse.che.dto.shared.DTO;
 public interface PullResult {
 
     /** @return true if nothing to pull */
-    boolean getAlreadyUpToDate();
+    boolean isAlreadyUpToDate();
 
     /** Set true if nothing to pull */
     void setAlreadyUpToDate(boolean alreadyUpToDate);
