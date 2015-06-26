@@ -17,11 +17,16 @@ import org.eclipse.che.dto.shared.DTO;
  */
 @DTO
 public interface PushResponse {
+
+    /** @return true if nothing to push */
     boolean getEverythingUpToDate();
 
+    /** Set true if nothing to push */
     void setEverythingUpToDate(boolean alreadyUpToDate);
 
+    /** @return output message */
     String getCommandOutput();
 
+    /** set output message */
     void setCommandOutput(String commandOutput);
 }

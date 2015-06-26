@@ -18,11 +18,15 @@ import org.eclipse.che.dto.shared.DTO;
 @DTO
 public interface PullResult {
 
+    /** @return true if nothing to pull */
     boolean getAlreadyUpToDate();
 
+    /** Set true if nothing to pull */
     void setAlreadyUpToDate(boolean alreadyUpToDate);
 
+    /** @return output message */
     String getCommandOutput();
 
+    /** set output message */
     void setCommandOutput(String commandOutput);
 }

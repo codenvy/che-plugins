@@ -101,6 +101,10 @@ public class PullCommand extends GitCommand<Void> {
         return this;
     }
 
+    /**
+     * Get pull result information
+     * @return PullResult DTO
+     */
     public PullResult getPoolResult() {
         return pullResult;
     }

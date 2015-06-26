@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.git.server.nativegit.commands;
 
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
-import org.eclipse.che.ide.ext.git.shared.PullResult;
 import org.eclipse.che.ide.ext.git.shared.PushResponse;
 
 import java.io.File;
@@ -23,11 +22,12 @@ import java.util.List;
  *
  * @author Eugene Voevodin
  */
-public class PushCommand extends GitCommand<PushResponse> {
+public class PushCommand extends GitCommand<Void> {
 
     private List<String> refSpec;
     private String   remote;
     private boolean  force;
+    private PushResponse pushResponse;
 
     public PushCommand(File repository) {
         super(repository);
@@ -35,7 +35,7 @@ public class PushCommand extends GitCommand<PushResponse> {
 
     /** @see GitCommand#execute() */
     @Override
-    public PushResponse execute() throws GitException {
+    public Void execute() throws GitException {
         remote = remote == null ? "origin" : remote;
         reset();
         commandLine.add("push");
@@ -47,6 +47,18 @@ public class PushCommand extends GitCommand<PushResponse> {
             commandLine.add("--force");
         }
         start();
+        pushResponse = DtoFactory.getInstance().createDto(PushResponse.class);
+        if (lines.getLast().startsWith("Everything")) {
+            pushResponse.setEverythingUpToDate(true);
+            pushResponse.setCommandOutput(lines.getLast());
+        } else  {
+            pushResponse.setEverythingUpToDate(false);
+            StringBuilder output = new StringBuilder();
+            for (String line : lines) {
+                output.append(line + "\n");
+            }
+            pushResponse.setCommandOutput(output.toString());
+        }
         return null;
     }
 
@@ -80,5 +92,13 @@ public class PushCommand extends GitCommand<PushResponse> {
     public PushCommand setForce(boolean force) {
         this.force = force;
         return this;
+    }
+
+    /**
+     * Get push response information
+     * @return PushResponse DTO
+     */
+    public PushResponse getPushResponse() {
+        return pushResponse;
     }
 }

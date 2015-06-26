@@ -496,7 +496,9 @@ public class NativeGitConnection implements GitConnection {
                    .setRefSpec(request.getRefSpec())
                    .setTimeout(request.getTimeout());
 
-        return pushCommand.execute();
+        executeRemoteCommand(pushCommand, remoteUri);
+
+        return pushCommand.getPushResponse();
     }
 
     @Override

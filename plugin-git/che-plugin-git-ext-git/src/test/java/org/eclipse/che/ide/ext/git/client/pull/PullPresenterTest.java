@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.pull;
 
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.web.bindery.event.shared.Event;
+import com.googlecode.gwt.test.utils.GwtReflectionUtils;
+
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
@@ -24,10 +28,6 @@ import org.eclipse.che.ide.ext.git.shared.Branch;
 import org.eclipse.che.ide.ext.git.shared.PullResult;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.web.bindery.event.shared.Event;
-import com.googlecode.gwt.test.utils.GwtReflectionUtils;
-
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -68,6 +68,8 @@ public class PullPresenterTest extends BaseTest {
     private EditorPartPresenter partPresenter;
     @Mock
     private BranchSearcher      branchSearcher;
+    @Mock
+    private PullResult          pullResult;
 
     @InjectMocks
     private PullPresenter presenter;
@@ -272,7 +274,7 @@ public class PullPresenterTest extends BaseTest {
                 Object[] arguments = invocation.getArguments();
                 AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[3];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
-                onSuccess.invoke(callback, (Void)null);
+                onSuccess.invoke(callback, pullResult);
                 return callback;
             }
         }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResult>)anyObject());
