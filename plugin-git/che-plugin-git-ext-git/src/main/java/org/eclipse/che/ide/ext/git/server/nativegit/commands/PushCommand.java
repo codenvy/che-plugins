@@ -51,11 +51,9 @@ public class PushCommand extends GitCommand<Void> {
         start();
         pushResponse = DtoFactory.getInstance().createDto(PushResponse.class);
         if (lines.getLast().startsWith("Everything")) {
-            pushResponse.setEverythingUpToDate(true);
-            pushResponse.setCommandOutput(lines.getLast());
+            pushResponse.withEverythingUpToDate(true).withCommandOutput(lines.getLast());
         } else  {
-            pushResponse.setEverythingUpToDate(false);
-            pushResponse.setCommandOutput(Joiner.on("\n").join(lines));
+            pushResponse.withEverythingUpToDate(false).withCommandOutput(Joiner.on("\n").join(lines));
         }
         return null;
     }
