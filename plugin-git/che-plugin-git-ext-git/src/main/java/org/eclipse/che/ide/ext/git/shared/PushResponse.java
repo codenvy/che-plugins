@@ -20,15 +20,19 @@ import org.eclipse.che.dto.shared.DTO;
 @DTO
 public interface PushResponse {
 
+    /** Set true if nothing to push */
+    void setEverythingUpToDate(boolean alreadyUpToDate);
+
     /** @return true if nothing to push */
     boolean isEverythingUpToDate();
 
-    /** Set true if nothing to push */
-    void setEverythingUpToDate(boolean alreadyUpToDate);
+    PushResponse withEverythingUpToDate(boolean alreadyUpToDate);
+
+    /** set output message */
+    void setCommandOutput(String commandOutput);
 
     /** @return output message */
     String getCommandOutput();
 
-    /** set output message */
-    void setCommandOutput(String commandOutput);
+    PushResponse withCommandOutput(String commandOutput);
 }

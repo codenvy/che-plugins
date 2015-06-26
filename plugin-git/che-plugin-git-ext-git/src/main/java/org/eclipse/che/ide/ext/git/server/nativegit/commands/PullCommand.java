@@ -64,8 +64,7 @@ public class PullCommand extends GitCommand<Void> {
             pullResponse.setCommandOutput(lines.getLast());
         } else  {
             pullResponse.setAlreadyUpToDate(false);
-            Joiner joiner = Joiner.on("\n");
-            pullResponse.setCommandOutput(joiner.join(lines.listIterator()));
+            pullResponse.setCommandOutput(Joiner.on("\n").join(lines));
         }
         return null;
     }

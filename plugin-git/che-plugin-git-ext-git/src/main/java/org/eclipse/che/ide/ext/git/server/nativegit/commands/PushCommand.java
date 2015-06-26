@@ -55,8 +55,7 @@ public class PushCommand extends GitCommand<Void> {
             pushResponse.setCommandOutput(lines.getLast());
         } else  {
             pushResponse.setEverythingUpToDate(false);
-            Joiner joiner = Joiner.on("\n");
-            pushResponse.setCommandOutput(joiner.join(lines.listIterator()));
+            pushResponse.setCommandOutput(Joiner.on("\n").join(lines));
         }
         return null;
     }
