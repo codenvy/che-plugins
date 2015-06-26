@@ -43,6 +43,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -342,6 +343,55 @@ public class PullPresenterTest extends BaseTest {
         verify(appContext).getCurrentProject();
         verify(eventBus, times(2)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
         verify(partPresenter).getEditorInput();
+    }
+
+    @Test
+    public void testOnPullClickedWhenAlreadyUpToDateHappenedAndRefreshProjectIsNotCalled() throws Exception {
+        when(pullResponse.isAlreadyUpToDate()).thenReturn(true);
+        when(pullResponse.getCommandOutput()).thenReturn("Already up-to-date");
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] arguments = invocation.getArguments();
+                AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[3];
+                Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
+                onSuccess.invoke(callback, pullResponse);
+                return callback;
+            }
+        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResponse>)anyObject());
+
+        presenter.showDialog();
+        presenter.onPullClicked();
+
+        verify(view).close();
+        verify(notificationManager).showInfo("Already up-to-date");
+        //check Refresh project is not called
+        verify(eventBus, never()).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
+    }
+
+    @Test
+    public void testOnPullClickedWhenPullHappenedAndRefreshProjectIsCalled() throws Exception {
+        when(pullResponse.isAlreadyUpToDate()).thenReturn(false);
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] arguments = invocation.getArguments();
+                AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[3];
+                Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
+                onSuccess.invoke(callback, pullResponse);
+                return callback;
+            }
+        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResponse>)anyObject());
+
+        presenter.showDialog();
+        presenter.onPullClicked();
+
+        verify(view).close();
+        verify(notificationManager).showInfo(anyString());
+        verify(constant).pullSuccess(eq(REMOTE_URI));
+        verify(eventBus, times(2)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
     }
 
     @Test
