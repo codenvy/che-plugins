@@ -49,12 +49,7 @@ public class PushCommand extends GitCommand<Void> {
             commandLine.add("--force");
         }
         start();
-        pushResponse = DtoFactory.getInstance().createDto(PushResponse.class);
-        if (lines.getLast().startsWith("Everything")) {
-            pushResponse.withEverythingUpToDate(true).withCommandOutput(lines.getLast());
-        } else  {
-            pushResponse.withEverythingUpToDate(false).withCommandOutput(Joiner.on("\n").join(lines));
-        }
+        pushResponse = DtoFactory.getInstance().createDto(PushResponse.class).withCommandOutput(Joiner.on("\n").join(lines));
         return null;
     }
 

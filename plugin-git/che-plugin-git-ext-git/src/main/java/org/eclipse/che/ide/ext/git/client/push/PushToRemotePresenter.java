@@ -265,11 +265,7 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
                      new AsyncRequestCallback<PushResponse>(dtoUnmarshallerFactory.newUnmarshaller(PushResponse.class)) {
             @Override
             protected void onSuccess(PushResponse result) {
-                if (result.isEverythingUpToDate()){
-                    notificationManager.showInfo(result.getCommandOutput());
-                } else {
-                    notificationManager.showInfo(constant.pushSuccess(repository));
-                }
+                notificationManager.showInfo(result.getCommandOutput());
             }
 
             @Override

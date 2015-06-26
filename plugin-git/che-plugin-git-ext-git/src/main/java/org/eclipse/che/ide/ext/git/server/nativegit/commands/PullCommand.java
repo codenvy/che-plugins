@@ -58,12 +58,7 @@ public class PullCommand extends GitCommand<Void> {
             setCommandEnvironment(environment);
         }
         start();
-        pullResponse = DtoFactory.getInstance().createDto(PullResponse.class);
-        if (lines.getLast().startsWith("Already")) {
-            pullResponse.withAlreadyUpToDate(true).withCommandOutput(lines.getLast());
-        } else  {
-            pullResponse.withAlreadyUpToDate(false).withCommandOutput(Joiner.on("\n").join(lines));
-        }
+        pullResponse = DtoFactory.getInstance().createDto(PullResponse.class).withCommandOutput(Joiner.on("\n").join(lines));
         return null;
     }
 

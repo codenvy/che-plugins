@@ -20,14 +20,6 @@ import org.eclipse.che.dto.shared.DTO;
 @DTO
 public interface PullResponse {
 
-    /** Set true if nothing to pull */
-    void setAlreadyUpToDate(boolean alreadyUpToDate);
-
-    /** @return true if nothing to pull */
-    boolean isAlreadyUpToDate();
-
-    PullResponse withAlreadyUpToDate(boolean alreadyUpToDate);
-
     /** set output message */
     void setCommandOutput(String commandOutput);
 

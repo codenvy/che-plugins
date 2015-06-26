@@ -173,10 +173,8 @@ public class PullPresenter implements PullView.ActionDelegate {
                               new AsyncRequestCallback<PullResponse>(dtoUnmarshallerFactory.newUnmarshaller(PullResponse.class)) {
             @Override
             protected void onSuccess(PullResponse result) {
-                if (result.isAlreadyUpToDate()){
-                    notificationManager.showInfo(result.getCommandOutput());
-                } else {
-                    notificationManager.showInfo(constant.pullSuccess(remoteUrl));
+                notificationManager.showInfo(result.getCommandOutput());
+                if (!result.getCommandOutput().contains("Already up-to-date")){
                     refreshProject(openedEditors);
                 }
             }
