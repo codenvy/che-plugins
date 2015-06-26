@@ -13,6 +13,8 @@ package org.eclipse.che.ide.ext.git.shared;
 import org.eclipse.che.dto.shared.DTO;
 
 /**
+ * Info received from pull response
+ *
  * @author Igor Vinokur
  */
 @DTO
