@@ -12,15 +12,20 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 /**
  * Request to delete branch.
  *
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: BranchDeleteRequest.java 22811 2011-03-22 07:28:35Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface BranchDeleteRequest extends GitRequest {
     /** @return name of branch to delete */
+	@ApiModelProperty("name of the branch to delete")
     String getName();
     
     void setName(String name);
@@ -28,6 +33,7 @@ public interface BranchDeleteRequest extends GitRequest {
     BranchDeleteRequest withName(String name);
 
     /** @return if <code>true</code> then delete branch {@link #name} even if it is not fully merged */
+    @ApiModelProperty("If true then delete the branch even if it is not fully merged")
     boolean isForce();
     
     void setForce(boolean isForce);

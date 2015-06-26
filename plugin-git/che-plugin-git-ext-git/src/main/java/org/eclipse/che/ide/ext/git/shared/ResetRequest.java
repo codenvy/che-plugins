@@ -13,6 +13,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -21,6 +24,7 @@ import java.util.List;
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: ResetRequest.java 22817 2011-03-22 09:17:52Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface ResetRequest extends GitRequest {
     /** Type of reset operation. */
@@ -52,6 +56,7 @@ public interface ResetRequest extends GitRequest {
     }
 
     /** @return commit to which current head should be reset */
+    @ApiModelProperty("commit to which current head should be reset")
     String getCommit();
     
     void setCommit(String commit);
@@ -59,11 +64,13 @@ public interface ResetRequest extends GitRequest {
     ResetRequest withCommit(String commit);
 
     /** @return type of reset. */
+    @ApiModelProperty(value="Type of reset to perform", allowableValues="[MIXED, SOFT, HARD, KEEP, MERGE]")
     ResetType getType();
     
     void setType(ResetType type);
 
     /** @return files to reset the index */
+    @ApiModelProperty("List of files to reset the index")
     List<String> getFilePattern();
 
     void setFilePattern(List<String> filePattern);

@@ -12,6 +12,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -20,9 +23,11 @@ import java.util.List;
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: RemoteAddRequest.java 67651 2011-03-25 16:15:36Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface RemoteAddRequest extends GitRequest {
     /** @return remote name */
+	@ApiModelProperty("The remote name")
     String getName();
     
     void setName(String name);
@@ -30,6 +35,7 @@ public interface RemoteAddRequest extends GitRequest {
     RemoteAddRequest withName(String name);
 
     /** @return repository url */
+    @ApiModelProperty("The remote repository URL")
     String getUrl();
     
     void setUrl(String url);
@@ -37,6 +43,7 @@ public interface RemoteAddRequest extends GitRequest {
     RemoteAddRequest withUrl(String url);
 
     /** @return list of tracked branches in remote repository */
+    @ApiModelProperty("The list of tracked branches in the remote repository")
     List<String> getBranches();
     
     void setBranches(List<String> branches);

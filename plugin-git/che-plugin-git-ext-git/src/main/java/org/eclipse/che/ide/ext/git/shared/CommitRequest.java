@@ -11,6 +11,10 @@
 package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
+
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -19,9 +23,11 @@ import java.util.List;
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: CommitRequest.java 22811 2011-03-22 07:28:35Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface CommitRequest extends GitRequest {
     /** @return commit message */
+	@ApiModelProperty("the commit message")
     String getMessage();
 
     void setMessage(String message);
@@ -29,6 +35,7 @@ public interface CommitRequest extends GitRequest {
     CommitRequest withMessage(String message);
 
     /** @return <code>true</code> if need automatically stage files that have been modified and deleted */
+    @ApiModelProperty("If true then automatically stage modified and deleted files")
     boolean isAll();
 
     void setAll(boolean isAll);
@@ -36,6 +43,7 @@ public interface CommitRequest extends GitRequest {
     CommitRequest withAll(boolean all);
 
     /** @return <code>true</code> in case when commit is amending a previous commit. */
+    @ApiModelProperty("If true then ammend the previous commit")
     boolean isAmend();
 
     void setAmend(boolean isAmend);
@@ -47,6 +55,7 @@ public interface CommitRequest extends GitRequest {
      * 
      * @param files the files to commit
      */
+    @ApiModelProperty("Set the files to be commited (ignoring the index)")
     void setFiles(List<String> files);
 
     /**

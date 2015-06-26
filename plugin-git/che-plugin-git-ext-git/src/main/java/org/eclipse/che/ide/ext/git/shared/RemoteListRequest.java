@@ -12,15 +12,20 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 /**
  * Request to get list of remotes. If {@link #remote} is specified then info about this remote only given.
  *
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: RemoteListRequest.java 68015 2011-04-06 09:21:31Z anya $
  */
+@ApiModel
 @DTO
 public interface RemoteListRequest extends GitRequest {
     /** @return if <code>true</code> show remote url and name otherwise show remote name only */
+	@ApiModelProperty("True to return the remote URL, false to return only the remote name")
     boolean isVerbose();
     
     void setVerbose(boolean isVerbose);
@@ -28,6 +33,7 @@ public interface RemoteListRequest extends GitRequest {
     RemoteListRequest withVerbose(boolean verbose);
 
     /** @return remote name */
+    @ApiModelProperty("The remote name")
     String getRemote();
     
     RemoteListRequest withRemote(String remote);

@@ -12,6 +12,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,12 +25,14 @@ import java.util.List;
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: AddRequest.java 22811 2011-03-22 07:28:35Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface AddRequest extends GitRequest {
     /** Default file pattern that will be used if {@link #filepattern} is not set. All content of working tree will be added in index. */
     List<String> DEFAULT_PATTERN = new ArrayList<String>(Arrays.asList("."));
 
     /** @return files to add content from */
+    @ApiModelProperty("A list of files to add to the index")
     List<String> getFilepattern();
     
     void setFilepattern(List<String> pattern);
@@ -40,6 +45,7 @@ public interface AddRequest extends GitRequest {
      *         modified
      *         files added to the index.
      */
+    @ApiModelProperty("if true then never stage new files, only new contents of tracked files. If false then new and modified files are added to the index")
     boolean isUpdate();
     
     void setUpdate(boolean isUpdate);

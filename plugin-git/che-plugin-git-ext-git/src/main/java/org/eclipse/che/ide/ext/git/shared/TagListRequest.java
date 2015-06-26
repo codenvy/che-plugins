@@ -12,15 +12,20 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 /**
  * Request to get list of available tags.
  *
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: TagListRequest.java 22811 2011-03-22 07:28:35Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface TagListRequest extends GitRequest {
     /** @return tag's names pattern */
+	@ApiModelProperty("tag names pattern")
     String getPattern();
     
     void setPattern(String pattern);

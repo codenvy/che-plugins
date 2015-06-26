@@ -12,15 +12,20 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 /**
  * Request to checkout a branch to the working tree.
  *
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: BranchCheckoutRequest.java 21623 2011-03-17 12:14:42Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface BranchCheckoutRequest extends GitRequest {
     /** @return name of branch to checkout */
+	@ApiModelProperty("Name of branch to checkout")
     String getName();
     
     void setName(String name);
@@ -28,6 +33,7 @@ public interface BranchCheckoutRequest extends GitRequest {
     BranchCheckoutRequest withName(String name);
 
     /** @return name of a commit at which to start the new branch. If <code>null</code> the HEAD will be used */
+    @ApiModelProperty("name of a commit at which to start the new branch. If <code>null</code> the HEAD will be used")
     String getStartPoint();
     
     void setStartPoint(String startPoint);
@@ -39,6 +45,7 @@ public interface BranchCheckoutRequest extends GitRequest {
      *         {@link #startPoint} is not set. If <code>false</code> and there is no branch with name {@link #name} corresponding exception
      *         will be thrown
      */
+    @ApiModelProperty("If true then create a new branch and start it at the provided startPoint")
     boolean isCreateNew();
     
     void setCreateNew(boolean isCreateNew);

@@ -12,6 +12,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -20,9 +23,11 @@ import java.util.List;
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: RmRequest.java 22817 2011-03-22 09:17:52Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface RmRequest extends GitRequest {
     /** @return files to remove */
+	@ApiModelProperty("List of items to remove")
     List<String> getItems();
     
     void setItems(List<String> items);
@@ -30,12 +35,14 @@ public interface RmRequest extends GitRequest {
     RmRequest withItems(List<String> items);
 
     /** @return is RmRequest represents remove from index only */
+    @ApiModelProperty("If true, remove only from the index")
     boolean isCached();
     
     void setCached(boolean isCached);
     
     RmRequest withCached(boolean cached);
 
+    @ApiModelProperty("if true, apply recursively")
     boolean isRecursively();
 
     void setRecursively(boolean isRecursively);

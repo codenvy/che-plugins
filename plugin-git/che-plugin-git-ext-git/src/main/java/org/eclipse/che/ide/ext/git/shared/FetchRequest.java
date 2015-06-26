@@ -12,6 +12,9 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -20,9 +23,11 @@ import java.util.List;
  * @author <a href="mailto:andrey.parfonov@exoplatform.com">Andrey Parfonov</a>
  * @version $Id: FetchRequest.java 22817 2011-03-22 09:17:52Z andrew00x $
  */
+@ApiModel
 @DTO
 public interface FetchRequest extends GitRequest {
     /** @return list of refspec to fetch */
+	@ApiModelProperty("list of refspec to fetch")
     List<String> getRefSpec();
     
     void setRefSpec(List<String> refSpec);
@@ -30,6 +35,7 @@ public interface FetchRequest extends GitRequest {
     FetchRequest withRefSpec(List<String> refSpec);
 
     /** @return remote name. If <code>null</code> then 'origin' will be used */
+    @ApiModelProperty("The remote name to fetch. If null then origin will be used")
     String getRemote();
     
     void setRemote(String remote);
@@ -37,6 +43,7 @@ public interface FetchRequest extends GitRequest {
     FetchRequest withRemote(String remote);
 
     /** @return <code>true</code> if local refs must be deleted if they deleted in remote repository and <code>false</code> otherwise */
+    @ApiModelProperty("if true then local refs must be deleted if they are deleted in the remote repository")
     boolean isRemoveDeletedRefs();
     
     void setRemoveDeletedRefs(boolean isRemoveDeletedRefs);
@@ -44,6 +51,7 @@ public interface FetchRequest extends GitRequest {
     FetchRequest withRemoveDeletedRefs(boolean isRemoveDeletedRefs);
 
     /** @return time (in seconds) to wait without data transfer occurring before aborting fetching data from remote repository */
+    @ApiModelProperty("Time in seconds to wait without data transfer occurring before aborting fetching data from remote repository")
     int getTimeout();
     
     void setTimeout(int timeout);

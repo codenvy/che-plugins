@@ -12,20 +12,26 @@ package org.eclipse.che.ide.ext.git.shared;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
  *
  */
+@ApiModel
 @DTO
 public interface ConfigRequest {
 
+	@ApiModelProperty("True to get all configuration keys")
     boolean isGetAll();
 
     void setGetAll(boolean geAll);
 
     ConfigRequest withGetAll(boolean geAll);
 
+    @ApiModelProperty("List of all configuration entries to get")
     List<String> getConfigEntry();
 
     void setConfigEntry(List<String> configEntry);
