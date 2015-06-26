@@ -22,6 +22,7 @@ import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.RunnerResources;
 import org.eclipse.che.ide.ext.runner.client.manager.RunnerManager;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
+import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -31,12 +32,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Map;
 
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_200;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_200;
 
 /**
  * @author Dmitry Shnurenko
@@ -91,7 +93,7 @@ public class RunActionTest {
 
         verify(eventLogger).log(action);
         verify(runnerManager, never()).launchRunner();
-        verify(runnerManager, never()).launchRunner(Matchers.<RunOptions>any(), anyString());
+        verify(runnerManager, never()).launchRunner(Matchers.<RunOptions>any(), Matchers.<Scope>any(),anyString());
     }
 
     @Test
@@ -136,6 +138,7 @@ public class RunActionTest {
     @Test
     public void actionShouldBeLaunchCustomEnvironment() throws Exception {
         when(chooseRunnerAction.selectEnvironment()).thenReturn(environment);
+        when(environment.getScope()).thenReturn(SYSTEM);
         when(appContext.getCurrentProject()).thenReturn(currentProject);
         when(currentProject.getRunner()).thenReturn(SOME_STRING + SOME_STRING);
 
@@ -162,7 +165,7 @@ public class RunActionTest {
         verify(runOptions).withMemorySize(MB_200.getValue());
 
         verify(runOptions).withOptions(Matchers.<Map<String, String>>any());
-        verify(runnerManager).launchRunner(runOptions, SOME_STRING);
+        verify(runnerManager).launchRunner(runOptions, SYSTEM, SOME_STRING);
     }
 
     @Test

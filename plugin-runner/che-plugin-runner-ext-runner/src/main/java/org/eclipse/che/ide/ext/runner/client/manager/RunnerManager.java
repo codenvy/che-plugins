@@ -10,10 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.manager;
 
+import com.google.inject.ImplementedBy;
+
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
-
-import com.google.inject.ImplementedBy;
+import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 
 import javax.annotation.Nonnull;
 
@@ -50,12 +51,14 @@ public interface RunnerManager {
      *
      * @param environmentName
      *         name of custom configuration
+     * @param scope
+     *         scope value of current environment
      * @param runOptions
      *         configuration of the runner
      * @return new instance of the runner
      */
     @Nonnull
-    Runner launchRunner(@Nonnull RunOptions runOptions, @Nonnull String environmentName);
+    Runner launchRunner(@Nonnull RunOptions runOptions, @Nonnull Scope scope, @Nonnull String environmentName);
 
     /**
      * Stops launch and run actions.

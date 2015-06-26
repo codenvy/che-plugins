@@ -86,7 +86,7 @@ public class RunAction extends AbstractRunnerActions {
                                                   .withEnvironmentId(environment.getId())
                                                   .withMemorySize(environment.getRam());
 
-                runnerManager.launchRunner(runOptions, environment.getName());
+                runnerManager.launchRunner(runOptions, environment.getScope(), environment.getName());
             }
     }
 }

@@ -45,6 +45,7 @@ import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.FAILED;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.IN_QUEUE;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.RUNNING;
 import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.STOPPED;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
 
 /**
  * The class contains methods which allows change settings of runner. By default runner has scope System,
@@ -86,7 +87,7 @@ public class RunnerImpl implements Runner {
                       @Nonnull RunnerCounter runnerCounter,
                       @Nonnull GetEnvironmentsUtil util,
                       @Nonnull @Assisted RunOptions runOptions) {
-        this(locale, runnerCounter, util, runOptions, null);
+        this(locale, runnerCounter, util, runOptions, SYSTEM, null);
     }
 
     /**
@@ -107,6 +108,7 @@ public class RunnerImpl implements Runner {
                       @Nonnull RunnerCounter runnerCounter,
                       @Nonnull GetEnvironmentsUtil util,
                       @Nonnull @Assisted RunOptions runOptions,
+                      @Nonnull @Assisted Scope environmentScope,
                       @Nullable @Assisted String environmentName) {
         this.runOptions = runOptions;
         this.ram = runOptions.getMemorySize();
@@ -115,7 +117,7 @@ public class RunnerImpl implements Runner {
                      (environmentName == null ? "" : " - " + getCorrectName(environmentName));
         this.activeTab = locale.runnerTabConsole();
         this.status = IN_QUEUE;
-        this.scope = Scope.SYSTEM;
+        this.scope = environmentScope;
 
         creationTime = System.currentTimeMillis();
 

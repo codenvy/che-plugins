@@ -58,6 +58,7 @@ import org.eclipse.che.ide.ext.runner.client.tabs.container.PanelLocation;
 import org.eclipse.che.ide.ext.runner.client.tabs.container.TabContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.history.HistoryPanel;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.container.PropertiesContainer;
+import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.TemplatesContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.terminal.container.TerminalContainer;
 import org.eclipse.che.ide.ext.runner.client.util.EnvironmentIdValidator;
@@ -430,7 +431,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
                                               .withEnvironmentId(selectedEnvironment.getId())
                                               .withMemorySize(selectedEnvironment.getRam());
 
-            Runner runner = modelsFactory.createRunner(runOptions, selectedEnvironment.getName());
+            Runner runner = modelsFactory.createRunner(runOptions, selectedEnvironment.getScope(), selectedEnvironment.getName());
 
             if (PROJECT.equals(selectedEnvironment.getScope())) {
                 runner.setScope(PROJECT);
@@ -571,7 +572,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
             runOptions = runOptions.withOptions(environment.getOptions())
                                    .withMemorySize(environment.getRam())
                                    .withEnvironmentId(environment.getId());
-            Runner runner = modelsFactory.createRunner(runOptions, environment.getName());
+            Runner runner = modelsFactory.createRunner(runOptions, environment.getScope(), environment.getName());
             if (environment.getId().startsWith(PROJECT_PREFIX)) {
                 runner.setScope(PROJECT);
             }
@@ -595,8 +596,8 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     /** {@inheritDoc} */
     @Override
     @Nonnull
-    public Runner launchRunner(@Nonnull RunOptions runOptions, @Nonnull String environmentName) {
-        return launchRunner(modelsFactory.createRunner(runOptions, environmentName));
+    public Runner launchRunner(@Nonnull RunOptions runOptions, @Nonnull Scope scope, @Nonnull String environmentName) {
+        return launchRunner(modelsFactory.createRunner(runOptions, scope, environmentName));
     }
 
     @Nonnull

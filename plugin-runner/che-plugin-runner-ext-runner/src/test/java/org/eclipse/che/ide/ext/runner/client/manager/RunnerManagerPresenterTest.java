@@ -55,6 +55,7 @@ import org.eclipse.che.ide.ext.runner.client.tabs.container.TabContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.container.tab.TabType;
 import org.eclipse.che.ide.ext.runner.client.tabs.history.HistoryPanel;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.container.PropertiesContainer;
+import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.TemplatesContainer;
 import org.eclipse.che.ide.ext.runner.client.tabs.terminal.container.TerminalContainer;
 import org.eclipse.che.ide.ext.runner.client.util.RunnerUtil;
@@ -89,6 +90,7 @@ import static org.eclipse.che.ide.ext.runner.client.tabs.container.tab.TabType.L
 import static org.eclipse.che.ide.ext.runner.client.tabs.container.tab.TabType.RIGHT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.DEFAULT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.PROJECT;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -502,7 +504,7 @@ public class RunnerManagerPresenterTest {
         when(panelState.getState()).thenReturn(TEMPLATE);
         when(runnerEnvironment.getScope()).thenReturn(PROJECT);
         when(selectionManager.getEnvironment()).thenReturn(runnerEnvironment);
-        when(modelsFactory.createRunner(eq(runOptions), anyString())).thenReturn(runner);
+        when(modelsFactory.createRunner(eq(runOptions), (Scope)any(), anyString())).thenReturn(runner);
 
         presenter.onSelectionChanged(ENVIRONMENT);
 
@@ -928,12 +930,13 @@ public class RunnerManagerPresenterTest {
         when(runOptions.withMemorySize(RAM_SIZE)).thenReturn(runOptions);
         when(runActionPermit.isAllowed()).thenReturn(true);
         when(chooseRunnerAction.selectEnvironment()).thenReturn(runnerEnvironment);
+        when(runnerEnvironment.getScope()).thenReturn(SYSTEM);
         when(runnerEnvironment.getId()).thenReturn(TEXT);
         Map<String, String> options = Collections.emptyMap();
         when(runnerEnvironment.getOptions()).thenReturn(options);
         when(runnerEnvironment.getRam()).thenReturn(2);
         when(runnerEnvironment.getName()).thenReturn(TEXT);
-        when(modelsFactory.createRunner(runOptions, TEXT)).thenReturn(runner);
+        when(modelsFactory.createRunner(runOptions, SYSTEM, TEXT)).thenReturn(runner);
 
         presenter.addRunner(processDescriptor);
         reset(view, history);
@@ -983,6 +986,7 @@ public class RunnerManagerPresenterTest {
     public void newRunnerShouldBeRunIfPanelStateIsTemplate() {
         Map<String, String> options = new HashMap<>();
         when(selectionManager.getEnvironment()).thenReturn(runnerEnvironment);
+        when(runnerEnvironment.getScope()).thenReturn(SYSTEM);
         when(runnerEnvironment.getRam()).thenReturn(RAM_SIZE);
         when(runnerEnvironment.getOptions()).thenReturn(options);
         when(runnerEnvironment.getName()).thenReturn(TEXT);
@@ -990,7 +994,7 @@ public class RunnerManagerPresenterTest {
         when(runOptions.withOptions(options)).thenReturn(runOptions);
         when(runOptions.withEnvironmentId(TEXT)).thenReturn(runOptions);
         when(runOptions.withMemorySize(RAM_SIZE)).thenReturn(runOptions);
-        when(modelsFactory.createRunner(runOptions, TEXT)).thenReturn(runner);
+        when(modelsFactory.createRunner(runOptions, SYSTEM, TEXT)).thenReturn(runner);
         when(panelState.getState()).thenReturn(TEMPLATE);
         when(runActionPermit.isAllowed()).thenReturn(true);
 
@@ -1005,7 +1009,7 @@ public class RunnerManagerPresenterTest {
         verify(runOptions).withOptions(options);
         verify(runOptions).withEnvironmentId(TEXT);
         verify(runOptions).withMemorySize(RAM_SIZE);
-        verify(modelsFactory).createRunner(runOptions, TEXT);
+        verify(modelsFactory).createRunner(runOptions, SYSTEM, TEXT);
 
         //verify launch runner
         verify(panelState).setState(RUNNERS);
@@ -1060,6 +1064,7 @@ public class RunnerManagerPresenterTest {
     public void runnerShouldBeRunIfRunnerNotNullAndStatusIsTemplate() {
         Map<String, String> options = new HashMap<>();
         when(selectionManager.getEnvironment()).thenReturn(runnerEnvironment);
+        when(runnerEnvironment.getScope()).thenReturn(SYSTEM);
         when(runnerEnvironment.getRam()).thenReturn(RAM_SIZE);
         when(runnerEnvironment.getOptions()).thenReturn(options);
         when(runnerEnvironment.getName()).thenReturn(TEXT);
@@ -1067,7 +1072,7 @@ public class RunnerManagerPresenterTest {
         when(runOptions.withOptions(options)).thenReturn(runOptions);
         when(runOptions.withEnvironmentId(TEXT)).thenReturn(runOptions);
         when(runOptions.withMemorySize(RAM_SIZE)).thenReturn(runOptions);
-        when(modelsFactory.createRunner(runOptions, TEXT)).thenReturn(runner);
+        when(modelsFactory.createRunner(runOptions, SYSTEM, TEXT)).thenReturn(runner);
         when(panelState.getState()).thenReturn(TEMPLATE);
         when(runActionPermit.isAllowed()).thenReturn(true);
 
@@ -1084,7 +1089,7 @@ public class RunnerManagerPresenterTest {
         verify(runOptions).withOptions(options);
         verify(runOptions).withEnvironmentId(TEXT);
         verify(runOptions).withMemorySize(RAM_SIZE);
-        verify(modelsFactory).createRunner(runOptions, TEXT);
+        verify(modelsFactory).createRunner(runOptions, SYSTEM, TEXT);
 
         //verify launch runner
         verify(panelState, times(2)).setState(RUNNERS);
@@ -1156,10 +1161,10 @@ public class RunnerManagerPresenterTest {
 
     @Test
     public void shouldCreateAndLaunchRunnerFromRunOptionsAndEnvironmentName() {
-        when(modelsFactory.createRunner(runOptions, TEXT)).thenReturn(runner);
-        presenter.launchRunner(runOptions, TEXT);
+        when(modelsFactory.createRunner(runOptions, SYSTEM, TEXT)).thenReturn(runner);
+        presenter.launchRunner(runOptions, SYSTEM, TEXT);
 
-        verify(modelsFactory).createRunner(runOptions, TEXT);
+        verify(modelsFactory).createRunner(runOptions, SYSTEM, TEXT);
     }
 
     @Test
@@ -1341,7 +1346,7 @@ public class RunnerManagerPresenterTest {
         verify(dtoFactory).createDto(RunOptions.class);
         verify(runOptions).withSkipBuild(true);
         verify(runOptions).withMemorySize(DEFAULT.getValue());
-        verify(modelsFactory,times(2)).createRunner(runOptions);
+        verify(modelsFactory, times(2)).createRunner(runOptions);
 
         //verify launch runner
         verify(panelState).setState(RUNNERS);

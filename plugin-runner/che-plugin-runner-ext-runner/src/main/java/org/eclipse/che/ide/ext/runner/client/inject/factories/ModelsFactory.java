@@ -44,12 +44,14 @@ public interface ModelsFactory {
      *
      * @param runOptions
      *         options which needs to be used
+     * @param scope
+     *         scope value of current environment
      * @param environmentName
      *         additional part of name for runner
      * @return an instance of {@link Runner}
      */
     @Nonnull
-    Runner createRunner(@Nonnull RunOptions runOptions, @Nullable String environmentName);
+    Runner createRunner(@Nonnull RunOptions runOptions, @Nonnull Scope scope, @Nullable String environmentName);
 
     /**
      * Creates environments with environment and scope.

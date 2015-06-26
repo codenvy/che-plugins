@@ -55,6 +55,10 @@ public class CMKeymapOverlay extends JavaScriptObject {
         this[keySpec] = commandName;
     }-*/;
 
+    public final native void removeBinding(String keySpec) /*-{
+        delete this[keySpec];
+    }-*/;
+
     public final Type getType(final String key) {
         if (isCommandName(key)) {
             return Type.COMMAND_NAME;

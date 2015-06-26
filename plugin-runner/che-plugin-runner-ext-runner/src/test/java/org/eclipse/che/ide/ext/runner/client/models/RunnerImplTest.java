@@ -45,6 +45,7 @@ import static org.eclipse.che.api.runner.internal.Constants.LINK_REL_WEB_URL;
 import static org.eclipse.che.ide.ext.runner.client.models.RunnerImpl.DATE_TIME_FORMAT;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_1000;
 import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM.MB_2000;
+import static org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope.SYSTEM;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -148,7 +149,7 @@ public class RunnerImplTest {
         when(runOptions.getEnvironmentId()).thenReturn(TEXT);
         initConstructorParameter();
 
-        runner = new RunnerImpl(locale, runnerCounter, util, runOptions, TEXT);
+        runner = new RunnerImpl(locale, runnerCounter, util, runOptions, SYSTEM, TEXT);
 
         verifySomeActionInConstructor();
         assertThat(runner.getTitle(), is(RUNNER_NAME + RUNNER_NUMBER + " - tomcat"));
@@ -160,7 +161,7 @@ public class RunnerImplTest {
         when(runOptions.getEnvironmentId()).thenReturn(TEXT);
         initConstructorParameter();
 
-        runner = new RunnerImpl(locale, runnerCounter, util, runOptions, null);
+        runner = new RunnerImpl(locale, runnerCounter, util, runOptions, SYSTEM, null);
 
         shouldVerifyFirstConstructor();
     }
@@ -564,7 +565,7 @@ public class RunnerImplTest {
     }
 
     @Test
-    public void equalsShouldReturnFalseForRunnerObjectsWithSameTitleButDifferentCreationTime() throws Exception{
+    public void equalsShouldReturnFalseForRunnerObjectsWithSameTitleButDifferentCreationTime() throws Exception {
         runner.setTitle(TEXT);
         Thread.sleep(1000);
 
@@ -983,7 +984,7 @@ public class RunnerImplTest {
 
     @Test
     public void scopeShouldBeChanged() {
-        assertThat(runner.getScope(), is(Scope.SYSTEM));
+        assertThat(runner.getScope(), is(SYSTEM));
 
         runner.setScope(Scope.PROJECT);
 
@@ -995,7 +996,7 @@ public class RunnerImplTest {
         reset(util);
         when(runOptions.getEnvironmentId()).thenReturn(TEXT);
 
-        runner = new RunnerImpl(locale, runnerCounter, util, runOptions, TEXT);
+        runner = new RunnerImpl(locale, runnerCounter, util, runOptions, SYSTEM, TEXT);
 
         verify(util).getCorrectCategoryName(TEXT);
         verify(util, never()).getType();
