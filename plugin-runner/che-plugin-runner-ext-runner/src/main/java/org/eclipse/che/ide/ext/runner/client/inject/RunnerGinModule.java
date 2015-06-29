@@ -12,13 +12,11 @@ package org.eclipse.che.ide.ext.runner.client.inject;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
-import com.google.gwt.inject.client.multibindings.GinMultibinder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
-import org.eclipse.che.ide.api.preferences.PreferencePagePresenter;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.HandlerFactory;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.ModelsFactory;
 import org.eclipse.che.ide.ext.runner.client.inject.factories.RunnerActionFactory;
@@ -31,7 +29,6 @@ import org.eclipse.che.ide.ext.runner.client.manager.menu.MenuWidget;
 import org.eclipse.che.ide.ext.runner.client.manager.menu.MenuWidgetImpl;
 import org.eclipse.che.ide.ext.runner.client.manager.menu.entry.MenuEntry;
 import org.eclipse.che.ide.ext.runner.client.manager.menu.entry.MenuEntryWidget;
-import org.eclipse.che.ide.ext.runner.client.manager.preferences.RunnerPreferencesPresenter;
 import org.eclipse.che.ide.ext.runner.client.models.Environment;
 import org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
@@ -97,9 +94,6 @@ public class RunnerGinModule extends AbstractGinModule {
                                              .implement(MenuWidget.class, MenuWidgetImpl.class)
                                              .implement(MenuEntry.class, MenuEntryWidget.class)
                                              .build(WidgetFactory.class));
-
-        GinMultibinder<PreferencePagePresenter> prefBinder = GinMultibinder.newSetBinder(binder(), PreferencePagePresenter.class);
-        prefBinder.addBinding().to(RunnerPreferencesPresenter.class);
     }
 
     /** Provides project-relative path to the folder for project-scoped runner environments. */
