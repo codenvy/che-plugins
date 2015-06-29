@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.pull;
 
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.web.bindery.event.shared.Event;
-import com.googlecode.gwt.test.utils.GwtReflectionUtils;
-
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
@@ -28,7 +24,10 @@ import org.eclipse.che.ide.ext.git.shared.Branch;
 import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.junit.Ignore;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.web.bindery.event.shared.Event;
+import com.googlecode.gwt.test.utils.GwtReflectionUtils;
+
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -268,9 +267,10 @@ public class PullPresenterTest extends BaseTest {
         verify(view).setEnablePullButton(eq(DISABLE_BUTTON));
     }
 
-    @Ignore
     @Test
     public void testOnPullClickedWhenPullRequestIsSuccessful() throws Exception {
+        when(pullResponse.getCommandOutput()).thenReturn("Something pulled");
+
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -291,7 +291,6 @@ public class PullPresenterTest extends BaseTest {
         verify(editorAgent).getOpenedEditors();
         verify(service).pull(eq(rootProjectDescriptor), anyString(), eq(REPOSITORY_NAME), (AsyncRequestCallback)anyObject());
         verify(notificationManager).showInfo(anyString());
-        verify(constant).pullSuccess(eq(REMOTE_URI));
         verify(appContext).getCurrentProject();
         verify(eventBus, times(2)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
         verify(partPresenter).getEditorInput();
@@ -347,10 +346,8 @@ public class PullPresenterTest extends BaseTest {
         verify(partPresenter).getEditorInput();
     }
 
-    @Ignore
     @Test
     public void testOnPullClickedWhenAlreadyUpToDateHappenedAndRefreshProjectIsNotCalled() throws Exception {
-        //when(pullResponse.isAlreadyUpToDate()).thenReturn(true);
         when(pullResponse.getCommandOutput()).thenReturn("Already up-to-date");
 
         doAnswer(new Answer() {
@@ -373,10 +370,9 @@ public class PullPresenterTest extends BaseTest {
         verify(eventBus, never()).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
     }
 
-    @Ignore
     @Test
     public void testOnPullClickedWhenPullHappenedAndRefreshProjectIsCalled() throws Exception {
-        //when(pullResponse.isAlreadyUpToDate()).thenReturn(false);
+        when(pullResponse.getCommandOutput()).thenReturn("Something pulled");
 
         doAnswer(new Answer() {
             @Override
@@ -394,7 +390,7 @@ public class PullPresenterTest extends BaseTest {
 
         verify(view).close();
         verify(notificationManager).showInfo(anyString());
-        verify(constant).pullSuccess(eq(REMOTE_URI));
+        verify(pullResponse, times(2)).getCommandOutput();
         verify(eventBus, times(2)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
     }
 

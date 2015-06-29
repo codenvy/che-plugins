@@ -10,11 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.push;
 
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.web.bindery.event.shared.Event;
-import com.googlecode.gwt.test.utils.GwtReflectionUtils;
-
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
@@ -23,19 +18,17 @@ import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.BranchFilterByRemote;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.ext.git.shared.Branch;
-import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import org.eclipse.che.ide.ext.git.shared.PushResponse;
 import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.junit.Ignore;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.googlecode.gwt.test.utils.GwtReflectionUtils;
+
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -46,9 +39,7 @@ import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -297,7 +288,6 @@ public class PushToRemotePresenterTest extends BaseTest {
                              (AsyncRequestCallback<PushResponse>)anyObject());
         verify(view).close();
         verify(notificationManager).showInfo(anyString());
-        //verify(constant).pushSuccess(eq(REPOSITORY_NAME));
     }
 
     @Test
@@ -403,43 +393,5 @@ public class PushToRemotePresenterTest extends BaseTest {
         verify(view).showDialog();
         verify(view).setRemoteBranches((Array<String>)anyObject());
         verify(view).setLocalBranches((Array<String>)anyObject());
-    }
-
-    @Ignore
-    @Test
-    public void testOnPushClickedWhenEverythingUpToDateHappened() throws Exception {
-        //when(pushResponse.isEverythingUpToDate()).thenReturn(true);
-        when(pushResponse.getCommandOutput()).thenReturn("Everything up-to-date");
-
-        presenter.showDialog();
-        presenter.onPushClicked();
-
-        verify(service).push((ProjectDescriptor)anyObject(), anyListOf(String.class), anyString(), anyBoolean(),
-                             asyncCallbackVoidCaptor.capture());
-        AsyncRequestCallback<PushResponse> voidCallback = asyncCallbackVoidCaptor.getValue();
-        Method onSuccess = GwtReflectionUtils.getMethod(voidCallback.getClass(), "onSuccess");
-        onSuccess.invoke(voidCallback, pushResponse);
-
-        verify(view).close();
-        verify(notificationManager).showInfo("Everything up-to-date");
-    }
-
-    @Ignore
-    @Test
-    public void testOnPushClickedWhenPushHappened() throws Exception {
-        //when(pushResponse.isEverythingUpToDate()).thenReturn(false);
-
-        presenter.showDialog();
-        presenter.onPushClicked();
-
-        verify(service).push((ProjectDescriptor)anyObject(), anyListOf(String.class), anyString(), anyBoolean(),
-                             asyncCallbackVoidCaptor.capture());
-        AsyncRequestCallback<PushResponse> voidCallback = asyncCallbackVoidCaptor.getValue();
-        Method onSuccess = GwtReflectionUtils.getMethod(voidCallback.getClass(), "onSuccess");
-        onSuccess.invoke(voidCallback, pushResponse);
-
-        verify(view).close();
-        verify(notificationManager).showInfo(anyString());
-        verify(constant).pushSuccess(eq(REPOSITORY_NAME));
     }
 }
