@@ -371,30 +371,6 @@ public class PullPresenterTest extends BaseTest {
     }
 
     @Test
-    public void testOnPullClickedWhenPullHappenedAndRefreshProjectIsCalled() throws Exception {
-        when(pullResponse.getCommandOutput()).thenReturn("Something pulled");
-
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                Object[] arguments = invocation.getArguments();
-                AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[3];
-                Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
-                onSuccess.invoke(callback, pullResponse);
-                return callback;
-            }
-        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResponse>)anyObject());
-
-        presenter.showDialog();
-        presenter.onPullClicked();
-
-        verify(view).close();
-        verify(notificationManager).showInfo(anyString());
-        verify(pullResponse, times(2)).getCommandOutput();
-        verify(eventBus, times(2)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
-    }
-
-    @Test
     public void testOnCancelClicked() throws Exception {
         presenter.onCancelClicked();
 
