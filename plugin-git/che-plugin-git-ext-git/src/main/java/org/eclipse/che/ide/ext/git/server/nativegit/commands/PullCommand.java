@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.git.server.nativegit.commands;
 
 import com.google.common.base.Joiner;
 
-import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.ide.ext.git.server.GitException;
 import org.eclipse.che.ide.ext.git.shared.GitUser;
 import org.eclipse.che.ide.ext.git.shared.PullResponse;
@@ -20,6 +19,8 @@ import org.eclipse.che.ide.ext.git.shared.PullResponse;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.eclipse.che.dto.server.DtoFactory.newDto;
 
 /**
  * Fetch from and merge with another repository
@@ -58,7 +59,7 @@ public class PullCommand extends GitCommand<Void> {
             setCommandEnvironment(environment);
         }
         start();
-        pullResponse = DtoFactory.getInstance().createDto(PullResponse.class).withCommandOutput(Joiner.on("\n").join(lines));
+        pullResponse = newDto(PullResponse.class).withCommandOutput(Joiner.on("\n").join(lines));
         return null;
     }
 
