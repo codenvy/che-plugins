@@ -89,7 +89,7 @@ public class VFSPermissionsFilterTest {
         path.set(filter, "/");
 
         when((request).getRequestURL())
-                .thenReturn(new StringBuffer("http://host.com/git/").append(WORKSPACE).append("/testProject"));
+                .thenReturn(new StringBuffer("http://host.com/git-server/").append(WORKSPACE).append("/testProject"));
     }
 
     //

@@ -77,7 +77,7 @@ public class VFSPermissionsFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest)request;
         int tokenPlace;
-        String lastTokenBeforePath = "/git/";
+        String lastTokenBeforePath = "/git-server/";
         if ((tokenPlace = req.getRequestURL().indexOf(lastTokenBeforePath)) != -1) {
             //get path to project
             String url = req.getRequestURL().substring(tokenPlace + lastTokenBeforePath.length());
