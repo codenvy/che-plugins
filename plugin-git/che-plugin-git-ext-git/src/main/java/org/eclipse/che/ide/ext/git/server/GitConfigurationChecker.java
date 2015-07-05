@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.server;
 
+import org.eclipse.che.api.project.server.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ import java.util.Set;
  *
  * Here we check that we have correct setting for git ignore.
  * Must be ignored files :
- *    .codenvy/misc.xml
+ *    .che/misc.xml
  *    .vfs/
  * like system files for Codenvy
  *
@@ -55,9 +56,9 @@ public class GitConfigurationChecker {
         GLOBAL_GITCONFIG_FILE_PATH = Paths.get(System.getProperty("user.home") + "/.gitconfig");
         DEFAULT_GITIGNORE_FILE_PATH = Paths.get(System.getProperty("user.home") + "/.gitignore_codenvy");
 
-        DEPRECATED_GITIGNORE_PATTERNS.add(".codenvy/");
+        DEPRECATED_GITIGNORE_PATTERNS.add(Constants.CODENVY_DIR+"/");
 
-        GITIGNORE_PATTERNS.add(".codenvy/misc.xml");
+        GITIGNORE_PATTERNS.add(Constants.CODENVY_DIR+"/misc.xml");
         GITIGNORE_PATTERNS.add(".vfs/");
     }
 
@@ -66,9 +67,9 @@ public class GitConfigurationChecker {
         GLOBAL_GITCONFIG_FILE_PATH = globalGitconfigFilePath;
         DEFAULT_GITIGNORE_FILE_PATH = gitIgnoreFilePath;
 
-        DEPRECATED_GITIGNORE_PATTERNS.add(".codenvy/");
+        DEPRECATED_GITIGNORE_PATTERNS.add(Constants.CODENVY_DIR+"/");
 
-        GITIGNORE_PATTERNS.add(".codenvy/misc.xml");
+        GITIGNORE_PATTERNS.add(Constants.CODENVY_DIR+"/misc.xml");
         GITIGNORE_PATTERNS.add(".vfs/");
     }
 
