@@ -16,14 +16,15 @@
     <parent>
         <artifactId>maven-depmgt-pom</artifactId>
         <groupId>org.eclipse.che.depmgt</groupId>
-        <version>3.10.3-SNAPSHOT</version>
+        <version>3.11.0-SNAPSHOT</version>
     </parent>
     <groupId>org.eclipse.che.plugin</groupId>
     <artifactId>che-plugin-parent</artifactId>
-    <version>3.10.3-SNAPSHOT</version>
+    <version>3.11.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Che Plugin :: Parent</name>
     <modules>
+        <module>plugin-help</module>
         <module>plugin-builder</module>
         <module>plugin-runner</module>
         <module>plugin-web</module>

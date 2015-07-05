@@ -19,6 +19,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+import org.eclipse.che.ide.api.notification.Notification;
+import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.ext.java.jdi.client.JavaRuntimeLocalizationConstant;
 import org.eclipse.che.ide.ext.java.jdi.client.JavaRuntimeResources;
 import org.eclipse.che.ide.ui.dialogs.CancelCallback;
@@ -27,6 +29,8 @@ import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.ui.dialogs.confirm.ConfirmDialog;
 
 import javax.annotation.Nonnull;
+
+import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 
 /**
  * @author Dmitry Shnurenko
@@ -54,7 +58,10 @@ public class RemoteDebugViewImpl extends Composite implements RemoteDebugView {
     private final ConfirmDialog dialog;
 
     @Inject
-    public RemoteDebugViewImpl(JavaRuntimeLocalizationConstant locale, JavaRuntimeResources resources, DialogFactory dialogFactory) {
+    public RemoteDebugViewImpl(JavaRuntimeLocalizationConstant locale,
+                               JavaRuntimeResources resources,
+                               DialogFactory dialogFactory,
+                               final NotificationManager notificationManager) {
         this.locale = locale;
         this.resources = resources;
 
@@ -63,7 +70,14 @@ public class RemoteDebugViewImpl extends Composite implements RemoteDebugView {
         ConfirmCallback confirmCallback = new ConfirmCallback() {
             @Override
             public void accepted() {
-                delegate.onConfirmClicked(host.getText(), Integer.parseInt(port.getText()));
+                try {
+                    delegate.onConfirmClicked(host.getText(), Integer.parseInt(port.getText()));
+                } catch (NumberFormatException exception) {
+                    dialog.show();
+
+                    Notification notification = new Notification(port.getText() + " is bad value of port", ERROR);
+                    notificationManager.showNotification(notification);
+                }
             }
         };
 

@@ -15,12 +15,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.regex.Pattern;
-
-import org.eclipse.che.ide.ext.svn.server.SubversionException;
-import org.eclipse.che.ide.ext.svn.server.SubversionProjectImporter;
-import org.eclipse.che.ide.ext.svn.server.SubversionProjectType;
-import org.eclipse.che.ide.ext.svn.server.SubversionValueProviderFactory;
 import org.eclipse.che.ide.ext.svn.server.credentials.CredentialsProvider;
 import org.eclipse.che.ide.ext.svn.server.repository.RepositoryUrlProvider;
 import org.eclipse.che.ide.ext.svn.server.rest.SubversionService;
@@ -37,7 +33,6 @@ import org.eclipse.che.api.project.server.ValueProviderFactory;
 import org.eclipse.che.api.project.server.type.ProjectType;
 import org.eclipse.che.api.user.server.dao.UserProfileDao;
 import org.eclipse.che.api.vfs.server.VirtualFileSystem;
-import org.eclipse.che.dto.server.DtoFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -58,8 +53,6 @@ public class SubversionProjectImporterTest {
     private File repoRoot;
     private VirtualFileSystem vfs;
     private SubversionProjectImporter projectImporter;
-
-    private DtoFactory dtoFactory = DtoFactory.getInstance();
 
     @Before
     public void setUp() throws Exception {
@@ -143,8 +136,8 @@ public class SubversionProjectImporterTest {
                                                     vfs.getMountPoint().getRoot().createFolder("project"));
 
         try {
-            projectImporter.importSources(project, "file://" + repoRoot.getAbsolutePath() + "/fake", null,
-                                          new TestUtils.SystemOutLineConsumerFactory());
+            String fakeUrl = Paths.get(repoRoot.getAbsolutePath()).toUri() + "fake";
+            projectImporter.importSources(project, fakeUrl, null, new TestUtils.SystemOutLineConsumerFactory());
 
             fail("The code above should had failed");
         } catch (SubversionException e) {
@@ -166,8 +159,8 @@ public class SubversionProjectImporterTest {
         final FolderEntry project = new FolderEntry("plugin-svn-test",
                                                     vfs.getMountPoint().getRoot().createFolder("project"));
 
-        projectImporter.importSources(project, "file://" + repoRoot.getAbsolutePath(), null,
-                                      new TestUtils.SystemOutLineConsumerFactory());
+        String repoUrl = Paths.get(repoRoot.getAbsolutePath()).toUri().toString();
+        projectImporter.importSources(project, repoUrl, null, new TestUtils.SystemOutLineConsumerFactory());
 
         assertTrue(project.getChild(".svn").isFolder());
         assertTrue(project.getChild("A").isFolder());

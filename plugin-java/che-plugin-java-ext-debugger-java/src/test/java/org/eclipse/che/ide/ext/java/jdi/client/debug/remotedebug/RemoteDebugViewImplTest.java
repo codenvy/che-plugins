@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.java.jdi.client.debug.remotedebug;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.ext.java.jdi.client.JavaRuntimeLocalizationConstant;
 import org.eclipse.che.ide.ext.java.jdi.client.JavaRuntimeResources;
 import org.eclipse.che.ide.ext.java.jdi.client.debug.remotedebug.RemoteDebugView.ActionDelegate;
@@ -50,6 +51,8 @@ public class RemoteDebugViewImplTest {
     private ConfirmDialog                   dialog;
     @Mock
     private DialogFactory                   dialogFactory;
+    @Mock
+    private NotificationManager             notificationManager;
 
     @Captor
     private ArgumentCaptor<ConfirmCallback> confirmCallbackCaptor;
@@ -67,7 +70,7 @@ public class RemoteDebugViewImplTest {
                                                confirmCallbackCaptor.capture(),
                                                failureCallbackCaptor.capture())).thenReturn(dialog);
 
-        view = new RemoteDebugViewImpl(locale, resources, dialogFactory);
+        view = new RemoteDebugViewImpl(locale, resources, dialogFactory, notificationManager);
         view.setDelegate(delegate);
     }
 

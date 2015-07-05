@@ -175,6 +175,15 @@ public class SubversionProjectImporterViewImpl extends Composite implements Subv
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
             return;
         }
+
+        if (projectName.getValue() != null && projectName.getValue().contains(" ")) {
+            String tmp = projectName.getValue();
+            while (tmp.contains(" ")) {
+                tmp = tmp.replaceAll(" ", "-");
+            }
+            projectName.setValue(tmp);
+        }
+
         delegate.onProjectNameChanged();
     }
 
@@ -235,4 +244,5 @@ public class SubversionProjectImporterViewImpl extends Composite implements Subv
 
         String horizontalLine();
     }
+
 }

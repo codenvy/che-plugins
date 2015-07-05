@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -151,6 +152,8 @@ public class Debugger implements EventsHandler {
                 Thread.sleep(2000);
                 vm = connector.attach(arguments);
                 break;
+            } catch (UnknownHostException | IllegalConnectorArgumentsException e) {
+                throw new VMConnectException(e.getMessage(), e);
             } catch (IOException e) {
                 LOG.error(e.getMessage(), e);
                 if (++attempt > 10) {
@@ -160,8 +163,6 @@ public class Debugger implements EventsHandler {
                     Thread.sleep(2000);
                 } catch (InterruptedException ignored) {
                 }
-            } catch (IllegalConnectorArgumentsException e) {
-                throw new VMConnectException(e.getMessage(), e);
             } catch (InterruptedException ignored) {
             }
         }

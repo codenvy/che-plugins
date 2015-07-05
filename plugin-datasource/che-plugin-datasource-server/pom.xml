@@ -16,11 +16,16 @@
     <parent>
         <artifactId>che-plugin-datasource-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.10.3-SNAPSHOT</version>
+        <version>3.11.0-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-datasource-server</artifactId>
     <name>Che Plugin :: Datasource :: Server</name>
     <dependencies>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons-codec.version}</version>
+        </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>
             <artifactId>opencsv</artifactId>

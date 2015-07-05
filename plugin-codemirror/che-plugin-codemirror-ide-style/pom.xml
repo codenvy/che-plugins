@@ -16,21 +16,21 @@
     <parent>
         <artifactId>che-plugin-codemirror-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.10.3-SNAPSHOT</version>
+        <version>3.11.0-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-codemirror-ide-style</artifactId>
     <packaging>jar</packaging>
     <name>Che Plugin :: CodeMirror :: IDE Style</name>
     <dependencies>
         <dependency>
+            <groupId>che.codemirror.resources</groupId>
+            <artifactId>che-codemirror-resources</artifactId>
+            <version>${che.codemirror.resources.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-ide-api</artifactId>
             <version>${che.core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.plugin</groupId>
-            <artifactId>che-plugin-codemirror-resources</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <build>
