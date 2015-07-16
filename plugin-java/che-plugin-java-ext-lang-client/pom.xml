@@ -116,6 +116,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.gwt.gwtmockito</groupId>
+            <artifactId>gwtmockito</artifactId>
+            <version>${com.google.gwt.gwtmockito}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>gwt-user</artifactId>
+                    <groupId>com.google.gwt</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>com.googlecode.gwt-test-utils</groupId>
             <artifactId>gwt-test-utils</artifactId>
             <version>${com.googlecode.gwt-test-utils.version}</version>

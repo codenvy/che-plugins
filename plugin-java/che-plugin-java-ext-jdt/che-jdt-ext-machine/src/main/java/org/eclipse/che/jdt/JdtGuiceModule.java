@@ -20,6 +20,7 @@ import com.google.inject.name.Named;
 import org.eclipse.che.core.internal.resources.ResourcesPlugin;
 import org.eclipse.che.inject.DynaModule;
 import org.eclipse.che.jdt.rest.CodeAssistService;
+import org.eclipse.che.jdt.rest.CompilerSetupService;
 import org.eclipse.che.jdt.rest.JavaClasspathService;
 import org.eclipse.che.jdt.rest.JavaReconcileService;
 import org.eclipse.core.internal.filebuffers.FileBuffersPlugin;
@@ -41,6 +42,7 @@ public class JdtGuiceModule extends AbstractModule {
         bind(JavaReconcileService.class);
         bind(JavaClasspathService.class);
         bind(CodeAssistService.class);
+        bind(CompilerSetupService.class);
         bind(ResourcesPlugin.class).asEagerSingleton();
         bind(JavaPlugin.class).asEagerSingleton();
         bind(FileBuffersPlugin.class).asEagerSingleton();

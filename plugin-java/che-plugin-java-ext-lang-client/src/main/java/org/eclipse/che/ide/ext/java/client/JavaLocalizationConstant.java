@@ -48,12 +48,6 @@ public interface JavaLocalizationConstant extends Messages {
     @Key("action.newPackage.description")
     String actionNewPackageDescription();
 
-    @Key("messages.newPackage.invalidName")
-    String messagesNewPackageInvalidName();
-
-    @Key("messages.file.successfully.parsed")
-    String fileSuccessfullyParsed();
-
     @Key("messages.dependencies.successfully.updated")
     String dependenciesSuccessfullyUpdated();
 
@@ -71,4 +65,61 @@ public interface JavaLocalizationConstant extends Messages {
 
     @Key("action.openDeclaration.description")
     String actionOpenDeclarationDescription();
+
+    @Key("compiler.error.warnings.setup")
+    String compilerSetup();
+
+    @Key("property.unused.local")
+    String propertyUnusedLocal();
+
+    @Key("property.unused.import")
+    String propertyUnusedImport();
+
+    @Key("property.dead.code")
+    String propertyDeadCode();
+
+    @Key("property.with.constructor.name")
+    String propertyWithConstructorName();
+
+    @Key("property.unnecessary.else")
+    String propertyUnnecessaryElse();
+
+    @Key("comparing.identical.values")
+    String comparingIdenticalValues();
+
+    @Key("no.effect.assignment")
+    String noEffectAssignment();
+
+    @Key("missing.serial.version.uid")
+    String missingSerialVersionUid();
+
+    @Key("type.parameter.hide.another.type")
+    String typeParameterHideAnotherType();
+
+    @Key("field.hides.another.field")
+    String fieldHidesAnotherField();
+
+    @Key("missing.switch.default.case")
+    String missingSwitchDefaultCase();
+
+    @Key("unused.private.member")
+    String unusedPrivateMember();
+
+    @Key("unchecked.type.operation")
+    String uncheckedTypeOperation();
+
+    @Key("usage.raw.type")
+    String usageRawType();
+
+    @Key("missing.override.annotation")
+    String missingOverrideAnnotation();
+
+    @Key("null.pointer.access")
+    String nullPointerAccess();
+
+    @Key("potential.null.pointer.access")
+    String potentialNullPointerAccess();
+
+    @Key("redundant.null.check")
+    String redundantNullCheck();
 }

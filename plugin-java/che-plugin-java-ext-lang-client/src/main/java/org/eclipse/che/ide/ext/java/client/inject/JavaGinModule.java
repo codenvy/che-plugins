@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.java.client.inject;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
+import com.google.gwt.inject.client.multibindings.GinMultibinder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -25,11 +26,16 @@ import org.eclipse.che.ide.ext.java.client.dependenciesupdater.JavaNameEnvironme
 import org.eclipse.che.ide.ext.java.client.documentation.QuickDocPresenter;
 import org.eclipse.che.ide.ext.java.client.documentation.QuickDocumentation;
 import org.eclipse.che.ide.ext.java.client.format.FormatController;
+import org.eclipse.che.ide.ext.java.client.inject.factories.PropertyWidgetFactory;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationServiceImpl;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileView;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileViewImpl;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaNodeFactory;
+import org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerSetupPresenter;
+import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidget;
+import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidgetImpl;
+import org.eclipse.che.ide.settings.common.SettingsPagePresenter;
 
 /**
  * @author Evgen Vidolob
@@ -48,6 +54,11 @@ public class JavaGinModule extends AbstractGinModule {
         bind(JavaNameEnvironmentServiceClient.class).to(JavaNameEnvironmentServiceClientImpl.class);
 
         install(new GinFactoryModuleBuilder().build(JavaNodeFactory.class));
+        install(new GinFactoryModuleBuilder().implement(PropertyWidget.class, PropertyWidgetImpl.class)
+                                             .build(PropertyWidgetFactory.class));
+
+        GinMultibinder<SettingsPagePresenter> settingsBinder = GinMultibinder.newSetBinder(binder(), SettingsPagePresenter.class);
+        settingsBinder.addBinding().to(CompilerSetupPresenter.class);
     }
 
     @Provides
