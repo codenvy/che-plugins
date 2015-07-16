@@ -38,7 +38,7 @@ public class CompilerSetupService {
     private static final JavaModel JAVA_MODEL = JavaModelManager.getJavaModelManager().getJavaModel();
 
     @POST
-    @Path("/setup")
+    @Path("/set")
     @Consumes(APPLICATION_JSON)
     public void setParameters(@QueryParam("projectpath") String projectPath, @Nonnull Map<String, String> changedParameters) {
         IJavaProject project = JAVA_MODEL.getJavaProject(projectPath);

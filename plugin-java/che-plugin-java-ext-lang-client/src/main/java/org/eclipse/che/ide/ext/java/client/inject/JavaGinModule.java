@@ -32,7 +32,7 @@ import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationServiceImpl;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileView;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileViewImpl;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaNodeFactory;
-import org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerSetupPresenter;
+import org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsPresenter;
 import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidget;
 import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidgetImpl;
 import org.eclipse.che.ide.settings.common.SettingsPagePresenter;
@@ -58,7 +58,7 @@ public class JavaGinModule extends AbstractGinModule {
                                              .build(PropertyWidgetFactory.class));
 
         GinMultibinder<SettingsPagePresenter> settingsBinder = GinMultibinder.newSetBinder(binder(), SettingsPagePresenter.class);
-        settingsBinder.addBinding().to(CompilerSetupPresenter.class);
+        settingsBinder.addBinding().to(ErrorWarningsPresenter.class);
     }
 
     @Provides

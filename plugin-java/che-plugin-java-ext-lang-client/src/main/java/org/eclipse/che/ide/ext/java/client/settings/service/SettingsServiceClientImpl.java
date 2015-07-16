@@ -76,7 +76,7 @@ public class SettingsServiceClientImpl implements SettingsServiceClient {
                              + '/'
                              + machineManager.getDeveloperMachineId()
                              + "/jdt/compiler-settings"
-                             + "/setup?projectpath=" + pathToProject;
+                             + "/set?projectpath=" + pathToProject;
 
                 JsonSerializable data = new JsonSerializable() {
                     @Override

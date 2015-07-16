@@ -13,29 +13,30 @@ package org.eclipse.che.ide.ext.java.client.settings.property;
 import com.google.inject.Inject;
 
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
+import org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.COMPARING_IDENTICAL_VALUES;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.COMPILER_UNUSED_IMPORT;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.COMPILER_UNUSED_LOCAL;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.DEAD_CODE;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.FIELD_HIDES_ANOTHER_VARIABLE;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.METHOD_WITH_CONSTRUCTOR_NAME;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.MISSING_DEFAULT_CASE;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.MISSING_OVERRIDE_ANNOTATION;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.MISSING_SERIAL_VERSION_UID;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.NO_EFFECT_ASSIGNMENT;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.NULL_POINTER_ACCESS;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.POTENTIAL_NULL_POINTER_ACCESS;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.REDUNDANT_NULL_CHECK;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.TYPE_PARAMETER_HIDE_ANOTHER_TYPE;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.UNCHECKED_TYPE_OPERATION;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.UNNECESSARY_ELSE_STATEMENT;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.UNUSED_PRIVATE_MEMBER;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.USAGE_OF_RAW_TYPE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.COMPARING_IDENTICAL_VALUES;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.COMPILER_UNUSED_IMPORT;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.COMPILER_UNUSED_LOCAL;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.DEAD_CODE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.FIELD_HIDES_ANOTHER_VARIABLE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.METHOD_WITH_CONSTRUCTOR_NAME;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.MISSING_DEFAULT_CASE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.MISSING_OVERRIDE_ANNOTATION;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.MISSING_SERIAL_VERSION_UID;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.NO_EFFECT_ASSIGNMENT;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.NULL_POINTER_ACCESS;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.POTENTIAL_NULL_POINTER_ACCESS;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.REDUNDANT_NULL_CHECK;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.TYPE_PARAMETER_HIDE_ANOTHER_TYPE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.UNCHECKED_TYPE_OPERATION;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.UNNECESSARY_ELSE_STATEMENT;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.UNUSED_PRIVATE_MEMBER;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.USAGE_OF_RAW_TYPE;
 
 /**
  * The class contains compiler properties ids which match to properties' names.
@@ -44,7 +45,7 @@ import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOpti
  */
 class PropertyNameManager {
 
-    private final Map<String, String> names;
+    private final Map<ErrorWarningsOptions, String> names;
 
     @Inject
     public PropertyNameManager(JavaLocalizationConstant locale) {
@@ -78,7 +79,7 @@ class PropertyNameManager {
      * @return name of property
      */
     @Nonnull
-    public String getName(@Nonnull String propertyId) {
+    public String getName(@Nonnull ErrorWarningsOptions propertyId) {
         String name = names.get(propertyId);
 
         if (name == null) {

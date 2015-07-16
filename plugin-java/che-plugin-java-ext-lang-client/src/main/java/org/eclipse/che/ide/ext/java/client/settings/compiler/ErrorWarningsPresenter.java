@@ -27,24 +27,24 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.COMPARING_IDENTICAL_VALUES;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.COMPILER_UNUSED_IMPORT;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.COMPILER_UNUSED_LOCAL;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.DEAD_CODE;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.FIELD_HIDES_ANOTHER_VARIABLE;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.METHOD_WITH_CONSTRUCTOR_NAME;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.MISSING_DEFAULT_CASE;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.MISSING_OVERRIDE_ANNOTATION;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.MISSING_SERIAL_VERSION_UID;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.NO_EFFECT_ASSIGNMENT;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.NULL_POINTER_ACCESS;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.POTENTIAL_NULL_POINTER_ACCESS;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.REDUNDANT_NULL_CHECK;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.TYPE_PARAMETER_HIDE_ANOTHER_TYPE;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.UNCHECKED_TYPE_OPERATION;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.UNNECESSARY_ELSE_STATEMENT;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.UNUSED_PRIVATE_MEMBER;
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.USAGE_OF_RAW_TYPE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.COMPARING_IDENTICAL_VALUES;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.COMPILER_UNUSED_IMPORT;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.COMPILER_UNUSED_LOCAL;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.DEAD_CODE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.FIELD_HIDES_ANOTHER_VARIABLE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.METHOD_WITH_CONSTRUCTOR_NAME;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.MISSING_DEFAULT_CASE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.MISSING_OVERRIDE_ANNOTATION;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.MISSING_SERIAL_VERSION_UID;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.NO_EFFECT_ASSIGNMENT;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.NULL_POINTER_ACCESS;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.POTENTIAL_NULL_POINTER_ACCESS;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.REDUNDANT_NULL_CHECK;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.TYPE_PARAMETER_HIDE_ANOTHER_TYPE;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.UNCHECKED_TYPE_OPERATION;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.UNNECESSARY_ELSE_STATEMENT;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.UNUSED_PRIVATE_MEMBER;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.USAGE_OF_RAW_TYPE;
 
 /**
  * The class contains business logic which allow control changing of compiler's properties.
@@ -52,9 +52,9 @@ import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOpti
  * @author Dmitry Shnurenko
  */
 @Singleton
-public class CompilerSetupPresenter extends AbstractSettingsPagePresenter implements PropertyWidget.ActionDelegate {
+public class ErrorWarningsPresenter extends AbstractSettingsPagePresenter implements PropertyWidget.ActionDelegate {
 
-    private final CompilerSetupView     view;
+    private final ErrorWarningsView     view;
     private final SettingsServiceClient service;
     private final PropertyWidgetFactory propertyFactory;
 
@@ -64,8 +64,8 @@ public class CompilerSetupPresenter extends AbstractSettingsPagePresenter implem
     private Map<String, String> allProperties;
 
     @Inject
-    public CompilerSetupPresenter(JavaLocalizationConstant locale,
-                                  CompilerSetupView view,
+    public ErrorWarningsPresenter(JavaLocalizationConstant locale,
+                                  ErrorWarningsView view,
                                   SettingsServiceClient service,
                                   PropertyWidgetFactory propertyFactory) {
         super(locale.compilerSetup());
@@ -127,18 +127,18 @@ public class CompilerSetupPresenter extends AbstractSettingsPagePresenter implem
     /** {@inheritDoc} */
     @Override
     public void go(AcceptsOneWidget container) {
-        addPropertiesPanel();
+        addErrorWarningsPanel();
 
         container.setWidget(view);
     }
 
-    private void addPropertiesPanel() {
+    private void addErrorWarningsPanel() {
         Promise<Map<String, String>> propertiesPromise = service.getCompileParameters();
 
         propertiesPromise.then(new Operation<Map<String, String>>() {
             @Override
             public void apply(Map<String, String> properties) throws OperationException {
-                CompilerSetupPresenter.this.allProperties = properties;
+                ErrorWarningsPresenter.this.allProperties = properties;
 
                 createAndAddWidget(COMPILER_UNUSED_LOCAL);
 
@@ -179,18 +179,20 @@ public class CompilerSetupPresenter extends AbstractSettingsPagePresenter implem
         });
     }
 
-    private void createAndAddWidget(@Nonnull String parameterId) {
+    private void createAndAddWidget(@Nonnull ErrorWarningsOptions option) {
+        String parameterId = option.toString();
+
         if (widgets.containsKey(parameterId)) {
             return;
         }
 
-        PropertyWidget widget = propertyFactory.create(parameterId);
+        PropertyWidget widget = propertyFactory.create(option);
 
         String value = allProperties.get(parameterId);
 
         widget.selectPropertyValue(value);
 
-        widget.setDelegate(CompilerSetupPresenter.this);
+        widget.setDelegate(ErrorWarningsPresenter.this);
 
         widgets.put(parameterId, widget);
 

@@ -22,6 +22,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
+import org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -37,7 +39,7 @@ public class PropertyWidgetImpl extends Composite implements PropertyWidget {
     public static final String WARNING = "warning";
     public static final String ERROR   = "error";
 
-    private final String propertyId;
+    private final ErrorWarningsOptions optionId;
 
     @UiField
     Label   title;
@@ -47,12 +49,12 @@ public class PropertyWidgetImpl extends Composite implements PropertyWidget {
     private ActionDelegate delegate;
 
     @Inject
-    public PropertyWidgetImpl(PropertyNameManager nameManager, @Assisted String propertyId) {
+    public PropertyWidgetImpl(PropertyNameManager nameManager, @Assisted ErrorWarningsOptions optionId) {
         initWidget(UI_BINDER.createAndBindUi(this));
 
-        this.propertyId = propertyId;
+        this.optionId = optionId;
 
-        this.title.setText(nameManager.getName(propertyId));
+        this.title.setText(nameManager.getName(optionId));
 
         property.addItem(IGNORE);
         property.addItem(WARNING);
@@ -74,7 +76,7 @@ public class PropertyWidgetImpl extends Composite implements PropertyWidget {
     public void onPropertyChanged(@SuppressWarnings("UnusedParameters") ChangeEvent event) {
         String selectedValue = getSelectedValue();
 
-        delegate.onPropertyChanged(propertyId, selectedValue);
+        delegate.onPropertyChanged(optionId.toString(), selectedValue);
     }
 
     private String getSelectedValue() {

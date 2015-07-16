@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.inject.factories;
 
+import org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions;
 import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidget;
 
 import javax.annotation.Nonnull;
@@ -24,9 +25,9 @@ public interface PropertyWidgetFactory {
     /**
      * Creates new instances of {@link PropertyWidget}. Each call of method returns new instance of widget.
      *
-     * @param propertyId
+     * @param optionId
      *         property id which need set to property. Each property has unique id which we get from server.
      * @return an instance of {@link PropertyWidget}
      */
-    PropertyWidget create(@Nonnull String propertyId);
+    PropertyWidget create(@Nonnull ErrorWarningsOptions optionId);
 }

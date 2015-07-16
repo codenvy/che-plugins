@@ -13,12 +13,15 @@ package org.eclipse.che.ide.ext.java.client.settings.property;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions;
 import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidget.ActionDelegate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.DEAD_CODE;
 import static org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidgetImpl.ERROR;
 import static org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidgetImpl.IGNORE;
 import static org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidgetImpl.WARNING;
@@ -44,15 +47,15 @@ public class PropertyWidgetImplTest {
 
     @Before
     public void setUp() {
-        when(nameManager.getName(SOME_TEXT)).thenReturn(SOME_TEXT);
+        when(nameManager.getName(Matchers.<ErrorWarningsOptions>anyObject())).thenReturn(SOME_TEXT);
 
-        widget = new PropertyWidgetImpl(nameManager, SOME_TEXT);
+        widget = new PropertyWidgetImpl(nameManager, DEAD_CODE);
         widget.setDelegate(delegate);
     }
 
     @Test
     public void constructorShouldBeVerified() {
-        verify(nameManager).getName(SOME_TEXT);
+        verify(nameManager).getName(DEAD_CODE);
         verify(widget.title).setText(SOME_TEXT);
 
         verify(widget.property).addItem(IGNORE);
@@ -77,7 +80,7 @@ public class PropertyWidgetImplTest {
 
         widget.onPropertyChanged(event);
 
-        verify(delegate).onPropertyChanged(SOME_TEXT, SOME_TEXT);
+        verify(delegate).onPropertyChanged(DEAD_CODE.toString(), SOME_TEXT);
     }
 
     @Test
@@ -86,7 +89,7 @@ public class PropertyWidgetImplTest {
 
         widget.onPropertyChanged(event);
 
-        verify(delegate).onPropertyChanged(SOME_TEXT, "");
+        verify(delegate).onPropertyChanged(DEAD_CODE.toString(), "");
     }
 
 }

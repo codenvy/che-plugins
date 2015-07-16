@@ -10,26 +10,32 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.settings.compiler;
 
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.inject.ImplementedBy;
+import com.google.gwtmockito.GwtMockitoTestRunner;
 
 import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidget;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
-import javax.annotation.Nonnull;
+import static org.mockito.Mockito.verify;
 
 /**
- * Provides methods to control panel of properties.
- *
  * @author Dmitry Shnurenko
  */
-@ImplementedBy(CompilerSetupViewImpl.class)
-public interface CompilerSetupView extends IsWidget {
+@RunWith(GwtMockitoTestRunner.class)
+public class ErrorWarningsViewImplTest {
 
-    /**
-     * Adds special property widget on special panel on view.
-     *
-     * @param propertyWidget
-     *         widget which will be added
-     */
-    void addProperty(@Nonnull PropertyWidget propertyWidget);
+    @Mock
+    private PropertyWidget widget;
+
+    @InjectMocks
+    private ErrorWarningsViewImpl view;
+
+    @Test
+    public void propertyShouldBeAdded() {
+        view.addProperty(widget);
+
+        verify(view.properties).add(widget);
+    }
 }

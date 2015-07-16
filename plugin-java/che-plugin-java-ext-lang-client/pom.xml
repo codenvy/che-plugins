@@ -11,7 +11,8 @@
       Codenvy, S.A. - initial API and implementation
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>che-plugin-java-parent</artifactId>
@@ -128,12 +129,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.gwt-test-utils</groupId>
-            <artifactId>gwt-test-utils</artifactId>
-            <version>${com.googlecode.gwt-test-utils.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>${javax.validation.version}</version>
@@ -195,8 +190,6 @@
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
-                    <!--temporary turnoff test after renaming package test fail -->
-                    <skipTests>true</skipTests>
                 </configuration>
             </plugin>
             <plugin>

@@ -28,8 +28,8 @@ import javax.annotation.Nonnull;
  *
  * @author Dmitry Shnurenko
  */
-public class CompilerSetupViewImpl extends Composite implements CompilerSetupView {
-    interface CompilerSetupViewImplUiBinder extends UiBinder<Widget, CompilerSetupViewImpl> {
+public class ErrorWarningsViewImpl extends Composite implements ErrorWarningsView {
+    interface CompilerSetupViewImplUiBinder extends UiBinder<Widget, ErrorWarningsViewImpl> {
     }
 
     private static final CompilerSetupViewImplUiBinder UI_BINDER = GWT.create(CompilerSetupViewImplUiBinder.class);
@@ -38,7 +38,7 @@ public class CompilerSetupViewImpl extends Composite implements CompilerSetupVie
     FlowPanel properties;
 
     @Inject
-    public CompilerSetupViewImpl() {
+    public ErrorWarningsViewImpl() {
         initWidget(UI_BINDER.createAndBindUi(this));
     }
 

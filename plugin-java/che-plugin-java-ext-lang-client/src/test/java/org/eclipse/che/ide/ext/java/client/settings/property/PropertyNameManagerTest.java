@@ -17,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.eclipse.che.ide.ext.java.client.settings.compiler.CompilerOptions.COMPILER_UNUSED_LOCAL;
+import static org.eclipse.che.ide.ext.java.client.settings.compiler.ErrorWarningsOptions.COMPILER_UNUSED_LOCAL;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -72,7 +72,7 @@ public class PropertyNameManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalArgumentExceptionShouldBeThrownWhenNameIsNotFound() {
-        nameManager.getName("test");
+        nameManager.getName(COMPILER_UNUSED_LOCAL);
     }
 
 }
