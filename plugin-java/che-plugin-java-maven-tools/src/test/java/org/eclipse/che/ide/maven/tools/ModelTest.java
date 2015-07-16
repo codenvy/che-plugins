@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.maven.tools;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -36,6 +38,12 @@ import static org.testng.Assert.assertTrue;
  * @author Eugene Voevodin
  */
 public class ModelTest {
+
+    @BeforeMethod
+    private void resetLineSeparator() {
+        //needed for xml tree to write content with \n line separator
+        System.setProperty("line.separator", "\n");
+    }
 
     @Test
     public void shouldBeAbleToCreateModel() throws Exception {
@@ -1286,6 +1294,443 @@ public class ModelTest {
                                 "            </plugin>\n" +
                                 "        </plugins>\n" +
                                 "    </build>\n" +
+                                "</project>");
+    }
+
+    @Test
+    public void shouldBeAbleToGetRepositorySnapshotsReleases() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <!-- Repositories --> \n" +
+                   "    <repositories>\n" +
+                   "        <repository>\n" +
+                   "            <snapshots>\n" +
+                   "                <enabled>true</enabled>\n" +
+                   "                <updatePolicy>daily</updatePolicy>\n" +
+                   "                <checksumPolicy>warn</checksumPolicy>\n" +
+                   "            </snapshots>" +
+                   "            <releases>" +
+                   "                <enabled>false</enabled>\n" +
+                   "                <updatePolicy>monthly</updatePolicy>\n" +
+                   "                <checksumPolicy>fail</checksumPolicy>\n" +
+                   "            </releases>" +
+                   "        </repository>" +
+                   "    </repositories>\n" +
+                   "</project>");
+
+        final Model model = Model.readFrom(pom);
+        final List<Repository> repositories = model.getRepositories();
+
+        assertEquals(repositories.size(), 1);
+        final Repository first = repositories.get(0);
+        assertTrue(first.getSnapshots().isEnabled());
+        assertEquals(first.getSnapshots().getUpdatePolicy(), "daily");
+        assertEquals(first.getSnapshots().getChecksumPolicy(), "warn");
+        assertFalse(first.getReleases().isEnabled());
+        assertEquals(first.getReleases().getUpdatePolicy(), "monthly");
+        assertEquals(first.getReleases().getChecksumPolicy(), "fail");
+    }
+
+    @Test
+    public void shouldBeAbleToChangeRepositorySnapshots() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <!-- Repositories --> \n" +
+                   "    <repositories>\n" +
+                   "        <repository>\n" +
+                   "            <snapshots>\n" +
+                   "                <enabled>true</enabled>\n" +
+                   "                <updatePolicy>daily</updatePolicy>\n" +
+                   "                <checksumPolicy>warn</checksumPolicy>\n" +
+                   "            </snapshots>" +
+                   "        </repository>" +
+                   "    </repositories>\n" +
+                   "</project>");
+        final Model model = Model.readFrom(pom);
+
+        model.getRepositories()
+             .get(0)
+             .getSnapshots()
+             .setEnabled(false)
+             .setUpdatePolicy("monthly")
+             .setChecksumPolicy(null);
+        model.writeTo(pom);
+
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
+                                "    <!-- Repositories --> \n" +
+                                "    <repositories>\n" +
+                                "        <repository>\n" +
+                                "            <snapshots>\n" +
+                                "                <enabled>false</enabled>\n" +
+                                "                <updatePolicy>monthly</updatePolicy>\n" +
+                                "            </snapshots>" +
+                                "        </repository>" +
+                                "    </repositories>\n" +
+                                "</project>");
+    }
+
+    @Test
+    public void shouldBeAbleToChangeRepositoryReleases() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <!-- Repositories --> \n" +
+                   "    <repositories>\n" +
+                   "        <repository>\n" +
+                   "            <releases>\n" +
+                   "                <enabled>true</enabled>\n" +
+                   "                <updatePolicy>daily</updatePolicy>\n" +
+                   "                <checksumPolicy>warn</checksumPolicy>\n" +
+                   "            </releases>" +
+                   "        </repository>" +
+                   "    </repositories>\n" +
+                   "</project>");
+        final Model model = Model.readFrom(pom);
+
+        model.getRepositories()
+             .get(0)
+             .getReleases()
+             .setEnabled(null)
+             .setUpdatePolicy("monthly")
+             .setChecksumPolicy("fail");
+        model.writeTo(pom);
+
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
+                                "    <!-- Repositories --> \n" +
+                                "    <repositories>\n" +
+                                "        <repository>\n" +
+                                "            <releases>\n" +
+                                "                <updatePolicy>monthly</updatePolicy>\n" +
+                                "                <checksumPolicy>fail</checksumPolicy>\n" +
+                                "            </releases>" +
+                                "        </repository>" +
+                                "    </repositories>\n" +
+                                "</project>");
+    }
+
+    @Test
+    public void shouldBeAbleToGetRepository() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <!-- Repositories --> \n" +
+                   "    <repositories>\n" +
+                   "        <repository>\n" +
+                   "            <id>central</id>\n" +
+                   "            <name>Central Repository</name>\n" +
+                   "            <url>http://repo.maven.apache.org/maven2</url>\n" +
+                   "            <layout>default</layout>\n" +
+                   "            <releases>\n" +
+                   "                <enabled>true</enabled>\n" +
+                   "                <updatePolicy>daily</updatePolicy>\n" +
+                   "                <checksumPolicy>warn</checksumPolicy>\n" +
+                   "            </releases>" +
+                   "        </repository>" +
+                   "    </repositories>\n" +
+                   "</project>");
+        final Model model = Model.readFrom(pom);
+
+        final Repository repository = model.getRepositories().get(0);
+
+        assertEquals(repository.getId(), "central");
+        assertEquals(repository.getName(), "Central Repository");
+        assertEquals(repository.getUrl(), "http://repo.maven.apache.org/maven2");
+        assertEquals(repository.getLayout(), "default");
+    }
+
+    @Test
+    public void shouldBeAbleToModifyRepository() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <!-- Repositories --> \n" +
+                   "    <repositories>\n" +
+                   "        <repository>\n" +
+                   "            <id>central</id>\n" +
+                   "            <name>Central Repository</name>\n" +
+                   "            <url>http://repo.maven.apache.org/maven2</url>\n" +
+                   "            <layout>default</layout>\n" +
+                   "            <releases>\n" +
+                   "                <enabled>true</enabled>\n" +
+                   "                <updatePolicy>daily</updatePolicy>\n" +
+                   "                <checksumPolicy>warn</checksumPolicy>\n" +
+                   "            </releases>\n" +
+                   "        </repository>\n" +
+                   "    </repositories>\n" +
+                   "</project>");
+        final Model model = Model.readFrom(pom);
+
+        model.getRepositories()
+             .get(0)
+             .setId("other-id")
+             .setName("other-name")
+             .setUrl("http://other-url.com")
+             .setLayout("other layout")
+             .setReleases(new RepositoryPolicy(false, "fail", "monthly"))
+             .setSnapshots(new RepositoryPolicy(false, "fail", "monthly"));
+        model.writeTo(pom);
+
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
+                                "    <!-- Repositories --> \n" +
+                                "    <repositories>\n" +
+                                "        <repository>\n" +
+                                "            <id>other-id</id>\n" +
+                                "            <name>other-name</name>\n" +
+                                "            <url>http://other-url.com</url>\n" +
+                                "            <layout>other layout</layout>\n" +
+                                "            <snapshots>\n" +
+                                "                <enabled>false</enabled>\n" +
+                                "                <checksumPolicy>fail</checksumPolicy>\n" +
+                                "                <updatePolicy>monthly</updatePolicy>\n" +
+                                "            </snapshots>\n" +
+                                "            <releases>\n" +
+                                "                <enabled>false</enabled>\n" +
+                                "                <checksumPolicy>fail</checksumPolicy>\n" +
+                                "                <updatePolicy>monthly</updatePolicy>\n" +
+                                "            </releases>\n" +
+                                "        </repository>\n" +
+                                "    </repositories>\n" +
+                                "</project>");
+    }
+
+    @Test
+    public void shouldBeAbleToAddRepository() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <!-- Repositories --> \n" +
+                   "    <repositories>\n" +
+                   "        <repository>\n" +
+                   "            <id>central</id>\n" +
+                   "            <name>Central Repository</name>\n" +
+                   "            <url>http://repo.maven.apache.org/maven2</url>\n" +
+                   "            <layout>default</layout>\n" +
+                   "            <releases>\n" +
+                   "                <enabled>true</enabled>\n" +
+                   "                <updatePolicy>daily</updatePolicy>\n" +
+                   "                <checksumPolicy>warn</checksumPolicy>\n" +
+                   "            </releases>\n" +
+                   "        </repository>\n" +
+                   "    </repositories>\n" +
+                   "</project>");
+
+        final Model model = Model.readFrom(pom)
+                                 .addRepository(new Repository().setId("id")
+                                                                .setLayout("default")
+                                                                .setUrl("url")
+                                                                .setName("name"));
+        model.save();
+        assertEquals(model.getRepositories().size(), 2);
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
+                                "    <!-- Repositories --> \n" +
+                                "    <repositories>\n" +
+                                "        <repository>\n" +
+                                "            <id>central</id>\n" +
+                                "            <name>Central Repository</name>\n" +
+                                "            <url>http://repo.maven.apache.org/maven2</url>\n" +
+                                "            <layout>default</layout>\n" +
+                                "            <releases>\n" +
+                                "                <enabled>true</enabled>\n" +
+                                "                <updatePolicy>daily</updatePolicy>\n" +
+                                "                <checksumPolicy>warn</checksumPolicy>\n" +
+                                "            </releases>\n" +
+                                "        </repository>\n" +
+                                "        <repository>\n" +
+                                "            <id>id</id>\n" +
+                                "            <name>name</name>\n" +
+                                "            <url>url</url>\n" +
+                                "            <layout>default</layout>\n" +
+                                "        </repository>\n" +
+                                "    </repositories>\n" +
+                                "</project>");
+    }
+
+    @Test
+    public void shouldBeAbleToSetRepositories() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "</project>");
+        final Model model = Model.readFrom(pom)
+                                 .setRepositories(singletonList(new Repository().setId("id")
+                                                                                .setLayout("default")
+                                                                                .setUrl("url")
+                                                                                .setName("name")));
+        model.save();
+
+        assertEquals(model.getRepositories().size(), 1);
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
+                                "    <repositories>\n" +
+                                "        <repository>\n" +
+                                "            <id>id</id>\n" +
+                                "            <name>name</name>\n" +
+                                "            <url>url</url>\n" +
+                                "            <layout>default</layout>\n" +
+                                "        </repository>\n" +
+                                "    </repositories>\n" +
+                                "</project>");
+    }
+
+    @Test
+    public void shouldBeAbleToRemoveRepositories() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <repositories>\n" +
+                   "        <repository>\n" +
+                   "            <id>id</id>\n" +
+                   "            <name>name</name>\n" +
+                   "            <url>url</url>\n" +
+                   "            <layout>default</layout>\n" +
+                   "        </repository>\n" +
+                   "    </repositories>\n" +
+                   "</project>");
+
+        final Model model = Model.readFrom(pom)
+                                 .setRepositories(null);
+        model.save();
+
+        assertTrue(model.getRepositories().isEmpty());
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
+                                "</project>");
+    }
+
+    @Test
+    public void shouldBeAbleToGetPluginRepository() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <!-- Plugin repositories --> \n" +
+                   "    <pluginRepositories>\n" +
+                   "        <repository>\n" +
+                   "            <id>central</id>\n" +
+                   "            <name>Central Repository</name>\n" +
+                   "            <url>http://repo.maven.apache.org/maven2</url>\n" +
+                   "            <layout>default</layout>\n" +
+                   "        </repository>" +
+                   "    </pluginRepositories>\n" +
+                   "</project>");
+        final Model model = Model.readFrom(pom);
+
+        final Repository repository = model.getPluginRepositories().get(0);
+
+        assertEquals(repository.getId(), "central");
+        assertEquals(repository.getName(), "Central Repository");
+        assertEquals(repository.getUrl(), "http://repo.maven.apache.org/maven2");
+        assertEquals(repository.getLayout(), "default");
+    }
+
+
+    @Test
+    public void shouldBeAbleToAddPluginRepository() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <!-- Repositories --> \n" +
+                   "    <pluginRepositories>\n" +
+                   "        <repository>\n" +
+                   "            <id>central</id>\n" +
+                   "            <name>Central Repository</name>\n" +
+                   "            <url>http://repo.maven.apache.org/maven2</url>\n" +
+                   "            <layout>default</layout>\n" +
+                   "            <releases>\n" +
+                   "                <enabled>true</enabled>\n" +
+                   "                <updatePolicy>daily</updatePolicy>\n" +
+                   "                <checksumPolicy>warn</checksumPolicy>\n" +
+                   "            </releases>\n" +
+                   "        </repository>\n" +
+                   "    </pluginRepositories>\n" +
+                   "</project>");
+
+        final Model model = Model.readFrom(pom)
+                                 .addPluginRepository(new Repository().setId("id")
+                                                                      .setLayout("default")
+                                                                      .setUrl("url")
+                                                                      .setName("name"));
+        model.save();
+        assertEquals(model.getPluginRepositories().size(), 2);
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
+                                "    <!-- Repositories --> \n" +
+                                "    <pluginRepositories>\n" +
+                                "        <repository>\n" +
+                                "            <id>central</id>\n" +
+                                "            <name>Central Repository</name>\n" +
+                                "            <url>http://repo.maven.apache.org/maven2</url>\n" +
+                                "            <layout>default</layout>\n" +
+                                "            <releases>\n" +
+                                "                <enabled>true</enabled>\n" +
+                                "                <updatePolicy>daily</updatePolicy>\n" +
+                                "                <checksumPolicy>warn</checksumPolicy>\n" +
+                                "            </releases>\n" +
+                                "        </repository>\n" +
+                                "        <repository>\n" +
+                                "            <id>id</id>\n" +
+                                "            <name>name</name>\n" +
+                                "            <url>url</url>\n" +
+                                "            <layout>default</layout>\n" +
+                                "        </repository>\n" +
+                                "    </pluginRepositories>\n" +
+                                "</project>");
+
+    }
+
+    @Test
+    public void shouldBeAbleToSetPluginRepositories() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "</project>");
+        final Model model = Model.readFrom(pom)
+                                 .setPluginRepositories(singletonList(new Repository().setId("id")
+                                                                                      .setLayout("default")
+                                                                                      .setUrl("url")
+                                                                                      .setName("name")));
+        model.save();
+
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
+                                "    <pluginRepositories>\n" +
+                                "        <repository>\n" +
+                                "            <id>id</id>\n" +
+                                "            <name>name</name>\n" +
+                                "            <url>url</url>\n" +
+                                "            <layout>default</layout>\n" +
+                                "        </repository>\n" +
+                                "    </pluginRepositories>\n" +
+                                "</project>");
+    }
+
+    @Test
+    public void shouldBeAbleToRemovePluginRepositories() throws Exception {
+        final File pom = getTestPomFile();
+        write(pom, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                   "<project>\n" +
+                   "    <pluginRepositories>\n" +
+                   "        <repository>\n" +
+                   "            <id>id</id>\n" +
+                   "            <name>name</name>\n" +
+                   "            <url>url</url>\n" +
+                   "            <layout>default</layout>\n" +
+                   "        </repository>\n" +
+                   "    </pluginRepositories>\n" +
+                   "</project>");
+
+        final Model model = Model.readFrom(pom)
+                                 .setPluginRepositories(null);
+        model.save();
+
+        assertTrue(model.getRepositories().isEmpty());
+        assertEquals(read(pom), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                "<project>\n" +
                                 "</project>");
     }
 

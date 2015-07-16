@@ -1,0 +1,33 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 Codenvy, S.A.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Codenvy, S.A. - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.che.ide.ext.java.jdt.internal.codeassist.select;
+
+import org.eclipse.che.ide.ext.java.jdt.internal.compiler.lookup.Binding;
+
+public class SelectionNodeFound extends RuntimeException {
+
+    public Binding binding;
+    public boolean isDeclaration;
+    private static final long serialVersionUID = -7335444736618092295L; // backward compatible
+
+    public SelectionNodeFound() {
+        this(null, false); // we found a problem in the selection node
+    }
+
+    public SelectionNodeFound(Binding binding) {
+        this(binding, false);
+    }
+
+    public SelectionNodeFound(Binding binding, boolean isDeclaration) {
+        this.binding = binding;
+        this.isDeclaration = isDeclaration;
+    }
+}

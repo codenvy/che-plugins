@@ -58,6 +58,8 @@ import static java.util.Objects.requireNonNull;
  * <li>properties</li>
  * <li>modules</li>
  * <li>dependencies</li>
+ * <li>repositories</li>
+ * <li>pluginRepositories</li>
  * </ul>
  * Order of elements in model based on
  * <a href="http://maven.apache.org/developers/conventions/code.html"> official recommended order</a>.
@@ -162,6 +164,7 @@ public final class Model {
 
     private static final ToModuleMapper     TO_MODULE_MAPPER     = new ToModuleMapper();
     private static final ToDependencyMapper TO_DEPENDENCY_MAPPER = new ToDependencyMapper();
+    private static final ToRepositoryMapper TO_REPOSITORY_MAPPER = new ToRepositoryMapper();
 
     private String               modelVersion;
     private String               groupId;
@@ -175,6 +178,8 @@ public final class Model {
     private DependencyManagement dependencyManagement;
     private Map<String, String>  properties;
     private List<String>         modules;
+    private List<Repository>     repositories;
+    private List<Repository>     pluginRepositories;
     private Dependencies         dependencies;
     private File                 pom;
 
@@ -323,6 +328,127 @@ public final class Model {
             return emptyList();
         }
         return new ArrayList<>(modules);
+    }
+
+    /**
+     * Returns list of repositories which are collections of artifacts which adhere to the Maven repository directory layout.
+     * <p/>
+     * Repositories exist as a place to collect and store artifacts.
+     */
+    public List<Repository> getRepositories() {
+        if (repositories == null) {
+            return emptyList();
+        }
+        return new ArrayList<>(repositories);
+    }
+
+    /**
+     * Returns list of repositories which are collections of plugin artifacts.
+     * <p/>
+     * Serves as a place to collect and store plugin artifacts.
+     */
+    public List<Repository> getPluginRepositories() {
+        if (pluginRepositories == null) {
+            return emptyList();
+        }
+        return new ArrayList<>(pluginRepositories);
+    }
+
+    /**
+     * Adds plugin repository
+     *
+     * @param pluginRepository
+     *         new plugin repository
+     */
+    public Model addPluginRepository(Repository pluginRepository) {
+        requireNonNull(pluginRepository, "Required not null plugin repository");
+        pluginRepositories().add(pluginRepository);
+        //add plugin repository to xml
+        if (root.hasSingleChild("pluginRepositories")) {
+            root.getSingleChild("pluginRepositories").appendChild(pluginRepository.asXMLElement());
+            pluginRepository.element = root.getLastChild();
+        } else {
+            root.insertChild(createElement("pluginRepositories", pluginRepository.asXMLElement()),
+                             beforeAnyOf("build",
+                                         "reporting",
+                                         "profiles").or(inTheEnd()));
+            pluginRepository.element = root.getSingleChild("pluginRepositories").getFirstChild();
+        }
+        return this;
+    }
+
+    /**
+     * Sets collection of plugin repositories.
+     * <p/>
+     * <b>Note: all existing plugin repositories will be removed from model and xml as well</b>
+     *
+     * @param pluginRepositories
+     *         new plugin repositories
+     */
+    public Model setPluginRepositories(Collection<? extends Repository> pluginRepositories) {
+        //remove existing plugin repositories
+        for (Repository pluginRepository : pluginRepositories()) {
+            pluginRepository.remove();
+        }
+        //add plugin repositories if necessary
+        if (pluginRepositories != null && !pluginRepositories.isEmpty()) {
+            for (Repository pluginRepository : pluginRepositories) {
+                addPluginRepository(pluginRepository);
+            }
+        } else {
+            root.removeChild("pluginRepositories");
+            this.pluginRepositories = null;
+        }
+        return this;
+    }
+
+    /**
+     * Adds plugin repository
+     *
+     * @param repository
+     *         new plugin repository
+     */
+    public Model addRepository(Repository repository) {
+        requireNonNull(repository, "Required not null repository");
+        repositories().add(repository);
+        //add repository to xml
+        if (root.hasSingleChild("repositories")) {
+            root.getSingleChild("repositories").appendChild(repository.asXMLElement());
+            repository.element = root.getLastChild();
+        } else {
+            root.insertChild(createElement("repositories", repository.asXMLElement()),
+                             beforeAnyOf("pluginRepositories",
+                                         "build",
+                                         "reporting",
+                                         "profiles").or(inTheEnd()));
+            repository.element = root.getSingleChild("repositories").getFirstChild();
+        }
+        return this;
+    }
+
+    /**
+     * Sets collection of repositories.
+     * <p/>
+     * <b>Note: all existing repositories will be removed from model and xml as well</b>
+     *
+     * @param repositories
+     *         new plugin repositories
+     */
+    public Model setRepositories(Collection<? extends Repository> repositories) {
+        //remove existing repositories
+        for (Repository repository : repositories()) {
+            repository.remove();
+        }
+        //add repositories if necessary
+        if (repositories != null && !repositories.isEmpty()) {
+            for (Repository repository : repositories) {
+                addRepository(repository);
+            }
+        } else {
+            root.removeChild("repositories");
+            this.repositories = null;
+        }
+        return this;
     }
 
     /**
@@ -847,6 +973,14 @@ public final class Model {
         return modules == null ? modules = new ArrayList<>() : modules;
     }
 
+    private List<Repository> repositories() {
+        return repositories == null ? repositories = new ArrayList<>() : repositories;
+    }
+
+    private List<Repository> pluginRepositories() {
+        return pluginRepositories == null ? pluginRepositories = new ArrayList<>() : pluginRepositories;
+    }
+
     private void addPropertyToXML(String key, String value) {
         if (properties().containsKey(key)) {
             root.getSingleChild("properties")
@@ -972,6 +1106,12 @@ public final class Model {
         if (root.hasSingleChild("modules")) {
             model.modules = tree.getElements("/project/modules/module", TO_MODULE_MAPPER);
         }
+        if (root.hasSingleChild("repositories")) {
+            model.repositories = tree.getElements("/project/repositories/repository", TO_REPOSITORY_MAPPER);
+        }
+        if (root.hasSingleChild("pluginRepositories")) {
+            model.pluginRepositories = tree.getElements("/project/pluginRepositories/repository", TO_REPOSITORY_MAPPER);
+        }
         if (root.hasSingleChild("properties")) {
             model.properties = fetchProperties(root.getSingleChild("properties"));
         }
@@ -999,6 +1139,14 @@ public final class Model {
         @Override
         public String map(Element element) {
             return element.getText();
+        }
+    }
+
+    private static class ToRepositoryMapper implements ElementMapper<Repository> {
+
+        @Override
+        public Repository map(Element element) {
+            return new Repository(element);
         }
     }
 }

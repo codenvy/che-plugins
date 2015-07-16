@@ -295,4 +295,9 @@ public class DockerInstance extends AbstractInstance {
     public void doUnbindProject(ProjectBinding project) throws MachineException {
         node.unbindProject(workspaceId, project);
     }
+
+    @Override
+    public DockerNode getNode() {
+        return node;
+    }
 }

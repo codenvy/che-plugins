@@ -39,4 +39,10 @@ public interface LocalizationConstant extends Messages {
 
     @Key("workspace.location.description")
     String workspaceLocationDescription();
+
+    @Key("messages.server.failure")
+    String messagesServerFailure();
+
+    @Key("connection.closed.dialog.title")
+    String connectionClosedDialogTitle();
 }

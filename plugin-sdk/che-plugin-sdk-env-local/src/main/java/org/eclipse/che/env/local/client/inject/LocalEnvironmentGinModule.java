@@ -16,8 +16,10 @@ import com.google.inject.Singleton;
 import org.eclipse.che.env.local.client.ActionDenyAccessDialogLocalEnv;
 import org.eclipse.che.env.local.client.ResourcesLockedActionPermitLocalEnv;
 import org.eclipse.che.env.local.client.SdkDocumentTitleDecorator;
+import org.eclipse.che.env.local.client.CheConnectionClosedInformer;
 import org.eclipse.che.env.local.client.WorkspaceToDirectoryMappingServiceClient;
 import org.eclipse.che.env.local.client.WorkspaceToDirectoryMappingServiceClientImpl;
+import org.eclipse.che.ide.api.ConnectionClosedInformer;
 import org.eclipse.che.ide.api.DocumentTitleDecorator;
 import org.eclipse.che.ide.api.action.permits.ActionDenyAccessDialog;
 import org.eclipse.che.ide.api.action.permits.Build;
@@ -38,6 +40,7 @@ public class LocalEnvironmentGinModule extends AbstractGinModule {
         bind(ActionDenyAccessDialog.class).annotatedWith(Run.class).to(ActionDenyAccessDialogLocalEnv.class).in(Singleton.class);
         bind(ResourcesLockedActionPermit.class).to(ResourcesLockedActionPermitLocalEnv.class).in(Singleton.class);
         bind(DocumentTitleDecorator.class).to(SdkDocumentTitleDecorator.class).in(Singleton.class);
+        bind(ConnectionClosedInformer.class).to(CheConnectionClosedInformer.class).in(Singleton.class);
         bind(WorkspaceToDirectoryMappingServiceClient.class).to(WorkspaceToDirectoryMappingServiceClientImpl.class).in(Singleton.class);
     }
 }

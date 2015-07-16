@@ -11,23 +11,40 @@
 package org.eclipse.che.plugin.docker.client;
 
 /**
+ * Implementation of docker AuthConfig object
+ * @see <a href="https://github.com/docker/docker/blob/v1.6.0/registry/auth.go#L29">source</a>
  * @author andrew00x
  */
 public class AuthConfig {
     private String serveraddress;
     private String username;
     private String password;
+    private String email;
+    private String auth;
 
-    public AuthConfig(String serveraddress, String username, String password) {
+
+    public AuthConfig(String serveraddress, String username, String password, String email, String auth) {
         this.serveraddress = serveraddress;
         this.username = username;
         this.password = password;
+        this.email = email;
+        this.auth = auth;
+    }
+
+    public AuthConfig(String serveraddress, String username, String password, String email) {
+        this.serveraddress = serveraddress;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.auth = "";
     }
 
     public AuthConfig(AuthConfig other) {
         this.serveraddress = other.serveraddress;
         this.username = other.username;
         this.password = other.password;
+        this.email = other.email;
+        this.auth = other.auth;
     }
 
     public AuthConfig() {
@@ -55,5 +72,21 @@ public class AuthConfig {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAuth() {
+        return auth;
+    }
+
+    public void setAuth(String auth) {
+        this.auth = auth;
     }
 }

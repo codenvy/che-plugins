@@ -92,18 +92,18 @@ public class DockerConnector {
 
     private final URI                      dockerDaemonUri;
     private final DockerCertificates       dockerCertificates;
-    private final AuthConfigs              authConfigs;
+    private final InitialAuthConfig        initialAuthConfig;
     private final ExecutorService          executor;
     private final Map<String, OOMDetector> oomDetectors;
 
-    public DockerConnector(AuthConfigs authConfigs) {
-        this(new DockerConnectorConfiguration(authConfigs));
+    public DockerConnector(InitialAuthConfig initialAuthConfig) {
+        this(new DockerConnectorConfiguration(initialAuthConfig));
     }
 
-    public DockerConnector(URI dockerDaemonUri, DockerCertificates dockerCertificates, AuthConfigs authConfigs) {
+    public DockerConnector(URI dockerDaemonUri, DockerCertificates dockerCertificates, InitialAuthConfig initialAuthConfig) {
         this.dockerDaemonUri = dockerDaemonUri;
         this.dockerCertificates = dockerCertificates;
-        this.authConfigs = authConfigs;
+        this.initialAuthConfig = initialAuthConfig;
         executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("DockerApiConnector-%d").setDaemon(true).build());
         oomDetectors = new ConcurrentHashMap<>();
     }
@@ -112,7 +112,7 @@ public class DockerConnector {
     private DockerConnector(DockerConnectorConfiguration connectorConfiguration) {
         this(connectorConfiguration.getDockerDaemonUri(),
              connectorConfiguration.getDockerCertificates(),
-             connectorConfiguration.getAuthConfigs());
+             connectorConfiguration.getInitialAuthConfig());
     }
 
     /**
@@ -130,7 +130,8 @@ public class DockerConnector {
                 final String msg = CharStreams.toString(new InputStreamReader(response.getInputStream()));
                 throw new DockerException(String.format("Error response from docker API, status: %d, message: %s", status, msg), status);
             }
-            return JsonHelper.fromJson(response.getInputStream(), org.eclipse.che.plugin.docker.client.json.SystemInfo.class, null, FIRST_LETTER_LOWERCASE);
+            return JsonHelper.fromJson(response.getInputStream(), org.eclipse.che.plugin.docker.client.json.SystemInfo.class, null,
+                                       FIRST_LETTER_LOWERCASE);
         } catch (JsonParseException e) {
             throw new IOException(e.getMessage(), e);
         } finally {
@@ -153,7 +154,8 @@ public class DockerConnector {
                 final String msg = CharStreams.toString(new InputStreamReader(response.getInputStream()));
                 throw new DockerException(String.format("Error response from docker API, status: %d, message: %s", status, msg), status);
             }
-            return JsonHelper.fromJson(response.getInputStream(), org.eclipse.che.plugin.docker.client.json.SystemInfo.class, null, FIRST_LETTER_LOWERCASE);
+            return JsonHelper.fromJson(response.getInputStream(), org.eclipse.che.plugin.docker.client.json.SystemInfo.class, null,
+                                       FIRST_LETTER_LOWERCASE);
         } catch (JsonParseException e) {
             throw new IOException(e.getMessage(), e);
         } finally {
@@ -768,7 +770,7 @@ public class DockerConnector {
             final List<Pair<String, ?>> headers = new ArrayList<>(3);
             headers.add(Pair.of("Content-Type", "text/plain"));
             headers.add(Pair.of("Content-Length", 0));
-            headers.add(Pair.of("X-Registry-Auth", authConfigs.getAuthHeader(registry)));
+            headers.add(Pair.of("X-Registry-Auth", initialAuthConfig.getAuthConfigHeader()));
             final StringBuilder pathBuilder = new StringBuilder("/images/");
             if (registry != null) {
                 pathBuilder.append(registry).append("/").append(repository);
@@ -871,7 +873,7 @@ public class DockerConnector {
             final List<Pair<String, ?>> headers = new ArrayList<>(3);
             headers.add(Pair.of("Content-Type", "text/plain"));
             headers.add(Pair.of("Content-Length", 0));
-            headers.add(Pair.of("X-Registry-Auth", authConfigs.getAuthHeader(registry)));
+            headers.add(Pair.of("X-Registry-Auth", initialAuthConfig.getAuthConfigHeader()));
             final StringBuilder pathBuilder = new StringBuilder("/images/create?fromImage=");
             if (registry != null) {
                 pathBuilder.append(registry).append("/");

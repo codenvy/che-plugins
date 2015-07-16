@@ -166,7 +166,7 @@ class Utils {
             }
             gwtModuleName = gwtModuleName.replace(java.io.File.separatorChar, '.');
             if (gwtModuleName.startsWith("."))
-                gwtModuleName = gwtModuleName.replaceFirst(".","");
+                gwtModuleName = gwtModuleName.substring(1);
             return new ExtensionDescriptor(gwtModuleName, MavenUtils.getGroupId(pom), pom.getArtifactId(), MavenUtils.getVersion(pom));
         } finally {
             zipFile.close();

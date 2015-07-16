@@ -31,17 +31,17 @@ public class DockerConnectorConfiguration {
     private String dockerCertificatesDirectoryPath = boot2dockerCertsDirectoryPath();
 
     @Inject
-    private AuthConfigs authConfigs;
+    private InitialAuthConfig initialAuthConfig;
 
     @Inject
-    public DockerConnectorConfiguration(AuthConfigs authConfigs) {
-        this.authConfigs = authConfigs;
+    public DockerConnectorConfiguration(InitialAuthConfig initialAuthConfig) {
+        this.initialAuthConfig = initialAuthConfig;
     }
 
     public DockerConnectorConfiguration(URI dockerDaemonUri,
                                         String dockerCertificatesDirectoryPath,
-                                        AuthConfigs authConfigs) {
-        this.authConfigs = authConfigs;
+                                        InitialAuthConfig initialAuthConfig) {
+        this.initialAuthConfig = initialAuthConfig;
         this.dockerDaemonUri = dockerDaemonUri;
         this.dockerCertificatesDirectoryPath = dockerCertificatesDirectoryPath;
     }
@@ -62,8 +62,8 @@ public class DockerConnectorConfiguration {
         return dockerDaemonUri;
     }
 
-    public AuthConfigs getAuthConfigs() {
-        return authConfigs;
+    public InitialAuthConfig getInitialAuthConfig() {
+        return initialAuthConfig;
     }
 
     public DockerCertificates getDockerCertificates() {

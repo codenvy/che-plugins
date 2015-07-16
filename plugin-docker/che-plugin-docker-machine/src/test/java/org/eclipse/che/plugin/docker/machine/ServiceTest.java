@@ -38,15 +38,18 @@ import org.eclipse.che.api.workspace.server.dao.MemberDao;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.user.User;
 import org.eclipse.che.dto.server.DtoFactory;
+import org.eclipse.che.inject.ConfigurationProperties;
 import org.eclipse.che.plugin.docker.client.AuthConfig;
 import org.eclipse.che.plugin.docker.client.AuthConfigs;
 import org.eclipse.che.plugin.docker.client.DockerConnector;
+import org.eclipse.che.plugin.docker.client.InitialAuthConfig;
 import org.eclipse.che.plugin.docker.client.ProgressLineFormatterImpl;
 import org.eclipse.che.plugin.docker.client.ProgressMonitor;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.eclipse.che.plugin.docker.client.json.HostConfig;
 import org.eclipse.che.plugin.docker.client.json.PortBinding;
 import org.eclipse.che.plugin.docker.client.json.ProgressStatus;
+import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -101,15 +104,17 @@ public class ServiceTest {
     private MachineManager       machineManager;
     private MachineService       machineService;
     private String               registryContainerId;
-    private AuthConfigs          authConfigs;
+    private InitialAuthConfig    authConfigs;
     private EventService         eventService;
+    @Mock
+    private ConfigurationProperties configurationProperties;
 
     private DtoFactory dtoFactory = DtoFactory.getInstance();
 
     @BeforeClass
     public void setUpClass() throws Exception {
         //authConfigs = new AuthConfigs(Collections.singleton(new AuthConfig("localhost:5000", "codenvy", "password1")));
-        authConfigs = new AuthConfigs(Collections.<AuthConfig>emptySet());
+        authConfigs = new InitialAuthConfig(configurationProperties);
 
         docker = new DockerConnector(authConfigs);
 
@@ -200,7 +205,7 @@ public class ServiceTest {
 
     @AfterMethod
     public void tearDown() throws Exception {
-        for (MachineState machine : new ArrayList<>(machineManager.getMachines())) {
+        for (MachineState machine : new ArrayList<>(machineManager.getMachinesStates())) {
             machineManager.destroy(machine.getId());
         }
     }
@@ -252,7 +257,7 @@ public class ServiceTest {
         expected.add(createMachineAndWaitRunningState().getId());
 
         Set<String> actual = new HashSet<>();
-        for (MachineState machine : machineManager.getMachines()) {
+        for (MachineState machine : machineManager.getMachinesStates()) {
             actual.add(machine.getId());
         }
         assertEquals(actual, expected);

@@ -79,19 +79,22 @@
                                 <unzip dest="${project.build.outputDirectory}" src="${project.build.directory}/packager-conf/jar/org.eclipse.jdt.core-${org.eclipse.jdt.core.version}.jar">
                                     <patternset>
                                         <exclude name="**/META-INF/**" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/util/Util**" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaProject.class" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaModelManager**" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/ClasspathEntry**" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaModelOperation**" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/SourceMapper**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/BecomeWorkingCopyOperation**" />
                                         <exclude name="**/org/eclipse/jdt/internal/core/ChangeClasspathOperation**" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/SetContainerOperation**" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/ReconcileWorkingCopyOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/ClasspathEntry**" />
                                         <exclude name="**/org/eclipse/jdt/internal/core/DeltaProcessingState**" />
                                         <exclude name="**/org/eclipse/jdt/internal/core/DeltaProcessor**" />
-                                        <exclude name="**/org/eclipse/jdt/internal/core/BecomeWorkingCopyOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaModel.class" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaModelManager**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaModelOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaProject.class" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/JavaProject$*.class" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/ReconcileWorkingCopyOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/SetContainerOperation**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/SourceMapper**" />
                                         <exclude name="**/org/eclipse/jdt/core/JavaConventions**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/search/indexing/IndexManager**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/util/Util**" />
                                     </patternset>
                                 </unzip>
                             </target>

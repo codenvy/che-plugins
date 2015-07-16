@@ -26,6 +26,6 @@ public class ExtensionProjectType extends ProjectType {
 
         addParent(mavenProjectType);
         setDefaultBuilder("maven");
-        setDefaultRunner("system:/sdk/tomcat7");
+        setDefaultRunner("system:/sdk/tomcat8");
     }
 }

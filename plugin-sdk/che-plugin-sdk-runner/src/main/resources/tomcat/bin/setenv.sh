@@ -1,22 +1,45 @@
 #
-# Copyright (c) 2012-2014 Codenvy, S.A.
-# All rights reserved. This program and the accompanying materials
-# are made available under the terms of the Eclipse Public License v1.0
-# which accompanies this distribution, and is available at
-# http://www.eclipse.org/legal/epl-v10.html
+# CODENVY CONFIDENTIAL
+# __________________
 #
-# Contributors:
-#   Codenvy, S.A. - initial API and implementation
+#  [2012] - [2015] Codenvy, S.A.
+#  All Rights Reserved.
+#
+# NOTICE:  All information contained herein is, and remains
+# the property of Codenvy S.A. and its suppliers,
+# if any.  The intellectual and technical concepts contained
+# herein are proprietary to Codenvy S.A.
+# and its suppliers and may be covered by U.S. and Foreign Patents,
+# patents in process, and are protected by trade secret or copyright law.
+# Dissemination of this information or reproduction of this material
+# is strictly forbidden unless prior written permission is obtained
+# from Codenvy S.A..
 #
 
-LOG_OPTS="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
-CODENVY_CONFIG_OPTS="-Xshare:auto -Xms512m -Xmx1024m -XX:MaxPermSize=256m"
-CODENVY_OPTS="-Dcodenvy.local.conf.dir=${CATALINA_HOME}/conf"
+#Global Conf dir
+[ -z "${CODENVY_LOCAL_CONF_DIR}" ]  && CODENVY_LOCAL_CONF_DIR="${CATALINA_HOME}/conf/"
 
-#REMOTE_DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"
+#Global JAVA options
+[ -z "${JAVA_OPTS}" ]  && JAVA_OPTS="-Xms256m -Xmx1024m  -server"
 
-JAVA_OPTS="$JAVA_OPTS $LOG_OPTS $CODENVY_CONFIG_OPTS $CODENVY_OPTS $REMOTE_DEBUG"
+#Global LOGS DIR
+[ -z "${CODENVY_LOGS_DIR}" ]  && CODENVY_LOGS_DIR="$CATALINA_HOME/logs"
 
-export SERVER_PORT=${PORT}
-export JAVA_OPTS
-export CLASSPATH="${CATALINA_HOME}/conf/:${CATALINA_HOME}/lib/jul-to-slf4j.jar:${CATALINA_HOME}/lib/slf4j-api.jar:${CATALINA_HOME}/lib/logback-classic.jar:${CATALINA_HOME}/lib/logback-core.jar:${JAVA_HOME}/lib/tools.jar"
+[ -z "${JPDA_ADDRESS}" ]  && JPDA_ADDRESS="8000"
+
+#Tomcat options
+[ -z "${CATALINA_OPTS}" ]  && CATALINA_OPTS="-Dcom.sun.management.jmxremote  \
+                                             -Dcom.sun.management.jmxremote.ssl=false \
+                                             -Dcom.sun.management.jmxremote.authenticate=false \
+                                             -Dcodenvy.local.conf.dir=${CODENVY_LOCAL_CONF_DIR}"
+
+#Class path
+[ -z "${CLASSPATH}" ]  && CLASSPATH="${CATALINA_HOME}/conf/:${JAVA_HOME}/lib/tools.jar"
+
+
+export JAVA_OPTS="$JAVA_OPTS  -Dcodenvy.logs.dir=${CODENVY_LOGS_DIR}"
+
+
+#Class path
+[ -z "${SERVER_PORT}" ]  && SERVER_PORT=${PORT}
+export SERVER_PORT

@@ -117,6 +117,12 @@
             <groupId>org.eclipse.text</groupId>
             <artifactId>org.eclipse.text</artifactId>
             <version>${org.eclipse.text.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>org.eclipse.equinox.common</artifactId>
+                    <groupId>org.eclipse.equinox</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.tycho</groupId>

@@ -90,7 +90,7 @@ public class SimpleGeneratorStrategyTest {
         Assert.assertTrue(testFolder.isFolder());
     }
 
-    private void prepareProject() throws ServerException, ConflictException, ForbiddenException {
+    private void prepareProject() throws Exception {
         final String vfsUser = "dev";
         final Set<String> vfsUserGroups = new LinkedHashSet<>(Arrays.asList("workspace/developer"));
 

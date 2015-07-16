@@ -60,7 +60,6 @@ public class SDKRunner extends Runner {
     private static final Logger LOG = LoggerFactory.getLogger(SDKRunner.class);
 
     public static final String IDE_GWT_XML_FILE_NAME    = "IDEPlatform.gwt.xml";
-    public static final String DEFAULT_SERVER_NAME      = "tomcat7";
     /** Rel for code server link. */
     public static final String LINK_REL_CODE_SERVER     = "code server";
     /** Name of configuration parameter that specifies the domain name or IP address of the code server. */

@@ -30,9 +30,6 @@ public class DockerExtServerModule extends AbstractModule {
         Multibinder<ServerConf> machineServers = Multibinder.newSetBinder(binder(), ServerConf.class);
         machineServers.addBinding().toInstance(new ServerConf("extensions", "4401", "http"));
 
-        bindConstant().annotatedWith(Names.named(DockerMachineExtServerLauncher.START_EXT_SERVER_COMMAND))
-                      .to("mkdir -p ~/che && unzip /mnt/che/ext-server.zip -d ~/che/ext-server && ~/che/ext-server/bin/catalina.sh start");
-
         // :ro removed because of bug in a docker 1.6:L
         //TODO add :ro when bug is fixed or rework ext server binding mechanism to provide copy of the ext server zip to each machine
         Multibinder<String> volumesMultibinder =

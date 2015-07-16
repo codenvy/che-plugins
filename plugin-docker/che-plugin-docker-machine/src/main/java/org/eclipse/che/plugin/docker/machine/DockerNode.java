@@ -11,6 +11,7 @@
 package org.eclipse.che.plugin.docker.machine;
 
 import org.eclipse.che.api.machine.server.exception.MachineException;
+import org.eclipse.che.api.machine.server.spi.InstanceNode;
 import org.eclipse.che.api.machine.shared.ProjectBinding;
 
 /**
@@ -18,7 +19,7 @@ import org.eclipse.che.api.machine.shared.ProjectBinding;
  *
  * @author Alexander Garagatyi
  */
-public interface DockerNode {
+public interface DockerNode extends InstanceNode {
     /**
      * Bind project to docker container.<br>
      * Project can't be bound/unbound if workspace is bound already, and vice versa.
@@ -71,11 +72,9 @@ public interface DockerNode {
      */
     void unbindWorkspace(String workspaceId, String hostProjectsFolder) throws MachineException;
 
-    /**
-     * Get path of folder on docker node that will contain bound projects
-     */
+    @Override
     String getProjectsFolder();
 
-
+    @Override
     String getHost();
 }

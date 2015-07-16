@@ -41,8 +41,6 @@ public abstract class BaseTomcatServer implements ApplicationServer {
     protected static final String SERVER_XML            =
             "<?xml version='1.0' encoding='utf-8'?>\n" +
             "<Server port=\"-1\">\n" +
-            "  <Listener className=\"org.apache.catalina.core.AprLifecycleListener\" SSLEngine=\"on\" />\n" +
-            "  <Listener className=\"org.apache.catalina.core.JasperListener\" />\n" +
             "  <Listener className=\"org.apache.catalina.core.JreMemoryLeakPreventionListener\" />\n" +
             "  <Listener className=\"org.apache.catalina.mbeans.GlobalResourcesLifecycleListener\" />\n" +
             "  <Listener className=\"org.apache.catalina.core.ThreadLocalLeakPreventionListener\" />\n" +

@@ -51,8 +51,6 @@ public class TomcatServer implements ApplicationServer {
     private static final String SERVER_XML         =
             "<?xml version='1.0' encoding='utf-8'?>\n" +
             "<Server port=\"-1\">\n" +
-            "  <Listener className=\"org.apache.catalina.core.AprLifecycleListener\" SSLEngine=\"on\" />\n" +
-            "  <Listener className=\"org.apache.catalina.core.JasperListener\" />\n" +
             "  <Listener className=\"org.apache.catalina.core.JreMemoryLeakPreventionListener\" />\n" +
             "  <Listener className=\"org.apache.catalina.mbeans.GlobalResourcesLifecycleListener\" />\n" +
             "  <Listener className=\"org.apache.catalina.core.ThreadLocalLeakPreventionListener\" />\n" +
@@ -81,12 +79,12 @@ public class TomcatServer implements ApplicationServer {
 
     @Override
     public final String getName() {
-        return "tomcat7";
+        return "tomcat8";
     }
 
     @Override
     public String getDescription() {
-        return "Apache Tomcat 7.0 is an implementation of the Java Servlet and JavaServer Pages technologies.\n" +
+        return "Apache Tomcat 8.0 is an implementation of the Java Servlet and JavaServer Pages technologies.\n" +
                "Home page: http://tomcat.apache.org/";
     }
 
