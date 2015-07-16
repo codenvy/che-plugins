@@ -110,12 +110,23 @@
     color: #929292;
 }
 
+.opacityButton {
+    opacity: 0.4;
+}
+
+.selectRecipe {
+    background-color: #132d41;
+ }
+
+.unSelectRecipe {
+    background-color: #373737;
+}
+
 .unavailableLabel {
     width: 100%;
     height: 100%;
     left: 0;
     cursor: default;
-    position: fixed;
     text-align: center;
     top: 50% !important;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 1);

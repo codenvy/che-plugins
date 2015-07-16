@@ -20,6 +20,7 @@ import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConso
 import org.eclipse.che.ide.extension.machine.client.outputspanel.OutputsContainerPresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance.MachineAppliancePresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel.MachinePanelPresenter;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.RecipePartPresenter;
 import org.eclipse.che.ide.workspace.PartStackPresenterFactory;
 import org.eclipse.che.ide.workspace.PartStackViewFactory;
 import org.eclipse.che.ide.workspace.WorkBenchControllerFactory;
@@ -37,6 +38,7 @@ import static org.eclipse.che.ide.api.parts.PartStackType.NAVIGATION;
  * Special view perspective which defines how must main window be displayed when we choose machine perspective.
  *
  * @author Dmitry Shnurenko
+ * @author Valeriy Svydenko
  */
 @Singleton
 public class MachinePerspective extends AbstractPerspective {
@@ -52,6 +54,7 @@ public class MachinePerspective extends AbstractPerspective {
                               PartStackPresenterFactory stackPresenterFactory,
                               MachineConsolePresenter console,
                               MachinePanelPresenter machinePanel,
+                              RecipePartPresenter recipePanel,
                               NotificationManager notificationManager,
                               OutputsContainerPresenter outputsContainer,
                               MachineAppliancePresenter infoContainer) {
@@ -68,6 +71,7 @@ public class MachinePerspective extends AbstractPerspective {
         addPart(notificationManager, INFORMATION, FIRST);
         addPart(outputsContainer, INFORMATION);
         addPart(machinePanel, NAVIGATION);
+        addPart(recipePanel, NAVIGATION);
 
         setActivePart(machinePanel);
     }
@@ -92,7 +96,6 @@ public class MachinePerspective extends AbstractPerspective {
         container.setWidget(view);
 
         openActivePart(INFORMATION);
-
-        setActivePart(machinePanel);
+        openActivePart(NAVIGATION);
     }
 }

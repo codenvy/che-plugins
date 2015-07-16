@@ -8,29 +8,28 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance;
+package org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.container;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.ImplementedBy;
 
-import org.eclipse.che.ide.api.parts.PartStackView;
+import org.eclipse.che.ide.api.mvp.View;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 /**
- * Provides methods to control view representation of info container.
- *
- * @author Dmitry Shnurenko
  * @author Valeriy Svydenko
  */
-@ImplementedBy(MachineApplianceViewImpl.class)
-public interface MachineApplianceView extends PartStackView {
+@ImplementedBy(RecipesContainerViewImpl.class)
+public interface RecipesContainerView extends View<RecipesContainerView.ActionDelegate>{
+    interface ActionDelegate {
+    }
 
     /**
-     * Shows tabs container on main view.
+     * Show a given widget in the special place in the container.
      *
-     * @param tabContainer
-     *         container which need add
+     * @param panel
+     *         recipes panel that needs to be shown
      */
-    void showContainer(@Nullable IsWidget tabContainer);
+    void showWidget(@Nonnull IsWidget panel);
 }

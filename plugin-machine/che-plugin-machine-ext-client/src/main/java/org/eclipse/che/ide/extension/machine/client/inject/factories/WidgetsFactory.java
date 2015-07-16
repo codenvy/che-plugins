@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.inject.factories;
 
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor.button.EditorButtonWidget;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor.button.EditorButtonWidgetImpl;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.header.TabHeader;
 
 import javax.annotation.Nonnull;
@@ -18,6 +20,7 @@ import javax.annotation.Nonnull;
  * Special factory for creating different widgets.
  *
  * @author Dmitry Shnurenko
+ * @author Valeriy Svydenko
  */
 public interface WidgetsFactory {
 
@@ -29,4 +32,17 @@ public interface WidgetsFactory {
      * @return an instance of {@link TabHeader}
      */
     TabHeader createTabHeader(@Nonnull String tabName);
+
+    /**
+     * Creates property button widget.
+     *
+     * @param title
+     *         title of button
+     * @param background
+     *         background of button
+     * @return an instance of {@link EditorButtonWidget}
+     */
+    @Nonnull
+    EditorButtonWidget createEditorButton(@Nonnull String title, @Nonnull EditorButtonWidgetImpl.Background background);
+
 }

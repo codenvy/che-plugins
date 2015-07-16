@@ -11,8 +11,11 @@
 package org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwtmockito.GwtMockitoTestRunner;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
 import org.eclipse.che.ide.client.inject.factories.TabItemFactory;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFactory;
@@ -21,6 +24,11 @@ import org.eclipse.che.ide.extension.machine.client.machine.Machine;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance.server.ServerPresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance.sufficientinfo.MachineInfoPresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance.terminal.TerminalPresenter;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel.MachinePanelPresenter;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel.MachinePanelView;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.RecipePartPresenter;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.RecipePartView;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.container.RecipesContainerPresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.Tab;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.container.TabContainerPresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.container.TabContainerView;
@@ -35,7 +43,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
@@ -45,8 +52,9 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Dmitry Shnurenko
+ * @author Valeriy Svydenko
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(GwtMockitoTestRunner.class)
 public class MachineAppliancePresenterTest {
 
     private final static String SOME_TEXT = "someText";
@@ -68,6 +76,8 @@ public class MachineAppliancePresenterTest {
     private TabItemFactory              tabItemFactory;
     @Mock
     private PartsComparator             comparator;
+    @Mock
+    private RecipesContainerPresenter   recipesContainerPresenter;
     //TODO un commit to test process tab
 //    @Mock
 //    private ProcessesPresenter          processesPresenter;
@@ -82,21 +92,33 @@ public class MachineAppliancePresenterTest {
 
     //additional mocks
     @Mock
-    private TabHeader        tabHeader;
+    private TabHeader              tabHeader;
     //    @Mock
 //    private Tab              processTab;
     @Mock
-    private Tab              terminalTab;
+    private Tab                    terminalTab;
     @Mock
-    private Tab              infoTab;
+    private Tab                    infoTab;
     @Mock
-    private Tab              serverTab;
+    private Tab                    serverTab;
     @Mock
-    private TabContainerView tabContainerView;
+    private TabContainerView       tabContainerView;
     @Mock
-    private Machine          machine;
+    private Machine                machine;
     @Mock
-    private AcceptsOneWidget container;
+    private Widget                 widget;
+    @Mock
+    private ActivePartChangedEvent event;
+    @Mock
+    private RecipePartPresenter    recipePartPresenter;
+    @Mock
+    private MachinePanelPresenter  machinePanelPresenter;
+    @Mock
+    private MachinePanelView       machinePanelView;
+    @Mock
+    private RecipePartView         recipePartView;
+    @Mock
+    private AcceptsOneWidget       container;
 
     @Captor
     private ArgumentCaptor<TabSelectHandler> handlerCaptor;
@@ -107,6 +129,7 @@ public class MachineAppliancePresenterTest {
     public void setUp() {
         when(machine.getId()).thenReturn(SOME_TEXT);
         when(tabContainer.getView()).thenReturn(tabContainerView);
+        when(tabContainerView.asWidget()).thenReturn(widget);
 
 //        when(locale.tabProcesses()).thenReturn(SOME_TEXT);
         when(locale.tabTerminal()).thenReturn(SOME_TEXT);
@@ -140,6 +163,7 @@ public class MachineAppliancePresenterTest {
                                                   tabItemFactory,
                                                   terminalPresenter,
                                                   infoPresenter,
+                                                  recipesContainerPresenter,
                                                   serverPresenter,
                                                   tabContainer);
     }
@@ -165,7 +189,7 @@ public class MachineAppliancePresenterTest {
 
         verify(tabContainer).getView();
 
-        verify(view).showContainer(tabContainerView);
+        verify(view).showContainer(widget);
     }
 
     @Test
@@ -203,13 +227,15 @@ public class MachineAppliancePresenterTest {
         reset(tabContainer);
 //        when(machine.getId()).thenReturn(SOME_TEXT);
         when(machine.getActiveTabName()).thenReturn(SOME_TEXT);
+        when(tabContainer.getView()).thenReturn(tabContainerView);
+        when(tabContainerView.asWidget()).thenReturn(widget);
 
         presenter.showAppliance(machine);
 
 //        verify(machine).getId();
 //        verify(processesPresenter).showProcesses(SOME_TEXT);
         verify(tabContainer).getView();
-        verify(view).showContainer(tabContainerView);
+        verify(view, times(2)).showContainer(widget);
 
         verify(tabContainer).showTab(SOME_TEXT);
         verify(terminalPresenter).updateTerminal(machine);
@@ -222,5 +248,24 @@ public class MachineAppliancePresenterTest {
         presenter.go(container);
 
         verify(container).setWidget(view);
+    }
+
+    @Test
+    public void recipeEditorShouldBeShowed() throws Exception {
+        when(event.getActivePart()).thenReturn(recipePartPresenter);
+        when(recipePartPresenter.getView()).thenReturn(recipePartView);
+
+        presenter.onActivePartChanged(event);
+
+        verify(view).showContainer(recipePartView.asWidget());
+    }
+
+    @Test
+    public void machinesShouldBeShowed() throws Exception {
+        when(event.getActivePart()).thenReturn(machinePanelPresenter);
+
+        presenter.onActivePartChanged(event);
+
+        verify(view).showContainer(tabContainerView);
     }
 }

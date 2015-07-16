@@ -15,10 +15,12 @@ import com.google.inject.assistedinject.Assisted;
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
 import org.eclipse.che.api.machine.shared.dto.MachineStateDescriptor;
 import org.eclipse.che.api.machine.shared.dto.ServerDescriptor;
+import org.eclipse.che.api.machine.shared.dto.recipe.RecipeDescriptor;
 import org.eclipse.che.ide.extension.machine.client.machine.Machine;
 import org.eclipse.che.ide.extension.machine.client.machine.MachineState;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance.server.Server;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel.MachineTreeNode;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor.RecipeEditorPanel;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.Tab;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.container.TabContainerView.TabSelectHandler;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.content.TabPresenter;
@@ -32,6 +34,7 @@ import java.util.Collection;
  * Special factory for creating entities.
  *
  * @author Dmitry Shnurenko
+ * @author Valeriy Svydenko
  */
 public interface EntityFactory {
 
@@ -59,6 +62,16 @@ public interface EntityFactory {
      * @return an instance of {@link Tab}
      */
     Tab createTab(@Nonnull TabHeader tabHeader, @Nonnull TabPresenter tabPresenter, @Nullable TabSelectHandler handler);
+
+    /**
+     * Creates a properties panel widget for a given environment.
+     *
+     * @param recipeDescriptor
+     *         descriptor that needs to be bound with a widget
+     * @return an instance of {@link RecipeEditorPanel}
+     */
+    @Nonnull
+    RecipeEditorPanel createRecipeEditorPanel(@Nullable RecipeDescriptor recipeDescriptor);
 
     /**
      * Creates server entity with special parameters.

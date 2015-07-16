@@ -92,5 +92,11 @@ public interface MachineResources extends ClientBundle {
         String fullSize();
 
         String unavailableLabel();
+
+        String selectRecipe();
+
+        String opacityButton();
+
+        String unSelectRecipe();
     }
 }

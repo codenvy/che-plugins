@@ -265,4 +265,22 @@ public interface MachineLocalizationConstant extends Messages {
 
     @Key("machine.restarted")
     String machineRestarted(String text);
+
+    @Key("view.recipePanel.title")
+    String viewRecipePanelTitle();
+
+    @Key("view.recipePanel.tooltip")
+    String viewRecipePanelTooltip();
+
+    @Key("editor.button.create")
+    String editorButtonCreate();
+
+    @Key("editor.button.save")
+    String editorButtonSave();
+
+    @Key("editor.button.delete")
+    String editorButtonDelete();
+
+    @Key("editor.button.cancel")
+    String editorButtonCancel();
 }

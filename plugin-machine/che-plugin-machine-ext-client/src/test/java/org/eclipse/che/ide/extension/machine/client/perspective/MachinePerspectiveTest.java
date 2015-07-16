@@ -24,6 +24,7 @@ import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConso
 import org.eclipse.che.ide.extension.machine.client.outputspanel.OutputsContainerPresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance.MachineAppliancePresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel.MachinePanelPresenter;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.RecipePartPresenter;
 import org.eclipse.che.ide.part.PartStackPresenter;
 import org.eclipse.che.ide.workspace.PartStackPresenterFactory;
 import org.eclipse.che.ide.workspace.PartStackViewFactory;
@@ -66,6 +67,8 @@ public class MachinePerspectiveTest {
     private NotificationManager        notificationManager;
     @Mock
     private OutputsContainerPresenter  outputsContainer;
+    @Mock
+    private RecipePartPresenter        recipePanel;
 
     //additional mocks
     @Mock
@@ -112,6 +115,7 @@ public class MachinePerspectiveTest {
                                              stackPresenterFactory,
                                              console,
                                              machinePanel,
+                                             recipePanel,
                                              notificationManager,
                                              outputsContainer,
                                              infoContainer);
@@ -139,6 +143,6 @@ public class MachinePerspectiveTest {
         verify(partStackPresenter, times(2)).go(simplePanel);
         verify(container).setWidget(view);
 
-        verify(partStackPresenter).openPreviousActivePart();
+        verify(partStackPresenter,times(2)).openPreviousActivePart();
     }
 }
