@@ -29,6 +29,8 @@ import javax.inject.Named;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,9 +117,9 @@ public class WindowsTomcatServer extends BaseTomcatServer {
                               "set \"CATALINA_TMPDIR=%cd%\\temp\"\r\n";
         final boolean debug = runnerConfiguration.getDebugPort() > 0;
         if (debug) {
-            return catalinaOpts + "call bin/catalina.bat jpda run 2>&1 | tee ../logs/output.log\r\n";
+            return catalinaOpts + "call bin/catalina.bat jpda run 2>&1\r\n";
         }
-        return catalinaOpts + "call bin/catalina.bat run 2>&1 | tee ../logs/output.log\r\n";
+        return catalinaOpts + "call bin/catalina.bat run 2>&1\r\n";
     }
 
     private static class TomcatProcess extends ApplicationProcess {
@@ -161,6 +163,8 @@ public class WindowsTomcatServer extends BaseTomcatServer {
                 winProcess = new WinProcess(process);
                 logger = new ApplicationLogsPublisher(new TomcatLogger(logFiles), eventService, id, workspace, project);
                 output = new StreamPump();
+                Path logFile = Paths.get(workDir.getAbsolutePath(), "logs", "output.log");
+                output.setLogFile(logFile);
                 output.start(process, logger);
                 LOG.debug("Start Tomcat at port {}, application {}", httpPort, workDir);
             } catch (IOException e) {
