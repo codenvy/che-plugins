@@ -27,9 +27,9 @@ import org.eclipse.che.api.machine.server.impl.SnapshotImpl;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.api.machine.shared.MachineStatus;
 import org.eclipse.che.api.machine.shared.dto.CommandDescriptor;
+import org.eclipse.che.api.machine.shared.dto.RecipeMachineCreationMetadata;
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
-import org.eclipse.che.api.machine.shared.dto.MachineFromRecipeMetadata;
-import org.eclipse.che.api.machine.shared.dto.MachineFromSnapshotMetadata;
+import org.eclipse.che.api.machine.shared.dto.SnapshotMachineCreationMetadata;
 import org.eclipse.che.api.machine.shared.dto.MachineStateDescriptor;
 import org.eclipse.che.api.machine.shared.dto.ProcessDescriptor;
 import org.eclipse.che.api.machine.shared.dto.recipe.RecipeDescriptor;
@@ -39,8 +39,6 @@ import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.user.User;
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.inject.ConfigurationProperties;
-import org.eclipse.che.plugin.docker.client.AuthConfig;
-import org.eclipse.che.plugin.docker.client.AuthConfigs;
 import org.eclipse.che.plugin.docker.client.DockerConnector;
 import org.eclipse.che.plugin.docker.client.InitialAuthConfig;
 import org.eclipse.che.plugin.docker.client.ProgressLineFormatterImpl;
@@ -95,17 +93,11 @@ public class ServiceTest {
     private DockerInstanceKey pushedImage;
 
     private SnapshotDao          snapshotDao;
-    private MemberDao            memberDao;
-    private DockerMachineFactory dockerFactory;
-    private DockerNode           dockerNode;
     private MachineRegistry      machineRegistry;
     private DockerConnector      docker;
-    private InstanceProvider     dockerInstanceProvider;
     private MachineManager       machineManager;
     private MachineService       machineService;
     private String               registryContainerId;
-    private InitialAuthConfig    authConfigs;
-    private EventService         eventService;
     @Mock
     private ConfigurationProperties configurationProperties;
 
@@ -114,7 +106,7 @@ public class ServiceTest {
     @BeforeClass
     public void setUpClass() throws Exception {
         //authConfigs = new AuthConfigs(Collections.singleton(new AuthConfig("localhost:5000", "codenvy", "password1")));
-        authConfigs = new InitialAuthConfig(configurationProperties);
+        InitialAuthConfig authConfigs = new InitialAuthConfig(configurationProperties);
 
         docker = new DockerConnector(authConfigs);
 
@@ -139,27 +131,28 @@ public class ServiceTest {
 
     @BeforeMethod
     public void setUp() throws Exception {
-        memberDao = mock(MemberDao.class);
+        MemberDao memberDao = mock(MemberDao.class);
 
         snapshotDao = mock(SnapshotDao.class);
 
-        dockerFactory = mock(DockerMachineFactory.class);
+        DockerMachineFactory dockerFactory = mock(DockerMachineFactory.class);
 
-        dockerNode = mock(DockerNode.class);
+        DockerNode dockerNode = mock(DockerNode.class);
 
-        eventService = mock(EventService.class);
+        EventService eventService = mock(EventService.class);
 
 
-        dockerInstanceProvider = new DockerInstanceProvider(docker,
-                                                            dockerFactory,
-                                                            new HashSet<ServerConf>(),
-                                                            new HashSet<String>());
+        InstanceProvider dockerInstanceProvider = new DockerInstanceProvider(docker,
+                                                                             dockerFactory,
+                                                                             new HashSet<ServerConf>(),
+                                                                             new HashSet<String>());
 
         machineManager = new MachineManager(snapshotDao,
                                             machineRegistry,
                                             new MachineInstanceProviders(Collections.singleton(dockerInstanceProvider)),
                                             "/tmp",
-                                            eventService);
+                                            eventService,
+                                            100);
 
         // fixme
 //        Field field = MachineService.class.getDeclaredField("defaultLineConsumer");
@@ -213,7 +206,7 @@ public class ServiceTest {
     @Test
     public void createFromRecipeTest() throws Exception {
         final MachineStateDescriptor machine = machineService.createMachineFromRecipe(
-                dtoFactory.createDto(MachineFromRecipeMetadata.class)
+                dtoFactory.createDto(RecipeMachineCreationMetadata.class)
                           .withType("docker")
                           .withWorkspaceId("wsId")
                           .withRecipeDescriptor(dtoFactory.createDto(RecipeDescriptor.class)
@@ -236,7 +229,7 @@ public class ServiceTest {
         when(snapshot.getOwner()).thenReturn(USER);
 
         final MachineStateDescriptor machine = machineService
-                .createMachineFromSnapshot(dtoFactory.createDto(MachineFromSnapshotMetadata.class).withSnapshotId(SNAPSHOT_ID));
+                .createMachineFromSnapshot(dtoFactory.createDto(SnapshotMachineCreationMetadata.class).withSnapshotId(SNAPSHOT_ID));
 
         waitMachineIsRunning(machine.getId());
     }
@@ -405,7 +398,7 @@ public class ServiceTest {
 
     private MachineState createMachineAndWaitRunningState()
             throws ServerException, NotFoundException, ForbiddenException, InterruptedException {
-        final MachineState machine = machineManager.create(dtoFactory.createDto(MachineFromRecipeMetadata.class)
+        final MachineState machine = machineManager.create(dtoFactory.createDto(RecipeMachineCreationMetadata.class)
                                                                      .withWorkspaceId("wsId")
                                                                      .withType("docker")
                                                                      .withRecipeDescriptor(dtoFactory.createDto(RecipeDescriptor.class)
