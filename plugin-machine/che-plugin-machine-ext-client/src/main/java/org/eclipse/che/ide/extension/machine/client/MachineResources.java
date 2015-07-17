@@ -13,6 +13,7 @@ package org.eclipse.che.ide.extension.machine.client;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.resources.client.TextResource;
 
 import org.vectomatic.dom.svg.ui.SVGResource;
 
@@ -45,6 +46,9 @@ public interface MachineResources extends ClientBundle {
 
     @Source("images/machine-perspective.svg")
     SVGResource machinePerspective();
+
+    @Source("recipe-template.txt")
+    TextResource recipeTemplate();
 
     ImageResource close();
 

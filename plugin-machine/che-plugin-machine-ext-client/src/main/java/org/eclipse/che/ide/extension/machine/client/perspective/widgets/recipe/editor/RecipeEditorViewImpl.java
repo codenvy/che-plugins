@@ -55,6 +55,8 @@ public class RecipeEditorViewImpl extends Composite implements RecipeEditorView 
     TextBox           scriptUrl;
     @UiField
     TextBox           tags;
+    @UiField
+    TextBox           name;
 
     @UiField(provided = true)
     final MachineResources resources;
@@ -150,6 +152,19 @@ public class RecipeEditorViewImpl extends Composite implements RecipeEditorView 
     /** {@inheritDoc} */
     @Nonnull
     @Override
+    public String getName() {
+        return name.getText();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setName(@Nonnull String name) {
+        this.name.setText(name);
+    }
+
+    /** {@inheritDoc} */
+    @Nonnull
+    @Override
     public List<String> getTags() {
         List<String> tagList = new ArrayList<>();
 
@@ -210,7 +225,7 @@ public class RecipeEditorViewImpl extends Composite implements RecipeEditorView 
         recipePanel.setWidgetHidden(buttonsPanel, true);
     }
 
-    @UiHandler("tags")
+    @UiHandler({"tags", "name"})
     public void onTextInputted(@SuppressWarnings("UnusedParameters") KeyUpEvent event) {
         cancelBtn.setEnable(true);
         saveBtn.setEnable(true);

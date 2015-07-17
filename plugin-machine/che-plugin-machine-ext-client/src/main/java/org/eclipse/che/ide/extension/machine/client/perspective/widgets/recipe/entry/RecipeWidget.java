@@ -41,7 +41,7 @@ public class RecipeWidget extends Composite implements RecipeEntry, ClickHandler
     @UiField
     SimpleLayoutPanel image;
     @UiField
-    Label             text;
+    Label             name;
     @UiField
     FlowPanel         main;
 
@@ -59,7 +59,7 @@ public class RecipeWidget extends Composite implements RecipeEntry, ClickHandler
         SVGImage icon = new SVGImage(resources.projectPerspective());
         image.getElement().appendChild(icon.getSvgElement().getElement());
 
-        text.setText(recipe.getId());
+        name.setText(recipe.getName());
 
         addDomHandler(this, ClickEvent.getType());
     }
@@ -92,6 +92,11 @@ public class RecipeWidget extends Composite implements RecipeEntry, ClickHandler
     public void unSelect() {
         main.removeStyleName(resources.getCss().selectRecipe());
         main.addStyleName(resources.getCss().unSelectRecipe());
+    }
+
+    /** Sets name of the Recipe. */
+    public void setName(@Nonnull String name) {
+        this.name.setText(name);
     }
 
 }

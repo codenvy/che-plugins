@@ -92,15 +92,28 @@ public class RecipeEditorPanel implements TabPresenter, RecipeEditorView.ActionD
         view.setEnableDeleteButton(enable);
     }
 
+    public void setVisibleSaveCancelDeleteBtn(boolean visible) {
+        view.setVisibleCancelButton(visible);
+        view.setVisibleDeleteButton(visible);
+        view.setVisibleSaveButton(visible);
+    }
+
     /** Returns a script of recipe */
     @Nonnull
     public String getScript() {
         return ((TextEditor)editor).getDocument().getContents();
     }
 
-    /** Returns list of tags */
+    /** Returns list of tags. */
+    @Nonnull
     public List<String> getTags() {
         return view.getTags();
+    }
+
+    /** Returns name of the recipe. */
+    @Nonnull
+    public String getName() {
+        return view.getName();
     }
 
     /** {@inheritDoc} */
@@ -207,6 +220,7 @@ public class RecipeEditorPanel implements TabPresenter, RecipeEditorView.ActionD
         setEnableSaveAndCancelButtons(false);
 
         view.setTags(recipeDescriptor.getTags());
+        view.setName(recipeDescriptor.getName());
 
         if (editor instanceof UndoableEditor) {
             HandlesUndoRedo undoRedo = ((UndoableEditor)editor).getUndoRedo();
@@ -226,7 +240,6 @@ public class RecipeEditorPanel implements TabPresenter, RecipeEditorView.ActionD
     /** {@inheritDoc} */
     @Override
     public void setVisible(boolean visible) {
-        setVisible(visible);
     }
 
     public interface ActionDelegate {

@@ -24,6 +24,7 @@ import org.eclipse.che.api.machine.shared.dto.recipe.RecipeUpdate;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
 import org.eclipse.che.ide.api.event.ActivePartChangedHandler;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -33,6 +34,7 @@ import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.eclipse.che.ide.extension.machine.client.MachineResources;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.container.RecipesContainerPresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor.RecipeEditorPanel;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor.RecipeEditorView;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.entry.RecipeEntry;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.entry.RecipeWidget;
 
@@ -133,7 +135,7 @@ public class RecipePartPresenter extends BasePresenter implements RecipePartView
         recipeRemoved.then(new Operation<Void>() {
             @Override
             public void apply(Void arg) throws OperationException {
-                notificationManager.showInfo("Recipe " + selectedRecipeDescriptor.getId() + " was deleted.");
+                notificationManager.showInfo("Recipe \"" + selectedRecipeDescriptor.getName() + "\"  was deleted.");
                 recipes.remove(selectedRecipe);
                 view.removeRecipe(selectedRecipe);
                 recipesContainerPresenter.removeRecipePanel(selectedRecipe);
@@ -153,18 +155,27 @@ public class RecipePartPresenter extends BasePresenter implements RecipePartView
     public void onCreateButtonClicked() {
         String type;
         String script;
-        List<String> tags = Collections.emptyList();
+        String name;
+        List<String> tags;
         if (selectedRecipe == null) {
+            RecipeEditorPanel stubPanel = recipesContainerPresenter.getEditorStubPanel();
             type = RECIPE_TYPE;
-            script = "{}";
+            script = resources.recipeTemplate().getText();
+            name = stubPanel.getName();
+            tags = stubPanel.getTags();
         } else {
             RecipeDescriptor selectedRecipeDescriptor = recipes.get(selectedRecipe);
             type = selectedRecipeDescriptor.getType();
             script = selectedRecipeDescriptor.getScript();
             tags = selectedRecipeDescriptor.getTags();
+            name = selectedRecipeDescriptor.getName();
         }
 
-        NewRecipe newRecipe = dtoFactory.createDto(NewRecipe.class).withType(type).withScript(script).withTags(tags);
+        NewRecipe newRecipe = dtoFactory.createDto(NewRecipe.class)
+                                        .withType(type)
+                                        .withScript(script)
+                                        .withName(name)
+                                        .withTags(tags);
 
         Promise<RecipeDescriptor> createRecipe = service.createRecipe(newRecipe);
         createRecipe.then(new Operation<RecipeDescriptor>() {
@@ -172,6 +183,15 @@ public class RecipePartPresenter extends BasePresenter implements RecipePartView
             public void apply(RecipeDescriptor recipeDescriptor) throws OperationException {
                 RecipeWidget createdRecipeWidget = addRecipe(recipeDescriptor);
                 onRecipeClicked(createdRecipeWidget);
+            }
+        });
+
+        createRecipe.catchError(new Operation<PromiseError>() {
+            @Override
+            public void apply(PromiseError arg) throws OperationException {
+                if (arg.getMessage() != null) {
+                    notificationManager.showError(arg.getMessage());
+                }
             }
         });
     }
@@ -182,16 +202,23 @@ public class RecipePartPresenter extends BasePresenter implements RecipePartView
         RecipeEditorPanel editorPanel = recipesContainerPresenter.getEditorPanel(selectedRecipe);
         RecipeDescriptor recipeDescriptor = selectedRecipe.getDescriptor();
         final RecipeUpdate recipeUpdate = dtoFactory.createDto(RecipeUpdate.class)
+                                                    .withId(recipeDescriptor.getId())
                                                     .withType(recipeDescriptor.getType())
                                                     .withScript(editorPanel.getScript())
+                                                    .withName(editorPanel.getName())
                                                     .withTags(editorPanel.getTags());
-        Promise<RecipeDescriptor> updateRecipe = service.updateRecipe(recipeDescriptor.getId(), recipeUpdate);
+        Promise<RecipeDescriptor> updateRecipe = service.updateRecipe(recipeUpdate);
         updateRecipe.then(new Operation<RecipeDescriptor>() {
             @Override
             public void apply(RecipeDescriptor recipeDescriptor) throws OperationException {
-                recipes.get(selectedRecipe).setScript(recipeDescriptor.getScript());
-                recipes.get(selectedRecipe).setTags(recipeDescriptor.getTags());
-                notificationManager.showInfo("Recipe " + recipeDescriptor.getId() + " was saved.");
+                RecipeDescriptor selectedRecipeDescriptor = recipes.get(selectedRecipe);
+                selectedRecipeDescriptor.setScript(recipeDescriptor.getScript());
+                selectedRecipeDescriptor.setTags(recipeDescriptor.getTags());
+                selectedRecipeDescriptor.setName(recipeDescriptor.getName());
+
+                selectedRecipe.setName(recipeDescriptor.getName());
+
+                notificationManager.showInfo("Recipe \"" + recipeDescriptor.getName() + "\" was saved.");
             }
         });
     }
@@ -265,6 +292,12 @@ public class RecipePartPresenter extends BasePresenter implements RecipePartView
 
     private void showEditorStubPanel() {
         RecipeEditorPanel editorStubPanel = recipesContainerPresenter.getEditorStubPanel();
+
+        RecipeEditorView stubPanelView = (RecipeEditorView)editorStubPanel.getView();
+        stubPanelView.setName("");
+        stubPanelView.setTags(Collections.<String>emptyList());
+
+        editorStubPanel.setVisibleSaveCancelDeleteBtn(false);
         editorStubPanel.setDelegate(this);
         recipesContainerPresenter.showEditorStubPanel();
     }

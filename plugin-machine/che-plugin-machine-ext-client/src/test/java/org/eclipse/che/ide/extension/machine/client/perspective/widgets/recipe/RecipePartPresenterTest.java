@@ -19,6 +19,7 @@ import org.eclipse.che.api.machine.shared.dto.recipe.RecipeDescriptor;
 import org.eclipse.che.api.machine.shared.dto.recipe.RecipeUpdate;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.dto.DtoFactory;
@@ -26,6 +27,7 @@ import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.eclipse.che.ide.extension.machine.client.MachineResources;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.container.RecipesContainerPresenter;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor.RecipeEditorPanel;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor.RecipeEditorView;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.entry.RecipeWidget;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -58,7 +61,7 @@ public class RecipePartPresenterTest {
     //constructor mocks
     @Mock
     private RecipePartView              recipePartView;
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private MachineResources            machineResources;
     @Mock
     private EventBus                    eventBus;
@@ -75,17 +78,19 @@ public class RecipePartPresenterTest {
 
     //additional mocks
     @Mock
-    private RecipeDescriptor     recipeDescriptor1;
+    private RecipeDescriptor  recipeDescriptor1;
     @Mock
-    private RecipeDescriptor     recipeDescriptor2;
+    private RecipeDescriptor  recipeDescriptor2;
     @Mock
-    private RecipeWidget         recipeWidget;
+    private RecipeWidget      recipeWidget;
     @Mock
-    private RecipeEditorPanel    recipeEditorPanel;
+    private RecipeEditorPanel recipeEditorPanel;
     @Mock
-    private OMSVGSVGElement      omsvgsvgElement;
+    private OMSVGSVGElement   omsvgsvgElement;
     @Mock
-    private SVGResource          svgResource;
+    private SVGResource       svgResource;
+    @Mock
+    RecipeEditorPanel stubPanel;
     @Mock
     private MachineResources.Css css;
 
@@ -105,6 +110,8 @@ public class RecipePartPresenterTest {
     @Captor
     private ArgumentCaptor<Operation<RecipeDescriptor>>       savedDescriptorCaptor;
     @Captor
+    private ArgumentCaptor<Operation<PromiseError>>           operationErrorArgumentCaptor;
+    @Captor
     private ArgumentCaptor<Operation<Void>>                   deleteCaptor;
 
     RecipePartPresenter recipePartPresenter;
@@ -114,6 +121,9 @@ public class RecipePartPresenterTest {
         when(machineResources.projectPerspective()).thenReturn(svgResource);
         when(svgResource.getSvg()).thenReturn(omsvgsvgElement);
         when(machineResources.getCss()).thenReturn(css);
+        when(machineResources.recipeTemplate().getText()).thenReturn("script");
+        when(recipesContainerPresenter.getEditorStubPanel()).thenReturn(stubPanel);
+        when(stubPanel.getName()).thenReturn("name");
 
         recipePartPresenter = new RecipePartPresenter(recipePartView,
                                                       machineResources,
@@ -153,8 +163,10 @@ public class RecipePartPresenterTest {
 
     @Test
     public void stubPanelShouldBeShowed() throws Exception {
+        RecipeEditorView recipeEditorView = mock(RecipeEditorView.class);
         when(service.getAllRecipes()).thenReturn(recipePromises);
         when(recipesContainerPresenter.getEditorStubPanel()).thenReturn(recipeEditorPanel);
+        when(recipeEditorPanel.getView()).thenReturn(recipeEditorView);
 
         recipePartPresenter.showRecipes();
 
@@ -167,6 +179,7 @@ public class RecipePartPresenterTest {
         verify(recipesContainerPresenter).getEditorStubPanel();
         verify(recipeEditorPanel).setDelegate(recipePartPresenter);
         verify(recipesContainerPresenter).showEditorStubPanel();
+        verify(recipeEditorView).setName("");
     }
 
     @Test
@@ -175,15 +188,20 @@ public class RecipePartPresenterTest {
         when(dtoFactory.createDto(NewRecipe.class)).thenReturn(newRecipe);
         when(newRecipe.withType(anyString())).thenReturn(newRecipe);
         when(newRecipe.withScript(anyString())).thenReturn(newRecipe);
+        when(newRecipe.withName(anyString())).thenReturn(newRecipe);
         when(newRecipe.withTags(Matchers.<List<String>>any())).thenReturn(newRecipe);
         when(service.createRecipe(newRecipe)).thenReturn(recipeDescriptorPromise);
         when(recipesContainerPresenter.getEditorPanel(Matchers.<RecipeWidget>any())).thenReturn(recipeEditorPanel);
+        when(recipeEditorPanel.getName()).thenReturn("name");
 
         recipePartPresenter.onCreateButtonClicked();
 
         verify(service).createRecipe(newRecipe);
         verify(newRecipe).withType(RECIPE_TYPE);
-        verify(newRecipe).withScript("{}");
+        verify(newRecipe).withScript("script");
+        verify(newRecipe).withName("name");
+        verify(stubPanel).getName();
+        verify(stubPanel).getTags();
         assertTrue(newRecipe.getTags().isEmpty());
 
         verify(recipeDescriptorPromise).then(operationDescriptorCaptor.capture());
@@ -199,12 +217,15 @@ public class RecipePartPresenterTest {
     @Test
     public void secondRecipeShouldBeCreated() throws Exception {
         NewRecipe newRecipe = mock(NewRecipe.class);
+
         when(dtoFactory.createDto(NewRecipe.class)).thenReturn(newRecipe);
         when(newRecipe.withType(anyString())).thenReturn(newRecipe);
         when(newRecipe.withScript(anyString())).thenReturn(newRecipe);
+        when(newRecipe.withName(anyString())).thenReturn(newRecipe);
         when(newRecipe.withTags(Matchers.<List<String>>any())).thenReturn(newRecipe);
         when(service.createRecipe(newRecipe)).thenReturn(recipeDescriptorPromise);
         when(recipesContainerPresenter.getEditorPanel(Matchers.<RecipeWidget>any())).thenReturn(recipeEditorPanel);
+        when(recipesContainerPresenter.getEditorStubPanel()).thenReturn(stubPanel);
 
         recipePartPresenter.onCreateButtonClicked();
 
@@ -218,7 +239,8 @@ public class RecipePartPresenterTest {
         verify(recipeDescriptor1).getTags();
 
         verify(newRecipe).withType(RECIPE_TYPE);
-        verify(newRecipe).withScript("{}");
+        verify(newRecipe).withScript("script");
+        verify(newRecipe).withName("name");
         assertTrue(newRecipe.getTags().isEmpty());
 
         verify(service, times(2)).createRecipe(newRecipe);
@@ -239,6 +261,7 @@ public class RecipePartPresenterTest {
         when(dtoFactory.createDto(NewRecipe.class)).thenReturn(newRecipe);
         when(newRecipe.withType(anyString())).thenReturn(newRecipe);
         when(newRecipe.withScript(anyString())).thenReturn(newRecipe);
+        when(newRecipe.withName(anyString())).thenReturn(newRecipe);
         when(newRecipe.withTags(Matchers.<List<String>>any())).thenReturn(newRecipe);
         when(service.createRecipe(newRecipe)).thenReturn(recipeDescriptorPromise);
         when(recipesContainerPresenter.getEditorPanel(Matchers.<RecipeWidget>any())).thenReturn(recipeEditorPanel);
@@ -259,11 +282,12 @@ public class RecipePartPresenterTest {
     @Test
     public void recipeShouldBeSaved() throws Exception {
         NewRecipe newRecipe = mock(NewRecipe.class);
-        List<String> tags = Arrays.asList("tag");
+        List<String> tags = Collections.singletonList("tag");
 
         when(dtoFactory.createDto(NewRecipe.class)).thenReturn(newRecipe);
         when(newRecipe.withType(anyString())).thenReturn(newRecipe);
         when(newRecipe.withScript(anyString())).thenReturn(newRecipe);
+        when(newRecipe.withName(anyString())).thenReturn(newRecipe);
         when(newRecipe.withTags(Matchers.<List<String>>any())).thenReturn(newRecipe);
         when(service.createRecipe(newRecipe)).thenReturn(recipeDescriptorPromise);
         when(recipesContainerPresenter.getEditorPanel(Matchers.<RecipeWidget>any())).thenReturn(recipeEditorPanel);
@@ -271,15 +295,19 @@ public class RecipePartPresenterTest {
         RecipeUpdate recipeUpdate = mock(RecipeUpdate.class);
         when(dtoFactory.createDto(RecipeUpdate.class)).thenReturn(recipeUpdate);
         when(recipeUpdate.withType(anyString())).thenReturn(recipeUpdate);
+        when(recipeUpdate.withId(anyString())).thenReturn(recipeUpdate);
         when(recipeUpdate.withScript(anyString())).thenReturn(recipeUpdate);
+        when(recipeUpdate.withName(anyString())).thenReturn(recipeUpdate);
         when(recipeUpdate.withTags(Matchers.<List<String>>any())).thenReturn(recipeUpdate);
         when(recipeDescriptor1.getId()).thenReturn("id");
+        when(recipeDescriptor1.getName()).thenReturn("name");
         when(recipeDescriptor1.getScript()).thenReturn("script");
         when(recipeDescriptor1.getTags()).thenReturn(tags);
-        when(service.updateRecipe("id", recipeUpdate)).thenReturn(savedRecipeDescriptorPromise);
+        when(service.updateRecipe(recipeUpdate)).thenReturn(savedRecipeDescriptorPromise);
         when(recipeDescriptor1.getType()).thenReturn(RECIPE_TYPE);
         when(recipeEditorPanel.getScript()).thenReturn("script");
         when(recipeEditorPanel.getTags()).thenReturn(tags);
+        when(recipeEditorPanel.getName()).thenReturn("name");
 
         recipePartPresenter.onCreateButtonClicked();
 
@@ -288,12 +316,12 @@ public class RecipePartPresenterTest {
 
         recipePartPresenter.onSaveButtonClicked();
 
-        verify(service).updateRecipe("id", recipeUpdate);
+        verify(service).updateRecipe(recipeUpdate);
         verify(savedRecipeDescriptorPromise).then(savedDescriptorCaptor.capture());
         savedDescriptorCaptor.getValue().apply(recipeDescriptor1);
         verify(recipeDescriptor1).setScript("script");
         verify(recipeDescriptor1).setTags(recipeDescriptor1.getTags());
-        verify(notificationManager).showInfo("Recipe id was saved.");
+        verify(notificationManager).showInfo("Recipe \"name\" was saved.");
     }
 
     @Test
@@ -326,5 +354,45 @@ public class RecipePartPresenterTest {
         recipePartPresenter.onActivePartChanged(event);
 
         verify(recipeEditorPanel).setDelegate(recipePartPresenter);
+    }
+
+    @Test
+    public void notificationShouldBeShowedWhenCreationIsFailed() throws Exception {
+        NewRecipe newRecipe = mock(NewRecipe.class);
+        when(dtoFactory.createDto(NewRecipe.class)).thenReturn(newRecipe);
+        when(newRecipe.withType(anyString())).thenReturn(newRecipe);
+        when(newRecipe.withScript(anyString())).thenReturn(newRecipe);
+        when(newRecipe.withName(anyString())).thenReturn(newRecipe);
+        when(newRecipe.withTags(Matchers.<List<String>>any())).thenReturn(newRecipe);
+        when(service.createRecipe(newRecipe)).thenReturn(recipeDescriptorPromise);
+        when(recipesContainerPresenter.getEditorPanel(Matchers.<RecipeWidget>any())).thenReturn(recipeEditorPanel);
+        when(recipeEditorPanel.getName()).thenReturn("name");
+
+        recipePartPresenter.onCreateButtonClicked();
+
+        verify(service).createRecipe(newRecipe);
+        verify(newRecipe).withType(RECIPE_TYPE);
+        verify(newRecipe).withScript("script");
+        verify(newRecipe).withName("name");
+        verify(stubPanel).getName();
+        verify(stubPanel).getTags();
+        assertTrue(newRecipe.getTags().isEmpty());
+
+        verify(recipeDescriptorPromise).then(operationDescriptorCaptor.capture());
+        operationDescriptorCaptor.getValue().apply(recipeDescriptor1);
+
+        verify(recipePartView).addRecipe(Matchers.<RecipeWidget>any());
+        verify(recipesContainerPresenter).addRecipePanel(Matchers.<RecipeWidget>any());
+        verify(recipesContainerPresenter).showEditorPanel(Matchers.<RecipeWidget>any());
+        verify(recipesContainerPresenter).getEditorPanel(Matchers.<RecipeWidget>any());
+        verify(recipeEditorPanel).setDelegate(recipePartPresenter);
+
+        PromiseError promiseError = mock(PromiseError.class);
+        when(promiseError.getMessage()).thenReturn("text");
+
+        verify(recipeDescriptorPromise).catchError(operationErrorArgumentCaptor.capture());
+        operationErrorArgumentCaptor.getValue().apply(promiseError);
+
+        verify(notificationManager).showError("text");
     }
 }

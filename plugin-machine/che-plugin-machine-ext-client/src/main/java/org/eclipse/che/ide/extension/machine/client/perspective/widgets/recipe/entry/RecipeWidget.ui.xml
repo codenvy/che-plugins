@@ -51,7 +51,7 @@
     <g:FlowPanel ui:field="main" addStyleNames="{style.main}">
 
         <g:SimpleLayoutPanel ui:field="image" addStyleNames="{style.image}"/>
-        <g:Label ui:field="text" addStyleNames="{style.label}"/>
+        <g:Label ui:field="name" addStyleNames="{style.label}"/>
 
     </g:FlowPanel>
 

@@ -67,6 +67,7 @@ public class RecipesContainerPresenter implements TabPresenter, RecipesContainer
         editorView.setScriptUrl(recipeDescriptor.getLink("get recipe script").getHref());
 
         editorView.setTags(recipeDescriptor.getTags());
+        editorView.setName(recipeDescriptor.getName());
     }
 
     /**

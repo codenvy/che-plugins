@@ -99,6 +99,24 @@ public class RecipeEditorPanelTest {
     }
 
     @Test
+    public void saveCancelDeleteButtonsShouldBeVisible() throws Exception {
+        presenter.setVisibleSaveCancelDeleteBtn(true);
+
+        verify(view).setVisibleDeleteButton(true);
+        verify(view).setVisibleCancelButton(true);
+        verify(view).setVisibleSaveButton(true);
+    }
+
+    @Test
+    public void saveCancelDeleteButtonsShouldBeHidden() throws Exception {
+        presenter.setVisibleSaveCancelDeleteBtn(false);
+
+        verify(view).setVisibleDeleteButton(false);
+        verify(view).setVisibleCancelButton(false);
+        verify(view).setVisibleSaveButton(false);
+    }
+
+    @Test
     public void tagsShouldBeReturned() throws Exception {
         presenter.getTags();
 

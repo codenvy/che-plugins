@@ -54,7 +54,12 @@
             <g:FlowPanel addStyleNames="{resources.getCss.fullSize}">
 
                 <g:FlowPanel addStyleNames="{style.textContainer}">
-                    <g:Label text="Recipe URL:" width="100%"/>
+                    <g:Label text="Name:" width="100%"/>
+                    <g:TextBox ui:field="name" addStyleNames="{style.script}" debugId="recipe-name"/>
+                </g:FlowPanel>
+
+                <g:FlowPanel addStyleNames="{style.textContainer}">
+                    <g:Label text="URL:" width="100%"/>
                     <g:TextBox ui:field="scriptUrl" enabled="false" addStyleNames="{style.script}" debugId="recipe-url"/>
                 </g:FlowPanel>
 

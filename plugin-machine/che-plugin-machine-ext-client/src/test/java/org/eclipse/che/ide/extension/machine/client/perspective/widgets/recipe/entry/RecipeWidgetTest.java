@@ -43,14 +43,14 @@ public class RecipeWidgetTest {
 
     @Before
     public void setUp() throws Exception {
-        when(recipeDescriptor.getId()).thenReturn("id");
+        when(recipeDescriptor.getName()).thenReturn("name");
 
         recipeWidget = new RecipeWidget(recipeDescriptor, resources);
     }
 
     @Test
     public void constructorShouldBePerformed() throws Exception {
-        verify(recipeWidget.text).setText("id");
+        verify(recipeWidget.name).setText("name");
         verify(resources).projectPerspective();
     }
 

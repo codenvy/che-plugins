@@ -45,6 +45,13 @@ public interface RecipeEditorView extends View<RecipeEditorView.ActionDelegate> 
     @Nonnull
     String getScriptUrl();
 
+    /** Gets name of the recipe */
+    @Nonnull
+    String getName();
+
+    /** Sets name of the recipe */
+    void setName(@Nonnull String name);
+
     /** Returns tags which used for recipes search */
     @Nonnull
     List<String> getTags();
