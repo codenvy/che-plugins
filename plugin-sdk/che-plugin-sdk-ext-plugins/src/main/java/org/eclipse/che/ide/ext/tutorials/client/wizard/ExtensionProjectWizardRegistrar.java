@@ -20,7 +20,7 @@ import com.google.inject.Provider;
 
 import javax.annotation.Nonnull;
 
-import static org.eclipse.che.ide.Constants.CODENVY_CATEGORY;
+import static org.eclipse.che.ide.Constants.ECLIPSE_CHE_CATEGORY;
 import static org.eclipse.che.ide.Constants.CODENVY_PLUGIN_ID;
 
 /**
@@ -44,7 +44,7 @@ public class ExtensionProjectWizardRegistrar implements ProjectWizardRegistrar {
 
     @Nonnull
     public String getCategory() {
-        return CODENVY_CATEGORY;
+        return ECLIPSE_CHE_CATEGORY;
     }
 
     @Nonnull

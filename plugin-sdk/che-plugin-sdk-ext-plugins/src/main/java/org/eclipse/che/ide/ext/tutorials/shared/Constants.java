@@ -15,5 +15,5 @@ public interface Constants {
     // project type ids
     final String TUTORIAL_ID   = "codenvy_tutorial";
     // project type names
-    final String TUTORIAL_NAME = "Codenvy Tutorial";
+    final String TUTORIAL_NAME = "Eclipse Che Tutorial";
 }
