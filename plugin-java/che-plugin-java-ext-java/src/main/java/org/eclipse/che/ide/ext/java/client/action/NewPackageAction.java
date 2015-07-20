@@ -21,12 +21,14 @@ import org.eclipse.che.ide.api.project.tree.TreeStructure;
 import org.eclipse.che.ide.api.project.tree.generic.ItemNode;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
+import org.eclipse.che.ide.commons.exception.ServerException;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.JavaUtils;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.AbstractSourceContainerNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
+import org.eclipse.che.ide.json.JsonHelper;
 import org.eclipse.che.ide.newresource.AbstractNewResourceAction;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.Unmarshallable;
@@ -88,7 +90,12 @@ public class NewPackageAction extends AbstractNewResourceAction {
 
             @Override
             public void onFailure(Throwable caught) {
-                dialogFactory.createMessageDialog("", caught.getMessage(), null).show();
+                if (caught instanceof ServerException) {
+                    String message = JsonHelper.parseJsonMessage(caught.getMessage());
+                    dialogFactory.createMessageDialog("", message, null).show();
+                } else {
+                    dialogFactory.createMessageDialog("", caught.getMessage(), null).show();
+                }
             }
         });
     }

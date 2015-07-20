@@ -14,12 +14,17 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.core.util.CommandLine;
+import org.eclipse.che.api.core.util.CompositeLineConsumer;
+import org.eclipse.che.api.core.util.IndentWrapperLineConsumer;
+import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.core.util.StreamPump;
+import org.eclipse.che.api.core.util.WritableLineConsumer;
 import org.eclipse.che.api.runner.RunnerException;
 import org.eclipse.che.api.runner.internal.ApplicationLogger;
 import org.eclipse.che.api.runner.internal.ApplicationLogsPublisher;
 import org.eclipse.che.api.runner.internal.ApplicationProcess;
 import org.eclipse.che.api.runner.internal.DeploymentSources;
+import org.eclipse.che.commons.lang.FlushingStreamWriter;
 import org.jvnet.winp.WinProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +32,11 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +47,9 @@ import java.util.List;
  */
 @Singleton
 public class WindowsTomcatServer extends BaseTomcatServer {
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsTomcatServer.class);
+    private static final Logger LOG        = LoggerFactory.getLogger(WindowsTomcatServer.class);
+    private static final String LOG_FOLDER = "logs";
+    private static final String LOG_FILE   = "output.log";
 
     @Inject
     public WindowsTomcatServer(@Named(MEM_SIZE_PARAMETER) int memSize,
@@ -52,7 +62,7 @@ public class WindowsTomcatServer extends BaseTomcatServer {
     public ApplicationProcess deploy(File appDir, DeploymentSources toDeploy, ApplicationServerRunnerConfiguration runnerConfiguration,
                                      ApplicationProcess.Callback callback) throws RunnerException {
         prepare(appDir, toDeploy, runnerConfiguration);
-        final File logsDir = new File(appDir, "logs");
+        final File logsDir = new File(appDir, LOG_FOLDER);
         final File startUpScriptFile;
         try {
             generateSetEnvScript(appDir, runnerConfiguration);
@@ -62,7 +72,7 @@ public class WindowsTomcatServer extends BaseTomcatServer {
             throw new RunnerException(e);
         }
         final List<File> logFiles = new ArrayList<>(1);
-        logFiles.add(new File(logsDir, "output.log"));
+        logFiles.add(new File(logsDir, LOG_FILE));
 
         return new TomcatProcess(appDir, startUpScriptFile, logFiles, runnerConfiguration, callback, eventService);
     }
@@ -75,8 +85,7 @@ public class WindowsTomcatServer extends BaseTomcatServer {
         }
         final String setEnvScript = "@echo off\r\n" +
                                     String.format("set \"CATALINA_OPTS=-server -Xms%dm -Xmx%dm\"\r\n", memory, memory) +
-                                    "set \"CLASSPATH=%CATALINA_HOME%/conf/;%CATALINA_HOME%/lib/jul-to-slf4j.jar;^%CATALINA_HOME%/lib/slf4j-api.jar;" +
-                                    "%CATALINA_HOME%/lib/logback-classic.jar\"";
+                                    "set \"CLASSPATH=%CATALINA_HOME%/conf/;\"";
         final File setEnvScriptFile = new File(appDir.toPath() + "/tomcat/bin", "setenv.bat");
         Files.write(setEnvScriptFile.toPath(), setEnvScript.getBytes());
         if (!setEnvScriptFile.setExecutable(true, false)) {
@@ -115,9 +124,9 @@ public class WindowsTomcatServer extends BaseTomcatServer {
                               "set \"CATALINA_TMPDIR=%cd%\\temp\"\r\n";
         final boolean debug = runnerConfiguration.getDebugPort() > 0;
         if (debug) {
-            return catalinaOpts + "call bin/catalina.bat jpda run 2>&1 | tee ../logs/output.log\r\n";
+            return catalinaOpts + "call bin/catalina.bat jpda run 2>&1\r\n";
         }
-        return catalinaOpts + "call bin/catalina.bat run 2>&1 | tee ../logs/output.log\r\n";
+        return catalinaOpts + "call bin/catalina.bat run 2>&1\r\n";
     }
 
     private static class TomcatProcess extends ApplicationProcess {
@@ -132,10 +141,11 @@ public class WindowsTomcatServer extends BaseTomcatServer {
         final String       project;
         final long         id;
 
-        ApplicationLogger logger;
-        Process           process;
-        StreamPump        output;
-        WinProcess        winProcess;
+        ApplicationLogsPublisher logger;
+        LineConsumer             logFileConsumer;
+        Process                  process;
+        StreamPump               output;
+        WinProcess               winProcess;
 
         TomcatProcess(File appDir, File startUpScriptFile, List<File> logFiles,
                       ApplicationServerRunnerConfiguration runnerConfiguration, Callback callback, EventService eventService) {
@@ -156,12 +166,17 @@ public class WindowsTomcatServer extends BaseTomcatServer {
             if (process != null && isAlive()) {
                 throw new IllegalStateException("Process is already started");
             }
+            File logFile = Paths.get(workDir.getAbsolutePath(), LOG_FOLDER, LOG_FILE).toFile();
             try {
+                OutputStreamWriter flashingStream = new FlushingStreamWriter(new FileOutputStream(logFile));
+                logger = new ApplicationLogsPublisher(new TomcatLogger(logFiles), eventService, id, workspace, project);
+                logFileConsumer = new IndentWrapperLineConsumer(new WritableLineConsumer(flashingStream));
+                LineConsumer logComposite = new CompositeLineConsumer(logFileConsumer, logger);
+
                 process = Runtime.getRuntime().exec(new CommandLine(startUpScriptFile.getAbsolutePath()).toShellCommand(), null, workDir);
                 winProcess = new WinProcess(process);
-                logger = new ApplicationLogsPublisher(new TomcatLogger(logFiles), eventService, id, workspace, project);
-                output = new StreamPump();
-                output.start(process, logger);
+                StreamPump output = new StreamPump();
+                output.start(process, logComposite);
                 LOG.debug("Start Tomcat at port {}, application {}", httpPort, workDir);
             } catch (IOException e) {
                 throw new RunnerException(e);
@@ -179,6 +194,11 @@ public class WindowsTomcatServer extends BaseTomcatServer {
             }
             callback.stopped();
             LOG.debug("Stop Tomcat at port {}, application {}", httpPort, workDir);
+            try {
+                logFileConsumer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         private void killProcess() throws RunnerException {

@@ -23,7 +23,9 @@ import org.eclipse.che.ide.api.project.tree.generic.ItemNode;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
+import org.eclipse.che.ide.commons.exception.ServerException;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
+import org.eclipse.che.ide.json.JsonHelper;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
@@ -258,7 +260,12 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
 
             @Override
             protected void onFailure(Throwable exception) {
-                dialogFactory.createMessageDialog("", exception.getMessage(), null).show();
+                if (exception instanceof ServerException) {
+                    String message = JsonHelper.parseJsonMessage(exception.getMessage());
+                    dialogFactory.createMessageDialog("", message, null).show();
+                } else {
+                    dialogFactory.createMessageDialog("", exception.getMessage(), null).show();
+                }
             }
         });
     }
