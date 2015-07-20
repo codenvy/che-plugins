@@ -68,6 +68,7 @@ public class DockerInstance extends AbstractInstance {
     private final DockerNode           node;
     private final String               workspaceId;
     private final boolean              workspaceIsBound;
+    private final int memorySizeMB;
 
     private ContainerInfo containerInfo;
 
@@ -82,7 +83,8 @@ public class DockerInstance extends AbstractInstance {
                           @Assisted("displayName") String displayName,
                           @Assisted("container") String container,
                           @Assisted DockerNode node,
-                          @Assisted LineConsumer outputConsumer) {
+                          @Assisted LineConsumer outputConsumer,
+                          @Assisted int memorySizeMB) {
         super(machineId, "docker", workspaceId, creator, workspaceIsBound, displayName);
         this.dockerMachineFactory = dockerMachineFactory;
         this.container = container;
@@ -92,6 +94,7 @@ public class DockerInstance extends AbstractInstance {
         this.node = node;
         this.workspaceId = workspaceId;
         this.workspaceIsBound = workspaceIsBound;
+        this.memorySizeMB = memorySizeMB;
     }
 
     @Override
@@ -299,5 +302,10 @@ public class DockerInstance extends AbstractInstance {
     @Override
     public DockerNode getNode() {
         return node;
+    }
+
+    @Override
+    public int getMemorySize() {
+        return memorySizeMB;
     }
 }

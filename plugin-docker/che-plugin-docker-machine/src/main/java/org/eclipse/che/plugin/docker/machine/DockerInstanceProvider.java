@@ -13,11 +13,9 @@ package org.eclipse.che.plugin.docker.machine;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.util.FileCleaner;
 import org.eclipse.che.api.core.util.LineConsumer;
-import org.eclipse.che.api.machine.server.exception.InvalidInstanceSnapshotException;
 import org.eclipse.che.api.machine.server.exception.InvalidRecipeException;
 import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.api.machine.server.exception.SnapshotException;
-import org.eclipse.che.api.machine.server.exception.UnsupportedRecipeException;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceKey;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
@@ -103,8 +101,8 @@ public class DockerInstanceProvider implements InstanceProvider {
                                    String workspaceId,
                                    boolean bindWorkspace,
                                    String displayName,
-                                   LineConsumer creationLogsOutput)
-            throws UnsupportedRecipeException, InvalidRecipeException, MachineException {
+                                   int memorySizeMB,
+                                   LineConsumer creationLogsOutput) throws MachineException {
         final Dockerfile dockerfile = parseRecipe(recipe);
 
         final String dockerImage = buildImage(dockerfile, creationLogsOutput);
@@ -115,6 +113,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                               workspaceId,
                               bindWorkspace,
                               displayName,
+                              memorySizeMB,
                               creationLogsOutput);
     }
 
@@ -176,8 +175,8 @@ public class DockerInstanceProvider implements InstanceProvider {
                                    String workspaceId,
                                    boolean bindWorkspace,
                                    String displayName,
-                                   LineConsumer creationLogsOutput)
-            throws NotFoundException, InvalidInstanceSnapshotException, MachineException {
+                                   int memorySizeMB,
+                                   LineConsumer creationLogsOutput) throws NotFoundException, MachineException {
         final String imageId = pullImage(instanceKey, creationLogsOutput);
 
         return createInstance(imageId,
@@ -186,6 +185,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                               workspaceId,
                               bindWorkspace,
                               displayName,
+                              memorySizeMB,
                               creationLogsOutput);
     }
 
@@ -261,11 +261,13 @@ public class DockerInstanceProvider implements InstanceProvider {
                                     String workspaceId,
                                     boolean bindWorkspace,
                                     String displayName,
+                                    int memorySizeMB,
                                     LineConsumer outputConsumer)
             throws MachineException {
         try {
             final ContainerConfig config = new ContainerConfig().withImage(imageId)
                                                                 .withMemorySwap(-1)
+                                                                .withMemory((long)memorySizeMB * 1024 * 1024)
                                                                 .withLabels(containerLabels)
                                                                 .withExposedPorts(portsToExpose);
 
@@ -294,7 +296,8 @@ public class DockerInstanceProvider implements InstanceProvider {
                                                        displayName,
                                                        containerId,
                                                        node,
-                                                       outputConsumer);
+                                                       outputConsumer,
+                                                       memorySizeMB);
         } catch (IOException e) {
             throw new MachineException(e);
         }
