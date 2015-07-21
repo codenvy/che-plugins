@@ -42,7 +42,7 @@ public class FormatService {
 
     public List<Change> format(@QueryParam("offset") int offset,
                                @QueryParam("length") int length,
-                               final String content) throws BadLocationException {
-        return formatter.format(offset, length, content);
+                               final String content) throws BadLocationException, IllegalArgumentException {
+        return formatter.format(content, offset, length);
     }
 }
