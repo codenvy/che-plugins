@@ -56,7 +56,7 @@ public class RecipeWidget extends Composite implements RecipeEntry, ClickHandler
 
         initWidget(UI_BINDER.createAndBindUi(this));
 
-        SVGImage icon = new SVGImage(resources.projectPerspective());
+        SVGImage icon = new SVGImage(resources.recipe());
         image.getElement().appendChild(icon.getSvgElement().getElement());
 
         name.setText(recipe.getName());

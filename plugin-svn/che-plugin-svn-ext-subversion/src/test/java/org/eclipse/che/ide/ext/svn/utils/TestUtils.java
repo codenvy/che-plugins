@@ -165,7 +165,7 @@ public class TestUtils {
 
         profileAttributes.put("firstName", "Codenvy");
         profileAttributes.put("lastName", "Codenvy");
-        profileAttributes.put("email", "codenvy@codenvy.com");
+        profileAttributes.put("email", "che@eclipse.org");
 
         Mockito.when(userProfileDao.getById("codenvy"))
                .thenReturn(new Profile().withId("codenvy").withUserId("codenvy").withAttributes(profileAttributes));

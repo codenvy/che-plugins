@@ -70,7 +70,7 @@ public class SingleEnvironmentFilter implements Filter {
                 password = getParameter("password", query);
             }
             if (username == null) {
-                username = "codenvy@codenvy.com";
+                username = "che@eclipse.org";
             }
             org.eclipse.che.api.user.server.dao.User daoUser;
             try {

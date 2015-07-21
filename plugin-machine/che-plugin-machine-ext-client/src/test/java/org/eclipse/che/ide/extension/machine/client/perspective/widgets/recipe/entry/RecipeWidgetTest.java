@@ -51,7 +51,7 @@ public class RecipeWidgetTest {
     @Test
     public void constructorShouldBePerformed() throws Exception {
         verify(recipeWidget.name).setText("name");
-        verify(resources).projectPerspective();
+        verify(resources).recipe();
     }
 
     @Test
