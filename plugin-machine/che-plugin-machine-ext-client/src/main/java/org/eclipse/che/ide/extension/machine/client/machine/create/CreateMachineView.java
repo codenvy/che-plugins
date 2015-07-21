@@ -49,6 +49,9 @@ public interface CreateMachineView extends View<CreateMachineView.ActionDelegate
     /** Sets tags. */
     void setTags(String tags);
 
+    /** Sets 'no recipe' hint visibility. */
+    void setNoRecipeHint(boolean show);
+
     /** Sets recipes corresponded to tags. */
     void setRecipes(List<RecipeDescriptor> recipes);
 

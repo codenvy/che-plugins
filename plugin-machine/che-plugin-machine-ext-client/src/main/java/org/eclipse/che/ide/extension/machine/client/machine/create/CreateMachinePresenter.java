@@ -21,6 +21,7 @@ import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.ide.extension.machine.client.machine.MachineManager;
 import org.eclipse.che.ide.extension.machine.client.util.RecipeProvider;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,6 +68,7 @@ public class CreateMachinePresenter implements CreateMachineView.ActionDelegate 
         view.setMachineName("");
         view.setRecipeURL("");
         view.setErrorHint(false);
+        view.setNoRecipeHint(false);
         view.setTags("");
 
         view.setRecipeURL(recipeProvider.getRecipeUrl());
@@ -84,10 +86,17 @@ public class CreateMachinePresenter implements CreateMachineView.ActionDelegate 
 
     @Override
     public void onTagsChanged() {
+        if (view.getTags().isEmpty()) {
+            view.setRecipes(Collections.<RecipeDescriptor>emptyList());
+            view.setNoRecipeHint(false);
+            return;
+        }
+
         recipeServiceClient.searchRecipes(view.getTags(), RECIPE_TYPE, SKIP_COUNT, MAX_COUNT).then(new Operation<List<RecipeDescriptor>>() {
             @Override
             public void apply(List<RecipeDescriptor> arg) throws OperationException {
                 view.setRecipes(arg);
+                view.setNoRecipeHint(arg.isEmpty());
             }
         });
     }

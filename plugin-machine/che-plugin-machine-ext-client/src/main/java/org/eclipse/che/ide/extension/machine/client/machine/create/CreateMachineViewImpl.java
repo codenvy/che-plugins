@@ -111,6 +111,8 @@ public class CreateMachineViewImpl extends Window implements CreateMachineView {
     Label                       errorHint;
     @UiField
     TextBox                     tags;
+    @UiField
+    Label                       noRecipeHint;
 
     private SimpleList<RecipeDescriptor> list;
     private ActionDelegate               delegate;
@@ -124,6 +126,7 @@ public class CreateMachineViewImpl extends Window implements CreateMachineView {
         public void onListItemDoubleClicked(Element listItemBase, RecipeDescriptor itemData) {
             delegate.onRecipeSelected(itemData);
             popupPanel.hide();
+            tags.setFocus(true);
         }
     };
 
@@ -268,6 +271,11 @@ public class CreateMachineViewImpl extends Window implements CreateMachineView {
     }
 
     @Override
+    public void setNoRecipeHint(boolean show) {
+        noRecipeHint.setVisible(show);
+    }
+
+    @Override
     public void setRecipes(List<RecipeDescriptor> recipes) {
         if (recipes.isEmpty()) {
             popupPanel.hide();
@@ -294,7 +302,6 @@ public class CreateMachineViewImpl extends Window implements CreateMachineView {
                                  coreResources.defaultSimpleListCss(),
                                  listItemRenderer,
                                  eventDelegate);
-
 
         list.render(recipes);
 
