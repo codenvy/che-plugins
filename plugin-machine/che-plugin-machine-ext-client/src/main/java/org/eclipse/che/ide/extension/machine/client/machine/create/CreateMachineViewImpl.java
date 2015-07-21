@@ -85,7 +85,7 @@ public class CreateMachineViewImpl extends Window implements CreateMachineView {
                     image.getElement().getStyle().setMargin(0, Style.Unit.PX);
                     icon.appendChild((Node)image.getElement());
 
-                    label.setInnerHTML(itemData.getId());
+                    label.setInnerHTML(itemData.getName());
                     group.setInnerHTML(itemData.getType());
 
                     itemElement.appendChild(icon);
@@ -123,6 +123,7 @@ public class CreateMachineViewImpl extends Window implements CreateMachineView {
         @Override
         public void onListItemDoubleClicked(Element listItemBase, RecipeDescriptor itemData) {
             delegate.onRecipeSelected(itemData);
+            popupPanel.hide();
         }
     };
 
@@ -324,6 +325,8 @@ public class CreateMachineViewImpl extends Window implements CreateMachineView {
         switch (event.getNativeKeyCode()) {
             case KEY_UP:
                 if (popupPanel.isShowing()) {
+                    event.preventDefault();
+
                     if (list.getSelectionModel().getSelectedIndex() == 0) {
                         list.getSelectionModel().setSelectedItem(list.getSelectionModel().size() - 1);
                     } else {
@@ -333,6 +336,8 @@ public class CreateMachineViewImpl extends Window implements CreateMachineView {
                 break;
             case KEY_DOWN:
                 if (popupPanel.isShowing()) {
+                    event.preventDefault();
+
                     if (list.getSelectionModel().getSelectedIndex() == list.getSelectionModel().size() - 1) {
                         list.getSelectionModel().setSelectedItem(0);
                     } else {
