@@ -22,7 +22,7 @@ import org.eclipse.che.api.machine.server.MachineRegistry;
 import org.eclipse.che.api.machine.server.MachineService;
 import org.eclipse.che.api.machine.server.dao.SnapshotDao;
 import org.eclipse.che.api.machine.server.exception.MachineException;
-import org.eclipse.che.api.machine.server.impl.MachineState;
+import org.eclipse.che.api.machine.server.impl.MachineImpl;
 import org.eclipse.che.api.machine.server.impl.SnapshotImpl;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.api.machine.shared.MachineStatus;
@@ -198,7 +198,7 @@ public class ServiceTest {
 
     @AfterMethod
     public void tearDown() throws Exception {
-        for (MachineState machine : new ArrayList<>(machineManager.getMachinesStates())) {
+        for (MachineImpl machine : new ArrayList<>(machineManager.getMachinesStates())) {
             machineManager.destroy(machine.getId());
         }
     }
@@ -236,7 +236,7 @@ public class ServiceTest {
 
     @Test
     public void getMachineTest() throws Exception {
-        final MachineState machine = createMachineAndWaitRunningState();
+        final MachineImpl machine = createMachineAndWaitRunningState();
 
         final MachineDescriptor machineById = machineService.getMachineById(machine.getId());
 
@@ -250,7 +250,7 @@ public class ServiceTest {
         expected.add(createMachineAndWaitRunningState().getId());
 
         Set<String> actual = new HashSet<>();
-        for (MachineState machine : machineManager.getMachinesStates()) {
+        for (MachineImpl machine : machineManager.getMachinesStates()) {
             actual.add(machine.getId());
         }
         assertEquals(actual, expected);
@@ -258,7 +258,7 @@ public class ServiceTest {
 
     @Test
     public void destroyMachineTest() throws Exception {
-        final MachineState machine = createMachineAndWaitRunningState();
+        final MachineImpl machine = createMachineAndWaitRunningState();
 
         machineService.destroyMachine(machine.getId());
 
@@ -278,7 +278,7 @@ public class ServiceTest {
 
     @Test(enabled = false)// TODO Add ability to check when snapshot creation is finishes or fails
     public void saveSnapshotTest() throws Exception {
-        final MachineState machine = createMachineAndWaitRunningState();
+        final MachineImpl machine = createMachineAndWaitRunningState();
 
         // use machine manager instead of machine service because it returns future with snapshot
         // that allows check operation result
@@ -323,7 +323,7 @@ public class ServiceTest {
 
     @Test
     public void executeTest() throws Exception {
-        final MachineState machine = createMachineAndWaitRunningState();
+        final MachineImpl machine = createMachineAndWaitRunningState();
 
         String commandInMachine = "echo \"command in machine\" && tail -f /dev/null";
         machineService
@@ -338,7 +338,7 @@ public class ServiceTest {
 
     @Test
     public void getProcessesTest() throws Exception {
-        final MachineState machine = createMachineAndWaitRunningState();
+        final MachineImpl machine = createMachineAndWaitRunningState();
 
         Set<String> commands = new HashSet<>(2);
         commands.add("tail -f /dev/null");
@@ -362,7 +362,7 @@ public class ServiceTest {
 
     @Test
     public void stopProcessTest() throws Exception {
-        final MachineState machine = createMachineAndWaitRunningState();
+        final MachineImpl machine = createMachineAndWaitRunningState();
 
         String commandInMachine = "echo \"command in machine\" && tail -f /dev/null";
         machineService
@@ -381,7 +381,7 @@ public class ServiceTest {
 
     @Test(expectedExceptions = NotFoundException.class, expectedExceptionsMessageRegExp = "Process with pid .* not found")
     public void shouldThrowNotFoundExceptionOnProcessKillIfProcessPidMissing() throws Exception {
-        final MachineState machine = createMachineAndWaitRunningState();
+        final MachineImpl machine = createMachineAndWaitRunningState();
 
         String commandInMachine = "echo \"command in machine\" && tail -f /dev/null";
         machineService
@@ -396,9 +396,9 @@ public class ServiceTest {
         machineService.stopProcess(machine.getId(), processes.get(0).getPid() + 100);
     }
 
-    private MachineState createMachineAndWaitRunningState()
+    private MachineImpl createMachineAndWaitRunningState()
             throws ServerException, NotFoundException, ForbiddenException, InterruptedException {
-        final MachineState machine = machineManager.create(dtoFactory.createDto(RecipeMachineCreationMetadata.class)
+        final MachineImpl machine = machineManager.create(dtoFactory.createDto(RecipeMachineCreationMetadata.class)
                                                                      .withWorkspaceId("wsId")
                                                                      .withType("docker")
                                                                      .withRecipeDescriptor(dtoFactory.createDto(RecipeDescriptor.class)
