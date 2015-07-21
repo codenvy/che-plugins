@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.container;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -23,10 +24,13 @@ import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.head
 
 import javax.annotation.Nonnull;
 
+import static com.google.gwt.dom.client.Style.Unit.PCT;
+
 /**
  * The class allows represent tab container on view.
  *
  * @author Dmitry Shnurenko
+ * @author Valeriy Svydenko
  */
 public class TabContainerViewImpl extends Composite implements TabContainerView {
     interface TabContainerUiBinder extends UiBinder<Widget, TabContainerViewImpl> {
@@ -42,6 +46,15 @@ public class TabContainerViewImpl extends Composite implements TabContainerView 
     @Inject
     public TabContainerViewImpl() {
         initWidget(UI_BINDER.createAndBindUi(this));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void onAttach() {
+        super.onAttach();
+        Style style = getElement().getParentElement().getParentElement().getStyle();
+        style.setHeight(100, PCT);
+        style.setWidth(100, PCT);
     }
 
     /** {@inheritDoc} */
