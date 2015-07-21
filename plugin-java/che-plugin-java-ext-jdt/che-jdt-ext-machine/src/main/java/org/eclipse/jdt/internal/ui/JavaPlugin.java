@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.internal.corext.format.CheCodeFormatterInitializer;
 import org.eclipse.jdt.internal.corext.template.java.AbstractJavaContextType;
 import org.eclipse.jdt.internal.corext.template.java.CodeTemplateContextType;
 import org.eclipse.jdt.internal.corext.template.java.JavaContextType;
@@ -154,6 +155,7 @@ public class JavaPlugin {
         fMembersOrderPreferenceCache= new MembersOrderPreferenceCache();
         PreferenceConstants.initializeDefaultValues(PreferenceConstants.getPreferenceStore());
         new JavaCorePreferenceInitializer().initializeDefaultPreferences();
+        new CheCodeFormatterInitializer().initializeDefaultPreferences();
     }
 
     @PreDestroy

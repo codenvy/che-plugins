@@ -25,6 +25,7 @@ import org.eclipse.che.jdt.rest.JavaClasspathService;
 import org.eclipse.che.jdt.rest.JavaReconcileService;
 import org.eclipse.core.internal.filebuffers.FileBuffersPlugin;
 import org.eclipse.ide.ext.machine.ProjectEventListener;
+import org.eclipse.jdt.internal.corext.format.FormatService;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 
 /**
@@ -41,6 +42,7 @@ public class JdtGuiceModule extends AbstractModule {
         bind(JavaNavigationService.class);
         bind(JavaReconcileService.class);
         bind(JavaClasspathService.class);
+        bind(FormatService.class);
         bind(CodeAssistService.class);
         bind(CompilerSetupService.class);
         bind(ResourcesPlugin.class).asEagerSingleton();

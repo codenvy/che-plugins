@@ -8,7 +8,7 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.ide.ext.java.server.format;
+package org.eclipse.jdt.internal.corext.format;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -22,21 +22,20 @@ import java.util.Map;
  */
 public class XMLParser extends DefaultHandler {
 
-    private Map settings;
+    private Map<String, String> settings;
 
-    public Map getSettings() {
+    public Map<String, String> getSettings() {
         return settings;
     }
 
     @Override
     public void startDocument()
             throws SAXException {
-        settings = new HashMap<String, String>();
+        settings = new HashMap<>();
     }
 
     @Override
-    public void startElement(String uri, String localName,
-                             String qName, Attributes attributes) throws SAXException {
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if (qName.equals("setting")) {
             String id = attributes.getValue("id");
             String value = attributes.getValue("value");
