@@ -39,6 +39,7 @@ public interface DockerMachineFactory {
                             @Assisted("container") String container,
                             @Assisted DockerNode node,
                             @Assisted LineConsumer outputConsumer,
+                            @Assisted("script") String script,
                             @Assisted int memorySizeMB) throws MachineException;
 
     DockerNode createNode(@Assisted String containerId) throws MachineException;

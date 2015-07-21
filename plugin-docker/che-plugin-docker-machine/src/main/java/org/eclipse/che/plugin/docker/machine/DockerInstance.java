@@ -84,8 +84,9 @@ public class DockerInstance extends AbstractInstance {
                           @Assisted("container") String container,
                           @Assisted DockerNode node,
                           @Assisted LineConsumer outputConsumer,
+                          @Assisted("script") String script,
                           @Assisted int memorySizeMB) {
-        super(machineId, "docker", workspaceId, creator, workspaceIsBound, displayName);
+        super(machineId, "docker", workspaceId, creator, script, workspaceIsBound, displayName);
         this.dockerMachineFactory = dockerMachineFactory;
         this.container = container;
         this.docker = docker;
