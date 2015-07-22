@@ -68,6 +68,7 @@ public class DockerInstance extends AbstractInstance {
     private final DockerNode           node;
     private final String               workspaceId;
     private final boolean              workspaceIsBound;
+    private final int memorySizeMB;
 
     private ContainerInfo containerInfo;
 
@@ -82,7 +83,8 @@ public class DockerInstance extends AbstractInstance {
                           @Assisted("displayName") String displayName,
                           @Assisted("container") String container,
                           @Assisted DockerNode node,
-                          @Assisted LineConsumer outputConsumer) {
+                          @Assisted LineConsumer outputConsumer,
+                          @Assisted int memorySizeMB) {
         super(machineId, "docker", workspaceId, creator, workspaceIsBound, displayName);
         this.dockerMachineFactory = dockerMachineFactory;
         this.container = container;
@@ -92,6 +94,7 @@ public class DockerInstance extends AbstractInstance {
         this.node = node;
         this.workspaceId = workspaceId;
         this.workspaceIsBound = workspaceIsBound;
+        this.memorySizeMB = memorySizeMB;
     }
 
     @Override
@@ -236,7 +239,7 @@ public class DockerInstance extends AbstractInstance {
     }
 
     @Override
-    public InstanceKey saveToSnapshot(String owner, String label) throws MachineException {
+    public InstanceKey saveToSnapshot(String owner) throws MachineException {
         try {
             final String repository = generateRepository();
             String comment = String.format("Suspended at %1$ta %1$tb %1$td %1$tT %1$tZ %1$tY", System.currentTimeMillis());
@@ -299,5 +302,10 @@ public class DockerInstance extends AbstractInstance {
     @Override
     public DockerNode getNode() {
         return node;
+    }
+
+    @Override
+    public int getMemorySize() {
+        return memorySizeMB;
     }
 }

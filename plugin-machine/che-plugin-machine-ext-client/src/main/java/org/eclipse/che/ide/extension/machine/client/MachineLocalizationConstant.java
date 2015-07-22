@@ -137,11 +137,17 @@ public interface MachineLocalizationConstant extends Messages {
     @Key("view.createMachine.message.urlIsNotValid")
     String viewCreateMachineUrlIsNotValid();
 
+    @Key("view.createMachine.message.noRecipe")
+    String viewCreateMachineNoRecipe();
+
     @Key("view.createMachine.name")
     String viewCreateMachineName();
 
     @Key("view.createMachine.recipeURL")
     String viewCreateMachineRecipeURL();
+
+    @Key("view.createMachine.findByTags")
+    String viewCreateMachineFindByTags();
 
 
     /* EditConfigurationsView */

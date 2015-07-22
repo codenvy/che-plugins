@@ -32,7 +32,7 @@
             height: 20px;
         }
 
-        .machineNameLabel {
+        .label {
             line-height: 25px;
         }
 
@@ -55,7 +55,7 @@
         <g:north size="40">
             <g:FlowPanel>
                 <g:Label text="{localizationConstant.viewCreateMachineName}"
-                         addStyleNames="{style.machineNameLabel} {style.floatLeft}"/>
+                         addStyleNames="{style.label} {style.floatLeft}"/>
                 <g:TextBox width="400px" ui:field="machineName" debugId="createMachineView-machineName"
                            addStyleNames="{style.inputField} {style.floatRight}"/>
             </g:FlowPanel>
@@ -63,7 +63,7 @@
         <g:center>
             <g:FlowPanel>
                 <g:Label text="{localizationConstant.viewCreateMachineRecipeURL}"
-                         addStyleNames="{style.machineNameLabel} {style.floatLeft}"/>
+                         addStyleNames="{style.label} {style.floatLeft}"/>
                 <g:TextBox width="400px" ui:field="recipeURL" debugId="createMachineView-recipeURL"
                            addStyleNames="{style.inputField} {style.floatRight}"/>
                 <g:Label visible="false" ui:field="errorHint" text="{localizationConstant.viewCreateMachineUrlIsNotValid}"
@@ -72,10 +72,11 @@
         </g:center>
         <g:south size="60">
             <g:FlowPanel>
-                <g:Label text="Find by tags:"
-                         addStyleNames="{style.machineNameLabel} {style.floatLeft}"/>
+                <g:Label text="{localizationConstant.viewCreateMachineFindByTags}" addStyleNames="{style.label} {style.floatLeft}"/>
                 <g:TextBox width="400px" ui:field="tags" debugId="createMachineView-tags"
                            addStyleNames="{style.inputField} {style.floatRight}"/>
+                <g:Label visible="false" ui:field="noRecipeHint" text="{localizationConstant.viewCreateMachineNoRecipe}"
+                         addStyleNames="{style.errorHint} {style.floatRight}"/>
             </g:FlowPanel>
         </g:south>
     </g:DockLayoutPanel>

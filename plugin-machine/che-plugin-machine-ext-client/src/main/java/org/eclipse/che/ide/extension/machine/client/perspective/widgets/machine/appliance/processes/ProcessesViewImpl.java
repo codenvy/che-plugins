@@ -93,7 +93,7 @@ public class ProcessesViewImpl extends Composite implements ProcessesView {
         TextColumn<ProcessDescriptor> active = new TextColumn<ProcessDescriptor>() {
             @Override
             public String getValue(ProcessDescriptor descriptor) {
-                boolean isActive = descriptor.getIsAlive();
+                boolean isActive = descriptor.isAlive();
 
                 //TODO it's stub. Need add real value
                 return isActive ? locale.processActive() : locale.processActive();
