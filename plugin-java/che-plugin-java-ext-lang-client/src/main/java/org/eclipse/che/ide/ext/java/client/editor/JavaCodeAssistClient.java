@@ -15,6 +15,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import org.eclipse.che.api.promises.client.Function;
+import org.eclipse.che.api.promises.client.FunctionException;
+import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
@@ -28,8 +32,11 @@ import org.eclipse.che.ide.rest.AsyncRequestFactory;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.eclipse.che.api.promises.client.callback.PromiseHelper.newCallback;
+import static org.eclipse.che.api.promises.client.callback.PromiseHelper.newPromise;
 import static org.eclipse.che.ide.rest.HTTPHeader.CONTENT_TYPE;
 
 /**
@@ -103,16 +110,28 @@ public class JavaCodeAssistClient {
      *         the given length to stop recording the edits (exclusive).
      * @param content
      *         the content to format
-     * @param callback
-     *         the callback to use for the response
      */
-    public void format(int offset, int length, String content, AsyncRequestCallback<Array<Change>> callback) {
-        String url =
-                machineExtPath + "/" + machineManager.getDeveloperMachineId() + "/code-formatting/format?offset=" + offset + "&length=" +
-                length;
-        asyncRequestFactory.createPostRequest(url, null)
-                           .header(CONTENT_TYPE, MimeType.TEXT_PLAIN)
-                           .data(content)
-                           .send(callback);
+    public Promise<List<Change>> format(final int offset, final int length, final String content) {
+
+        return newPromise(new AsyncPromiseHelper.RequestCall<Array<Change>>() {
+            @Override
+            public void makeCall(AsyncCallback<Array<Change>> callback) {
+                String url = machineExtPath + "/" + machineManager.getDeveloperMachineId() + "/code-formatting/format?offset=" + offset +
+                             "&length=" + length;
+                asyncRequestFactory.createPostRequest(url, null)
+                                   .header(CONTENT_TYPE, MimeType.TEXT_PLAIN)
+                                   .data(content)
+                                   .send(newCallback(callback, unmarshallerFactory.newArrayUnmarshaller(Change.class)));
+            }
+        }).then(new Function<Array<Change>, List<Change>>() {
+            @Override
+            public List<Change> apply(Array<Change> arg) throws FunctionException {
+                final List<Change> changes = new ArrayList<>();
+                for (Change change : arg.asIterable()) {
+                    changes.add(change);
+                }
+                return changes;
+            }
+        });
     }
 }

@@ -12,18 +12,20 @@ package org.eclipse.che.ide.ext.java.client.editor;
 
 import com.google.inject.Inject;
 
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.texteditor.HandlesUndoRedo;
 import org.eclipse.che.ide.api.texteditor.UndoableEditor;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.shared.dto.Change;
 import org.eclipse.che.ide.jseditor.client.document.Document;
 import org.eclipse.che.ide.jseditor.client.formatter.ContentFormatter;
-import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.util.loging.Log;
+
+import java.util.List;
 
 /**
  * ContentFormatter implementation
@@ -32,17 +34,14 @@ import org.eclipse.che.ide.util.loging.Log;
  */
 public class JavaFormatter implements ContentFormatter {
 
-    private JavaCodeAssistClient    service;
-    private EditorAgent            editorAgent;
-    private DtoUnmarshallerFactory dtoUnmarshallerFactory;
+    private JavaCodeAssistClient service;
+    private EditorAgent          editorAgent;
 
     @Inject
     public JavaFormatter(JavaCodeAssistClient service,
-                         EditorAgent editorAgent,
-                         DtoUnmarshallerFactory dtoUnmarshallerFactory) {
+                         EditorAgent editorAgent) {
         this.service = service;
         this.editorAgent = editorAgent;
-        this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
     }
 
     @Override
@@ -54,21 +53,22 @@ public class JavaFormatter implements ContentFormatter {
             offset = 0;
             length = document.getContentsCharCount();
         }
-        Unmarshallable<Array<Change>> unmarshaller = dtoUnmarshallerFactory.newArrayUnmarshaller(Change.class);
-        service.format(offset, length, document.getContents(), new AsyncRequestCallback<Array<Change>>(unmarshaller) {
-            @Override
-            protected void onSuccess(Array<Change> result) {
-                applyChanges(result, document);
-            }
 
+        Promise<List<Change>> changesPromise = service.format(offset, length, document.getContents());
+        changesPromise.then(new Operation<List<Change>>() {
             @Override
-            protected void onFailure(Throwable exception) {
-                Log.error(getClass(), exception);
+            public void apply(List<Change> changes) throws OperationException {
+                applyChanges(changes, document);
+            }
+        }).catchError(new Operation<PromiseError>() {
+            @Override
+            public void apply(PromiseError arg) throws OperationException {
+                Log.error(getClass(), arg.getCause());
             }
         });
     }
 
-    private void applyChanges(Array<Change> changes, Document document) {
+    private void applyChanges(List<Change> changes, Document document) {
         HandlesUndoRedo undoRedo = null;
         EditorPartPresenter editorPartPresenter = editorAgent.getActiveEditor();
         if (editorPartPresenter instanceof UndoableEditor) {
@@ -78,7 +78,7 @@ public class JavaFormatter implements ContentFormatter {
             if (undoRedo != null) {
                 undoRedo.beginCompoundChange();
             }
-            for (Change change : changes.asIterable()) {
+            for (Change change : changes) {
                 document.replace(change.getOffset(), change.getLength(), change.getText());
             }
         } catch (final Exception e) {
