@@ -113,6 +113,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                               workspaceId,
                               bindWorkspace,
                               displayName,
+                              recipe,
                               memorySizeMB,
                               creationLogsOutput);
     }
@@ -175,6 +176,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                    String workspaceId,
                                    boolean bindWorkspace,
                                    String displayName,
+                                   Recipe recipe,
                                    int memorySizeMB,
                                    LineConsumer creationLogsOutput) throws NotFoundException, MachineException {
         final String imageId = pullImage(instanceKey, creationLogsOutput);
@@ -185,6 +187,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                               workspaceId,
                               bindWorkspace,
                               displayName,
+                              recipe,
                               memorySizeMB,
                               creationLogsOutput);
     }
@@ -261,6 +264,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                     String workspaceId,
                                     boolean bindWorkspace,
                                     String displayName,
+                                    Recipe recipe,
                                     int memorySizeMB,
                                     LineConsumer outputConsumer)
             throws MachineException {
@@ -297,6 +301,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                                        containerId,
                                                        node,
                                                        outputConsumer,
+                                                       recipe,
                                                        memorySizeMB);
         } catch (IOException e) {
             throw new MachineException(e);

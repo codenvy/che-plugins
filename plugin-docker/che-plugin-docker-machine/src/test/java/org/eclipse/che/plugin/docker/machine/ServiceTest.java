@@ -27,12 +27,12 @@ import org.eclipse.che.api.machine.server.impl.SnapshotImpl;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.api.machine.shared.MachineStatus;
 import org.eclipse.che.api.machine.shared.dto.CommandDescriptor;
-import org.eclipse.che.api.machine.shared.dto.RecipeMachineCreationMetadata;
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
-import org.eclipse.che.api.machine.shared.dto.SnapshotMachineCreationMetadata;
 import org.eclipse.che.api.machine.shared.dto.MachineStateDescriptor;
 import org.eclipse.che.api.machine.shared.dto.ProcessDescriptor;
-import org.eclipse.che.api.machine.shared.dto.recipe.RecipeDescriptor;
+import org.eclipse.che.api.machine.shared.dto.RecipeMachineCreationMetadata;
+import org.eclipse.che.api.machine.shared.dto.SnapshotMachineCreationMetadata;
+import org.eclipse.che.api.machine.shared.dto.recipe.MachineRecipe;
 import org.eclipse.che.api.workspace.server.dao.Member;
 import org.eclipse.che.api.workspace.server.dao.MemberDao;
 import org.eclipse.che.commons.env.EnvironmentContext;
@@ -209,9 +209,9 @@ public class ServiceTest {
                 dtoFactory.createDto(RecipeMachineCreationMetadata.class)
                           .withType("docker")
                           .withWorkspaceId("wsId")
-                          .withRecipeDescriptor(dtoFactory.createDto(RecipeDescriptor.class)
-                                                          .withType("Dockerfile")
-                                                          .withScript("FROM ubuntu\nCMD tail -f /dev/null\n")));
+                          .withRecipe(dtoFactory.createDto(MachineRecipe.class)
+                                                .withType("Dockerfile")
+                                                .withScript("FROM ubuntu\nCMD tail -f /dev/null\n")));
 
         waitMachineIsRunning(machine.getId());
     }
@@ -401,10 +401,11 @@ public class ServiceTest {
         final MachineImpl machine = machineManager.create(dtoFactory.createDto(RecipeMachineCreationMetadata.class)
                                                                      .withWorkspaceId("wsId")
                                                                      .withType("docker")
-                                                                     .withRecipeDescriptor(dtoFactory.createDto(RecipeDescriptor.class)
-                                                                                                     .withType("Dockerfile")
-                                                                                                     .withScript(
-                                                                                                             "FROM ubuntu\nCMD tail -f /dev/null\n"))
+                                                                     .withRecipe(dtoFactory.createDto(MachineRecipe.class)
+                                                                                           .withType("Dockerfile")
+                                                                                           .withScript(
+                                                                                                   "FROM ubuntu\nCMD tail -f " +
+                                                                                                   "/dev/null\n"))
                                                                      .withBindWorkspace(false)
                                                                      .withDisplayName("displayName")
                                                                      .withOutputChannel("blah")
