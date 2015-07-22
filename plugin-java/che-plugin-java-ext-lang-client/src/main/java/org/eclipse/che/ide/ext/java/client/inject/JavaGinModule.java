@@ -25,8 +25,6 @@ import org.eclipse.che.ide.ext.java.client.dependenciesupdater.JavaNameEnvironme
 import org.eclipse.che.ide.ext.java.client.dependenciesupdater.JavaNameEnvironmentServiceClientImpl;
 import org.eclipse.che.ide.ext.java.client.documentation.QuickDocPresenter;
 import org.eclipse.che.ide.ext.java.client.documentation.QuickDocumentation;
-import org.eclipse.che.ide.ext.java.client.format.FormatClientService;
-import org.eclipse.che.ide.ext.java.client.format.FormatClientServiceImpl;
 import org.eclipse.che.ide.ext.java.client.inject.factories.PropertyWidgetFactory;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationServiceImpl;
@@ -52,7 +50,6 @@ public class JavaGinModule extends AbstractGinModule {
         bind(QuickDocumentation.class).to(QuickDocPresenter.class).in(Singleton.class);
         bind(JavaNavigationService.class).to(JavaNavigationServiceImpl.class);
         bind(JavaNameEnvironmentServiceClient.class).to(JavaNameEnvironmentServiceClientImpl.class);
-        bind(FormatClientService.class).to(FormatClientServiceImpl.class).in(Singleton.class);
 
         install(new GinFactoryModuleBuilder().build(JavaNodeFactory.class));
         install(new GinFactoryModuleBuilder().implement(PropertyWidget.class, PropertyWidgetImpl.class)

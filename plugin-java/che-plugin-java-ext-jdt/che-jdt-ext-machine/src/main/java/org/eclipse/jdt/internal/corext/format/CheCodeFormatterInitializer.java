@@ -18,7 +18,6 @@ import java.util.Map;
 /**
  * @author Roman Nikitenko
  */
-
 public class CheCodeFormatterInitializer extends AbstractPreferenceInitializer {
 
     @Override

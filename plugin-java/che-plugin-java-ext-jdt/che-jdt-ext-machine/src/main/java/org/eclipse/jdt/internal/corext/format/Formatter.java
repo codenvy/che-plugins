@@ -23,7 +23,6 @@ import java.util.List;
 /**
  * @author Roman Nikitenko
  */
-
 public class Formatter {
 
     /**

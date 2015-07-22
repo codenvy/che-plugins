@@ -15,8 +15,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
+import org.eclipse.che.ide.ext.java.shared.dto.Change;
 import org.eclipse.che.ide.ext.java.shared.dto.Problem;
 import org.eclipse.che.ide.ext.java.shared.dto.ProposalApplyResult;
 import org.eclipse.che.ide.ext.java.shared.dto.Proposals;
@@ -27,6 +29,8 @@ import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 
 import java.util.List;
+
+import static org.eclipse.che.ide.rest.HTTPHeader.CONTENT_TYPE;
 
 /**
  * @author Evgen Vidolob
@@ -67,7 +71,8 @@ public class JavaCodeAssistClient {
 
 
     public void applyProposal(String sessionId, int index, boolean insert, final AsyncCallback<ProposalApplyResult> callback) {
-        String url = machineExtPath +"/" +machineManager.getDeveloperMachineId() +"/jdt/code-assist/apply/completion/?sessionid=" + sessionId + "&index=" + index + "&insert=" + insert;
+        String url = machineExtPath + "/" + machineManager.getDeveloperMachineId() + "/jdt/code-assist/apply/completion/?sessionid=" +
+                     sessionId + "&index=" + index + "&insert=" + insert;
         Unmarshallable<ProposalApplyResult> unmarshaller =
                 unmarshallerFactory.newUnmarshaller(ProposalApplyResult.class);
         asyncRequestFactory.createGetRequest(url).send(new AsyncRequestCallback<ProposalApplyResult>(unmarshaller) {
@@ -84,6 +89,30 @@ public class JavaCodeAssistClient {
     }
 
     public String getProposalDocUrl(int id, String sessionId) {
-        return machineExtPath+"/"+ machineManager.getDeveloperMachineId()+"/jdt/code-assist/compute/info?sessionid=" + sessionId+"&index="+id;
+        return machineExtPath + "/" + machineManager.getDeveloperMachineId() + "/jdt/code-assist/compute/info?sessionid=" + sessionId +
+               "&index=" + id;
+    }
+
+    /**
+     * Creates edits that describe how to format the given string.
+     * Returns the changes required to format source.
+     *
+     * @param offset
+     *         The given offset to start recording the edits (inclusive).
+     * @param length
+     *         the given length to stop recording the edits (exclusive).
+     * @param content
+     *         the content to format
+     * @param callback
+     *         the callback to use for the response
+     */
+    public void format(int offset, int length, String content, AsyncRequestCallback<Array<Change>> callback) {
+        String url =
+                machineExtPath + "/" + machineManager.getDeveloperMachineId() + "/code-formatting/format?offset=" + offset + "&length=" +
+                length;
+        asyncRequestFactory.createPostRequest(url, null)
+                           .header(CONTENT_TYPE, MimeType.TEXT_PLAIN)
+                           .data(content)
+                           .send(callback);
     }
 }

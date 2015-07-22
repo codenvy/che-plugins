@@ -1679,7 +1679,7 @@ public class JavaModelManager {
         defaultOptionsMap.put(org.eclipse.jdt.core.JavaCore.CORE_ENABLE_CLASSPATH_MULTIPLE_OUTPUT_LOCATIONS, org.eclipse.jdt.core.JavaCore.ENABLED);
 
         // Formatter settings
-        defaultOptionsMap.putAll(CheCodeFormatterOptions.getDefaultFormatSettings());
+        defaultOptionsMap.putAll(DefaultCodeFormatterConstants.getEclipseDefaultSettings());
 
         // CodeAssist settings
         defaultOptionsMap.put(org.eclipse.jdt.core.JavaCore.CODEASSIST_VISIBILITY_CHECK, org.eclipse.jdt.core.JavaCore.DISABLED);

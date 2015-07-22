@@ -24,7 +24,6 @@ import java.util.Map;
 /**
  * @author Roman Nikitenko
  */
-
 public class CheCodeFormatterOptions {
     private static final Logger LOG               = LoggerFactory.getLogger(CheCodeFormatterInitializer.class);
     private static final String DEFAULT_CODESTYLE = "che-codestyle-eclipse_.xml";
