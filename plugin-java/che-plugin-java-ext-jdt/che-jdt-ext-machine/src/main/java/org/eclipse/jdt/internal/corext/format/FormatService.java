@@ -40,9 +40,9 @@ public class FormatService {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces({MediaType.APPLICATION_JSON})
 
-    public List<Change> format(@QueryParam("offset") int offset,
-                               @QueryParam("length") int length,
-                               final String content) throws BadLocationException, IllegalArgumentException {
-        return formatter.format(content, offset, length);
+    public List<Change> getFormatChanges(@QueryParam("offset") int offset,
+                                         @QueryParam("length") int length,
+                                         final String content) throws BadLocationException, IllegalArgumentException {
+        return formatter.getFormatChanges(content, offset, length);
     }
 }

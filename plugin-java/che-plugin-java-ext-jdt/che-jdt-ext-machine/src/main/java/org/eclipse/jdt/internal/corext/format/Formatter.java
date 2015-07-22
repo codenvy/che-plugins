@@ -40,7 +40,7 @@ public class Formatter {
      * @throws IllegalArgumentException
      *         If the offset and length are not inside the string, a IllegalArgumentException is thrown.
      */
-    public List<Change> format(String content, int offset, int length) throws BadLocationException, IllegalArgumentException {
+    public List<Change> getFormatChanges(String content, int offset, int length) throws BadLocationException, IllegalArgumentException {
         IDocument document = new Document(content);
         DocumentChangeListener documentChangeListener = new DocumentChangeListener(document);
         TextEdit textEdit = CodeFormatterUtil.format2(CodeFormatter.K_COMPILATION_UNIT, content, offset, length, 0, null, null);

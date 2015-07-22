@@ -63,6 +63,7 @@ import org.eclipse.jdt.internal.core.util.Messages;
 import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.jdt.internal.core.util.WeakHashSet;
 import org.eclipse.jdt.internal.core.util.WeakHashSetOfCharArray;
+import org.eclipse.jdt.internal.corext.format.CheCodeFormatterOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -1678,7 +1679,7 @@ public class JavaModelManager {
         defaultOptionsMap.put(org.eclipse.jdt.core.JavaCore.CORE_ENABLE_CLASSPATH_MULTIPLE_OUTPUT_LOCATIONS, org.eclipse.jdt.core.JavaCore.ENABLED);
 
         // Formatter settings
-        defaultOptionsMap.putAll(DefaultCodeFormatterConstants.getEclipseDefaultSettings());
+        defaultOptionsMap.putAll(CheCodeFormatterOptions.getDefaultFormatSettings());
 
         // CodeAssist settings
         defaultOptionsMap.put(org.eclipse.jdt.core.JavaCore.CODEASSIST_VISIBILITY_CHECK, org.eclipse.jdt.core.JavaCore.DISABLED);
