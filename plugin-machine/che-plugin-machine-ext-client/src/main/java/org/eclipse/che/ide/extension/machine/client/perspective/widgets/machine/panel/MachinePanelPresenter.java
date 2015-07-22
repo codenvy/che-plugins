@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel;
 
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
@@ -93,7 +92,6 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
 
                 for (MachineDescriptor descriptor : machines) {
                     Machine machine = entityFactory.createMachine(descriptor);
-                      Window.alert(descriptor.getRecipe().getScript());
                     MachineTreeNode machineNode = entityFactory.createMachineNode(rootNode, machine, null);
 
                     rootChildren.add(machineNode);

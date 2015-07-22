@@ -41,8 +41,7 @@ public class RecipeTabPresenter implements TabPresenter {
      *         machine for which need update information
      */
     public void updateInfo(@Nonnull Machine machine) {
-        //TODO need add recipe into the machine
-        view.setScript("");
+        view.setScript(machine.getScript());
     }
 
     /** {@inheritDoc} */
