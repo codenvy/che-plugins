@@ -209,9 +209,9 @@ public class ServiceTest {
                 dtoFactory.createDto(RecipeMachineCreationMetadata.class)
                           .withType("docker")
                           .withWorkspaceId("wsId")
-                          .withMachineRecipe(dtoFactory.createDto(MachineRecipe.class)
-                                                       .withType("Dockerfile")
-                                                       .withScript("FROM ubuntu\nCMD tail -f /dev/null\n")));
+                          .withRecipe(dtoFactory.createDto(MachineRecipe.class)
+                                                .withType("Dockerfile")
+                                                .withScript("FROM ubuntu\nCMD tail -f /dev/null\n")));
 
         waitMachineIsRunning(machine.getId());
     }
@@ -401,11 +401,11 @@ public class ServiceTest {
         final MachineImpl machine = machineManager.create(dtoFactory.createDto(RecipeMachineCreationMetadata.class)
                                                                      .withWorkspaceId("wsId")
                                                                      .withType("docker")
-                                                                     .withMachineRecipe(dtoFactory.createDto(MachineRecipe.class)
-                                                                                                  .withType("Dockerfile")
-                                                                                                  .withScript(
-                                                                                                          "FROM ubuntu\nCMD tail -f " +
-                                                                                                          "/dev/null\n"))
+                                                                     .withRecipe(dtoFactory.createDto(MachineRecipe.class)
+                                                                                           .withType("Dockerfile")
+                                                                                           .withScript(
+                                                                                                   "FROM ubuntu\nCMD tail -f " +
+                                                                                                   "/dev/null\n"))
                                                                      .withBindWorkspace(false)
                                                                      .withDisplayName("displayName")
                                                                      .withOutputChannel("blah")
