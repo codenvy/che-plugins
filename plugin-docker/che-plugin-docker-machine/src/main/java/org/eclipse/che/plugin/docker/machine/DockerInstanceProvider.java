@@ -113,7 +113,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                               workspaceId,
                               bindWorkspace,
                               displayName,
-                              recipe.getScript(),
+                              recipe,
                               memorySizeMB,
                               creationLogsOutput);
     }
@@ -176,7 +176,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                    String workspaceId,
                                    boolean bindWorkspace,
                                    String displayName,
-                                   String script,
+                                   Recipe recipe,
                                    int memorySizeMB,
                                    LineConsumer creationLogsOutput) throws NotFoundException, MachineException {
         final String imageId = pullImage(instanceKey, creationLogsOutput);
@@ -187,7 +187,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                               workspaceId,
                               bindWorkspace,
                               displayName,
-                              script,
+                              recipe,
                               memorySizeMB,
                               creationLogsOutput);
     }
@@ -264,7 +264,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                     String workspaceId,
                                     boolean bindWorkspace,
                                     String displayName,
-                                    String script,
+                                    Recipe recipe,
                                     int memorySizeMB,
                                     LineConsumer outputConsumer)
             throws MachineException {
@@ -301,7 +301,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                                        containerId,
                                                        node,
                                                        outputConsumer,
-                                                       script,
+                                                       recipe,
                                                        memorySizeMB);
         } catch (IOException e) {
             throw new MachineException(e);

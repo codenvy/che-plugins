@@ -23,6 +23,7 @@ import org.eclipse.che.api.machine.server.spi.InstanceKey;
 import org.eclipse.che.api.machine.server.spi.InstanceMetadata;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
 import org.eclipse.che.api.machine.shared.ProjectBinding;
+import org.eclipse.che.api.machine.shared.Recipe;
 import org.eclipse.che.api.machine.shared.Server;
 import org.eclipse.che.commons.lang.NameGenerator;
 import org.eclipse.che.plugin.docker.client.DockerConnector;
@@ -84,9 +85,9 @@ public class DockerInstance extends AbstractInstance {
                           @Assisted("container") String container,
                           @Assisted DockerNode node,
                           @Assisted LineConsumer outputConsumer,
-                          @Assisted("script") String script,
+                          @Assisted("recipe") Recipe recipe,
                           @Assisted int memorySizeMB) {
-        super(machineId, "docker", workspaceId, creator, script, workspaceIsBound, displayName);
+        super(machineId, "docker", workspaceId, creator, recipe, workspaceIsBound, displayName);
         this.dockerMachineFactory = dockerMachineFactory;
         this.container = container;
         this.docker = docker;
