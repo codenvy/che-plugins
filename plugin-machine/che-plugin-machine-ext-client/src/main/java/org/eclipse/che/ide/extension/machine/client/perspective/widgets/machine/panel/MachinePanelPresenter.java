@@ -92,7 +92,6 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
 
                 for (MachineDescriptor descriptor : machines) {
                     Machine machine = entityFactory.createMachine(descriptor);
-
                     MachineTreeNode machineNode = entityFactory.createMachineNode(rootNode, machine, null);
 
                     rootChildren.add(machineNode);

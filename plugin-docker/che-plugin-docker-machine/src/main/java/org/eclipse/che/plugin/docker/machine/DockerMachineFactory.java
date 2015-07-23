@@ -16,6 +16,7 @@ import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
+import org.eclipse.che.api.machine.shared.Recipe;
 
 import javax.annotation.Nullable;
 
@@ -39,6 +40,7 @@ public interface DockerMachineFactory {
                             @Assisted("container") String container,
                             @Assisted DockerNode node,
                             @Assisted LineConsumer outputConsumer,
+                            @Assisted Recipe recipe,
                             @Assisted int memorySizeMB) throws MachineException;
 
     DockerNode createNode(@Assisted String containerId) throws MachineException;

@@ -12,6 +12,7 @@ package org.eclipse.che.ide.extension.machine.client.machine;
 
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
 import org.eclipse.che.api.machine.shared.dto.ServerDescriptor;
+import org.eclipse.che.api.machine.shared.dto.recipe.MachineRecipe;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import java.util.Map;
 import static org.eclipse.che.ide.extension.machine.client.machine.Machine.TERMINAL_REF_KEY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -107,6 +109,17 @@ public class MachineTest {
         machine.getType();
 
         verify(descriptor).getType();
+    }
+
+    @Test
+    public void scriptShouldBeReturned() {
+        MachineRecipe machineRecipe = mock(MachineRecipe.class);
+        when(descriptor.getRecipe()).thenReturn(machineRecipe);
+
+        machine.getScript();
+
+        verify(descriptor).getRecipe();
+        verify(machineRecipe).getScript();
     }
 
     @Test

@@ -62,6 +62,11 @@ public class Machine {
         return descriptor.getType();
     }
 
+    /** @return script of machine recipe */
+    public String getScript() {
+        return descriptor.getRecipe().getScript();
+    }
+
     /** @return special url which references on terminal content. */
     @Nonnull
     public String getTerminalUrl() {

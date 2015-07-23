@@ -289,4 +289,7 @@ public interface MachineLocalizationConstant extends Messages {
 
     @Key("editor.button.cancel")
     String editorButtonCancel();
+
+    @Key("tab.recipe")
+    String tabRecipe();
 }
