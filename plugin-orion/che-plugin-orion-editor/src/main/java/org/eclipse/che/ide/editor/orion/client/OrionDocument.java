@@ -17,6 +17,7 @@ import org.eclipse.che.ide.editor.orion.client.jso.ModelChangedEventOverlay;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionEditorOverlay;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionPixelPositionOverlay;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionSelectionOverlay;
+import org.eclipse.che.ide.editor.orion.client.jso.OrionTextModelOverlay.EventHandler;
 import org.eclipse.che.ide.editor.orion.client.jso.OrionTextViewOverlay;
 import org.eclipse.che.ide.jseditor.client.document.AbstractEmbeddedDocument;
 import org.eclipse.che.ide.jseditor.client.document.EmbeddedDocument;
@@ -35,26 +36,28 @@ import org.eclipse.che.ide.jseditor.client.text.TextRange;
  */
 public class OrionDocument extends AbstractEmbeddedDocument {
 
-    private final OrionTextViewOverlay textViewOverlay;
+    private static final String EVENT_TYPE = "Changed";
 
-    private final OrionPositionConverter positionConverter;
+    private final OrionTextViewOverlay      textViewOverlay;
+    private final OrionPositionConverter    positionConverter;
+    private final HasCursorActivityHandlers hasCursorActivityHandlers;
+    private final OrionEditorOverlay        editorOverlay;
 
-    private final HasCursorActivityHandlers  hasCursorActivityHandlers;
-    private OrionEditorOverlay editorOverlay;
+    public OrionDocument(OrionTextViewOverlay textViewOverlay,
+                         HasCursorActivityHandlers hasCursorActivityHandlers,
+                         OrionEditorOverlay editorOverlay) {
 
-    public OrionDocument(final OrionTextViewOverlay textViewOverlay,
-                         final HasCursorActivityHandlers hasCursorActivityHandlers, OrionEditorOverlay editorOverlay) {
         this.textViewOverlay = textViewOverlay;
         this.hasCursorActivityHandlers = hasCursorActivityHandlers;
         this.editorOverlay = editorOverlay;
         this.positionConverter = new OrionPositionConverter();
-        textViewOverlay.addEventListener("ModelChanged", new OrionTextViewOverlay.EventHandler<ModelChangedEventOverlay>() {
+
+        this.editorOverlay.getModel().addEventListener(EVENT_TYPE, new EventHandler<ModelChangedEventOverlay>() {
             @Override
             public void onEvent(ModelChangedEventOverlay parameter) {
                 fireDocumentChangeEvent(parameter);
             }
         }, true);
-
     }
 
     private void fireDocumentChangeEvent(final ModelChangedEventOverlay param) {
@@ -74,7 +77,12 @@ public class OrionDocument extends AbstractEmbeddedDocument {
         }
         String text = textViewOverlay.getModel().getText(startOffset, startOffset + length);
 
-        final DocumentChangeEvent event = new DocumentChangeEvent(this, startOffset, length, text, removedCharCount);//TODO: need check removedCharCount add it for fix according to https://github.com/codenvy/che-core/pull/122
+        final DocumentChangeEvent event = new DocumentChangeEvent(this,
+                                                                  startOffset,
+                                                                  length,
+                                                                  text,
+                                                                  removedCharCount);//TODO: need check removedCharCount add it for fix
+        // according to https://github.com/codenvy/che-core/pull/122
         getDocEventBus().fireEvent(event);
     }
 
@@ -182,8 +190,7 @@ public class OrionDocument extends AbstractEmbeddedDocument {
 
         @Override
         public int pixelToOffset(PixelCoordinates coordinates) {
-            return textViewOverlay.getOffsetAtLocation(coordinates.getX(),
-                                                                    coordinates.getY());
+            return textViewOverlay.getOffsetAtLocation(coordinates.getX(), coordinates.getY());
         }
     }
 
