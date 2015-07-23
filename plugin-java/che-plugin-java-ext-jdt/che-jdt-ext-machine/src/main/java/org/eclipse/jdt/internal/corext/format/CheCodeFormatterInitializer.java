@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.jdt.internal.corext.format;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import java.util.Hashtable;
 import java.util.Map;
@@ -18,9 +17,8 @@ import java.util.Map;
 /**
  * @author Roman Nikitenko
  */
-public class CheCodeFormatterInitializer extends AbstractPreferenceInitializer {
+public class CheCodeFormatterInitializer {
 
-    @Override
     public void initializeDefaultPreferences() {
         Map<String, String> codeFormatterDefaultSettings = CheCodeFormatterOptions.getDefaultFormatSettings();
         Hashtable<String, String> formatSettings = new Hashtable<>(codeFormatterDefaultSettings.size());
