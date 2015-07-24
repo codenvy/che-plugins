@@ -763,6 +763,7 @@ public class DefaultCodeFormatterConstants{
     * @deprecated Use {@link #FORMATTER_COMMENT_CLEAR_BLANK_LINES_IN_BLOCK_COMMENT} and
     *             {@link #FORMATTER_COMMENT_CLEAR_BLANK_LINES_IN_JAVADOC_COMMENT}
     */
+   @Deprecated
    public final static String FORMATTER_COMMENT_CLEAR_BLANK_LINES =
       "org.eclipse.jdt.core.formatter.comment.clear_blank_lines"; //$NON-NLS-1$
 
@@ -810,6 +811,7 @@ public class DefaultCodeFormatterConstants{
     * @deprecated Use multiple settings for each kind of comments. See {@link #FORMATTER_COMMENT_FORMAT_BLOCK_COMMENT},
     *             {@link #FORMATTER_COMMENT_FORMAT_JAVADOC_COMMENT} and {@link #FORMATTER_COMMENT_FORMAT_LINE_COMMENT}.
     */
+   @Deprecated
    public final static String FORMATTER_COMMENT_FORMAT = "org.eclipse.jdt.core.formatter.comment.format_comments"; //$NON-NLS-1$
 
    /**
@@ -1624,6 +1626,7 @@ public class DefaultCodeFormatterConstants{
     *             {@link #FORMATTER_INSERT_NEW_LINE_AFTER_ANNOTATION_ON_LOCAL_VARIABLE}
     *             {@link #FORMATTER_INSERT_NEW_LINE_AFTER_ANNOTATION_ON_PARAMETER}
     */
+   @Deprecated
    public static final String FORMATTER_INSERT_NEW_LINE_AFTER_ANNOTATION = JavaCore.PLUGIN_ID
       + ".formatter.insert_new_line_after_annotation";//$NON-NLS-1$
 
@@ -1644,6 +1647,7 @@ public class DefaultCodeFormatterConstants{
     *             {@link #FORMATTER_INSERT_NEW_LINE_AFTER_ANNOTATION_ON_PACKAGE}
     *             {@link #FORMATTER_INSERT_NEW_LINE_AFTER_ANNOTATION_ON_TYPE}
     */
+   @Deprecated
    public static final String FORMATTER_INSERT_NEW_LINE_AFTER_ANNOTATION_ON_MEMBER = JavaCore.PLUGIN_ID
       + ".formatter.insert_new_line_after_annotation_on_member";//$NON-NLS-1$
 

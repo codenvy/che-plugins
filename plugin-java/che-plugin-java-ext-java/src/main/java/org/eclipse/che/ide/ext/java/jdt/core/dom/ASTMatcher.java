@@ -1075,6 +1075,7 @@ public class ASTMatcher {
      *
      * @deprecated mark deprecated to hide deprecated usage
      */
+    @Deprecated
     private boolean compareDeprecatedComment(Javadoc first, Javadoc second) {
         if (first.getAST().apiLevel == AST.JLS2_INTERNAL) {
             return safeEquals(first.getComment(), second.getComment());

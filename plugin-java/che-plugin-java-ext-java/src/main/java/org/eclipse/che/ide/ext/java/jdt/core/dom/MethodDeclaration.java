@@ -599,6 +599,7 @@ public class MethodDeclaration extends BodyDeclaration {
      *         if this operation is used in an AST later than JLS2
      * @deprecated In the JLS3 API, this method is replaced by {@link #getReturnType2()}, which may return <code>null</code>.
      */
+    @Deprecated
     public Type getReturnType() {
         return internalGetReturnType();
     }
@@ -644,6 +645,7 @@ public class MethodDeclaration extends BodyDeclaration {
      *         if this operation is used in an AST later than JLS2
      * @deprecated In the JLS3 API, this method is replaced by {@link #setReturnType2(Type)}, which accepts <code>null</code> .
      */
+    @Deprecated
     public void setReturnType(Type type) {
         internalSetReturnType(type);
     }

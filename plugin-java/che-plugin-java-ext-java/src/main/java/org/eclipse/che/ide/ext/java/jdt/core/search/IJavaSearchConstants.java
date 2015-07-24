@@ -445,6 +445,7 @@ public interface IJavaSearchConstants {
      * @category matchRule
      * @deprecated Use {@link SearchPattern#R_EXACT_MATCH} instead.
      */
+    @Deprecated
     int EXACT_MATCH = 0;
 
     /**
@@ -453,6 +454,7 @@ public interface IJavaSearchConstants {
      * @category matchRule
      * @deprecated Use {@link SearchPattern#R_PREFIX_MATCH} instead.
      */
+    @Deprecated
     int PREFIX_MATCH = 1;
 
     /**
@@ -462,6 +464,7 @@ public interface IJavaSearchConstants {
      * @category matchRule
      * @deprecated Use {@link SearchPattern#R_PATTERN_MATCH} instead.
      */
+    @Deprecated
     int PATTERN_MATCH = 2;
 
    /* Case sensitivity */
@@ -472,6 +475,7 @@ public interface IJavaSearchConstants {
      * @category matchRule
      * @deprecated Use the methods that take the matchMode with {@link SearchPattern#R_CASE_SENSITIVE} as a matchRule instead.
      */
+    @Deprecated
     boolean CASE_SENSITIVE = true;
 
     /**
@@ -480,6 +484,7 @@ public interface IJavaSearchConstants {
      * @category matchRule
      * @deprecated Use the methods that take the matchMode without {@link SearchPattern#R_CASE_SENSITIVE} as a matchRule instead.
      */
+    @Deprecated
     boolean CASE_INSENSITIVE = false;
 
 }

@@ -61,6 +61,7 @@ import static org.junit.Assert.assertTrue;
 public class ASTRewritingMethodDeclTest extends ASTRewritingTest {
 
     /** @deprecated using deprecated code */
+    @Deprecated
     @Test
     public void testMethodDeclChanges() throws Exception {
         StringBuffer buf = new StringBuffer();

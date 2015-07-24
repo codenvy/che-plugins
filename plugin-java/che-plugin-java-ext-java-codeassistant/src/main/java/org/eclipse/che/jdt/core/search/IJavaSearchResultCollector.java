@@ -41,12 +41,14 @@ import org.eclipse.jdt.core.IJavaElement;
  * @deprecated Since 3.0, the class
  * {@link org.eclipse.jdt.core.search.SearchRequestor} replaces this interface.
  */
+@Deprecated
 public interface IJavaSearchResultCollector {
 	/**
 	 * The search result corresponds exactly to the search pattern.
 	 *
 	 * @deprecated Use {@link org.eclipse.jdt.core.search.SearchMatch#A_ACCURATE} instead.
 	 */
+	@Deprecated
 	int EXACT_MATCH = 0;
 
 	/**
@@ -56,6 +58,7 @@ public interface IJavaSearchResultCollector {
 	 *
 	 * @deprecated Use {@link org.eclipse.jdt.core.search.SearchMatch#A_INACCURATE} instead.
 	 */
+	@Deprecated
 	int POTENTIAL_MATCH = 1;
 
 	/**
@@ -63,6 +66,7 @@ public interface IJavaSearchResultCollector {
 	 *
 	 * @deprecated Replaced by {@link org.eclipse.jdt.core.search.SearchRequestor#beginReporting()}.
 	 */
+	@Deprecated
 	public void aboutToStart();
 
 	/**
@@ -88,6 +92,7 @@ public interface IJavaSearchResultCollector {
 	 * @deprecated Replaced by {@link org.eclipse.jdt.core.search.SearchRequestor#acceptSearchMatch(org.eclipse.jdt.core.search
 	 * .SearchMatch)}.
 	 */
+	@Deprecated
 	public void accept(
 			IResource resource,
 			int start,
@@ -101,6 +106,7 @@ public interface IJavaSearchResultCollector {
 	 *
 	 * @deprecated Replaced by {@link org.eclipse.jdt.core.search.SearchRequestor#endReporting()}.
 	 */
+	@Deprecated
 	public void done();
 
 	/**

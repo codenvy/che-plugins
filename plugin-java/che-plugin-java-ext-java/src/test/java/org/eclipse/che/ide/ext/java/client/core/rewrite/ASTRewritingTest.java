@@ -43,6 +43,7 @@ import org.eclipse.che.ide.ext.java.jdt.text.edits.TextEdit;
 
 public abstract class ASTRewritingTest extends BaseTest {
     /** @deprecated using deprecated code */
+    @Deprecated
     private static final int AST_INTERNAL_JLS2 = AST.JLS2;
 
 
@@ -179,11 +180,13 @@ public abstract class ASTRewritingTest extends BaseTest {
     }
 
     /** @deprecated using deprecated code */
+    @Deprecated
     private void setModifiers(BodyDeclaration bodyDeclaration, int modifiers) {
         bodyDeclaration.setModifiers(modifiers);
     }
 
     /** @deprecated using deprecated code */
+    @Deprecated
     private void setReturnType(MethodDeclaration methodDeclaration, Type type) {
         methodDeclaration.setReturnType(type);
     }

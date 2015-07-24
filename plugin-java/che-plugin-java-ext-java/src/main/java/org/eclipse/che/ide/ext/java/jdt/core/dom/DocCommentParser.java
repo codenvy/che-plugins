@@ -83,6 +83,7 @@ class DocCommentParser extends AbstractCommentParser {
      *
      * @deprecated mark deprecated to hide deprecated usage
      */
+    @Deprecated
     private void setComment(int start, int length) {
         this.docComment.setComment(new String(this.source, start, length));
     }

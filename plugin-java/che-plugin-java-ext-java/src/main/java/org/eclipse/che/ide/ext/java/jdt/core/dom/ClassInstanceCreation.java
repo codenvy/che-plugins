@@ -362,6 +362,7 @@ public class ClassInstanceCreation extends Expression {
      * @deprecated In the JLS3 API, this method is replaced by {@link #getType()} , which returns a <code>Type</code> instead of a
      *             <code>Name</code>.
      */
+    @Deprecated
     public Name getName() {
         return internalGetName();
     }
@@ -402,6 +403,7 @@ public class ClassInstanceCreation extends Expression {
      * @deprecated In the JLS3 API, this method is replaced by {@link #setType(Type)}, which expects a <code>Type</code> instead of
      *             a <code>Name</code>.
      */
+    @Deprecated
     public void setName(Name name) {
         internalSetName(name);
     }

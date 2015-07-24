@@ -104,6 +104,7 @@ public class Message {
      * @see #getLength()
      * @deprecated Use {@link #getStartPosition()} instead.
      */
+    @Deprecated
     public int getSourcePosition() {
         return getStartPosition();
     }

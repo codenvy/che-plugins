@@ -112,6 +112,7 @@ public class ASTRewriteFlattener extends ASTVisitor {
      *
      * @deprecated
      */
+    @Deprecated
    /* package */static final int JLS2_INTERNAL = AST.JLS2;
 
     public static String asString(ASTNode node, RewriteEventStore store) {

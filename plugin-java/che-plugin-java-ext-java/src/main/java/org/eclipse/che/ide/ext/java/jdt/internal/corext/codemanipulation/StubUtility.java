@@ -820,6 +820,7 @@ public class StubUtility {
      * @return the return type
      * @deprecated Deprecated to avoid deprecated warnings
      */
+    @Deprecated
     private static ASTNode getReturnType(MethodDeclaration decl) {
         // used from API, can't eliminate
         return decl.getAST().apiLevel() == AST.JLS2 ? decl.getReturnType() : decl.getReturnType2();

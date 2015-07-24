@@ -152,6 +152,7 @@ public final class ASTRewriteAnalyzer extends ASTVisitor {
      *
      * @deprecated
      */
+    @Deprecated
    /* package */static final int JLS2_INTERNAL = AST.JLS2;
 
     TextEdit currentEdit;

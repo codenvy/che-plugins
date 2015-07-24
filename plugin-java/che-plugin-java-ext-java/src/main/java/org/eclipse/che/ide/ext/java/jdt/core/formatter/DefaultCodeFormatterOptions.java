@@ -3203,6 +3203,7 @@ public class DefaultCodeFormatterOptions {
      *         the given map
      * @deprecated
      */
+    @Deprecated
     private void setDeprecatedOptions(Map settings) {
         // backward compatibility code
         final Object commentClearBlankLinesOption =

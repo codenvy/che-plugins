@@ -131,6 +131,7 @@ public class NaiveASTFlattener extends ASTVisitor {
      * @since 3.4
      * @deprecated
      */
+    @Deprecated
     private static final int JLS2 = AST.JLS2;
 
     /** The string buffer into which the serialized representation of the AST is written. */
@@ -149,6 +150,7 @@ public class NaiveASTFlattener extends ASTVisitor {
      * @since 3.4
      * @deprecated
      */
+    @Deprecated
     private Name getName(ClassInstanceCreation node) {
         return node.getName();
     }
@@ -168,6 +170,7 @@ public class NaiveASTFlattener extends ASTVisitor {
      * @since 3.4
      * @deprecated
      */
+    @Deprecated
     private Type getReturnType(MethodDeclaration node) {
         return node.getReturnType();
     }
@@ -178,6 +181,7 @@ public class NaiveASTFlattener extends ASTVisitor {
      * @since 3.4
      * @deprecated
      */
+    @Deprecated
     private Name getSuperclass(TypeDeclaration node) {
         return node.getSuperclass();
     }
@@ -188,6 +192,7 @@ public class NaiveASTFlattener extends ASTVisitor {
      * @since 3.4
      * @deprecated
      */
+    @Deprecated
     private TypeDeclaration getTypeDeclaration(TypeDeclarationStatement node) {
         return node.getTypeDeclaration();
     }
@@ -265,6 +270,7 @@ public class NaiveASTFlattener extends ASTVisitor {
      * @since 3.4
      * @deprecated
      */
+    @Deprecated
     private List superInterfaces(TypeDeclaration node) {
         return node.superInterfaces();
     }

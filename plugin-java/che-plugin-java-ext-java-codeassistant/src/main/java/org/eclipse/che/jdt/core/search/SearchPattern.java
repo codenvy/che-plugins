@@ -892,6 +892,7 @@ public static final int[] getMatchingRegions(String pattern, String name, int ma
  * 	(see "https://bugs.eclipse.org/bugs/show_bug.cgi?id=142044" for more details).
  * 	This might be done in a further version...
  */
+@Deprecated
 public static SearchPattern createAndPattern(SearchPattern leftPattern, SearchPattern rightPattern) {
 	return new AndPattern(leftPattern, rightPattern);
 }

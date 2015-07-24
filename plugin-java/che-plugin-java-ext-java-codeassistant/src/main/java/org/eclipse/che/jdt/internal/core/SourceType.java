@@ -73,6 +73,7 @@ protected void closing(Object info) throws JavaModelException {
  * @see org.eclipse.jdt.core.IType
  * @deprecated
  */
+@Deprecated
 public void codeComplete(char[] snippet,int insertion,int position,char[][] localVariableTypeNames,char[][] localVariableNames,int[] localVariableModifiers,boolean isStatic,ICompletionRequestor requestor) throws
 
 																																																			 JavaModelException {
@@ -83,6 +84,7 @@ public void codeComplete(char[] snippet,int insertion,int position,char[][] loca
  * @see org.eclipse.jdt.core.IType
  * @deprecated
  */
+@Deprecated
 public void codeComplete(char[] snippet,int insertion,int position,char[][] localVariableTypeNames,char[][] localVariableNames,int[] localVariableModifiers,boolean isStatic,ICompletionRequestor requestor, WorkingCopyOwner owner) throws
 																																																									 JavaModelException {
 //	if (requestor == null) {
@@ -750,6 +752,7 @@ public ITypeHierarchy newSupertypeHierarchy(
  * @see org.eclipse.jdt.core.IType#newSupertypeHierarchy(org.eclipse.jdt.core.IWorkingCopy[], org.eclipse.core.runtime.IProgressMonitor)
  * @deprecated
  */
+@Deprecated
 public ITypeHierarchy newSupertypeHierarchy(
 	IWorkingCopy[] workingCopies,
 	IProgressMonitor monitor)
@@ -844,6 +847,7 @@ public ITypeHierarchy newTypeHierarchy(
  * @see org.eclipse.jdt.core.IType#newTypeHierarchy(org.eclipse.jdt.core.IWorkingCopy[], org.eclipse.core.runtime.IProgressMonitor)
  * @deprecated
  */
+@Deprecated
 public ITypeHierarchy newTypeHierarchy(
 	IWorkingCopy[] workingCopies,
 	IProgressMonitor monitor)

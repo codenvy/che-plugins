@@ -80,6 +80,7 @@ public class GapTextStore implements TextStore {
      *         if the gap is ever larger than this, it will automatically be shrunken (&gt;=&nbsp;0)
      * @deprecated use {@link GapTextStore#GapTextStore(int, int, float)} instead
      */
+    @Deprecated
     public GapTextStore(int lowWatermark, int highWatermark) {
       /*
        * Legacy constructor. The API contract states that highWatermark is the upper bound for the gap size. Albeit this contract

@@ -20,6 +20,7 @@ package org.eclipse.che.jdt.core.search;
  * </p>
  * @deprecated Use abstract class {@link org.eclipse.jdt.core.search.TypeNameRequestor} instead.
  */
+@Deprecated
 public interface ITypeNameRequestor {
 /**
  * Accepts a top-level or a member class.
