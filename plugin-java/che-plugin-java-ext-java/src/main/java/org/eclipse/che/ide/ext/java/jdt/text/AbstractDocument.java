@@ -581,6 +581,7 @@ public abstract class AbstractDocument implements Document {
      * @since 2.0
      * @deprecated as of 3.0. Use <code>doFireDocumentChanged2(DocumentEvent)</code> instead; this method will be removed.
      */
+    @Deprecated
     protected void doFireDocumentChanged(DocumentEvent event, boolean firePartitionChange, Region partitionChange) {
         doFireDocumentChanged2(event);
     }
@@ -1095,6 +1096,7 @@ public abstract class AbstractDocument implements Document {
      * @since 2.0
      * @deprecated since 3.1. Use {@link IDocumentExtension4#startRewriteSession(DocumentRewriteSessionType)} instead.
      */
+    @Deprecated
     public void startSequentialRewrite(boolean normalized) {
     }
 
@@ -1104,6 +1106,7 @@ public abstract class AbstractDocument implements Document {
      * @since 2.0
      * @deprecated As of 3.1, replaced by {@link IDocumentExtension4#stopRewriteSession(DocumentRewriteSession)}
      */
+    @Deprecated
     public void stopSequentialRewrite() {
     }
 

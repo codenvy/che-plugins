@@ -99,6 +99,7 @@ public final class AST {
      * @since 3.0
      * @deprecated Clients should use the {@link #JLS4} AST API instead.
      */
+    @Deprecated
     public static final int JLS2 = 2;
 
     /**
@@ -310,6 +311,7 @@ public final class AST {
      * @deprecated Clients should port their code to use the new JLS3 AST API and call
      *             {@link #newAST(int) AST.newAST(AST.JLS3)} instead of using this constructor.
      */
+    @Deprecated
     public AST(Map<String, String> options) {
         this(JLS2);
         Object sourceLevelOption = options.get(JavaCore.COMPILER_SOURCE);

@@ -37,6 +37,7 @@ public class Javadoc extends Comment {
      * @since 3.0
      * @deprecated Replaced by {@link #TAGS_PROPERTY} in the JLS3 API.
      */
+    @Deprecated
     public static final SimplePropertyDescriptor COMMENT_PROPERTY = new SimplePropertyDescriptor(Javadoc.class,
                                                                                                  "comment", String.class, MANDATORY);
     //$NON-NLS-1$
@@ -106,6 +107,7 @@ public class Javadoc extends Comment {
      * @deprecated The comment string was replaced in the 3.0 release by a representation of the structure of the doc comment. For
      *             backwards compatibility, it is still funcational as before.
      */
+    @Deprecated
     private String comment = MINIMAL_DOC_COMMENT;
 
     /**
@@ -199,6 +201,7 @@ public class Javadoc extends Comment {
      * @deprecated The comment string was replaced in the 3.0 release by a representation of the structure of the doc comment. See
      *             {@link #tags() tags}.
      */
+    @Deprecated
     public String getComment() {
         supportedOnlyIn2();
         return this.comment;
@@ -217,6 +220,7 @@ public class Javadoc extends Comment {
      * @deprecated The comment string was replaced in the 3.0 release by a representation of the structure of the doc comment. See
      *             {@link #tags() tags}.
      */
+    @Deprecated
     public void setComment(String docComment) {
         supportedOnlyIn2();
         if (docComment == null) {

@@ -19,6 +19,7 @@ package org.eclipse.che.jdt.core.search;
  * @deprecated Since 3.0, the class
  * {@link org.eclipse.jdt.core.search.SearchPattern} replaces this interface.
  */
+@Deprecated
 public interface ISearchPattern {
 	// used as a marker interface: contains no methods
 }

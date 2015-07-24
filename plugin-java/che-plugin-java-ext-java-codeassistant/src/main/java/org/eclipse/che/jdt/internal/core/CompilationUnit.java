@@ -61,6 +61,7 @@ public class CompilationUnit extends Openable
      *
      * @deprecated
      */
+    @Deprecated
     /*package*/ static final int JLS2_INTERNAL = AST.JLS2;
 
     private static final IImportDeclaration[] NO_IMPORTS = new IImportDeclaration[0];
@@ -293,6 +294,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.ICodeAssist#codeComplete(int, org.eclipse.jdt.core.ICompletionRequestor)
      * @deprecated
      */
+    @Deprecated
     public void codeComplete(int offset, ICompletionRequestor requestor) throws JavaModelException {
 //	codeComplete(offset, requestor, DefaultWorkingCopyOwner.PRIMARY);
         throw new UnsupportedOperationException();
@@ -303,6 +305,7 @@ public class CompilationUnit extends Openable
      * org.eclipse.jdt.core.WorkingCopyOwner)
      * @deprecated
      */
+    @Deprecated
     public void codeComplete(int offset, ICompletionRequestor requestor, WorkingCopyOwner workingCopyOwner) throws JavaModelException {
 //	if (requestor == null) {
 //		throw new IllegalArgumentException("Completion requestor cannot be null"); //$NON-NLS-1$
@@ -315,6 +318,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.ICodeAssist#codeComplete(int, org.eclipse.jdt.core.ICodeCompletionRequestor)
      * @deprecated - use codeComplete(int, ICompletionRequestor)
      */
+    @Deprecated
     public void codeComplete(int offset, final ICodeCompletionRequestor requestor) throws JavaModelException {
 //
 //	if (requestor == null){
@@ -447,6 +451,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.IWorkingCopy#commit(boolean, org.eclipse.core.runtime.IProgressMonitor)
      * @deprecated
      */
+    @Deprecated
     public void commit(boolean force, IProgressMonitor monitor) throws JavaModelException {
 //	commitWorkingCopy(force, monitor);
         throw new UnsupportedOperationException();
@@ -562,6 +567,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.IWorkingCopy#destroy()
      * @deprecated
      */
+    @Deprecated
     public void destroy() {
         try {
             discardWorkingCopy();
@@ -666,6 +672,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.IWorkingCopy#findSharedWorkingCopy(org.eclipse.jdt.core.IBufferFactory)
      * @deprecated
      */
+    @Deprecated
     public IJavaElement findSharedWorkingCopy(IBufferFactory factory) {
 
 //	// if factory is null, default factory must be used
@@ -907,6 +914,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.IWorkingCopy#getOriginal(org.eclipse.jdt.core.IJavaElement)
      * @deprecated
      */
+    @Deprecated
     public IJavaElement getOriginal(IJavaElement workingCopyElement) {
         // backward compatibility
         if (!isWorkingCopy()) return null;
@@ -922,6 +930,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.IWorkingCopy#getOriginalElement()
      * @deprecated
      */
+    @Deprecated
     public IJavaElement getOriginalElement() {
         // backward compatibility
         if (!isWorkingCopy()) return null;
@@ -1052,6 +1061,7 @@ public class CompilationUnit extends Openable
      * org.eclipse.jdt.core.IBufferFactory, org.eclipse.jdt.core.IProblemRequestor)
      * @deprecated
      */
+    @Deprecated
     public IJavaElement getSharedWorkingCopy(IProgressMonitor pm, IBufferFactory factory, IProblemRequestor problemRequestor) throws
                                                                                                                               JavaModelException {
 
@@ -1066,6 +1076,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.IWorkingCopy#getWorkingCopy()
      * @deprecated
      */
+    @Deprecated
     public IJavaElement getWorkingCopy() throws JavaModelException {
         return getWorkingCopy(null);
     }
@@ -1090,6 +1101,7 @@ public class CompilationUnit extends Openable
      * org.eclipse.jdt.core.IProblemRequestor)
      * @deprecated
      */
+    @Deprecated
     public IJavaElement getWorkingCopy(IProgressMonitor monitor, IBufferFactory factory, IProblemRequestor problemRequestor) throws
                                                                                                                              JavaModelException {
 //	return getWorkingCopy(BufferFactoryWrapper.create(factory), problemRequestor, monitor);
@@ -1101,6 +1113,7 @@ public class CompilationUnit extends Openable
      * org.eclipse.jdt.core.IProblemRequestor, org.eclipse.core.runtime.IProgressMonitor)
      * @deprecated
      */
+    @Deprecated
     public ICompilationUnit getWorkingCopy(WorkingCopyOwner workingCopyOwner, IProblemRequestor problemRequestor, IProgressMonitor monitor)
             throws
             JavaModelException {
@@ -1152,6 +1165,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.IWorkingCopy#isBasedOn(org.eclipse.core.resources.IResource)
      * @deprecated
      */
+    @Deprecated
     public boolean isBasedOn(IResource resource) {
         if (!isWorkingCopy()) return false;
         if (!getResource().equals(resource)) return false;
@@ -1347,6 +1361,7 @@ public class CompilationUnit extends Openable
      * @see org.eclipse.jdt.core.ICompilationUnit#reconcile()
      * @deprecated
      */
+    @Deprecated
     public IMarker[] reconcile() throws JavaModelException {
 //	reconcile(NO_AST, false/*don't force problem detection*/, false, null/*use primary owner*/, null/*no progress monitor*/);
 //	return null;

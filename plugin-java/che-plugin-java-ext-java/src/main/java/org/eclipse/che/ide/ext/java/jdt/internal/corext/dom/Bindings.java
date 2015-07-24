@@ -618,6 +618,7 @@ public class Bindings {
      * @deprecated use {@link #isSubsignature(IMethodBinding, IMethodBinding)}
      */
     // TODO: rename to isErasureEquivalentMethod and change to two IMethodBinding parameters
+    @Deprecated
     public static boolean isEqualMethod(IMethodBinding method, String methodName, ITypeBinding[] parameters) {
         if (!method.getName().equals(methodName))
             return false;
@@ -1212,6 +1213,7 @@ public class Bindings {
      *             hierarchy (directly overrides each other), or
      *             {@link #findMethodInHierarchy(ITypeBinding, String, ITypeBinding[])} else.
      */
+    @Deprecated
     public static boolean containsSignatureEquivalentConstructor(IMethodBinding[] candidates, IMethodBinding overridable) {
         for (int index = 0; index < candidates.length; index++) {
             if (isSignatureEquivalentConstructor(candidates[index], overridable))
@@ -1241,6 +1243,7 @@ public class Bindings {
      *             hierarchy (directly overrides each other), or
      *             {@link #findMethodInHierarchy(ITypeBinding, String, ITypeBinding[])} else.
      */
+    @Deprecated
     public static boolean areOverriddenMethods(IMethodBinding overridden, IMethodBinding overridable) {
 
         if (!overridden.getName().equals(overridable.getName()))

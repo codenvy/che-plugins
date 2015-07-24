@@ -190,6 +190,7 @@ public static char[] translatedName(char[] name) {
  * @see org.eclipse.jdt.core.ICodeAssist#codeComplete(int, org.eclipse.jdt.core.ICompletionRequestor)
  * @deprecated
  */
+@Deprecated
 public void codeComplete(int offset, ICompletionRequestor requestor) throws JavaModelException {
 //	codeComplete(offset, requestor, DefaultWorkingCopyOwner.PRIMARY);
 	throw new UnsupportedOperationException();
@@ -199,6 +200,7 @@ public void codeComplete(int offset, ICompletionRequestor requestor) throws Java
  * @see org.eclipse.jdt.core.ICodeAssist#codeComplete(int, org.eclipse.jdt.core.ICompletionRequestor, org.eclipse.jdt.core.WorkingCopyOwner)
  * @deprecated
  */
+@Deprecated
 public void codeComplete(int offset, ICompletionRequestor requestor, WorkingCopyOwner owner) throws JavaModelException {
 //	if (requestor == null) {
 //		throw new IllegalArgumentException("Completion requestor cannot be null"); //$NON-NLS-1$
@@ -703,6 +705,7 @@ public ICompilationUnit getWorkingCopy(WorkingCopyOwner owner, IProgressMonitor 
  * @see org.eclipse.jdt.core.IClassFile
  * @deprecated
  */
+@Deprecated
 public IJavaElement getWorkingCopy(IProgressMonitor monitor, org.eclipse.jdt.core.IBufferFactory factory) throws JavaModelException {
 //	return getWorkingCopy(BufferFactoryWrapper.create(factory), monitor);
 	throw new UnsupportedOperationException();
@@ -829,6 +832,7 @@ private IType getOuterMostEnclosingType() {
  * @see org.eclipse.jdt.core.ICodeAssist#codeComplete(int, org.eclipse.jdt.core.ICodeCompletionRequestor)
  * @deprecated - should use codeComplete(int, ICompletionRequestor) instead
  */
+@Deprecated
 public void codeComplete(int offset, final org.eclipse.jdt.core.ICodeCompletionRequestor requestor) throws JavaModelException {
 
 //	if (requestor == null){

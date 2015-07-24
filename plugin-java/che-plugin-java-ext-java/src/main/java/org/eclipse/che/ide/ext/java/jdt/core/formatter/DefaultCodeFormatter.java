@@ -416,6 +416,7 @@ public class DefaultCodeFormatter extends CodeFormatter {
      *
      * @deprecated
      */
+    @Deprecated
     private Object oldCommentFormatOption() {
         return this.options.get(DefaultCodeFormatterConstants.FORMATTER_COMMENT_FORMAT);
     }

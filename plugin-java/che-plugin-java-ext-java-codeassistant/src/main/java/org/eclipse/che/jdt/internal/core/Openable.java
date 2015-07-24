@@ -333,6 +333,7 @@ public abstract class Openable extends JavaElement implements IOpenable, IBuffer
      *
      * @deprecated
      */
+    @Deprecated
     public IBufferFactory getBufferFactory() {
         return getBufferManager().getDefaultBufferFactory();
     }

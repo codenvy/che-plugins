@@ -85,6 +85,7 @@ public class BinaryType extends BinaryMember implements IType, SuffixConstants {
 	 * .ICompletionRequestor)
 	 * @deprecated
 	 */
+	@Deprecated
 	public void codeComplete(char[] snippet, int insertion, int position, char[][] localVariableTypeNames, char[][] localVariableNames,
 							 int[] localVariableModifiers, boolean isStatic, ICompletionRequestor requestor) throws JavaModelException {
 //		codeComplete(snippet, insertion, position, localVariableTypeNames, localVariableNames, localVariableModifiers, isStatic, requestor,
@@ -97,6 +98,7 @@ public class BinaryType extends BinaryMember implements IType, SuffixConstants {
 	 * .ICompletionRequestor, org.eclipse.jdt.core.WorkingCopyOwner)
 	 * @deprecated
 	 */
+	@Deprecated
 	public void codeComplete(char[] snippet, int insertion, int position, char[][] localVariableTypeNames, char[][] localVariableNames,
 							 int[] localVariableModifiers, boolean isStatic, ICompletionRequestor requestor, WorkingCopyOwner owner)
 			throws JavaModelException {
@@ -845,6 +847,7 @@ public ITypeHierarchy newSupertypeHierarchy(
  * @see org.eclipse.jdt.core.IType#newSupertypeHierarchy(org.eclipse.jdt.core.IWorkingCopy[], org.eclipse.core.runtime.IProgressMonitor)
  * @deprecated
  */
+@Deprecated
 public ITypeHierarchy newSupertypeHierarchy(
 	IWorkingCopy[] workingCopies,
 	IProgressMonitor monitor)
@@ -921,6 +924,7 @@ public ITypeHierarchy newTypeHierarchy(IJavaProject project, WorkingCopyOwner ow
  * @see org.eclipse.jdt.core.IType#newTypeHierarchy(org.eclipse.core.runtime.IProgressMonitor monitor)
  * @deprecated
  */
+@Deprecated
 public ITypeHierarchy newTypeHierarchy(IProgressMonitor monitor) throws JavaModelException {
 	// https://bugs.eclipse.org/bugs/show_bug.cgi?id=228845, consider any
 	// changes that may exist on primary working copies.
@@ -944,6 +948,7 @@ public ITypeHierarchy newTypeHierarchy(
  * @see org.eclipse.jdt.core.IType#newTypeHierarchy(org.eclipse.jdt.core.IWorkingCopy[], org.eclipse.core.runtime.IProgressMonitor)
  * @deprecated
  */
+@Deprecated
 public ITypeHierarchy newTypeHierarchy(
 	IWorkingCopy[] workingCopies,
 	IProgressMonitor monitor)

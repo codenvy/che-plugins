@@ -498,6 +498,7 @@ public class TypeDeclaration extends AbstractTypeDeclaration {
      * @deprecated In the JLS3 API, this method is replaced by {@link #getSuperclassType()}, which returns a <code>Type</code>
      *             instead of a <code>Name</code>.
      */
+    @Deprecated
     public Name getSuperclass() {
         return internalGetSuperclass();
     }
@@ -550,6 +551,7 @@ public class TypeDeclaration extends AbstractTypeDeclaration {
      * @deprecated In the JLS3 API, this method is replaced by {@link #setSuperclassType(Type)}, which expects a <code>Type</code>
      *             instead of a <code>Name</code>.
      */
+    @Deprecated
     public void setSuperclass(Name superclassName) {
         internalSetSuperclass(superclassName);
     }
@@ -605,6 +607,7 @@ public class TypeDeclaration extends AbstractTypeDeclaration {
      *         if this operation is used in an AST later than JLS2
      * @deprecated In the JLS3 API, this method is replaced by {@link #superInterfaceTypes()}.
      */
+    @Deprecated
     public List superInterfaces() {
         return internalSuperInterfaces();
     }

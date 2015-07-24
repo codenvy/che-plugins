@@ -183,6 +183,7 @@ public final class BindingKey {
      * @see org.eclipse.jdt.core.BindingKey#createWildcardTypeBindingKey(String, char, String, int)
      * @deprecated This method is missing crucial information necessary for proper wildcard binding key creation.
      */
+    @Deprecated
     public static String createWilcardTypeBindingKey(String typeKey, char kind) {
         // Note this implementation is supposed to closely follow the behavior in WildcardBinding#computeUniqueKey()
         // but it doesn't and hence the deprecation. See https://bugs.eclipse.org/bugs/show_bug.cgi?id=234609

@@ -251,6 +251,7 @@ public class TypeDeclarationStatement extends Statement {
      * @deprecated In the JLS3 API, this method is replaced by {@link #getDeclaration()}, which returns
      *             <code>AbstractTypeDeclaration</code> instead of <code>TypeDeclaration</code>.
      */
+    @Deprecated
     public TypeDeclaration getTypeDeclaration() {
         return internalGetTypeDeclaration();
     }
@@ -283,6 +284,7 @@ public class TypeDeclarationStatement extends Statement {
      * @deprecated In the JLS3 API, this method is replaced by {@link #setDeclaration(AbstractTypeDeclaration)} which takes
      *             <code>AbstractTypeDeclaration</code> instead of <code>TypeDeclaration</code>.
      */
+    @Deprecated
     public void setTypeDeclaration(TypeDeclaration decl) {
         internalSetTypeDeclaration(decl);
     }

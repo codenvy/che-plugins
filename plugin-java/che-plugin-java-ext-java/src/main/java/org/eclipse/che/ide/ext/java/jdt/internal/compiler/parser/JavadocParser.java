@@ -775,7 +775,7 @@ public class JavadocParser extends AbstractCommentParser {
                             this.sourceParser.problemReporter().javadocUnexpectedTag(this.tagSourceStart, this.tagSourceEnd);
                         // bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=51600
                         // store invalid param references in specific array
-                        if (this.invalidParamReferencesPtr == -1l) {
+                        if (this.invalidParamReferencesPtr == -1L) {
                             this.invalidParamReferencesStack = new JavadocSingleNameReference[10];
                         }
                         int stackLength = this.invalidParamReferencesStack.length;

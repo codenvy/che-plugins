@@ -540,6 +540,7 @@ public ITypeParameter[] getTypeParameters() throws JavaModelException {
  * @since 3.0
  * @deprecated
  */
+@Deprecated
 public String[] getTypeParameterSignatures() throws JavaModelException {
 	IBinaryMethod info = (IBinaryMethod) getElementInfo();
 	char[] genericSignature = info.getGenericSignature();

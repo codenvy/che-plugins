@@ -63,6 +63,7 @@ public class CleanUpConstants {
      * @since 3.3
      * @deprecated replaced by {@link #FORMAT_SOURCE_CODE}
      */
+    @Deprecated
     public static final String FORMAT_COMMENT = "cleanup.format_comment"; //$NON-NLS-1$
 
     /**
@@ -78,6 +79,7 @@ public class CleanUpConstants {
      * @deprecated replaced by
      *             {@link DefaultCodeFormatterConstants#FORMATTER_COMMENT_FORMAT_LINE_COMMENT}
      */
+    @Deprecated
     public static final String FORMAT_SINGLE_LINE_COMMENT = "cleanup.format_single_line_comment"; //$NON-NLS-1$
 
     /**
@@ -93,6 +95,7 @@ public class CleanUpConstants {
      * @deprecated replaced by
      *             {@link DefaultCodeFormatterConstants#FORMATTER_COMMENT_FORMAT_BLOCK_COMMENT}
      */
+    @Deprecated
     public static final String FORMAT_MULTI_LINE_COMMENT = "cleanup.format_multi_line_comment"; //$NON-NLS-1$
 
     /**
@@ -108,6 +111,7 @@ public class CleanUpConstants {
      * @deprecated replaced by
      *             {@link DefaultCodeFormatterConstants#FORMATTER_COMMENT_FORMAT_JAVADOC_COMMENT}
      */
+    @Deprecated
     public static final String FORMAT_JAVADOC = "cleanup.format_javadoc"; //$NON-NLS-1$
 
     /**

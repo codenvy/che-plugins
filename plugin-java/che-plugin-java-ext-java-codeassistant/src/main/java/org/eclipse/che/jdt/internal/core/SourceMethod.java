@@ -154,6 +154,7 @@ public ILocalVariable[] getParameters() throws JavaModelException {
  * @since 3.0
  * @deprecated
  */
+@Deprecated
 public String[] getTypeParameterSignatures() throws JavaModelException {
 	ITypeParameter[] typeParameters = getTypeParameters();
 	int length = typeParameters.length;

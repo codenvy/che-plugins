@@ -448,6 +448,7 @@ public class JavaModelStatus extends Status implements IJavaModelStatus, IJavaMo
 	 * @see org.eclipse.jdt.core.IJavaModelStatus#getString()
 	 * @deprecated
 	 */
+	@Deprecated
 	public String getString() {
 		return this.string;
 	}

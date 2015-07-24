@@ -636,6 +636,7 @@ public class CompilationUnit extends ASTNode {
      * @see #getLineNumber(int)
      * @deprecated Use getLineNumber(int) instead. Be careful to handle the negative values.
      */
+    @Deprecated
     public int lineNumber(int position) {
         int lineNumber = getLineNumber(position);
         return lineNumber < 1 ? 1 : lineNumber;

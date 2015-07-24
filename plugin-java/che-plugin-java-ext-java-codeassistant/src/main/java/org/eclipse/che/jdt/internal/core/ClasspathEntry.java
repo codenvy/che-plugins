@@ -1505,6 +1505,7 @@ public class ClasspathEntry implements IClasspathEntry {
      * @see org.eclipse.jdt.core.IClasspathEntry
      * @deprecated
      */
+    @Deprecated
     public IClasspathEntry getResolvedEntry() {
 
         return JavaCore.getResolvedClasspathEntry(this);

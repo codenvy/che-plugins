@@ -67,6 +67,7 @@ public abstract class Statement extends ASTNode {
      *
      * @deprecated The leading comment feature was removed in 2.1.
      */
+    @Deprecated
     private String optionalLeadingComment = null;
 
     /**
@@ -98,6 +99,7 @@ public abstract class Statement extends ASTNode {
      *             compilation unit's {@linkplain CompilationUnit#getCommentList() comment table} or use a scanner to reanalyze the
      *             source text immediately preceding the statement's source range.
      */
+    @Deprecated
     public String getLeadingComment() {
         return this.optionalLeadingComment;
     }
@@ -131,6 +133,7 @@ public abstract class Statement extends ASTNode {
      * @deprecated This feature was removed in the 2.1 release because it was only a partial, and inadequate, solution to the issue
      *             of associating comments with statements.
      */
+    @Deprecated
     public void setLeadingComment(String comment) {
         if (comment != null) {
             char[] source = comment.toCharArray();

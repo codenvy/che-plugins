@@ -60,6 +60,7 @@ public class SearchEngine {
      *
      * @deprecated marking deprecated as it uses deprecated ISearchPattern
      */
+    @Deprecated
     static class SearchPatternAdapter implements ISearchPattern {
         SearchPattern pattern;
 
@@ -73,6 +74,7 @@ public class SearchEngine {
      *
      * @deprecated marking deprecated as it uses deprecated IJavaSearchResultCollector
      */
+    @Deprecated
     static class ResultCollectorAdapter extends SearchRequestor {
         IJavaSearchResultCollector resultCollector;
 
@@ -113,6 +115,7 @@ public class SearchEngine {
      *
      * @deprecated marking deprecated as it uses deprecated ITypeNameRequestor
      */
+    @Deprecated
     static class TypeNameRequestorAdapter implements IRestrictedAccessTypeRequestor {
         ITypeNameRequestor nameRequestor;
 
@@ -276,6 +279,7 @@ public class SearchEngine {
      * @return a new Java search scope
      * @deprecated Use {@link #createJavaSearchScope(org.eclipse.jdt.core.IJavaElement[])} instead.
      */
+    @Deprecated
     public static IJavaSearchScope createJavaSearchScope(IResource[] resources) {
         int length = resources.length;
         IJavaElement[] elements = new IJavaElement[length];
@@ -387,6 +391,7 @@ public class SearchEngine {
      * @deprecated Use {@link org.eclipse.jdt.core.search.SearchPattern#createOrPattern(org.eclipse.jdt.core.search.SearchPattern,
      * org.eclipse.jdt.core.search.SearchPattern)} instead.
      */
+    @Deprecated
     public static ISearchPattern createOrSearchPattern(ISearchPattern leftPattern, ISearchPattern rightPattern) {
         SearchPattern left = ((SearchPatternAdapter)leftPattern).pattern;
         SearchPattern right = ((SearchPatternAdapter)rightPattern).pattern;
@@ -449,6 +454,7 @@ public class SearchEngine {
      * @return a search pattern on the given string pattern, or <code>null</code> if the string pattern is ill-formed.
      * @deprecated Use {@link org.eclipse.jdt.core.search.SearchPattern#createPattern(String, int, int, int)} instead.
      */
+    @Deprecated
     public static ISearchPattern createSearchPattern(String stringPattern, int searchFor, int limitTo, boolean isCaseSensitive) {
         int matchMode = stringPattern.indexOf('*') != -1 || stringPattern.indexOf('?') != -1
                         ? SearchPattern.R_PATTERN_MATCH
@@ -483,6 +489,7 @@ public class SearchEngine {
      * @return a search pattern for a Java element or <code>null</code> if the given element is ill-formed
      * @deprecated Use {@link org.eclipse.jdt.core.search.SearchPattern#createPattern(org.eclipse.jdt.core.IJavaElement, int)} instead.
      */
+    @Deprecated
     public static ISearchPattern createSearchPattern(IJavaElement element, int limitTo) {
         return new SearchPatternAdapter(SearchPattern.createPattern(element, limitTo));
     }
@@ -564,6 +571,7 @@ public class SearchEngine {
      * @deprecated Use {@link  #search(SearchPattern, SearchParticipant[], IJavaSearchScope, SearchRequestor, org.eclipse.core.runtime
      * .IProgressMonitor)} instead.
      */
+    @Deprecated
     public void search(IWorkspace workspace, String patternString, int searchFor, int limitTo, IJavaSearchScope scope,
                        IJavaSearchResultCollector resultCollector) throws
                                                                    JavaModelException {
@@ -617,6 +625,7 @@ public class SearchEngine {
      * @deprecated Use {@link #search(SearchPattern, SearchParticipant[], IJavaSearchScope, SearchRequestor,
      * org.eclipse.core.runtime.IProgressMonitor)} instead.
      */
+    @Deprecated
     public void search(IWorkspace workspace, IJavaElement element, int limitTo, IJavaSearchScope scope,
                        IJavaSearchResultCollector resultCollector) throws
                                                                    JavaModelException {
@@ -644,6 +653,7 @@ public class SearchEngine {
      * @deprecated Use {@link  #search(SearchPattern, SearchParticipant[], IJavaSearchScope, SearchRequestor, org.eclipse.core.runtime
      * .IProgressMonitor)} instead.
      */
+    @Deprecated
     public void search(IWorkspace workspace, ISearchPattern searchPattern, IJavaSearchScope scope,
                        IJavaSearchResultCollector resultCollector) throws
                                                                    JavaModelException {
@@ -762,6 +772,7 @@ public class SearchEngine {
      * org.eclipse.core.runtime.IProgressMonitor)}
      * instead
      */
+    @Deprecated
     public void searchAllTypeNames(
             final char[] packageExactName,
             final char[] typeName,
@@ -1167,6 +1178,7 @@ public class SearchEngine {
      * @deprecated Use {@link #searchAllTypeNames(char[], char[], int, int, IJavaSearchScope, TypeNameRequestor, int,
      * org.eclipse.core.runtime.IProgressMonitor)} instead
      */
+    @Deprecated
     public void searchAllTypeNames(
             final char[] packageName,
             final char[] typeName,
@@ -1239,6 +1251,7 @@ public class SearchEngine {
      * @deprecated Use {@link #searchAllTypeNames(char[], char[], int, int, IJavaSearchScope, ITypeNameRequestor, int,
      * org.eclipse.core.runtime.IProgressMonitor)} instead
      */
+    @Deprecated
     public void searchAllTypeNames(
             IWorkspace workspace,
             final char[] packageName,
@@ -1354,6 +1367,7 @@ public class SearchEngine {
      * @deprecated Use {@link  #searchDeclarationsOfAccessedFields(org.eclipse.jdt.core.IJavaElement, SearchRequestor,
      * org.eclipse.core.runtime.IProgressMonitor)} instead.
      */
+    @Deprecated
     public void searchDeclarationsOfAccessedFields(IWorkspace workspace, IJavaElement enclosingElement,
                                                    IJavaSearchResultCollector resultCollector) throws
                                                                                                JavaModelException {
@@ -1453,6 +1467,7 @@ public class SearchEngine {
      * @deprecated Use {@link #searchDeclarationsOfReferencedTypes(org.eclipse.jdt.core.IJavaElement, SearchRequestor,
      * org.eclipse.core.runtime.IProgressMonitor)} instead.
      */
+    @Deprecated
     public void searchDeclarationsOfReferencedTypes(IWorkspace workspace, IJavaElement enclosingElement,
                                                     IJavaSearchResultCollector resultCollector) throws
                                                                                                 JavaModelException {
@@ -1557,6 +1572,7 @@ public class SearchEngine {
      * @deprecated Use {@link #searchDeclarationsOfSentMessages(org.eclipse.jdt.core.IJavaElement, SearchRequestor,
      * org.eclipse.core.runtime.IProgressMonitor)} instead.
      */
+    @Deprecated
     public void searchDeclarationsOfSentMessages(IWorkspace workspace, IJavaElement enclosingElement, IJavaSearchResultCollector
             resultCollector) throws
                              JavaModelException {

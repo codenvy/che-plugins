@@ -311,6 +311,7 @@ public class VariableDeclarationStatement extends Statement {
      * @deprecated In the JLS3 API, this method is replaced by {@link #modifiers()} which contains a list of a
      *             <code>Modifier</code> nodes.
      */
+    @Deprecated
     public void setModifiers(int modifiers) {
         internalSetModifiers(modifiers);
     }

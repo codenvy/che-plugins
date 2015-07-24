@@ -20,6 +20,7 @@ public abstract class AbstractSearchScope implements IJavaSearchScope {
  * @see org.eclipse.jdt.core.search.IJavaSearchScope#includesBinaries()
  * @deprecated
  */
+@Deprecated
 public boolean includesBinaries() {
 	return true;
 }
@@ -28,6 +29,7 @@ public boolean includesBinaries() {
  * @see org.eclipse.jdt.core.search.IJavaSearchScope#includesClasspaths()
  * @deprecated
  */
+@Deprecated
 public boolean includesClasspaths() {
 	return true;
 }
@@ -42,6 +44,7 @@ public abstract void processDelta(IJavaElementDelta delta, int eventType);
  * @see org.eclipse.jdt.core.search.IJavaSearchScope#setIncludesBinaries(boolean)
  * @deprecated
  */
+@Deprecated
 public void setIncludesBinaries(boolean includesBinaries) {
 	// implements interface method
 }
@@ -50,6 +53,7 @@ public void setIncludesBinaries(boolean includesBinaries) {
  * @see org.eclipse.jdt.core.search.IJavaSearchScope#setIncludesClasspaths(boolean)
  * @deprecated
  */
+@Deprecated
 public void setIncludesClasspaths(boolean includesClasspaths) {
 	// implements interface method
 }

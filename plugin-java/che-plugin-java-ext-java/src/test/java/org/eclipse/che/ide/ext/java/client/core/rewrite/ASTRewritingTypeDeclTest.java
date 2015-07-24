@@ -57,6 +57,7 @@ import static org.junit.Assert.assertTrue;
 public class ASTRewritingTypeDeclTest extends ASTRewritingTest {
 
     /** @deprecated using deprecated code */
+    @Deprecated
     @Test
     public void testTypeDeclChanges() throws Exception {
         StringBuffer buf = new StringBuffer();
@@ -335,6 +336,7 @@ public class ASTRewritingTypeDeclTest extends ASTRewritingTest {
     }
 
     /** @deprecated using deprecated code */
+    @Deprecated
     @Test
     public void testTypeDeclRemoves() throws Exception {
         StringBuffer buf = new StringBuffer();
