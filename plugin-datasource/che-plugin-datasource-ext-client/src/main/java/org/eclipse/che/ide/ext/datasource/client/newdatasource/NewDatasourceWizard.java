@@ -21,13 +21,11 @@ import org.eclipse.che.ide.ext.datasource.shared.DatabaseConfigurationDTO;
 import org.eclipse.che.ide.util.loging.Log;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
 
-@Singleton
 public class NewDatasourceWizard extends AbstractWizard<DatabaseConfigurationDTO> {
     public static final String DATASOURCE_NAME_KEY = "DatasourceName";
 
