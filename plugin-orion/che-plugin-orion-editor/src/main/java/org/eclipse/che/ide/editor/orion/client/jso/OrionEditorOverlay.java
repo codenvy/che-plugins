@@ -39,6 +39,18 @@ public class OrionEditorOverlay extends JavaScriptObject {
         return this.getModel();
     }-*/;
 
+    public final native void setCaretOffset(int offset) /*-{
+        this.setCaretOffset(offset, true);
+    }-*/;
+
+    public final native int getCaretOffset() /*-{
+        return this.getCaretOffset();
+    }-*/;
+
+    public final native void setText(String text, int start, int end) /*-{
+        this.setText(text, start, end);
+    }-*/;
+
     public final native OrionUndoStackOverlay getUndoStack() /*-{
         return this.getUndoStack();
     }-*/;
@@ -49,8 +61,11 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Sets the selection.
-     * @param start offset of the start of range
-     * @param end offset of the end of range (can be before the start)
+     *
+     * @param start
+     *         offset of the start of range
+     * @param end
+     *         offset of the end of range (can be before the start)
      */
     public final native void setSelection(int start, int end) /*-{
         this.setSelection(start, end);
@@ -58,9 +73,13 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Sets the selection.
-     * @param start offset of the start of range
-     * @param end offset of the end of range (can be before the start)
-     * @param show scroll to show the range iff the value is true
+     *
+     * @param start
+     *         offset of the start of range
+     * @param end
+     *         offset of the end of range (can be before the start)
+     * @param show
+     *         scroll to show the range iff the value is true
      */
     public final native void setSelection(int start, int end, boolean show) /*-{
         this.setSelection(start, end, show);
@@ -68,9 +87,13 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Sets the selection.
-     * @param start offset of the start of range
-     * @param end offset of the end of range (can be before the start)
-     * @param show additional percentage ([0,1] that must also be shown
+     *
+     * @param start
+     *         offset of the start of range
+     * @param end
+     *         offset of the end of range (can be before the start)
+     * @param show
+     *         additional percentage ([0,1] that must also be shown
      */
     public final native void setSelection(int start, int end, double show) /*-{
         this.setSelection(start, end, show);
@@ -78,9 +101,13 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Sets the selection.
-     * @param start offset of the start of range
-     * @param end offset of the end of range (can be before the start)
-     * @param options an option object
+     *
+     * @param start
+     *         offset of the start of range
+     * @param end
+     *         offset of the end of range (can be before the start)
+     * @param options
+     *         an option object
      */
     public final native void setSelection(int start, int end, OrionTextViewShowOptionsOverlay options) /*-{
         this.setSelection(start, end, show);
@@ -105,7 +132,9 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Report the message to the user.
-     * @param message the message
+     *
+     * @param message
+     *         the message
      */
     public final native void reportStatus(String message) /*-{
         this.reportStatus(message);
@@ -113,8 +142,11 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Report the message to the user.
-     * @param message the message
-     * @param type either normal or "progress" or "error";
+     *
+     * @param message
+     *         the message
+     * @param type
+     *         either normal or "progress" or "error";
      */
     public final native void reportStatus(String message, String type) /*-{
         this.reportStatus(message, type);
@@ -122,9 +154,13 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Report the message to the user.
-     * @param message the message
-     * @param type either normal or "progress" or "error"
-     * @param accessible if true, a screen reader will read this message
+     *
+     * @param message
+     *         the message
+     * @param type
+     *         either normal or "progress" or "error"
+     * @param accessible
+     *         if true, a screen reader will read this message
      */
     public final native void reportStatus(String message, String type, boolean accessible) /*-{
         this.reportStatus(message, type, accessible);
@@ -132,10 +168,11 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Returns the annotation model.
+     *
      * @return the annotation model
      */
     public final native OrionAnnotationModelOverlay getAnnotationModel() /*-{
-        return this.getAnnotationModel();
+        return this._annotationModel;
     }-*/;
 
     public final native void setZoomRulerVisible(boolean visible) /*-{
@@ -149,6 +186,7 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Returns the annotation styler of the editor.
+     *
      * @return
      */
     public final native AnnotationStylerOverlay getAnnotationStyler() /*-{
@@ -157,6 +195,7 @@ public class OrionEditorOverlay extends JavaScriptObject {
 
     /**
      * Returns the editor linked mode.
+     *
      * @return
      */
     public final native OrionLinkedModeOverlay getLinkedMode() /*-{

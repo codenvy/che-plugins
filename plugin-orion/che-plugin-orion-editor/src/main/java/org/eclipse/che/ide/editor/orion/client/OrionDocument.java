@@ -75,7 +75,7 @@ public class OrionDocument extends AbstractEmbeddedDocument {
             length = removedCharCount;
             startOffset = startOffset - length;
         }
-        String text = textViewOverlay.getModel().getText(startOffset, startOffset + length);
+        String text = editorOverlay.getModel().getText(startOffset, startOffset + length);
 
         final DocumentChangeEvent event = new DocumentChangeEvent(this,
                                                                   startOffset,
@@ -121,23 +121,23 @@ public class OrionDocument extends AbstractEmbeddedDocument {
 
     @Override
     public void setCursorPosition(final TextPosition position) {
-        this.textViewOverlay.setCaretOffset(getIndexFromPosition(position));
+        this.editorOverlay.setCaretOffset(getIndexFromPosition(position));
 
     }
 
     @Override
     public TextPosition getCursorPosition() {
-        final int offset = this.textViewOverlay.getCaretOffset();
+        final int offset = this.editorOverlay.getCaretOffset();
         return getPositionFromIndex(offset);
     }
 
     public int getCursorOffset() {
-        return this.textViewOverlay.getCaretOffset();
+        return this.editorOverlay.getTextView().getCaretOffset();
     }
 
     @Override
     public int getLineCount() {
-        return this.textViewOverlay.getModel().getLineCount();
+        return this.editorOverlay.getModel().getLineCount();
     }
 
     @Override
@@ -195,16 +195,16 @@ public class OrionDocument extends AbstractEmbeddedDocument {
     }
 
     public void replace(final Region region, final String text) {
-        this.textViewOverlay.setText(text, region.getOffset(), region.getOffset() + region.getLength());
+        this.editorOverlay.setText(text, region.getOffset(), region.getOffset() + region.getLength());
     }
 
     public int getContentsCharCount() {
-        return this.textViewOverlay.getModel().getCharCount();
+        return this.editorOverlay.getModel().getCharCount();
     }
 
     @Override
     public String getLineContent(final int line) {
-        return this.textViewOverlay.getModel().getLine(line);
+        return this.editorOverlay.getModel().getLine(line);
     }
 
     @Override

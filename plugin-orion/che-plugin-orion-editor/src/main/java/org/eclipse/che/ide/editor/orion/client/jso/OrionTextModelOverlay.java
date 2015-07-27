@@ -100,12 +100,9 @@ public class OrionTextModelOverlay extends JavaScriptObject {
                                                                             EventHandler<T> handler,
                                                                             boolean useCapture) /*-{
         var func = function (param) {
-            handler.@org.eclipse.che.ide.editor.orion.client.jso.OrionTextViewOverlay.EventHandler::onEvent(*)(param);
+            handler.@org.eclipse.che.ide.editor.orion.client.jso.OrionTextModelOverlay.EventHandler::onEvent(*)(param);
         };
-        if (this.handels === undefined) {
-            this.handels = {};
-        }
-        this.handels[handler] = func;
+
         this.addEventListener(eventType, func, useCapture);
     }-*/;
 
