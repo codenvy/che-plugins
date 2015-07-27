@@ -12,7 +12,7 @@ package org.eclipse.che.env.local.client;
 
 import com.google.inject.Inject;
 
-import org.eclipse.che.env.local.client.lacation.WorkspaceLocationPresenter;
+import org.eclipse.che.env.local.client.location.WorkspaceLocationPresenter;
 import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
 

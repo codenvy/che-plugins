@@ -13,7 +13,7 @@ package org.eclipse.che.env.local.client;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.env.local.client.lacation.WorkspaceLocationPresenter;
+import org.eclipse.che.env.local.client.location.WorkspaceLocationPresenter;
 import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.action.IdeActions;

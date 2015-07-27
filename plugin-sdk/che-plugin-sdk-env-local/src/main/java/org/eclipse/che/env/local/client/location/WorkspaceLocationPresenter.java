@@ -8,7 +8,7 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.env.local.client.lacation;
+package org.eclipse.che.env.local.client.location;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
