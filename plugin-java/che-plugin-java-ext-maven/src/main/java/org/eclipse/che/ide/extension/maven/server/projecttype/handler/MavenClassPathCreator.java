@@ -14,17 +14,17 @@ import org.eclipse.che.api.core.ConflictException;
 import org.eclipse.che.api.core.ForbiddenException;
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.project.server.FolderEntry;
-import org.eclipse.che.api.project.server.handlers.ClassPathHandler;
+import org.eclipse.che.api.project.server.handlers.ProjectCreatedHandler;
 import org.eclipse.che.ide.extension.maven.server.projecttype.MavenProjectResolver;
 import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
 
 /**
  * @author Roman Nikitenko
  */
-public class MavenClassPathCreator implements ClassPathHandler{
+public class MavenClassPathCreator implements ProjectCreatedHandler {
 
     @Override
-    public void onCreateClassPath(FolderEntry projectFolder) throws ServerException, ForbiddenException, ConflictException {
+    public void onProjectCreated(FolderEntry projectFolder) throws ServerException, ForbiddenException, ConflictException {
         MavenProjectResolver.createClassPath(projectFolder);
     }
 
