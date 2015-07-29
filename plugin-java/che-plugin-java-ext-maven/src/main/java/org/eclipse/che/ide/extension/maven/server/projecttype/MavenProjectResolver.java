@@ -47,15 +47,19 @@ public class MavenProjectResolver {
                                                      "\t<classpathentry kind=\"con\" path=\"org.eclipse.che.MAVEN2_CLASSPATH_CONTAINER\"/>\n" +
                                                      "</classpath>";
 
+    public static void createClassPath(FolderEntry projectFolder) throws ServerException, ForbiddenException, ConflictException {
+        VirtualFileEntry child = projectFolder.getChild(".codenvy");
+        if(child != null && child.getVirtualFile().getChild("classpath") == null){
+            child.getVirtualFile().createFile("classpath", null, new ByteArrayInputStream(CLASS_PATH_CONTENT.getBytes()));
+        }
+    }
+
     public static void resolve(FolderEntry projectFolder, ProjectManager projectManager)
             throws ConflictException, ForbiddenException, ServerException, NotFoundException, IOException {
         VirtualFileEntry pom = projectFolder.getChild("pom.xml");
         if (pom != null) {
-            //TODO this is temp, should move to another place
-            VirtualFileEntry child = projectFolder.getChild(".codenvy");
-            if(child != null && child.getVirtualFile().getChild("classpath") == null){
-               child.getVirtualFile().createFile("classpath", null, new ByteArrayInputStream(CLASS_PATH_CONTENT.getBytes()));
-            }
+            createClassPath(projectFolder);
+
             Model model = Model.readFrom(pom.getVirtualFile());
             String packaging = model.getPackaging();
             if (packaging.equals("pom")) {
