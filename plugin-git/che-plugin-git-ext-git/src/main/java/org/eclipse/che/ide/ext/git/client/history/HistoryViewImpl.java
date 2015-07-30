@@ -16,6 +16,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.parts.PartStackUIResources;
 import org.eclipse.che.ide.api.parts.base.BaseView;
@@ -24,10 +26,9 @@ import org.eclipse.che.ide.editor.codemirror.highlighter.client.HighlightMode;
 import org.eclipse.che.ide.editor.codemirror.highlighter.client.Highlighter;
 import org.eclipse.che.ide.editor.codemirror.highlighter.client.HighlighterProvider;
 import org.eclipse.che.ide.editor.codemirror.highlighter.client.HighlighterProvider.HighlightModeCallback;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.shared.Revision;
 import org.eclipse.che.ide.util.loging.Log;
+
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.dom.client.Element;
@@ -63,35 +64,35 @@ public class HistoryViewImpl extends BaseView<HistoryView.ActionDelegate> implem
     }
 
     @UiField
-    DockLayoutPanel           dataCommitBPanel;
+    DockLayoutPanel     dataCommitBPanel;
     @UiField
-    DockLayoutPanel           revisionCommitBPanel;
+    DockLayoutPanel     revisionCommitBPanel;
     @UiField
-    HTML                      compareType;
+    HTML                compareType;
     @UiField
-    TextBox                   commitARevision;
+    TextBox             commitARevision;
     @UiField
-    TextBox                   commitADate;
+    TextBox             commitADate;
     @UiField
-    TextBox                   commitBRevision;
+    TextBox             commitBRevision;
     @UiField
-    TextBox                   commitBDate;
+    TextBox             commitBDate;
     @UiField
-    Element                   editor;
+    Element             editor;
     @UiField(provided = true)
-    CellTable<Revision>       commits;
+    CellTable<Revision> commits;
     @UiField
-    Button                    btnRefresh;
+    Button              btnRefresh;
     @UiField
-    Button btnProjectChanges;
+    Button              btnProjectChanges;
     @UiField
-    Button btnResourceChanges;
+    Button              btnResourceChanges;
     @UiField
-    Button btnDiffWithIndex;
+    Button              btnDiffWithIndex;
     @UiField
-    Button btnDiffWithWorkTree;
+    Button              btnDiffWithWorkTree;
     @UiField
-    Button btnDiffWithPrevCommit;
+    Button              btnDiffWithPrevCommit;
     @UiField(provided = true)
     final GitResources            res;
     @UiField(provided = true)
@@ -140,6 +141,7 @@ public class HistoryViewImpl extends BaseView<HistoryView.ActionDelegate> implem
                     delayedDiffContext = null;
                 }
             }
+
             @Override
             public void onFailure() {
                 Log.warn(HistoryViewImpl.class, "Diff highlighter not available");
@@ -159,6 +161,7 @@ public class HistoryViewImpl extends BaseView<HistoryView.ActionDelegate> implem
                 return DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM).format(
                         new Date((long)revision.getCommitTime()));
             }
+
             @Override
             public void render(Cell.Context context, Revision revision, SafeHtmlBuilder sb) {
                 sb.appendHtmlConstant("<div id=\"" + UIObject.DEBUG_ID_PREFIX + "git-showHistory-table-" + context.getIndex() + "\">");

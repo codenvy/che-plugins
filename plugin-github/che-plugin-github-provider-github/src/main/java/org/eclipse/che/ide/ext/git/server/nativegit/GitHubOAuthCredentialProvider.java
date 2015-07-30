@@ -11,10 +11,12 @@
 package org.eclipse.che.ide.ext.git.server.nativegit;
 
 import org.eclipse.che.api.auth.shared.dto.OAuthToken;
+import org.eclipse.che.api.git.GitException;
+import org.eclipse.che.api.git.shared.GitUser;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.dto.server.DtoFactory;
-import org.eclipse.che.ide.ext.git.server.GitException;
-import org.eclipse.che.ide.ext.git.shared.GitUser;
+import org.eclipse.che.git.impl.nativegit.CredentialsProvider;
+import org.eclipse.che.git.impl.nativegit.UserCredential;
 import org.eclipse.che.security.oauth.GitHubOAuthAuthenticator;
 import org.eclipse.che.security.oauth.OAuthAuthenticationException;
 import org.eclipse.che.security.oauth.shared.User;

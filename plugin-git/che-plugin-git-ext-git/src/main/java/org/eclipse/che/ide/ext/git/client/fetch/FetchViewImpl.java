@@ -10,11 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.fetch;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.shared.Remote;
+import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.ui.window.Window;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,7 +35,7 @@ import javax.annotation.Nonnull;
 
 /**
  * The implementation of {@link FetchView}.
- * 
+ *
  * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
  */
 @Singleton
@@ -45,26 +46,26 @@ public class FetchViewImpl extends Window implements FetchView {
     private static FetchViewImplUiBinder ourUiBinder = GWT.create(FetchViewImplUiBinder.class);
 
     @UiField
-    CheckBox                             removeDeletedRefs;
+    CheckBox removeDeletedRefs;
     @UiField
-    CheckBox                             fetchAllBranches;
+    CheckBox fetchAllBranches;
     @UiField
-    ListBox                              repository;
+    ListBox  repository;
     @UiField
-    ListBox                              localBranch;
+    ListBox  localBranch;
     @UiField
-    ListBox                              remoteBranch;
-    Button                               btnFetch;
-    Button                               btnCancel;
+    ListBox  remoteBranch;
+    Button btnFetch;
+    Button btnCancel;
     @UiField(provided = true)
-    final GitResources                   res;
+    final   GitResources            res;
     @UiField(provided = true)
-    final GitLocalizationConstant        locale;
-    private ActionDelegate               delegate;
+    final   GitLocalizationConstant locale;
+    private ActionDelegate          delegate;
 
     /**
      * Create view.
-     * 
+     *
      * @param resources
      * @param locale
      */
@@ -78,7 +79,7 @@ public class FetchViewImpl extends Window implements FetchView {
 
         this.setTitle(locale.fetchTitle());
         this.setWidget(widget);
-        
+
         btnCancel = createButton(locale.buttonCancel(), "git-remotes-fetch-cancel", new ClickHandler() {
 
             @Override
@@ -200,7 +201,7 @@ public class FetchViewImpl extends Window implements FetchView {
     public void onValueChanged(ValueChangeEvent<Boolean> event) {
         delegate.onValueChanged();
     }
-    
+
     @UiHandler("remoteBranch")
     public void onValueChanged(ChangeEvent event) {
         delegate.onRemoteBranchChanged();

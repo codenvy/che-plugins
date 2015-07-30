@@ -14,6 +14,7 @@ import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.job.Job;
 import org.eclipse.che.ide.job.JobChangeEvent;
 import org.eclipse.che.ide.job.RequestStatusHandlerBase;
+
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;

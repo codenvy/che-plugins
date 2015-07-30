@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.history;
 
+import org.eclipse.che.api.git.shared.DiffRequest;
+import org.eclipse.che.api.git.shared.LogResponse;
+import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
@@ -23,10 +26,8 @@ import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
-import org.eclipse.che.ide.ext.git.shared.DiffRequest;
-import org.eclipse.che.ide.ext.git.shared.LogResponse;
-import org.eclipse.che.ide.ext.git.shared.Revision;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
+
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
@@ -39,7 +40,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.eclipse.che.ide.ext.git.shared.DiffRequest.DiffType.RAW;
+import static org.eclipse.che.api.git.shared.DiffRequest.DiffType.RAW;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;

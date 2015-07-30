@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.reset.files;
 
+import org.eclipse.che.api.git.shared.IndexFile;
+import org.eclipse.che.api.git.shared.ResetRequest;
+import org.eclipse.che.api.git.shared.Status;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
-import org.eclipse.che.ide.ext.git.shared.IndexFile;
-import org.eclipse.che.ide.ext.git.shared.ResetRequest;
-import org.eclipse.che.ide.ext.git.shared.Status;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.message.MessageDialog;

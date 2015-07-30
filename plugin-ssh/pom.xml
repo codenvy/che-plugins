@@ -24,5 +24,6 @@
     <name>Che Plugin :: SSH :: Parent</name>
     <modules>
         <module>che-plugin-ssh-ext-sshkey</module>
+        <module>che-plugin-ssh-git-native</module>
     </modules>
 </project>

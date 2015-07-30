@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client;
 
-import org.eclipse.che.ide.ext.git.shared.Branch;
 
+import org.eclipse.che.api.git.shared.Branch;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

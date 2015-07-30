@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.status;
 
+import org.eclipse.che.api.git.shared.StatusFormat;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
-import org.eclipse.che.ide.ext.git.shared.StatusFormat;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
@@ -68,16 +68,16 @@ public class StatusCommandPresenterTest extends BaseTest {
                 onSuccess.invoke(callback, EMPTY_TEXT);
                 return callback;
             }
-        }).when(service).statusText(Matchers.<ProjectDescriptor> anyObject(),
-                                    Matchers.<StatusFormat> anyObject(),
-                                    Matchers.<AsyncRequestCallback<String>> anyObject());
+        }).when(service).statusText(Matchers.<ProjectDescriptor>anyObject(),
+                                    Matchers.<StatusFormat>anyObject(),
+                                    Matchers.<AsyncRequestCallback<String>>anyObject());
 
         presenter.showStatus();
 
         verify(appContext).getCurrentProject();
         verify(service).statusText(eq(rootProjectDescriptor),
                                    eq(IS_NOT_FORMATTED),
-                                   Matchers.<AsyncRequestCallback<String>> anyObject());
+                                   Matchers.<AsyncRequestCallback<String>>anyObject());
     }
 
     @Test

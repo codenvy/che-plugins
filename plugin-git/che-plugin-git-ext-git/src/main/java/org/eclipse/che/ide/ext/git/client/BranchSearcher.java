@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client;
 
+import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.ext.git.shared.Branch;
 
 import javax.annotation.Nonnull;
 

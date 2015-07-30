@@ -20,8 +20,8 @@
     <inherits name='org.eclipse.che.ide.Api'/>
     <inherits name="com.google.gwt.inject.Inject"/>
     <inherits name="org.eclipse.che.ide.Core"/>
-    <inherits name="org.eclipse.che.ide.editor.codemirror.highlighter.Highlighter" />
+    <inherits name="org.eclipse.che.ide.editor.codemirror.highlighter.Highlighter"/>
+    <inherits name="org.eclipse.che.api.Git"/>
 
     <source path="client"/>
-    <source path="shared"/>
 </module>

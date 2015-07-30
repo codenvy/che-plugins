@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.inject;
 
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.gwt.client.GitServiceClientImpl;
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 import org.eclipse.che.ide.api.project.wizard.ImportWizardRegistrar;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartView;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartViewImpl;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
-import org.eclipse.che.ide.ext.git.client.GitServiceClientImpl;
 import org.eclipse.che.ide.ext.git.client.add.AddToIndexView;
 import org.eclipse.che.ide.ext.git.client.add.AddToIndexViewImpl;
 import org.eclipse.che.ide.ext.git.client.branch.BranchView;
@@ -45,6 +45,7 @@ import org.eclipse.che.ide.ext.git.client.reset.files.ResetFilesView;
 import org.eclipse.che.ide.ext.git.client.reset.files.ResetFilesViewImpl;
 import org.eclipse.che.ide.ext.git.client.url.ShowProjectGitReadOnlyUrlView;
 import org.eclipse.che.ide.ext.git.client.url.ShowProjectGitReadOnlyUrlViewImpl;
+
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.gwt.inject.client.multibindings.GinMultibinder;
 import com.google.inject.Singleton;
@@ -55,7 +56,7 @@ public class GitGinModule extends AbstractGinModule {
     /** {@inheritDoc} */
     @Override
     protected void configure() {
-        bind(GitServiceClient.class).to(GitServiceClientImpl.class).in(Singleton.class);
+//        bind(GitServiceClient.class).to(GitServiceClientImpl.class).in(Singleton.class);
 
         GinMultibinder.newSetBinder(binder(), ImportWizardRegistrar.class).addBinding().to(GitImportWizardRegistrar.class);
 

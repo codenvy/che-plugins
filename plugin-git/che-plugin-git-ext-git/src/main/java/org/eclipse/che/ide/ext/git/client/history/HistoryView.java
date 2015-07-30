@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.history;
 
+import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.api.parts.base.BaseActionDelegate;
 import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.ext.git.shared.Revision;
 
 import javax.annotation.Nonnull;
 

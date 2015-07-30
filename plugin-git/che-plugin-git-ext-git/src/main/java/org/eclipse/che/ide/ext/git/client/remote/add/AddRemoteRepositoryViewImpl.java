@@ -44,8 +44,8 @@ public class AddRemoteRepositoryViewImpl extends Window implements AddRemoteRepo
     TextBox name;
     @UiField
     TextBox url;
-    Button  btnOk;
-    Button  btnCancel;
+    Button btnOk;
+    Button btnCancel;
     @UiField(provided = true)
     final   GitResources            res;
     @UiField(provided = true)
@@ -68,7 +68,7 @@ public class AddRemoteRepositoryViewImpl extends Window implements AddRemoteRepo
 
         this.setTitle("Add remote repository");
         this.setWidget(widget);
-        
+
         btnCancel = createButton(locale.buttonCancel(), "git-addRemoteRepository-btnCancel", new ClickHandler() {
 
             @Override

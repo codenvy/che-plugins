@@ -41,13 +41,13 @@ public class AddToIndexViewImpl extends Window implements AddToIndexView {
     private static AddToIndexViewImplUiBinder ourUiBinder = GWT.create(AddToIndexViewImplUiBinder.class);
 
     @UiField
-    HTML message;
+    HTML     message;
     @UiField
     TextArea items;
     @UiField
     CheckBox update;
-    Button   btnAdd;
-    Button   btnCancel;
+    Button btnAdd;
+    Button btnCancel;
     @UiField(provided = true)
     final   GitResources            res;
     @UiField(provided = true)

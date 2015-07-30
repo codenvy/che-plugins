@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.add;
 
+import org.eclipse.che.api.git.shared.Status;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
@@ -18,10 +19,10 @@ import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
-import org.eclipse.che.ide.ext.git.shared.Status;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.websocket.WebSocketException;
 import org.eclipse.che.ide.websocket.rest.RequestCallback;
+
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
@@ -61,18 +62,24 @@ public class AddToIndexPresenterTest extends BaseTest {
     private ArgumentCaptor<AsyncRequestCallback<Status>> asyncRequestCallbackStatusCaptor;
 
     @Mock
-    private AddToIndexView      view;
+    private AddToIndexView view;
     @Mock
-    private SelectionAgent      selectionAgent;
+    private SelectionAgent selectionAgent;
     @Mock
-    private Status              statusResponse;
+    private Status         statusResponse;
 
     private AddToIndexPresenter presenter;
 
     @Override
     public void disarm() {
         super.disarm();
-        presenter = new AddToIndexPresenter(view, appContext, dtoUnmarshallerFactory, constant, service, notificationManager, selectionAgent);
+        presenter = new AddToIndexPresenter(view,
+                                            appContext,
+                                            dtoUnmarshallerFactory,
+                                            constant,
+                                            service,
+                                            notificationManager,
+                                            selectionAgent);
     }
 
     @Test
@@ -132,7 +139,7 @@ public class AddToIndexPresenterTest extends BaseTest {
 
         verify(appContext).getCurrentProject();
         verify(constant).addToIndexAllChanges();
-        verify(view).setMessage(eq(MESSAGE), Matchers.<List<String>> eq(null));
+        verify(view).setMessage(eq(MESSAGE), Matchers.<List<String>>eq(null));
         verify(view).setUpdated(anyBoolean());
         verify(view).showDialog();
     }
@@ -161,7 +168,7 @@ public class AddToIndexPresenterTest extends BaseTest {
 
         verify(appContext).getCurrentProject();
         verify(constant).addToIndexFolder(eq(PROJECT_NAME));
-        verify(view).setMessage(eq(MESSAGE), Matchers.<List<String>> eq(null));
+        verify(view).setMessage(eq(MESSAGE), Matchers.<List<String>>eq(null));
         verify(view).setUpdated(anyBoolean());
         verify(view).showDialog();
     }
@@ -191,7 +198,7 @@ public class AddToIndexPresenterTest extends BaseTest {
 
         verify(appContext).getCurrentProject();
         verify(constant).addToIndexFile(eq(PROJECT_NAME));
-        verify(view).setMessage(eq(MESSAGE), Matchers.<List<String>> eq(null));
+        verify(view).setMessage(eq(MESSAGE), Matchers.<List<String>>eq(null));
         verify(view).setUpdated(anyBoolean());
         verify(view).showDialog();
     }
@@ -209,7 +216,10 @@ public class AddToIndexPresenterTest extends BaseTest {
         final FileNode file2 = mock(FileNode.class);
         when(file2.getPath()).thenReturn(file2Path);
 
-        final List<StorableNode> files = new ArrayList<StorableNode>() {{ add(file1); add(file2); }};
+        final List<StorableNode> files = new ArrayList<StorableNode>() {{
+            add(file1);
+            add(file2);
+        }};
         when(selection.getAllElements()).thenReturn(files);
         when(selection.getHeadElement()).thenReturn(file1);
         when(selection.isEmpty()).thenReturn(false);
@@ -230,7 +240,7 @@ public class AddToIndexPresenterTest extends BaseTest {
 
         verify(appContext).getCurrentProject();
         verify(constant).addToIndexMultiple();
-        verify(view).setMessage(eq(MESSAGE), Matchers.<List<String>> anyObject());
+        verify(view).setMessage(eq(MESSAGE), Matchers.<List<String>>anyObject());
         verify(view).setUpdated(anyBoolean());
         verify(view).showDialog();
     }

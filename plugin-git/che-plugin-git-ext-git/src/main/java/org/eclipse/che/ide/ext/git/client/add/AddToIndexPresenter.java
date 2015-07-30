@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.add;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.Status;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -17,14 +20,12 @@ import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
-import org.eclipse.che.ide.ext.git.shared.Status;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.websocket.WebSocketException;
 import org.eclipse.che.ide.websocket.rest.RequestCallback;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -53,6 +54,7 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
     private CurrentProject          project;
     private SelectionAgent          selectionAgent;
     private NotificationManager     notificationManager;
+
     private final DtoUnmarshallerFactory dtoUnmarshallerFactory;
 
     /**
@@ -83,7 +85,9 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
     }
 
-    /** Show dialog. */
+    /**
+     * Show dialog.
+     */
     public void showDialog() {
         project = appContext.getCurrentProject();
         if (project == null) {
@@ -91,22 +95,22 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
         }
         final Unmarshallable<Status> unmarshall = this.dtoUnmarshallerFactory.newUnmarshaller(Status.class);
         service.status(project.getRootProject(),
-                           new AsyncRequestCallback<Status>(unmarshall) {
-                               @Override
-                               protected void onSuccess(final Status result) {
-                                   if (!result.isClean()) {
+                       new AsyncRequestCallback<Status>(unmarshall) {
+                           @Override
+                           protected void onSuccess(final Status result) {
+                               if (!result.isClean()) {
                                    addSelection();
-                                   } else {
-                                       notificationManager.showInfo(constant.nothingAddToIndex());
-                                   }
+                               } else {
+                                   notificationManager.showInfo(constant.nothingAddToIndex());
                                }
+                           }
 
-                               @Override
-                               protected void onFailure(Throwable exception) {
-                                   String errorMessage = exception.getMessage() != null ? exception.getMessage() : constant.statusFailed();
-                                   notificationManager.showError(errorMessage);
-                               }
-                           });
+                           @Override
+                           protected void onFailure(Throwable exception) {
+                               String errorMessage = exception.getMessage() != null ? exception.getMessage() : constant.statusFailed();
+                               notificationManager.showError(errorMessage);
+                           }
+                       });
     }
 
     private void addSelection() {
@@ -147,7 +151,9 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onAddClicked() {
         boolean update = view.isUpdated();
@@ -277,7 +283,9 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
         notificationManager.showError(errorMessage);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCancelClicked() {
         view.close();

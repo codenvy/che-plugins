@@ -11,12 +11,12 @@
 package org.eclipse.che.ide.ext.github.server.inject;
 
 import org.eclipse.che.api.project.server.ProjectImporter;
-import org.eclipse.che.ide.ext.git.server.nativegit.SshKeyUploader;
 import org.eclipse.che.ide.ext.github.server.GitHubDTOFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubKeyUploader;
 import org.eclipse.che.ide.ext.github.server.GitHubProjectImporter;
 import org.eclipse.che.ide.ext.github.server.rest.GitHubService;
+import org.eclipse.che.ide.ext.ssh.server.SshKeyUploader;
 import org.eclipse.che.inject.DynaModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;

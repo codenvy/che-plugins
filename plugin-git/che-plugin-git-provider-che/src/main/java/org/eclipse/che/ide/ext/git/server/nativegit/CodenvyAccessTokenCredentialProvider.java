@@ -17,12 +17,14 @@ import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.UnauthorizedException;
 import org.eclipse.che.api.core.rest.HttpJsonHelper;
 import org.eclipse.che.api.core.rest.shared.dto.Link;
+import org.eclipse.che.api.git.GitException;
+import org.eclipse.che.api.git.shared.GitUser;
 import org.eclipse.che.api.user.shared.dto.ProfileDescriptor;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.user.User;
 import org.eclipse.che.dto.server.DtoFactory;
-import org.eclipse.che.ide.ext.git.server.GitException;
-import org.eclipse.che.ide.ext.git.shared.GitUser;
+import org.eclipse.che.git.impl.nativegit.CredentialsProvider;
+import org.eclipse.che.git.impl.nativegit.UserCredential;
 import com.google.common.base.Joiner;
 
 import org.slf4j.Logger;

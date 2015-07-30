@@ -13,9 +13,9 @@ package org.eclipse.che.ide.ext.git.client.merge;
 import elemental.events.KeyboardEvent;
 import elemental.events.MouseEvent;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ui.tree.Tree;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
@@ -51,8 +51,8 @@ public class MergeViewImpl extends Window implements MergeView {
 
     private static MergeViewImplUiBinder ourUiBinder = GWT.create(MergeViewImplUiBinder.class);
 
-    Button      btnCancel;
-    Button      btnMerge;
+    Button btnCancel;
+    Button btnMerge;
     @UiField
     ScrollPanel referencesPanel;
     @UiField(provided = true)
@@ -128,7 +128,7 @@ public class MergeViewImpl extends Window implements MergeView {
             public void onRootDragDrop(MouseEvent event) {
                 //do nothing
             }
-            
+
             @Override
             public void onKeyboard(KeyboardEvent event) {
                 //do nothing

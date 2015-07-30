@@ -22,6 +22,16 @@
     <name>Che Plugin :: Git :: Che credential provider</name>
     <dependencies>
         <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-git</artifactId>
+            <version>${che.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-git-impl-native</artifactId>
+            <version>${che.core.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
             <artifactId>che-plugin-git-ext-git</artifactId>
             <version>${project.version}</version>

@@ -10,17 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.remote;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.ext.git.client.remote.add.AddRemoteRepositoryPresenter;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -36,15 +37,16 @@ import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
  */
 @Singleton
 public class RemotePresenter implements RemoteView.ActionDelegate {
-    private final DtoUnmarshallerFactory       dtoUnmarshallerFactory;
-    private       RemoteView                   view;
-    private       GitServiceClient             service;
-    private       AppContext                   appContext;
-    private       GitLocalizationConstant      constant;
-    private       AddRemoteRepositoryPresenter addRemoteRepositoryPresenter;
-    private       NotificationManager          notificationManager;
-    private       Remote                       selectedRemote;
-    private       ProjectDescriptor            project;
+    private final DtoUnmarshallerFactory dtoUnmarshallerFactory;
+
+    private RemoteView                   view;
+    private GitServiceClient             service;
+    private AppContext                   appContext;
+    private GitLocalizationConstant      constant;
+    private AddRemoteRepositoryPresenter addRemoteRepositoryPresenter;
+    private NotificationManager          notificationManager;
+    private Remote                       selectedRemote;
+    private ProjectDescriptor            project;
 
     @Inject
     public RemotePresenter(RemoteView view, GitServiceClient service, AppContext appContext, GitLocalizationConstant constant,
@@ -60,7 +62,9 @@ public class RemotePresenter implements RemoteView.ActionDelegate {
         this.notificationManager = notificationManager;
     }
 
-    /** Show dialog. */
+    /**
+     * Show dialog.
+     */
     public void showDialog() {
         project = appContext.getCurrentProject().getRootProject();
         getRemotes();
@@ -88,17 +92,20 @@ public class RemotePresenter implements RemoteView.ActionDelegate {
                                            exception.getMessage() != null ? exception.getMessage() : constant.remoteListFailed();
                                    handleError(errorMessage);
                                }
-                           }
-                          );
+                           });
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCloseClicked() {
         view.close();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onAddClicked() {
         addRemoteRepositoryPresenter.showDialog(new AsyncCallback<Void>() {
@@ -116,7 +123,9 @@ public class RemotePresenter implements RemoteView.ActionDelegate {
         });
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onDeleteClicked() {
         if (selectedRemote == null) {
@@ -140,7 +149,9 @@ public class RemotePresenter implements RemoteView.ActionDelegate {
         });
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onRemoteSelected(@Nonnull Remote remote) {
         selectedRemote = remote;

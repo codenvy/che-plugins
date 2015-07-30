@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.reset.commit;
 
+import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.ext.git.shared.Revision;
 
 import javax.annotation.Nonnull;
 import java.util.List;
