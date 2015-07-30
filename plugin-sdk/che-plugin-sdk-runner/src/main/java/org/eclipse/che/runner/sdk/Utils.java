@@ -16,6 +16,7 @@ import org.eclipse.che.api.core.util.ListLineConsumer;
 import org.eclipse.che.api.core.util.DownloadPlugin;
 import org.eclipse.che.api.core.util.HttpDownloadPlugin;
 import org.eclipse.che.api.core.util.ProcessUtil;
+import org.eclipse.che.api.core.util.SystemInfo;
 import org.eclipse.che.api.core.util.ValueHolder;
 import org.eclipse.che.api.project.server.Constants;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
@@ -107,7 +108,14 @@ class Utils {
      * @return {@link java.util.zip.ZipFile} that represents a built artifact
      */
     static ZipFile buildProjectFromSources(Path sourcesPath, String artifactNamePattern) throws IOException, InterruptedException {
-        final String[] command = new String[]{MavenUtils.getMavenExecCommand(), "clean", "package"};
+        final String[] command;
+
+        if (SystemInfo.isWindows()) {
+            command = new String[]{"CMD", "/C", "mvn", "clean", "package"};
+        } else {
+            command = new String[]{MavenUtils.getMavenExecCommand(), "clean", "package"};
+        }
+
         ProcessBuilder processBuilder = new ProcessBuilder(command).directory(sourcesPath.toFile()).redirectErrorStream(true);
         Process process = processBuilder.start();
         ListLineConsumer consumer = new ListLineConsumer();
