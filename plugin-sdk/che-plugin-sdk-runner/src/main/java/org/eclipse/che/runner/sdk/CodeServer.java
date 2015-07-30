@@ -54,9 +54,10 @@ import java.util.concurrent.ExecutorService;
  */
 @Singleton
 public class CodeServer {
-    private static final Logger LOG                    = LoggerFactory.getLogger(CodeServer.class);
+    private static final Logger LOG                             = LoggerFactory.getLogger(CodeServer.class);
+    private static final String ADD_SOURCES_PROFILE_ID          = "customExtensionSources";
+    private static final String UNABELE_UPDATE_SCRIPT_ATTRIBUTE = "Unable to update attributes of the startup script";
     /** Id of Maven POM profile used to add (re)sources of custom extension to code server recompilation process. */
-    private static final String ADD_SOURCES_PROFILE_ID = "customExtensionSources";
 
     /**
      * Prepare GWT code server for launching.
@@ -142,7 +143,7 @@ public class CodeServer {
             }
 
             final int port = runnerConfiguration.getCodeServerPort();
-            if (port != - 1) {
+            if (port != -1) {
                 gwtPlugin.setConfigProperty("codeServerPort", Integer.toString(port));
             }
 
@@ -155,7 +156,7 @@ public class CodeServer {
     private java.io.File genStartUpScriptUnix(java.io.File workDir) throws RunnerException {
         final String startupScript = "#!/bin/sh\n" +
                                      "cd war\n" +
-                                     codeServerUnix() +
+                                     generateSources() +
                                      "PID=$!\n" +
                                      "echo \"$PID\" > run.pid\n" +
                                      "wait $PID";
@@ -166,14 +167,14 @@ public class CodeServer {
             throw new RunnerException(e);
         }
         if (!startUpScriptFile.setExecutable(true, false)) {
-            throw new RunnerException("Unable to update attributes of the startup script");
+            throw new RunnerException(UNABELE_UPDATE_SCRIPT_ATTRIBUTE);
         }
         return startUpScriptFile;
     }
 
-    private String codeServerUnix() {
-        return String
-                .format("mvn clean generate-sources gwt:run-codeserver -Dgwt.compiler.incremental=false -Dgwt.module=org.eclipse.che.ide.IDEPlatform -P%s > stdout.log &\n",
+    private String generateSources() {
+        return String.format("mvn clean generate-sources gwt:run-codeserver -Dgwt.compiler.incremental=false " +
+                        "-Dgwt.module=org.eclipse.che.ide.IDEPlatform -P%s > stdout.log &\n",
                         ADD_SOURCES_PROFILE_ID);
     }
 
@@ -181,7 +182,30 @@ public class CodeServer {
 
     private CodeServerProcess startWindows(File codeServerWorkDir, SDKRunnerConfiguration runnerConfiguration, Path extensionSourcesPath,
                                            String projectApiBaseUrl, ExecutorService executor) throws RunnerException {
-        throw new UnsupportedOperationException();
+        java.io.File startUpScriptFile = getStartUpScriptWindows(codeServerWorkDir);
+        return new CodeServerProcess(runnerConfiguration.getCodeServerBindAddress(),
+                                     runnerConfiguration.getCodeServerPort(),
+                                     startUpScriptFile,
+                                     codeServerWorkDir,
+                                     extensionSourcesPath,
+                                     projectApiBaseUrl,
+                                     executor);
+    }
+
+    private java.io.File getStartUpScriptWindows(java.io.File workDir) throws RunnerException {
+        final String startUpScript = "@echo off\r\n" +
+                                     "cd war\r\n" +
+                                     "call " + generateSources();
+        final java.io.File startUpScriptFile = new java.io.File(workDir, "startup.bat");
+        try {
+            Files.write(startUpScriptFile.toPath(), startUpScript.getBytes());
+        } catch (IOException e) {
+            throw new RunnerException(e);
+        }
+        if (!startUpScriptFile.setExecutable(true, false)) {
+            throw new RunnerException(UNABELE_UPDATE_SCRIPT_ATTRIBUTE);
+        }
+        return startUpScriptFile;
     }
 
     public static class CodeServerProcess implements ProjectEventListener {

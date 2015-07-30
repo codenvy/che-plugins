@@ -42,6 +42,11 @@
             <artifactId>che-plugin-java-maven-tools</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jvnet.winp</groupId>
+            <artifactId>winp</artifactId>
+            <version>${org.jvnet.winp.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
