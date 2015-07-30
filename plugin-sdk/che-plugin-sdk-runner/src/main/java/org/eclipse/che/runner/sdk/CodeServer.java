@@ -24,6 +24,7 @@ import org.eclipse.che.ide.maven.tools.Dependency;
 import org.eclipse.che.ide.maven.tools.Model;
 import org.eclipse.che.ide.maven.tools.Plugin;
 
+import org.jvnet.winp.WinProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -183,7 +184,7 @@ public class CodeServer {
     private CodeServerProcess startWindows(File codeServerWorkDir, SDKRunnerConfiguration runnerConfiguration, Path extensionSourcesPath,
                                            String projectApiBaseUrl, ExecutorService executor) throws RunnerException {
         java.io.File startUpScriptFile = getStartUpScriptWindows(codeServerWorkDir);
-        return new CodeServerProcess(runnerConfiguration.getCodeServerBindAddress(),
+        return new WindowsCodeServerProcess(runnerConfiguration.getCodeServerBindAddress(),
                                      runnerConfiguration.getCodeServerPort(),
                                      startUpScriptFile,
                                      codeServerWorkDir,
@@ -210,14 +211,14 @@ public class CodeServer {
 
     public static class CodeServerProcess implements ProjectEventListener {
         private final String          bindAddress;
-        private final int             port;
-        private final java.io.File    startUpScriptFile;
-        private final java.io.File    workDir;
+        protected final int             port;
+        protected final java.io.File    startUpScriptFile;
+        protected final java.io.File    workDir;
         private final Path            extensionSourcesPath;
         private final String          projectApiBaseUrl;
         private final ExecutorService executor;
 
-        private Process process;
+        protected Process process;
 
         protected CodeServerProcess(String bindAddress, int port, File startUpScriptFile, File workDir, Path extensionSourcesPath,
                                     String projectApiBaseUrl, ExecutorService executor) {
@@ -243,7 +244,7 @@ public class CodeServer {
             }
         }
 
-        public synchronized void stop() {
+        public synchronized void stop() throws RunnerException {
             if (process == null) {
                 throw new IllegalStateException("Code server process is not started yet");
             }
@@ -376,6 +377,48 @@ public class CodeServer {
                     }
                 });
             }
+        }
+    }
+
+    public static class WindowsCodeServerProcess extends CodeServerProcess {
+
+        private WinProcess winProcess;
+
+        protected WindowsCodeServerProcess(String bindAddress, int port, File startUpScriptFile, File workDir, Path extensionSourcesPath, String projectApiBaseUrl, ExecutorService executor) {
+            super(bindAddress, port, startUpScriptFile, workDir, extensionSourcesPath, projectApiBaseUrl, executor);
+        }
+
+        public synchronized void start() throws RunnerException {
+            if (process != null && isAlive()) {
+                throw new IllegalStateException("Code server process is already started");
+            }
+
+            try {
+                process = Runtime.getRuntime().exec(new CommandLine(startUpScriptFile.getAbsolutePath()).toShellCommand(), null, workDir);
+                winProcess = new WinProcess(process);
+                LOG.debug("Start GWT code server at port {}, working directory {}", port, workDir);
+            } catch (IOException e) {
+                throw new RunnerException(e);
+            }
+        }
+
+        public synchronized void stop() throws RunnerException {
+            if (process == null) {
+                throw new IllegalStateException("Code server process is not started yet");
+            }
+            killProcess();
+            LOG.debug("Stop GWT code server at port {}, working directory {}", port, workDir);
+        }
+
+        private void killProcess() throws RunnerException {
+            if (isAlive()) {
+                winProcess.killRecursively();
+                winProcess = null;
+            }
+        }
+
+        public boolean isAlive() {
+            return winProcess != null && winProcess.getPid() > 0;
         }
     }
 }
