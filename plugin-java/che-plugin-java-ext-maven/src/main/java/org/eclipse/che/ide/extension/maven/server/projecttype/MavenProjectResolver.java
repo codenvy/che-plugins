@@ -22,7 +22,6 @@ import org.eclipse.che.api.project.server.VirtualFileEntry;
 import org.eclipse.che.api.project.server.type.AttributeValue;
 import org.eclipse.che.ide.maven.tools.Model;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -40,37 +39,22 @@ import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.VERSION
  */
 
 public class MavenProjectResolver {
-    private static final String CLASS_PATH_CONTENT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                                                     "<classpath>\n" +
-                                                     "\t<classpathentry kind=\"src\" path=\"src/main/java\"/>\n" +
-                                                     "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\n" +
-                                                     "\t<classpathentry kind=\"con\" path=\"org.eclipse.che.MAVEN2_CLASSPATH_CONTAINER\"/>\n" +
-                                                     "</classpath>";
-
-    public static void createClassPath(FolderEntry projectFolder) throws ServerException, ForbiddenException, ConflictException {
-        VirtualFileEntry child = projectFolder.getChild(".codenvy");
-        if(child != null && child.getVirtualFile().getChild("classpath") == null){
-            child.getVirtualFile().createFile("classpath", null, new ByteArrayInputStream(CLASS_PATH_CONTENT.getBytes()));
-        }
-    }
 
     public static void resolve(FolderEntry projectFolder, ProjectManager projectManager)
             throws ConflictException, ForbiddenException, ServerException, NotFoundException, IOException {
         VirtualFileEntry pom = projectFolder.getChild("pom.xml");
         if (pom != null) {
-            createClassPath(projectFolder);
-
             Model model = Model.readFrom(pom.getVirtualFile());
+            MavenClassPathConfigurator.configure(projectFolder, model);
+
             String packaging = model.getPackaging();
             if (packaging.equals("pom")) {
-                createProjectsOnModules(model,
-                                        projectManager.getProject(projectFolder.getWorkspace(), projectFolder.getPath()),
-                                        projectFolder.getWorkspace(),
-                                        projectManager);
+                String ws = projectFolder.getWorkspace();
+                Project project = projectManager.getProject(ws, projectFolder.getPath());
+                createProjectsOnModules(model, project, ws, projectManager);
             }
         }
     }
-
 
     private static FolderEntry getParentFolder(String module, Project parentProject) {
         FolderEntry parentFolder = parentProject.getBaseFolder();
@@ -98,7 +82,7 @@ public class MavenProjectResolver {
     }
 
     private static void createProjectsOnModules(Model model, Project parentProject, String ws, ProjectManager projectManager)
-            throws ServerException, ForbiddenException, ConflictException, IOException, NotFoundException {
+            throws ServerException, ForbiddenException, ConflictException, NotFoundException, IOException {
         List<String> modules = model.getModules();
         for (String module : modules) {
             FolderEntry parentFolder = getParentFolder(module, parentProject);
@@ -115,6 +99,4 @@ public class MavenProjectResolver {
             }
         }
     }
-
-
 }
