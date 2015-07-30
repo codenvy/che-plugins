@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.branch;
 
+import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
@@ -23,7 +24,6 @@ import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
-import org.eclipse.che.ide.ext.git.shared.Branch;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.CancelCallback;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
@@ -42,7 +42,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 
 import static org.eclipse.che.ide.ext.git.client.patcher.WindowPatcher.RETURNED_MESSAGE;
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_ALL;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_ALL;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;

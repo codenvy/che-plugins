@@ -11,6 +11,9 @@
 package org.eclipse.che.ide.ext.git.client.branch;
 
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorAgent;
@@ -21,10 +24,7 @@ import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.dto.DtoFactory;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
-import org.eclipse.che.ide.ext.git.shared.Branch;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
@@ -40,7 +40,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_ALL;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_ALL;
 
 /**
  * Presenter for displaying and work with branches.

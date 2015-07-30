@@ -11,6 +11,11 @@
 package org.eclipse.che.ide.ext.git.client.pull;
 
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.Branch;
+import org.eclipse.che.api.git.shared.PullResponse;
+import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorAgent;
@@ -22,13 +27,9 @@ import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
-import org.eclipse.che.ide.ext.git.shared.Branch;
-import org.eclipse.che.ide.ext.git.shared.PullResponse;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -37,8 +38,8 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_LOCAL;
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_REMOTE;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_LOCAL;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_REMOTE;
 
 /**
  * Presenter pulling changes from remote repository.
@@ -171,22 +172,22 @@ public class PullPresenter implements PullView.ActionDelegate {
 
         gitServiceClient.pull(project.getRootProject(), getRefs(), remoteName,
                               new AsyncRequestCallback<PullResponse>(dtoUnmarshallerFactory.newUnmarshaller(PullResponse.class)) {
-            @Override
-            protected void onSuccess(PullResponse result) {
-                notificationManager.showInfo(result.getCommandOutput());
-                if (!result.getCommandOutput().contains("Already up-to-date")){
-                    refreshProject(openedEditors);
-                }
-            }
+                                  @Override
+                                  protected void onSuccess(PullResponse result) {
+                                      notificationManager.showInfo(result.getCommandOutput());
+                                      if (!result.getCommandOutput().contains("Already up-to-date")) {
+                                          refreshProject(openedEditors);
+                                      }
+                                  }
 
-            @Override
-            protected void onFailure(Throwable throwable) {
-                if (throwable.getMessage().contains("Merge conflict")) {
-                    refreshProject(openedEditors);
-                }
-                handleError(throwable, remoteUrl);
-            }
-        });
+                                  @Override
+                                  protected void onFailure(Throwable throwable) {
+                                      if (throwable.getMessage().contains("Merge conflict")) {
+                                          refreshProject(openedEditors);
+                                      }
+                                      handleError(throwable, remoteUrl);
+                                  }
+                              });
     }
 
     /**
@@ -250,5 +251,4 @@ public class PullPresenter implements PullView.ActionDelegate {
     public void onRemoteBranchChanged() {
         view.selectLocalBranch(view.getRemoteBranch());
     }
-
 }

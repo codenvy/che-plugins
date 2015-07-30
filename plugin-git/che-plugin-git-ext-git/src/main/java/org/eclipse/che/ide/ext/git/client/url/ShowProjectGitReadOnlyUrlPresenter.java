@@ -10,17 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.url;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.StringUnmarshaller;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 

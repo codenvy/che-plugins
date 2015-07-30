@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.push;
 
+import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 
 import javax.annotation.Nonnull;
 

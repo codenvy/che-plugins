@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.pull;
 
+import org.eclipse.che.api.git.shared.Branch;
+import org.eclipse.che.api.git.shared.PullResponse;
+import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
@@ -20,9 +23,6 @@ import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
-import org.eclipse.che.ide.ext.git.shared.Branch;
-import org.eclipse.che.ide.ext.git.shared.PullResponse;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.web.bindery.event.shared.Event;

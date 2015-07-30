@@ -10,9 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.ide.api.action.ActionManager;
-import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
+import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.ext.git.client.action.AddToIndexAction;
 import org.eclipse.che.ide.ext.git.client.action.CheckoutReferenceAction;
@@ -31,12 +34,10 @@ import org.eclipse.che.ide.ext.git.client.action.ShowGitUrlAction;
 import org.eclipse.che.ide.ext.git.client.action.ShowMergeAction;
 import org.eclipse.che.ide.ext.git.client.action.ShowRemoteAction;
 import org.eclipse.che.ide.ext.git.client.action.ShowStatusAction;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
-import static org.eclipse.che.ide.api.constraints.Anchor.BEFORE;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_MAIN_MENU;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_WINDOW;
+import static org.eclipse.che.ide.api.constraints.Anchor.BEFORE;
 
 /**
  * Extension add Git support to the IDE Application.

@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.importer.page;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.project.shared.dto.ImportProject;
 import org.eclipse.che.api.project.shared.dto.NewProject;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.util.NameUtils;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;

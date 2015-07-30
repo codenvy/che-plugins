@@ -27,6 +27,8 @@
 */
 package org.eclipse.che.ide.ext.git.client.merge;
 
+import org.eclipse.che.api.git.shared.Branch;
+import org.eclipse.che.api.git.shared.MergeResult;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
@@ -37,8 +39,6 @@ import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
-import org.eclipse.che.ide.ext.git.shared.Branch;
-import org.eclipse.che.ide.ext.git.shared.MergeResult;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
@@ -49,9 +49,9 @@ import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Method;
 
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_LOCAL;
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_REMOTE;
-import static org.eclipse.che.ide.ext.git.shared.MergeResult.MergeStatus.ALREADY_UP_TO_DATE;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_LOCAL;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_REMOTE;
+import static org.eclipse.che.api.git.shared.MergeResult.MergeStatus.ALREADY_UP_TO_DATE;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;

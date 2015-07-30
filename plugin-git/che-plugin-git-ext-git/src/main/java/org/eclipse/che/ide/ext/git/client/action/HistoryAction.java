@@ -11,12 +11,13 @@
 package org.eclipse.che.ide.ext.git.client.action;
 
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ext.git.client.history.HistoryPresenter;
+
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -25,7 +26,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class HistoryAction extends GitAction {
     private final Provider<HistoryPresenter> presenterProvider;
-    private final AnalyticsEventLogger eventLogger;
+    private final AnalyticsEventLogger       eventLogger;
 
     @Inject
     public HistoryAction(Provider<HistoryPresenter> presenterProvider,

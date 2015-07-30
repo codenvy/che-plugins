@@ -69,8 +69,8 @@ public class CommitViewImpl extends Window implements CommitView {
      */
     @UiField
     TextArea message;
-    Button   btnCommit;
-    Button   btnCancel;
+    Button btnCommit;
+    Button btnCancel;
     @UiField(provided = true)
     final   GitResources            res;
     @UiField(provided = true)
@@ -93,7 +93,7 @@ public class CommitViewImpl extends Window implements CommitView {
 
         this.setTitle(locale.commitTitle());
         this.setWidget(widget);
-        
+
         btnCancel = createButton(locale.buttonCancel(), "git-commit-cancel", new ClickHandler() {
 
             @Override

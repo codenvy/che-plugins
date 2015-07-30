@@ -11,20 +11,21 @@
 package org.eclipse.che.ide.ext.git.client.fetch;
 
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.Branch;
+import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.dto.DtoFactory;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
-import org.eclipse.che.ide.ext.git.shared.Branch;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.websocket.WebSocketException;
 import org.eclipse.che.ide.websocket.rest.RequestCallback;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -33,8 +34,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_LOCAL;
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_REMOTE;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_LOCAL;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_REMOTE;
 
 /**
  * Presenter for fetching changes from remote repository.

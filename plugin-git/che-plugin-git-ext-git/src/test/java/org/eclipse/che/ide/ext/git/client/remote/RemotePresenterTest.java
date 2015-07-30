@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.remote;
 
+import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.remote.add.AddRemoteRepositoryPresenter;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;

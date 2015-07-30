@@ -15,9 +15,9 @@ import org.eclipse.che.api.project.shared.dto.ImportSourceDescriptor;
 import org.eclipse.che.api.project.shared.dto.NewProject;
 import org.eclipse.che.api.project.shared.dto.Source;
 import org.eclipse.che.ide.api.wizard.Wizard;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

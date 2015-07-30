@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.remote.add;
 
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
 public class AddRemoteRepositoryPresenter implements AddRemoteRepositoryView.ActionDelegate {
     private AddRemoteRepositoryView view;
     private GitServiceClient        service;
-    private AppContext appContext;
+    private AppContext              appContext;
     private AsyncCallback<Void>     callback;
 
     /**

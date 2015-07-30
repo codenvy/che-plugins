@@ -10,12 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.url;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.shared.Remote;
+import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.ui.window.Window;
 import org.eclipse.che.ide.ui.zeroClipboard.ClipboardButtonBuilder;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.reset.files;
 
+import org.eclipse.che.api.git.shared.IndexFile;
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.ext.git.shared.IndexFile;
 
 import javax.annotation.Nonnull;
 

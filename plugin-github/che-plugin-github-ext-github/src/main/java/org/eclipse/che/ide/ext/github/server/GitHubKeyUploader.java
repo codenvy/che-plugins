@@ -10,23 +10,23 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.server;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.api.auth.oauth.OAuthTokenProvider;
 import org.eclipse.che.api.auth.shared.dto.OAuthToken;
 import org.eclipse.che.api.core.UnauthorizedException;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.json.JsonHelper;
 import org.eclipse.che.dto.server.DtoFactory;
+import org.eclipse.che.git.impl.nativegit.GitUrl;
 import org.eclipse.che.ide.MimeType;
-import org.eclipse.che.ide.ext.git.server.commons.Util;
-import org.eclipse.che.ide.ext.git.server.nativegit.SshKeyUploader;
 import org.eclipse.che.ide.ext.github.shared.GitHubKey;
 import org.eclipse.che.ide.ext.ssh.server.SshKey;
+import org.eclipse.che.ide.ext.ssh.server.SshKeyUploader;
 import org.eclipse.che.ide.rest.HTTPHeader;
 import org.eclipse.che.ide.rest.HTTPMethod;
 import org.eclipse.che.ide.rest.HTTPStatus;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,23 +40,27 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Vladyslav Zhukovskii
  */
 @Singleton
-public class GitHubKeyUploader extends SshKeyUploader {
+public class GitHubKeyUploader implements SshKeyUploader {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GitHubKeyUploader.class);
+    private static final Logger  LOG                = LoggerFactory.getLogger(GitHubKeyUploader.class);
+    private static final Pattern GITHUB_URL_PATTERN = Pattern.compile(".*github\\.com.*");
+
+    private OAuthTokenProvider tokenProvider;
 
     @Inject
     public GitHubKeyUploader(OAuthTokenProvider tokenProvider) {
-        super(tokenProvider);
+        this.tokenProvider = tokenProvider;
     }
 
     @Override
     public boolean match(String url) {
-        return Util.isSSH(url) && Util.isGitHub(url);
+        return GitUrl.isSSH(url) && GITHUB_URL_PATTERN.matcher(url).matches();
     }
 
     @Override
@@ -80,7 +84,7 @@ public class GitHubKeyUploader extends SshKeyUploader {
         }
 
         final Map<String, String> postParams = new HashMap<>(2);
-        postParams.put("title", Util.getCodenvyTimeStampKeyLabel());
+        postParams.put("title", GitUrl.getCodenvyTimeStampKeyLabel());
         postParams.put("key", new String(publicKey.getBytes()));
 
         final String postBody = JsonHelper.toJson(postParams);

@@ -14,12 +14,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 /**

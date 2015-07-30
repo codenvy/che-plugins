@@ -16,7 +16,7 @@
     <parent>
         <artifactId>angularjs-core</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.11.6-SNAPSHOT</version>
+        <version>3.11.7-SNAPSHOT</version>
     </parent>
     <artifactId>angularjs-core-server</artifactId>
     <packaging>jar</packaging>

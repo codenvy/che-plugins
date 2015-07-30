@@ -14,11 +14,11 @@ import elemental.dom.Element;
 import elemental.html.TableCellElement;
 import elemental.html.TableElement;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.ide.collections.Array;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.shared.Branch;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.ui.list.SimpleList;

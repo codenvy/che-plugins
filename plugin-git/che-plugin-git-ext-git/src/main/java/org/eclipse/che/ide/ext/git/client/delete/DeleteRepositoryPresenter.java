@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.delete;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 import com.google.inject.Inject;

@@ -11,9 +11,10 @@
 package org.eclipse.che.ide.ext.git.client.reset.commit;
 
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.shared.Revision;
 import org.eclipse.che.ide.ui.window.Window;
+
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
@@ -52,17 +53,17 @@ public class ResetToCommitViewImpl extends Window implements ResetToCommitView {
     private static ResetToCommitViewImplUiBinder ourUiBinder = GWT.create(ResetToCommitViewImplUiBinder.class);
 
     @UiField
-    RadioButton         soft;
+    RadioButton soft;
     @UiField
-    RadioButton         mixed;
+    RadioButton mixed;
     @UiField
-    RadioButton         hard;
-//    @UiField
+    RadioButton hard;
+    //    @UiField
 //    RadioButton         keep;
 //    @UiField
 //    RadioButton         merge;
-    Button              btnReset;
-    Button              btnCancel;
+    Button btnReset;
+    Button btnCancel;
     @UiField(provided = true)
     CellTable<Revision> commits;
     @UiField(provided = true)
@@ -154,6 +155,7 @@ public class ResetToCommitViewImpl extends Window implements ResetToCommitView {
                 return DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM).format(
                         new Date((long)revision.getCommitTime()));
             }
+
             @Override
             public void render(Cell.Context context, Revision revision, SafeHtmlBuilder sb) {
                 sb.appendHtmlConstant("<div id=\"" + UIObject.DEBUG_ID_PREFIX + "git-reset-cellTable-" + context.getIndex() + "\">");

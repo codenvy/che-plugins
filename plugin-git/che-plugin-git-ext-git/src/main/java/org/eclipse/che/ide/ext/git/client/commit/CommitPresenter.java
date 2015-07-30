@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.commit;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.LogResponse;
+import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -17,11 +21,7 @@ import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
 import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
-import org.eclipse.che.ide.ext.git.shared.LogResponse;
-import org.eclipse.che.ide.ext.git.shared.Revision;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
@@ -109,7 +109,7 @@ public class CommitPresenter implements CommitView.ActionDelegate {
     private void commitAddSelection(final String message, final boolean amend) {
         // first git-add the selection
         @SuppressWarnings("unchecked")
-        final Selection<StorableNode< ? >> selection = (Selection<StorableNode< ? >>)this.selectionAgent.getSelection();
+        final Selection<StorableNode<?>> selection = (Selection<StorableNode<?>>)this.selectionAgent.getSelection();
         if (selection.isEmpty() || !(selection.getFirstElement() instanceof StorableNode)) {
             doCommit(message, false, amend);
         } else {
@@ -122,6 +122,7 @@ public class CommitPresenter implements CommitView.ActionDelegate {
                         // then commit
                         doCommit(message, false, amend);
                     }
+
                     @Override
                     protected void onFailure(final Throwable exception) {
                         handleError(exception);
@@ -133,11 +134,11 @@ public class CommitPresenter implements CommitView.ActionDelegate {
         }
     }
 
-    private List<String> buildFileList(final Selection<StorableNode< ? >> selection) {
+    private List<String> buildFileList(final Selection<StorableNode<?>> selection) {
         final List<String> filePattern = new ArrayList<>();
-        final Array<StorableNode< ? >> selected = selection.getAll();
+        final Array<StorableNode<?>> selected = selection.getAll();
         final String base = appContext.getCurrentProject().getRootProject().getPath();
-        for (final StorableNode< ? > node : selected.asIterable()) {
+        for (final StorableNode<?> node : selected.asIterable()) {
             filePattern.add(getPath(node, base));
         }
         return filePattern;
@@ -146,7 +147,7 @@ public class CommitPresenter implements CommitView.ActionDelegate {
     private void commitOnlySelection(final String message, final boolean amend) {
         // first git-add the selection
         @SuppressWarnings("unchecked")
-        final Selection<StorableNode< ? >> selection = (Selection<StorableNode< ? >>)this.selectionAgent.getSelection();
+        final Selection<StorableNode<?>> selection = (Selection<StorableNode<?>>)this.selectionAgent.getSelection();
         if (!selection.isEmpty() && (selection.getFirstElement() instanceof StorableNode)) {
             final List<String> files = buildFileList(selection);
             service.commit(appContext.getCurrentProject().getRootProject(), message, files, amend,
@@ -166,7 +167,7 @@ public class CommitPresenter implements CommitView.ActionDelegate {
                                    handleError(exception);
                                }
                            }
-                   );
+                          );
         } // else don't commit as it goes against user intent
         this.view.close();
     }
@@ -189,11 +190,11 @@ public class CommitPresenter implements CommitView.ActionDelegate {
                                handleError(exception);
                            }
                        }
-               );
+                      );
         this.view.close();
     }
 
-    private String getPath(final StorableNode< ? > node, final String base) {
+    private String getPath(final StorableNode<?> node, final String base) {
         String path = node.getPath();
         if (path.startsWith(base)) {
             path = path.replaceFirst(base, "");

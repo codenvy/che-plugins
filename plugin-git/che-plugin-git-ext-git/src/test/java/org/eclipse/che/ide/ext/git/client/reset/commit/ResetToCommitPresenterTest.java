@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.reset.commit;
 
+import org.eclipse.che.api.git.shared.LogResponse;
+import org.eclipse.che.api.git.shared.ResetRequest;
+import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
@@ -20,9 +23,6 @@ import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
-import org.eclipse.che.ide.ext.git.shared.LogResponse;
-import org.eclipse.che.ide.ext.git.shared.ResetRequest;
-import org.eclipse.che.ide.ext.git.shared.Revision;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.google.web.bindery.event.shared.Event;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
@@ -38,8 +38,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.eclipse.che.ide.ext.git.shared.ResetRequest.ResetType.HARD;
-import static org.eclipse.che.ide.ext.git.shared.ResetRequest.ResetType.MIXED;
+import static org.eclipse.che.api.git.shared.ResetRequest.ResetType.HARD;
+import static org.eclipse.che.api.git.shared.ResetRequest.ResetType.MIXED;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -56,9 +56,9 @@ import static org.mockito.Mockito.when;
  * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
  */
 public class ResetToCommitPresenterTest extends BaseTest {
-    public static final boolean IS_TEXT_FORMATTED  = true;
-    public static final boolean IS_MIXED           = true;
-    public static final String  FILE_PATH          = "/src/testClass.java";
+    public static final boolean IS_TEXT_FORMATTED = true;
+    public static final boolean IS_MIXED          = true;
+    public static final String  FILE_PATH         = "/src/testClass.java";
 
     @Mock
     private ResetToCommitView      view;

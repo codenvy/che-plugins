@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.reset.commit;
 
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.LogResponse;
+import org.eclipse.che.api.git.shared.ResetRequest;
+import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
@@ -17,13 +22,9 @@ import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
-import org.eclipse.che.ide.ext.git.shared.LogResponse;
-import org.eclipse.che.ide.ext.git.shared.ResetRequest;
-import org.eclipse.che.ide.ext.git.shared.Revision;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -53,7 +54,9 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
     private       EventBus                  eventBus;
     private       List<EditorPartPresenter> openedEditors;
 
-    /** Create presenter. */
+    /**
+     * Create presenter.
+     */
     @Inject
     public ResetToCommitPresenter(ResetToCommitView view,
                                   GitServiceClient service,
@@ -74,7 +77,9 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
     }
 
-    /** Show dialog. */
+    /**
+     * Show dialog.
+     */
     public void showDialog() {
         service.log(appContext.getCurrentProject().getRootProject(), false,
                     new AsyncRequestCallback<LogResponse>(dtoUnmarshallerFactory.newUnmarshaller(LogResponse.class)) {
@@ -96,7 +101,9 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
                    );
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onResetClicked() {
         view.close();
@@ -108,20 +115,26 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
         reset();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCancelClicked() {
         view.close();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onRevisionSelected(@Nonnull Revision revision) {
         selectedRevision = revision;
         view.setEnableResetButton(selectedRevision != null);
     }
 
-    /** Reset current HEAD to the specified state and refresh project in the success case.*/
+    /**
+     * Reset current HEAD to the specified state and refresh project in the success case.
+     */
     private void reset() {
         ResetRequest.ResetType type = view.isMixMode() ? ResetRequest.ResetType.MIXED : null;
         type = (type == null && view.isSoftMode()) ? ResetRequest.ResetType.SOFT : type;

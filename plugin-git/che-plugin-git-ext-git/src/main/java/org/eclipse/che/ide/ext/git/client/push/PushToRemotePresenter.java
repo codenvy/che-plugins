@@ -11,6 +11,11 @@
 package org.eclipse.che.ide.ext.git.client.push;
 
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.Branch;
+import org.eclipse.che.api.git.shared.PushResponse;
+import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
@@ -19,14 +24,10 @@ import org.eclipse.che.ide.commons.exception.UnauthorizedException;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BranchFilterByRemote;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.ext.git.client.GitServiceClient;
-import org.eclipse.che.ide.ext.git.shared.Branch;
-import org.eclipse.che.ide.ext.git.shared.PushResponse;
-import org.eclipse.che.ide.ext.git.shared.Remote;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.StringMapUnmarshaller;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -37,8 +38,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_LOCAL;
-import static org.eclipse.che.ide.ext.git.shared.BranchListRequest.LIST_REMOTE;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_LOCAL;
+import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_REMOTE;
 
 /**
  * Presenter for pushing changes to remote repository.
@@ -105,7 +106,8 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
 
                                @Override
                                protected void onFailure(Throwable exception) {
-                                   String errorMessage = exception.getMessage() != null ? exception.getMessage() : constant.remoteListFailed();
+                                   String errorMessage =
+                                           exception.getMessage() != null ? exception.getMessage() : constant.remoteListFailed();
                                    notificationManager.showError(errorMessage);
                                    view.setEnablePushButton(false);
                                }
@@ -263,16 +265,16 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
         final String repository = view.getRepository();
         service.push(project.getRootProject(), getRefs(), repository, false,
                      new AsyncRequestCallback<PushResponse>(dtoUnmarshallerFactory.newUnmarshaller(PushResponse.class)) {
-            @Override
-            protected void onSuccess(PushResponse result) {
-                notificationManager.showInfo(result.getCommandOutput());
-            }
+                         @Override
+                         protected void onSuccess(PushResponse result) {
+                             notificationManager.showInfo(result.getCommandOutput());
+                         }
 
-            @Override
-            protected void onFailure(Throwable exception) {
-                handleError(exception);
-            }
-        });
+                         @Override
+                         protected void onFailure(Throwable exception) {
+                             handleError(exception);
+                         }
+                     });
         view.close();
     }
 
