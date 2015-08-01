@@ -22,7 +22,7 @@ import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
 /**
  * @author Roman Nikitenko
  */
-public class MavenProjectCreated implements ProjectCreatedHandler {
+public class MavenProjectCreatedHandler implements ProjectCreatedHandler {
 
     @Override
     public void onProjectCreated(FolderEntry projectFolder)
