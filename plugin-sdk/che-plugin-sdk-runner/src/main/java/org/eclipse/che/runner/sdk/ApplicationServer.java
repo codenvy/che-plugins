@@ -51,6 +51,6 @@ public interface ApplicationServer {
                               ZipFile warToDeploy,
                               File extensionJar,
                               SDKRunnerConfiguration runnerConfiguration,
-                              CodeServer.CodeServerProcess codeServerProcess,
+                              CodeServerProcess codeServerProcess,
                               ApplicationProcess.Callback callback) throws RunnerException;
 }

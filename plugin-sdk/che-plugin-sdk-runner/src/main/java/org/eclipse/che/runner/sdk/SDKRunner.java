@@ -169,7 +169,7 @@ public class SDKRunner extends Runner {
             throw new RunnerException(e);
         }
 
-        final CodeServer.CodeServerProcess codeServerProcess = codeServer.prepare(codeServerWorkDirPath,
+        final CodeServerProcess codeServerProcess = codeServer.prepare(codeServerWorkDirPath,
                                                                                   sdkRunnerCfg,
                                                                                   extensionDescriptor,
                                                                                   getExecutor());
@@ -237,8 +237,7 @@ public class SDKRunner extends Runner {
                                      extension.version));
             model.writeTo(pom);
 
-            GwtXmlUtils.inheritGwtModule(IoUtil.findFile(SDKRunner.IDE_GWT_XML_FILE_NAME, workDirPath.toFile()).toPath(),
-                                         extension.gwtModuleName);
+            GwtXmlUtils.inheritGwtModule(IoUtil.findFile(IDE_GWT_XML_FILE_NAME, workDirPath.toFile()).toPath(), extension.gwtModuleName);
 
             warPath = Utils.buildProjectFromSources(workDirPath, "*.war");
         } catch (Exception e) {
