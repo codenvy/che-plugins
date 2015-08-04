@@ -172,7 +172,7 @@ public class OrionEditorOverlay extends JavaScriptObject {
      * @return the annotation model
      */
     public final native OrionAnnotationModelOverlay getAnnotationModel() /*-{
-        return this._annotationModel;
+        return this.getAnnotationModel();
     }-*/;
 
     public final native void setZoomRulerVisible(boolean visible) /*-{

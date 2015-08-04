@@ -36,8 +36,6 @@ import org.eclipse.che.ide.jseditor.client.text.TextRange;
  */
 public class OrionDocument extends AbstractEmbeddedDocument {
 
-    private static final String EVENT_TYPE = "Changed";
-
     private final OrionTextViewOverlay      textViewOverlay;
     private final OrionPositionConverter    positionConverter;
     private final HasCursorActivityHandlers hasCursorActivityHandlers;
@@ -52,7 +50,7 @@ public class OrionDocument extends AbstractEmbeddedDocument {
         this.editorOverlay = editorOverlay;
         this.positionConverter = new OrionPositionConverter();
 
-        this.editorOverlay.getModel().addEventListener(EVENT_TYPE, new EventHandler<ModelChangedEventOverlay>() {
+        this.editorOverlay.getModel().addEventListener("Changed", new EventHandler<ModelChangedEventOverlay>() {
             @Override
             public void onEvent(ModelChangedEventOverlay parameter) {
                 fireDocumentChangeEvent(parameter);
