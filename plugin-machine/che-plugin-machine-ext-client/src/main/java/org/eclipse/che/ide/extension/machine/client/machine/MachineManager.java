@@ -44,6 +44,7 @@ import org.eclipse.che.ide.extension.machine.client.outputspanel.OutputsContaine
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.CommandConsoleFactory;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.OutputConsole;
 import org.eclipse.che.ide.extension.machine.client.util.RecipeProvider;
+import org.eclipse.che.ide.extension.machine.client.watcher.SystemFileWatcher;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.util.UUID;
 import org.eclipse.che.ide.util.loging.Log;
@@ -80,6 +81,7 @@ public class MachineManager implements ProjectActionHandler {
     private final DialogFactory               dialogFactory;
     private final RecipeProvider              recipeProvider;
     private final EntityFactory               entityFactory;
+    private final SystemFileWatcher           systemFileWatcher;
 
     /** Stores ID of the developer machine (where workspace or current project is bound). */
     private String devMachineId;
@@ -96,7 +98,8 @@ public class MachineManager implements ProjectActionHandler {
                           MachineStatusNotifier machineStatusNotifier,
                           DialogFactory dialogFactory,
                           RecipeProvider recipeProvider,
-                          EntityFactory entityFactory) {
+                          EntityFactory entityFactory,
+                          SystemFileWatcher systemFileWatcher) {
         this.machineServiceClient = machineServiceClient;
         this.messageBus = messageBus;
         this.machineConsolePresenter = machineConsolePresenter;
@@ -109,6 +112,7 @@ public class MachineManager implements ProjectActionHandler {
         this.dialogFactory = dialogFactory;
         this.recipeProvider = recipeProvider;
         this.entityFactory = entityFactory;
+        this.systemFileWatcher = systemFileWatcher;
     }
 
     @Override
@@ -190,6 +194,8 @@ public class MachineManager implements ProjectActionHandler {
                         @Override
                         public void onRunning() {
                             devMachineId = machine.getId();
+
+                            systemFileWatcher.registerWatcher(machineDescriptor.getWorkspaceId());
                         }
                     };
                 }
