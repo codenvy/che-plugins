@@ -97,4 +97,10 @@ public interface GitHubLocalizationConstant extends Messages {
     @Key("view.import.githubImporterPage.projectVisibilityPrivate")
     String githubImporterPageprojectVisibilityPrivate();
 
+    @Key("view.import.githubImporterPage.keepDirectory")
+    String githubImporterPageKeepDirectory();
+
+    @Key("view.import.githubImporterPage.keepDirectoryField")
+    String githubImporterPageKeepDirectoryField();
+
 }

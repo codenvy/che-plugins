@@ -80,7 +80,7 @@ public class GitImporterPagePresenterTest {
         verify(container).setWidget(eq(view));
         verify(view).setProjectName(anyString());
         verify(view).setProjectDescription(anyString());
-        verify(view).setVisibility(anyBoolean());
+        verify(view).setProjectVisibility(anyBoolean());
         verify(view).setProjectUrl(anyString());
         verify(view).setInputsEnableState(eq(true));
         verify(view).focusInUrlInput();

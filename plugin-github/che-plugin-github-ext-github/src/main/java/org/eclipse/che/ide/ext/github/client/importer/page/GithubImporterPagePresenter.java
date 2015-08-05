@@ -37,6 +37,8 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Roman Nikitenko
@@ -99,6 +101,9 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
         validateProjectName();
     }
 
+    /**
+     * Validates project name and highlights input when error.
+     */
     private void validateProjectName() {
         if (NameUtils.checkProjectName(view.getProjectName())) {
             view.hideNameError();
@@ -136,22 +141,68 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
         updateDelegate.updateControls();
     }
 
+    /**
+     * Returns project parameters map.
+     *
+     * @return parameters map
+     */
+    private Map<String, String> projectParameters() {
+        Map<String, String> parameters = dataObject.getSource().getProject().getParameters();
+        if (parameters == null) {
+            parameters = new HashMap<>();
+            dataObject.getSource().getProject().setParameters(parameters);
+        }
+
+        return parameters;
+    }
+
+    @Override
+    public void keepDirectorySelected(boolean keepDirectory) {
+        view.enableDirectoryNameField(keepDirectory);
+
+        if (keepDirectory) {
+            projectParameters().put("keepDirectory", view.getDirectoryName());
+            view.highlightDirectoryNameField(!NameUtils.checkProjectName(view.getDirectoryName()));
+            view.focusDirectoryNameFiend();
+        } else {
+            projectParameters().remove("keepDirectory");
+            view.highlightDirectoryNameField(false);
+        }
+    }
+
+    @Override
+    public void keepDirectoryNameChanged(@Nonnull String directoryName) {
+        if (view.keepDirectory()) {
+            projectParameters().put("keepDirectory", directoryName);
+            view.highlightDirectoryNameField(!NameUtils.checkProjectName(view.getDirectoryName()));
+        } else {
+            projectParameters().remove("keepDirectory");
+            view.highlightDirectoryNameField(false);
+        }
+    }
+
     @Override
     public void go(@Nonnull AcceptsOneWidget container) {
         container.setWidget(view);
+
         updateView();
+
+        view.setKeepDirectoryChecked(false);
+        view.setDirectoryName("");
+        view.enableDirectoryNameField(false);
+        view.highlightDirectoryNameField(false);
 
         view.setInputsEnableState(true);
         view.focusInUrlInput();
     }
 
-    /** Updates view from data-object. */
+    /**
+     * Updates the view.
+     */
     private void updateView() {
-        final NewProject project = dataObject.getProject();
-
-        view.setProjectName(project.getName());
-        view.setProjectDescription(project.getDescription());
-        view.setVisibility(PUBLIC_VISIBILITY.equals(project.getVisibility()));
+        view.setProjectName(dataObject.getProject().getName());
+        view.setProjectDescription(dataObject.getProject().getDescription());
+        view.setProjectVisibility(PUBLIC_VISIBILITY.equals(dataObject.getProject().getVisibility()));
         view.setProjectUrl(dataObject.getSource().getProject().getLocation());
     }
 
@@ -184,6 +235,9 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
                 });
     }
 
+    /**
+     * Authorizes on GitHub.
+     */
     private void authorize() {
         showProcessing(true);
         gitHubAuthenticator.authorize(new AsyncCallback<OAuthStatus>() {
@@ -229,7 +283,9 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
         view.showGithubPanel();
     }
 
-    /** Refresh project list on view. */
+    /**
+     * Refresh project list on view.
+     */
     private void refreshProjectList() {
         Array<ProjectData> projectsData = Collections.createArray();
 
@@ -257,13 +313,17 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
         }
     }
 
-    /** Shown the state that the request is processing. */
+    /**
+     * Shown the state that the request is processing.
+     */
     private void showProcessing(boolean inProgress) {
         view.setLoaderVisibility(inProgress);
         view.setInputsEnableState(!inProgress);
     }
 
-    /** Gets project name from uri. */
+    /**
+     * Gets project name from uri.
+     */
     private String extractProjectNameFromUri(@Nonnull String uri) {
         int indexFinishProjectName = uri.lastIndexOf(".");
         int indexStartProjectName = uri.lastIndexOf("/") != -1 ? uri.lastIndexOf("/") + 1 : (uri.lastIndexOf(":") + 1);

@@ -23,20 +23,30 @@ import javax.annotation.Nonnull;
 @ImplementedBy(GithubImporterPageViewImpl.class)
 public interface GithubImporterPageView extends View<GithubImporterPageView.ActionDelegate> {
 
-    public interface ActionDelegate {
-        /** Performs any actions appropriate in response to the user having changed the project's name. */
+    interface ActionDelegate {
+        /**
+         * Performs any actions appropriate in response to the user having changed the project's name.
+         */
         void projectNameChanged(@Nonnull String name);
 
-        /** Performs any actions appropriate in response to the user having changed the project's URL. */
+        /**
+         * Performs any actions appropriate in response to the user having changed the project's URL.
+         */
         void projectUrlChanged(@Nonnull String url);
 
-        /** Performs any actions appropriate in response to the user having changed the project's description. */
+        /**
+         * Performs any actions appropriate in response to the user having changed the project's description.
+         */
         void projectDescriptionChanged(@Nonnull String projectDescriptionValue);
 
-        /** Performs any actions appropriate in response to the user having changed the project's visibility. */
+        /**
+         * Performs any actions appropriate in response to the user having changed the project's visibility.
+         */
         void projectVisibilityChanged(boolean aPublic);
 
-        /** Performs any actions appropriate in response to the user having clicked the 'LoadRepo' key. */
+        /**
+         * Performs any actions appropriate in response to the user having clicked the 'LoadRepo' key.
+         */
         void onLoadRepoClicked();
 
         /**
@@ -47,20 +57,36 @@ public interface GithubImporterPageView extends View<GithubImporterPageView.Acti
          */
         void onRepositorySelected(@Nonnull ProjectData repository);
 
-        /** Performs any actions appropriate in response to the user having changed account field. */
+        /**
+         * Performs any actions appropriate in response to the user having changed account field.
+         */
         void onAccountChanged();
+
+        /** Perform actions when selecting Keep Directory checkbox. */
+        void keepDirectorySelected(boolean keepDirectory);
+
+        /** Perform actions when changing the name of a directory. */
+        void keepDirectoryNameChanged(@Nonnull String url);
     }
 
-    /** Show the name error. */
+    /**
+     * Show the name error.
+     */
     void showNameError();
 
-    /** Hide the name error. */
+    /**
+     * Hide the name error.
+     */
     void hideNameError();
 
-    /** Show URL error. */
+    /**
+     * Show URL error.
+     */
     void showUrlError(@Nonnull String message);
 
-    /** Hide URL error. */
+    /**
+     * Hide URL error.
+     */
     void hideUrlError();
 
     /**
@@ -71,7 +97,12 @@ public interface GithubImporterPageView extends View<GithubImporterPageView.Acti
      */
     void setProjectUrl(@Nonnull String url);
 
-    void setVisibility(boolean visible);
+    /**
+     * Updates project visibility.
+     *
+     * @param visibility project visibility
+     */
+    void setProjectVisibility(boolean visibility);
 
     /**
      * Get the project's name value.
@@ -97,7 +128,9 @@ public interface GithubImporterPageView extends View<GithubImporterPageView.Acti
      */
     void setProjectDescription(@Nonnull String projectDescription);
 
-    /** Give focus to project's URL input. */
+    /**
+     * Focuses URL field.
+     */
     void focusInUrlInput();
 
     /**
@@ -128,13 +161,19 @@ public interface GithubImporterPageView extends View<GithubImporterPageView.Acti
      */
     void setAccountNames(@Nonnull Array<String> names);
 
-    /** Close github panel. */
+    /**
+     * Close github panel.
+     */
     void closeGithubPanel();
 
-    /** Show github panel. */
+    /**
+     * Show github panel.
+     */
     void showGithubPanel();
 
-    /** Reset the page. */
+    /**
+     * Reset the page.
+     */
     void reset();
 
     /**
@@ -144,5 +183,52 @@ public interface GithubImporterPageView extends View<GithubImporterPageView.Acti
      *         <code>true</code> if visible.
      */
     void setLoaderVisibility(boolean isVisible);
+
+    /**
+     * Returns whether user wants to checkout a special directory.
+     *
+     * @return <b>true</b> if user has checked the Keep Director checkbox, otherwise returns <b>false</b>
+     */
+    boolean keepDirectory();
+
+    /**
+     *  Sets new value of Keep Directory checkbox.
+     *
+     * @param checked <b>true</b> to check the field or <b>false</b> to leave it unchecked
+     */
+    void setKeepDirectoryChecked(boolean checked);
+
+    /**
+     * Returns the name of a directory to checkout.
+     *
+     * @return name of a directory to checkout
+     */
+    String getDirectoryName();
+
+    /**
+     * Sets new value of Directory name field.
+     *
+     * @param directoryName new value of directory name field
+     */
+    void setDirectoryName(String directoryName);
+
+    /**
+     * Enables or disables Directory name field.
+     *
+     * @param enable true or false to enable or disable the field
+     */
+    void enableDirectoryNameField(boolean enable);
+
+    /***
+     * Highlights Directory name field to notify its value is invalid.
+     *
+     * @param highlight <b>true</b> to highlight the field or <b>false</b> to remove highlighting
+     */
+    void highlightDirectoryNameField(boolean highlight);
+
+    /**
+     * Focuses directory name field.
+     */
+    void focusDirectoryNameFiend();
 
 }

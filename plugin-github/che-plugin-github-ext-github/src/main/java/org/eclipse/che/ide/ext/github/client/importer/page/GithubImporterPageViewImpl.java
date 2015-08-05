@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.client.importer.page;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.user.client.ui.CheckBox;
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.github.client.GitHubLocalizationConstant;
@@ -61,36 +63,49 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
     interface GithubImporterPageViewImplUiBinder extends UiBinder<DockLayoutPanel, GithubImporterPageViewImpl> {
     }
 
-    private ActionDelegate delegate;
-
     @UiField(provided = true)
     GithubStyle            style;
+
     @UiField
     Label                  labelUrlError;
+
     @UiField
     TextBox                projectName;
+
     @UiField
     TextArea               projectDescription;
+
     @UiField
     RadioButton            projectPrivate;
+
     @UiField
     RadioButton            projectPublic;
+
     @UiField
     TextBox                projectUrl;
+
     @UiField
     FlowPanel              bottomPanel;
+
     @UiField
     DockLayoutPanel        githubPanel;
+
     @UiField
     Button                 loadRepo;
+
     @UiField
     ListBox                accountName;
+
     @UiField(provided = true)
     CellTable<ProjectData> repositories;
-    @UiField(provided = true)
-    final GitHubResources            resources;
-    @UiField(provided = true)
-    final GitHubLocalizationConstant locale;
+
+    @UiField
+    CheckBox               keepDirectory;
+
+    @UiField
+    TextBox                directoryName;
+
+    private ActionDelegate delegate;
 
     @Inject
     public GithubImporterPageViewImpl(GitHubResources resources,
@@ -98,13 +113,10 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
                                       Resources ideResources,
                                       GithubImporterPageViewImplUiBinder uiBinder) {
 
-        this.resources = resources;
-        this.locale = locale;
-
         style = resources.githubImporterPageStyle();
         style.ensureInjected();
 
-        createRepositoriesTable(ideResources);
+        createRepositoriesTable(ideResources, locale);
         initWidget(uiBinder.createAndBindUi(this));
 
         projectName.getElement().setAttribute("maxlength", "32");
@@ -114,7 +126,6 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
         loadRepo.addStyleName(ideResources.Css().buttonLoader());
         loadRepo.sinkEvents(Event.ONCLICK);
         loadRepo.addHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 delegate.onLoadRepoClicked();
@@ -126,10 +137,10 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
     /**
      * Creates table what contains list of available repositories.
      *
-     * @param ideResources
+     * @param resources
      */
-    private void createRepositoriesTable(@Nonnull Resources ideResources) {
-        repositories = new CellTable<ProjectData>(15, ideResources);
+    private void createRepositoriesTable(final Resources resources, GitHubLocalizationConstant locale) {
+        repositories = new CellTable<ProjectData>(15, resources);
 
         Column<ProjectData, ImageResource> iconColumn = new Column<ProjectData, ImageResource>(new ImageResourceCell()) {
             @Override
@@ -215,6 +226,20 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
         delegate.onAccountChanged();
     }
 
+    @UiHandler({"keepDirectory"})
+    void keepDirectoryHandler(ValueChangeEvent<Boolean> event) {
+        delegate.keepDirectorySelected(event.getValue());
+    }
+
+    @UiHandler("directoryName")
+    void onDirectoryNameChanged(KeyUpEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+            return;
+        }
+
+        delegate.keepDirectoryNameChanged(directoryName.getValue());
+    }
+
     @Override
     public void setProjectUrl(@Nonnull String url) {
         projectUrl.setText(url);
@@ -222,7 +247,7 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
     }
 
     @Override
-    public void setVisibility(boolean visible) {
+    public void setProjectVisibility(boolean visible) {
         projectPublic.setValue(visible, false);
         projectPrivate.setValue(!visible, false);
     }
@@ -293,6 +318,51 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
         if (isEnabled) {
             focusInUrlInput();
         }
+    }
+
+    @Override
+    public boolean keepDirectory() {
+        return keepDirectory.getValue();
+    }
+
+    @Override
+    public void setKeepDirectoryChecked(boolean checked) {
+        keepDirectory.setValue(checked);
+    }
+
+    @Override
+    public String getDirectoryName() {
+        return directoryName.getValue();
+    }
+
+    @Override
+    public void setDirectoryName(String directoryName) {
+        this.directoryName.setValue(directoryName);
+    }
+
+    @Override
+    public void enableDirectoryNameField(boolean enable) {
+        directoryName.setEnabled(enable);
+    }
+
+    @Override
+    public void highlightDirectoryNameField(boolean highlight) {
+        if (highlight) {
+            directoryName.addStyleName(style.inputError());
+        } else {
+            directoryName.removeStyleName(style.inputError());
+        }
+    }
+
+    @Override
+    public void focusDirectoryNameFiend() {
+        Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+            @Override
+            public void execute() {
+                directoryName.setFocus(true);
+                directoryName.selectAll();
+            }
+        });
     }
 
     @Override

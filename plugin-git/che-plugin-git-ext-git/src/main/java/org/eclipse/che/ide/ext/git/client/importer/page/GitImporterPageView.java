@@ -20,7 +20,8 @@ import javax.annotation.Nonnull;
  */
 @ImplementedBy(GitImporterPageViewImpl.class)
 public interface GitImporterPageView extends View<GitImporterPageView.ActionDelegate> {
-    public interface ActionDelegate {
+
+    interface ActionDelegate {
         /** Performs any actions appropriate in response to the user having changed the project's name. */
         void projectNameChanged(@Nonnull String name);
 
@@ -32,18 +33,32 @@ public interface GitImporterPageView extends View<GitImporterPageView.ActionDele
 
         /** Performs any actions appropriate in response to the user having changed the project's visibility. */
         void projectVisibilityChanged(boolean aPublic);
+
+        /** Perform actions when selecting Keep Directory checkbox. */
+        void keepDirectorySelected(boolean keepDirectory);
+
+        /** Perform actions when changing the name of a directory. */
+        void keepDirectoryNameChanged(@Nonnull String url);
     }
 
-    /** Show the name error. */
+    /**
+     * Show the name error.
+     */
     void showNameError();
 
-    /** Hide the name error. */
+    /**
+     * Hide the name error.
+     */
     void hideNameError();
 
-    /** Show URL error. */
+    /**
+     * Show URL error.
+     */
     void showUrlError(@Nonnull String message);
 
-    /** Hide URL error. */
+    /**
+     * Hide URL error.
+     */
     void hideUrlError();
 
     /**
@@ -70,7 +85,9 @@ public interface GitImporterPageView extends View<GitImporterPageView.ActionDele
      */
     void setProjectName(@Nonnull String projectName);
 
-    /** Give focus to project's URL input. */
+    /**
+     * Focuses URL field.
+     */
     void focusInUrlInput();
 
     /**
@@ -81,7 +98,65 @@ public interface GitImporterPageView extends View<GitImporterPageView.ActionDele
      */
     void setInputsEnableState(boolean isEnabled);
 
+    /**
+     * Sets project description field value.
+     *
+     * @param projectDescription project description
+     */
     void setProjectDescription(@Nonnull String projectDescription);
 
-    void setVisibility(boolean visible);
+    /**
+     * Updates project visibility.
+     *
+     * @param visibility project visibility
+     */
+    void setProjectVisibility(boolean visibility);
+
+    /**
+     * Returns whether user wants to checkout a special directory.
+     *
+     * @return <b>true</b> if user has checked the Keep Director checkbox, otherwise returns <b>false</b>
+     */
+    boolean keepDirectory();
+
+    /**
+     *  Sets new value of Keep Directory checkbox.
+     *
+     * @param checked <b>true</b> to check the field or <b>false</b> to leave it unchecked
+     */
+    void setKeepDirectoryChecked(boolean checked);
+
+    /**
+     * Returns the name of a directory to checkout.
+     *
+     * @return name of a directory to checkout
+     */
+    String getDirectoryName();
+
+    /**
+     * Sets new value of Directory name field.
+     *
+     * @param directoryName new value of directory name field
+     */
+    void setDirectoryName(String directoryName);
+
+    /**
+     * Enables or disables Directory name field.
+     *
+     * @param enable true or false to enable or disable the field
+     */
+    void enableDirectoryNameField(boolean enable);
+
+    /***
+     * Highlights Directory name field to notify its value is invalid.
+     *
+     * @param highlight <b>true</b> to highlight the field or <b>false</b> to remove highlighting
+     */
+    void highlightDirectoryNameField(boolean highlight);
+
+    /**
+     * Focuses directory name field.
+     */
+    void focusDirectoryNameFiend();
+
 }
