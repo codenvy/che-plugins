@@ -100,7 +100,8 @@ public class ContentAssistWidget implements EventListener {
 
     @AssistedInject
     public ContentAssistWidget(final PopupResources popupResources,
-                               @Assisted final OrionEditorWidget textEditor, @Assisted OrionKeyModeOverlay assistMode) {
+                               @Assisted final OrionEditorWidget textEditor,
+                               @Assisted OrionKeyModeOverlay assistMode) {
         this.popupElement = Elements.createDivElement(popupResources.popupStyle().window());
         this.listElement = Elements.createUListElement();
         this.popupElement.appendChild(this.listElement);
@@ -241,8 +242,11 @@ public class ContentAssistWidget implements EventListener {
 
     /**
      * Show the widget at the given document position.
-     * @param Xcoord the horizontal pixel position in the document
-     * @param Ycoord the vertical pixel position in the document
+     *
+     * @param Xcoord
+     *         the horizontal pixel position in the document
+     * @param Ycoord
+     *         the vertical pixel position in the document
      */
     public void show(final float Xcoord, final float Ycoord) {
         textEditor.getTextView().addKeyMode(assistMode);
@@ -381,8 +385,10 @@ public class ContentAssistWidget implements EventListener {
     }
 
     public void positionAndShow() {
-        int offset = textEditor.getDocument().getCursorOffset();
         OrionTextViewOverlay textView = textEditor.getTextView();
+
+        int offset = textView.getCaretOffset();
+
         OrionPixelPositionOverlay caretLocation = textView.getLocationAtOffset(offset);
         caretLocation.setY(caretLocation.getY() + textView.getLineHeight());
         caretLocation = textView.convert(caretLocation, "document", "page");
@@ -444,7 +450,9 @@ public class ContentAssistWidget implements EventListener {
 
     /**
      * Add an item in the popup view.
-     * @param itemModel the data for the item
+     *
+     * @param itemModel
+     *         the data for the item
      */
     public void addItem(final CompletionProposal itemModel) {
         if (itemModel == null) {
@@ -460,7 +468,7 @@ public class ContentAssistWidget implements EventListener {
 
     /** Hide the popup. */
     public void hide() {
-        if(showingDoc){
+        if (showingDoc) {
             docWidget.hide();
             showingDoc = false;
             return;

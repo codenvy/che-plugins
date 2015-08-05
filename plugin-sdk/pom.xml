@@ -25,8 +25,8 @@
     <modules>
         <!--module>che-plugin-sdk-ext-plugins</module-->
         <module>che-plugin-sdk-env-local</module>
-        <!--module>che-plugin-sdk-runner</module>
-        <module>che-plugin-sdk-tools</module-->
+        <!--module>che-plugin-sdk-runner</module-->
+        <module>che-plugin-sdk-tools</module>
     </modules>
     <properties>
         <dto-generator-out-directory>${project.build.directory}/generated-sources/dto/</dto-generator-out-directory>

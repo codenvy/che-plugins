@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
+import org.eclipse.che.api.core.ConflictException;
 import org.eclipse.che.api.core.ForbiddenException;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.ServerException;
@@ -390,7 +391,7 @@ public class ServiceTest {
     }
 
     private MachineImpl createMachineAndWaitRunningState()
-            throws ServerException, NotFoundException, ForbiddenException, InterruptedException {
+            throws ServerException, NotFoundException, ForbiddenException, InterruptedException, ConflictException {
         final MachineImpl machine = machineManager.create(DtoFactory.newDto(RecipeMachineCreationMetadata.class)
                                                                     .withWorkspaceId("wsId")
                                                                     .withType("docker")

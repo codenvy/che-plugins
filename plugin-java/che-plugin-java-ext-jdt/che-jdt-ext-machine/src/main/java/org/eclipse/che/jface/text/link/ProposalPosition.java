@@ -97,6 +97,7 @@ public class ProposalPosition extends LinkedPosition {
 	/*
 	 * @see org.eclipse.jdt.internal.ui.text.link.LinkedPosition#hashCode()
 	 */
+	@SuppressWarnings("ArrayHashCode")
 	public int hashCode() {
 		return super.hashCode() | (fProposals == null ? 0 : fProposals.hashCode());
 	}

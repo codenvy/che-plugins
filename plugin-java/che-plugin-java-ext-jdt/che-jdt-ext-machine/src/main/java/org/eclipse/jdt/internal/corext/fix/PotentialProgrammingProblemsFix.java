@@ -110,7 +110,7 @@ public class PotentialProgrammingProblemsFix extends CompilationUnitRewriteOpera
 					if (curr instanceof ITypeBinding) {
 						ITypeBinding typeBinding = (ITypeBinding)curr;
 //						try {
-							Long id = 0l;//SerialVersionHashOperation.calculateSerialVersionId(typeBinding, new SubProgressMonitor(monitor, 1));
+							Long id = 0L;//SerialVersionHashOperation.calculateSerialVersionId(typeBinding, new SubProgressMonitor(monitor, 1));
 							if (id != null) {
 								setSerialVersionId(typeBinding, id);
 							} else {

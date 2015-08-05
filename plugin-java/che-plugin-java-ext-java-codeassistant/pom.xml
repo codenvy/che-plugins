@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-plugin-java-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.11.4-SNAPSHOT</version>
+        <version>3.11.7-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-java-ext-java-codeassistant</artifactId>
     <packaging>jar</packaging>
@@ -50,6 +50,11 @@
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-api-builder</artifactId>
+            <version>${che.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-commons-schedule</artifactId>
             <version>${che.core.version}</version>
         </dependency>
         <dependency>

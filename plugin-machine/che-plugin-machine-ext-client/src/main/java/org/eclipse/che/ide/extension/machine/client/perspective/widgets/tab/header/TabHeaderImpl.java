@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
  *
  * @author Dmitry Shnurenko
  */
-@Singleton
+
 public class TabHeaderImpl extends Composite implements TabHeader, ClickHandler {
     interface TabHeaderImplUiBinder extends UiBinder<Widget, TabHeaderImpl> {
     }

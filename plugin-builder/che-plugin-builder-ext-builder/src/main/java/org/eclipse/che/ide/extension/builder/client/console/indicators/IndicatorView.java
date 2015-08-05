@@ -11,16 +11,16 @@
 
 package org.eclipse.che.ide.extension.builder.client.console.indicators;
 
-import org.eclipse.che.ide.api.action.Presentation;
-import org.eclipse.che.ide.api.action.PropertyChangeEvent;
-import org.eclipse.che.ide.api.action.PropertyChangeListener;
-import org.eclipse.che.ide.extension.builder.client.BuilderResources;
-
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.InlineLabel;
+
+import org.eclipse.che.ide.api.action.Presentation;
+import org.eclipse.che.ide.api.action.PropertyChangeEvent;
+import org.eclipse.che.ide.api.action.PropertyChangeListener;
+import org.eclipse.che.ide.extension.builder.client.BuilderResources;
 
 /**
  * View for {@link IndicatorAction}.
@@ -30,12 +30,13 @@ import com.google.gwt.user.client.ui.InlineLabel;
  * @author Artem Zatsarynnyy
  */
 public class IndicatorView extends Composite {
+    private static final String TARGET = "download-frame";
+
     private final boolean          isURL;
     private final Presentation     presentation;
     private       Anchor           dataAnchor;
     private       InlineLabel      dataLabel;
     private       PropertyListener propertyListener;
-    private final static String TARGET = "download-frame";
 
     public IndicatorView(String caption, boolean isURL, int width, Presentation presentation, BuilderResources resources) {
         this.isURL = isURL;

@@ -23,6 +23,7 @@ import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.core.notification.EventSubscriber;
 import org.eclipse.che.api.vfs.server.observation.VirtualFileEvent;
 import org.eclipse.che.commons.lang.IoUtil;
+import org.eclipse.che.commons.schedule.ScheduleRate;
 import org.eclipse.che.jdt.core.resources.ResourceChangedEvent;
 import org.eclipse.che.jdt.internal.core.JavaProject;
 import org.eclipse.che.vfs.impl.fs.LocalFSMountStrategy;
@@ -38,8 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -91,14 +90,6 @@ public class JavaProjectService {
                         }
                     }
                 }).build();
-
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-        executorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                cache.cleanUp();
-            }
-        }, 1, 1,TimeUnit.HOURS);
     }
 
     public JavaProject getOrCreateJavaProject(String wsId, String projectPath) {
@@ -210,5 +201,13 @@ public class JavaProjectService {
                 LOG.error("Can't update java model", t);
             }
         }
+    }
+
+    /**
+     * Periodically cleanup cache, to avoid memory leak.
+     */
+    @ScheduleRate(initialDelay = 1, period = 1, unit = TimeUnit.HOURS)
+    void cacheClenup() {
+        cache.cleanUp();
     }
 }

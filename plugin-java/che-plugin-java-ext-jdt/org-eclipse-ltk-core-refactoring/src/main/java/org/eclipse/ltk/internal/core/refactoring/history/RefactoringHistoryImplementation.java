@@ -127,6 +127,7 @@ public final class RefactoringHistoryImplementation extends RefactoringHistory {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("ArrayToString")
 	public String toString() {
 		final StringBuffer buffer= new StringBuffer(256);
 		buffer.append(getClass().getName());

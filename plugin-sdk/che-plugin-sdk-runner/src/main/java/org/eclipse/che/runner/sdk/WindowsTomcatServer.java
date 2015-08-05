@@ -8,11 +8,11 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.runner.webapps;
+package org.eclipse.che.runner.sdk;
 
-import com.google.inject.Singleton;
-
+import com.google.common.collect.ImmutableList;
 import org.eclipse.che.api.core.notification.EventService;
+
 import org.eclipse.che.api.core.util.CommandLine;
 import org.eclipse.che.api.core.util.CompositeLineConsumer;
 import org.eclipse.che.api.core.util.IndentWrapperLineConsumer;
@@ -23,7 +23,6 @@ import org.eclipse.che.api.runner.RunnerException;
 import org.eclipse.che.api.runner.internal.ApplicationLogger;
 import org.eclipse.che.api.runner.internal.ApplicationLogsPublisher;
 import org.eclipse.che.api.runner.internal.ApplicationProcess;
-import org.eclipse.che.api.runner.internal.DeploymentSources;
 import org.eclipse.che.commons.lang.FlushingStreamWriter;
 import org.jvnet.winp.WinProcess;
 import org.slf4j.Logger;
@@ -31,53 +30,52 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.File;
+import javax.inject.Singleton;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code ApplicationServer} implementation to deploy application to Apache Tomcat servlet container for windows system.
+ * {@link ApplicationServer} implementation to deploy application to Apache Tomcat servlet container on os Windows.
  *
- * @author Roman Nikitenko
+ * @author Artem Zatsarynnyy
+ * @author Eugene Voevodin
+ * @author Alexander Andrienko
  */
 @Singleton
-public class WindowsTomcatServer extends BaseTomcatServer {
-    private static final Logger LOG        = LoggerFactory.getLogger(WindowsTomcatServer.class);
+public class WindowsTomcatServer extends AbstractTomcatServer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WindowsTomcatServer.class);
     private static final String LOG_FOLDER = "logs";
     private static final String LOG_FILE   = "output.log";
 
     @Inject
-    public WindowsTomcatServer(@Named(MEM_SIZE_PARAMETER) int memSize,
-                               @Named(TOMCAT_HOME_PARAMETER) File tomcatHome,
+    public WindowsTomcatServer(@Named(MEM_SIZE_PARAMETER) int memSize, ApplicationUpdaterRegistry applicationUpdaterRegistry,
                                EventService eventService) {
-        super(memSize, tomcatHome, eventService);
+        super(memSize, applicationUpdaterRegistry, eventService);
     }
 
     @Override
-    public ApplicationProcess deploy(File appDir, DeploymentSources toDeploy, ApplicationServerRunnerConfiguration runnerConfiguration,
-                                     ApplicationProcess.Callback callback) throws RunnerException {
-        prepare(appDir, toDeploy, runnerConfiguration);
-        final File logsDir = new File(appDir, LOG_FOLDER);
-        final File startUpScriptFile;
+    protected ApplicationProcess start(java.io.File appDir, SDKRunnerConfiguration runnerCfg,
+                                       CodeServerProcess codeServerProcess, ApplicationProcess.Callback callback)
+            throws RunnerException {
+        final java.io.File startUpScriptFile;
+        final java.io.File logsDir = new java.io.File(appDir, LOG_FOLDER);
         try {
-            generateSetEnvScript(appDir, runnerConfiguration);
-            startUpScriptFile = generateStartUpScript(appDir, runnerConfiguration);
+            generateSetEnvScript(appDir, runnerCfg);
+            startUpScriptFile = generateStartUpScript(appDir, runnerCfg);
             Files.createDirectory(logsDir.toPath());
         } catch (IOException e) {
             throw new RunnerException(e);
         }
-        final List<File> logFiles = new ArrayList<>(1);
-        logFiles.add(new File(logsDir, LOG_FILE));
-
-        return new TomcatProcess(appDir, startUpScriptFile, logFiles, runnerConfiguration, callback, eventService);
+        final List<java.io.File> logFiles = ImmutableList.of(new java.io.File(logsDir, LOG_FILE));
+        return new TomcatProcess(appDir, startUpScriptFile, logFiles, runnerCfg, callback, codeServerProcess, eventService);
     }
 
-    private void generateSetEnvScript(File appDir, ApplicationServerRunnerConfiguration runnerConfiguration)
+    private void generateSetEnvScript(java.io.File appDir, SDKRunnerConfiguration runnerConfiguration)
             throws IOException {
         int memory = runnerConfiguration.getMemory();
         if (memory <= 0) {
@@ -86,21 +84,21 @@ public class WindowsTomcatServer extends BaseTomcatServer {
         final String setEnvScript = "@echo off\r\n" +
                                     String.format("set \"CATALINA_OPTS=-server -Xms%dm -Xmx%dm\"\r\n", memory, memory) +
                                     "set \"CLASSPATH=%CATALINA_HOME%/conf/;\"";
-        final File setEnvScriptFile = new File(appDir.toPath() + "/tomcat/bin", "setenv.bat");
+        final java.io.File setEnvScriptFile = new java.io.File(appDir.toPath() + "/tomcat/bin", "setenv.bat");
         Files.write(setEnvScriptFile.toPath(), setEnvScript.getBytes());
         if (!setEnvScriptFile.setExecutable(true, false)) {
             throw new IOException("Unable to update attributes of the setenv script");
         }
     }
 
-    private File generateStartUpScript(File appDir, ApplicationServerRunnerConfiguration runnerConfiguration)
+    private java.io.File generateStartUpScript(java.io.File appDir, SDKRunnerConfiguration runnerConfiguration)
             throws IOException {
         final String startupScript = "@echo off\r\n" +
                                      "setlocal\r\n" +
                                      setDebugVariables(runnerConfiguration) +
                                      "cd tomcat\r\n" +
                                      setCatalinaVariables(runnerConfiguration);
-        final File startUpScriptFile = new File(appDir, "startup.bat");
+        final java.io.File startUpScriptFile = new java.io.File(appDir, "startup.bat");
         Files.write(startUpScriptFile.toPath(), startupScript.getBytes());
         if (!startUpScriptFile.setExecutable(true, false)) {
             throw new IOException("Unable to update attributes of the startup script");
@@ -108,7 +106,7 @@ public class WindowsTomcatServer extends BaseTomcatServer {
         return startUpScriptFile;
     }
 
-    private String setDebugVariables(ApplicationServerRunnerConfiguration runnerConfiguration) {
+    private String setDebugVariables(SDKRunnerConfiguration runnerConfiguration) {
         final int debugPort = runnerConfiguration.getDebugPort();
         if (debugPort > 0) {
             return "set \"JPDA_ADDRESS=" + debugPort + "\"\r\n" +
@@ -118,7 +116,7 @@ public class WindowsTomcatServer extends BaseTomcatServer {
         return "";
     }
 
-    private String setCatalinaVariables(ApplicationServerRunnerConfiguration runnerConfiguration) {
+    private String setCatalinaVariables(SDKRunnerConfiguration runnerConfiguration) {
         String catalinaOpts = "set \"CATALINA_HOME=%cd%\"\r\n" +
                               "set \"CATALINA_BASE=%cd%\"\r\n" +
                               "set \"CATALINA_TMPDIR=%cd%\\temp\"\r\n";
@@ -130,35 +128,38 @@ public class WindowsTomcatServer extends BaseTomcatServer {
     }
 
     private static class TomcatProcess extends ApplicationProcess {
-        final int          httpPort;
-        final List<File>   logFiles;
-        final int          debugPort;
-        final File         startUpScriptFile;
-        final File         workDir;
-        final Callback     callback;
-        final EventService eventService;
-        final String       workspace;
-        final String       project;
-        final long         id;
+        final int                          httpPort;
+        final List<java.io.File>           logFiles;
+        final int                          debugPort;
+        final java.io.File                 startUpScriptFile;
+        final java.io.File                 workDir;
+        final CodeServerProcess codeServerProcess;
+        final Callback                     callback;
+        final String                       workspace;
+        final String                       project;
+        final long                         id;
+        final EventService                 eventService;
 
-        ApplicationLogsPublisher logger;
-        LineConsumer             logFileConsumer;
-        Process                  process;
-        StreamPump               output;
-        WinProcess               winProcess;
+        ApplicationLogger logger;
+        Process           process;
+        StreamPump        output;
+        WinProcess        winProcess;
+        LineConsumer      logFileConsumer;
 
-        TomcatProcess(File appDir, File startUpScriptFile, List<File> logFiles,
-                      ApplicationServerRunnerConfiguration runnerConfiguration, Callback callback, EventService eventService) {
-            this.httpPort = runnerConfiguration.getHttpPort();
+        TomcatProcess(java.io.File appDir, java.io.File startUpScriptFile, List<java.io.File> logFiles,
+                      SDKRunnerConfiguration runnerCfg, Callback callback, CodeServerProcess codeServerProcess,
+                      EventService eventService) {
+            this.httpPort = runnerCfg.getHttpPort();
             this.logFiles = logFiles;
-            this.debugPort = runnerConfiguration.getDebugPort();
+            this.debugPort = runnerCfg.getDebugPort();
             this.startUpScriptFile = startUpScriptFile;
+            this.codeServerProcess = codeServerProcess;
             this.workDir = appDir;
             this.callback = callback;
             this.eventService = eventService;
-            this.workspace = runnerConfiguration.getRequest().getWorkspace();
-            this.project = runnerConfiguration.getRequest().getProject();
-            this.id = runnerConfiguration.getRequest().getId();
+            this.workspace = runnerCfg.getRequest().getWorkspace();
+            this.project = runnerCfg.getRequest().getProject();
+            this.id = runnerCfg.getRequest().getId();
         }
 
         @Override
@@ -166,17 +167,23 @@ public class WindowsTomcatServer extends BaseTomcatServer {
             if (process != null && isAlive()) {
                 throw new IllegalStateException("Process is already started");
             }
-            File logFile = Paths.get(workDir.getAbsolutePath(), LOG_FOLDER, LOG_FILE).toFile();
+            java.io.File logFile = Paths.get(workDir.getAbsolutePath(), LOG_FOLDER, LOG_FILE).toFile();
             try {
                 OutputStreamWriter flashingStream = new FlushingStreamWriter(new FileOutputStream(logFile));
-                logger = new ApplicationLogsPublisher(new TomcatLogger(logFiles), eventService, id, workspace, project);
+                logger = new ApplicationLogsPublisher(new TomcatLogger(logFiles, codeServerProcess), eventService, id, workspace, project);
                 logFileConsumer = new IndentWrapperLineConsumer(new WritableLineConsumer(flashingStream));
                 LineConsumer logComposite = new CompositeLineConsumer(logFileConsumer, logger);
 
                 process = Runtime.getRuntime().exec(new CommandLine(startUpScriptFile.getAbsolutePath()).toShellCommand(), null, workDir);
                 winProcess = new WinProcess(process);
-                StreamPump output = new StreamPump();
+                output = new StreamPump();
                 output.start(process, logComposite);
+                try {
+                    codeServerProcess.start();
+                } catch (RunnerException e) {
+                    killProcess();
+                    LOG.error(e.getMessage(), e);
+                }
                 LOG.debug("Start Tomcat at port {}, application {}", httpPort, workDir);
             } catch (IOException e) {
                 throw new RunnerException(e);
@@ -192,6 +199,11 @@ public class WindowsTomcatServer extends BaseTomcatServer {
             if (output != null) {
                 output.stop();
             }
+            try {
+                codeServerProcess.stop();
+            } catch (Exception e) {
+                LOG.error(e.getMessage(), e);
+            }
             callback.stopped();
             LOG.debug("Stop Tomcat at port {}, application {}", httpPort, workDir);
             try {
@@ -206,6 +218,10 @@ public class WindowsTomcatServer extends BaseTomcatServer {
                 winProcess.killRecursively();
                 winProcess = null;
             }
+        }
+
+        public boolean isAlive() {
+            return winProcess != null && winProcess.getPid() > 0;
         }
 
         @Override
@@ -234,10 +250,6 @@ public class WindowsTomcatServer extends BaseTomcatServer {
                 return -1;
             }
             return process.exitValue();
-        }
-
-        public boolean isAlive() {
-            return winProcess != null && winProcess.getPid() > 0;
         }
 
         @Override
