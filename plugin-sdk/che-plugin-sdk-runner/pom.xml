@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-plugin-sdk-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.11.7-SNAPSHOT</version>
+        <version>3.11.8-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-sdk-runner</artifactId>
     <packaging>jar</packaging>
@@ -41,6 +41,11 @@
             <groupId>org.eclipse.che.plugin</groupId>
             <artifactId>che-plugin-java-maven-tools</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.winp</groupId>
+            <artifactId>winp</artifactId>
+            <version>${org.jvnet.winp.version}</version>
         </dependency>
     </dependencies>
     <build>
