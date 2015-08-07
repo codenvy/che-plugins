@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-plugin-npm-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.11.8-SNAPSHOT</version>
+        <version>3.11.9-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-npm-builder</artifactId>
     <packaging>jar</packaging>

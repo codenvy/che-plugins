@@ -16,7 +16,7 @@
     <parent>
         <artifactId>angularjs-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.11.8-SNAPSHOT</version>
+        <version>3.11.9-SNAPSHOT</version>
     </parent>
     <artifactId>angularjs-templates</artifactId>
     <packaging>pom</packaging>
