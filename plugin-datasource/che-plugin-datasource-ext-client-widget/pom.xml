@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-plugin-datasource-parent</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.11.9-SNAPSHOT</version>
+        <version>3.11.10-SNAPSHOT</version>
     </parent>
     <artifactId>che-plugin-datasource-ext-client-widget</artifactId>
     <name>Che Plugin :: Datasource :: Client widget</name>
