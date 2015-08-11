@@ -23,7 +23,6 @@ import org.eclipse.che.ide.ext.datasource.client.ssl.upload.UploadSslTrustCertDi
 import org.eclipse.che.ide.ext.datasource.shared.ssl.SslKeyStoreEntry;
 
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.eclipse.che.ide.rest.AsyncRequestLoader;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.util.loging.Log;
 import com.google.gwt.user.client.Window;
@@ -40,7 +39,6 @@ public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter
     private       SslKeyStoreClientService          service;
     private       SslMessages                       constant;
     private       EventBus                          eventBus;
-    private       AsyncRequestLoader                loader;
     private       UploadSslKeyDialogPresenter       uploadSshKeyPresenter;
     private       UploadSslTrustCertDialogPresenter uploadSshServerCertPresenter;
     private       NotificationManager               notificationManager;
@@ -51,7 +49,6 @@ public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter
                                        SslResources resources,
                                        SslMessages constant,
                                        EventBus eventBus,
-                                       AsyncRequestLoader loader,
                                        UploadSslKeyDialogPresenter uploadSshKeyPresenter,
                                        UploadSslTrustCertDialogPresenter uploadSshServerCertPresenter,
                                        NotificationManager notificationManager,
@@ -65,7 +62,6 @@ public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter
         this.service = service;
         this.constant = constant;
         this.eventBus = eventBus;
-        this.loader = loader;
         this.uploadSshKeyPresenter = uploadSshKeyPresenter;
         this.notificationManager = notificationManager;
     }
@@ -78,13 +74,11 @@ public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter
             service.deleteClientKey(key, new AsyncRequestCallback<Void>() {
                 @Override
                 public void onSuccess(Void result) {
-                    loader.hide();
                     refreshClientKeys();
                 }
 
                 @Override
                 public void onFailure(Throwable exception) {
-                    loader.hide();
                     Notification notification = new Notification(exception.getMessage(), Type.ERROR);
                     notificationManager.showNotification(notification);
                     eventBus.fireEvent(new ExceptionThrownEvent(exception));
@@ -98,13 +92,11 @@ public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter
                 new AsyncRequestCallback<Array<SslKeyStoreEntry>>(dtoUnmarshallerFactory.newArrayUnmarshaller(SslKeyStoreEntry.class)) {
                     @Override
                     public void onSuccess(Array<SslKeyStoreEntry> result) {
-                        loader.hide();
                         view.setClientKeys(result);
                     }
 
                     @Override
                     public void onFailure(Throwable exception) {
-                        loader.hide();
                         Notification notification = new Notification(exception.getMessage(), Notification.Type.ERROR);
                         notificationManager.showNotification(notification);
                         eventBus.fireEvent(new ExceptionThrownEvent(exception));
@@ -201,6 +193,4 @@ public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter
     public void revertChanges() {
 
     }
-
-
 }
