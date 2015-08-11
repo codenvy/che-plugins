@@ -80,7 +80,7 @@ public class GitImporterPagePresenterTest {
         verify(container).setWidget(eq(view));
         verify(view).setProjectName(anyString());
         verify(view).setProjectDescription(anyString());
-        verify(view).setVisibility(anyBoolean());
+        verify(view).setProjectVisibility(anyBoolean());
         verify(view).setProjectUrl(anyString());
         verify(view).setInputsEnableState(eq(true));
         verify(view).focusInUrlInput();
@@ -251,6 +251,44 @@ public class GitImporterPagePresenterTest {
         presenter.projectVisibilityChanged(true);
 
         verify(newProject).setVisibility(eq("public"));
+    }
+
+    /**
+     * Directory name field must become enabled when Keep directory is checked.
+     */
+    @Test
+    public void keepDirectorySelectedTest() {
+        presenter.keepDirectorySelected(true);
+        verify(view).enableDirectoryNameField(true);
+    }
+
+    /**
+     * Directory name field must become disabled when Keep directory is unchecked.
+     */
+    @Test
+    public void keepDirectoryNotSelectedTest() {
+        presenter.keepDirectorySelected(false);
+        verify(view).enableDirectoryNameField(false);
+    }
+
+    /**
+     * Empty directory name field must be highlighted when Keep directory is checked.
+     */
+    @Test
+    public void emptyDirectoryNameEnteredTest() {
+        when(view.getDirectoryName()).thenReturn("");
+        presenter.keepDirectorySelected(true);
+        verify(view).highlightDirectoryNameField(true);
+    }
+
+    /**
+     * Non empty directory name field must be without highlighting when Keep directory is checked.
+     */
+    @Test
+    public void directoryNameEnteredTest() {
+        when(view.getDirectoryName()).thenReturn("test");
+        presenter.keepDirectorySelected(true);
+        verify(view).highlightDirectoryNameField(false);
     }
 
     private void verifyInvocationsForCorrectUrl(String correctUrl) {

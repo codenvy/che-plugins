@@ -20,6 +20,8 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Roman Nikitenko
@@ -103,23 +105,62 @@ public class GitImporterPagePresenter extends AbstractWizardPage<ImportProject> 
         updateDelegate.updateControls();
     }
 
+    /**
+     * Returns project parameters map.
+     *
+     * @return parameters map
+     */
+    private Map<String, String> projectParameters() {
+        Map<String, String> parameters = dataObject.getSource().getProject().getParameters();
+        if (parameters == null) {
+            parameters = new HashMap<String, String>();
+            dataObject.getSource().getProject().setParameters(parameters);
+        }
+
+        return parameters;
+    }
+
+    @Override
+    public void keepDirectorySelected(boolean keepDirectory) {
+        view.enableDirectoryNameField(keepDirectory);
+
+        if (keepDirectory) {
+            projectParameters().put("keepDirectory", view.getDirectoryName());
+            view.highlightDirectoryNameField(!NameUtils.checkProjectName(view.getDirectoryName()));
+            view.focusDirectoryNameFiend();
+        } else {
+            projectParameters().remove("keepDirectory");
+            view.highlightDirectoryNameField(false);
+        }
+    }
+
+    @Override
+    public void keepDirectoryNameChanged(@Nonnull String directoryName) {
+        if (view.keepDirectory()) {
+            projectParameters().put("keepDirectory", directoryName);
+            view.highlightDirectoryNameField(!NameUtils.checkProjectName(view.getDirectoryName()));
+        } else {
+            projectParameters().remove("keepDirectory");
+            view.highlightDirectoryNameField(false);
+        }
+    }
+
     @Override
     public void go(@Nonnull AcceptsOneWidget container) {
         container.setWidget(view);
-        updateView();
+
+        view.setProjectName(dataObject.getProject().getName());
+        view.setProjectDescription(dataObject.getProject().getDescription());
+        view.setProjectVisibility(PUBLIC_VISIBILITY.equals(dataObject.getProject().getVisibility()));
+        view.setProjectUrl(dataObject.getSource().getProject().getLocation());
+
+        view.setKeepDirectoryChecked(false);
+        view.setDirectoryName("");
+        view.enableDirectoryNameField(false);
+        view.highlightDirectoryNameField(false);
 
         view.setInputsEnableState(true);
         view.focusInUrlInput();
-    }
-
-    /** Updates view from data-object. */
-    private void updateView() {
-        final NewProject project = dataObject.getProject();
-
-        view.setProjectName(project.getName());
-        view.setProjectDescription(project.getDescription());
-        view.setVisibility(PUBLIC_VISIBILITY.equals(project.getVisibility()));
-        view.setProjectUrl(dataObject.getSource().getProject().getLocation());
     }
 
     /** Gets project name from uri. */

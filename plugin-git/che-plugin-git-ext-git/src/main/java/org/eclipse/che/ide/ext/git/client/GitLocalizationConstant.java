@@ -293,6 +293,12 @@ public interface GitLocalizationConstant extends Messages {
     @Key("view.import.gitImporterPage.projectVisibilityPrivate")
     String gitImporterPageprojectVisibilityPrivate();
 
+    @Key("view.import.gitImporterPage.keepDirectory")
+    String gitImporterPageKeepDirectory();
+
+    @Key("view.import.gitImporterPage.keepDirectoryField")
+    String gitImporterPageKeepDirectoryField();
+
     // Add
     @Key("view.add_to_index.all_changes")
     String addToIndexAllChanges();

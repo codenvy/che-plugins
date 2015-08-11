@@ -16,8 +16,24 @@
     <ui:with field='locale' type='org.eclipse.che.ide.ext.github.client.GitHubLocalizationConstant'/>
     <ui:with field='resources' type='org.eclipse.che.ide.ext.github.client.GitHubResources'/>
     <ui:with field="style" type="org.eclipse.che.ide.ext.github.client.importer.page.GithubImporterPageViewImpl.GithubStyle"/>
+
+    <ui:style field="styles">
+
+        .checkbox {
+            float: left;
+            margin-left: 78px;
+        }
+
+        .checkbox label {
+            line-height: 18px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+    </ui:style>
+
     <g:DockLayoutPanel unit="PX" addStyleNames="{style.mainPanel}">
-        <g:north size="205">
+        <g:north size="300">
             <g:FlowPanel ui:field="importerPanel">
                 <g:FlowPanel height="37px" addStyleNames="{style.namePanel}">
                     <g:Label text="{locale.githubImporterPageProjectUrl}"
@@ -46,7 +62,7 @@
                                 debugId="file-importProject-projectDescription" title="{locale.githubImporterPageProjectDescriptionPrompt}"
                                 tabIndex="5"/>
                 </g:FlowPanel>
-                <g:FlowPanel height="30px" addStyleNames="{style.namePanel}">
+                <g:FlowPanel height="40px" addStyleNames="{style.namePanel}">
                     <g:Label text="{locale.githubImporterPageProjectPrivacy}" addStyleNames="{style.labelPosition}"/>
                     <g:RadioButton name="privacy" text="{locale.githubImporterPageprojectVisibilityPublic}"
                                    addStyleNames="{style.radioButtonPosition}" checked="true"
@@ -55,6 +71,18 @@
                                    addStyleNames="{style.radioButtonPosition}"
                                    ui:field="projectPrivate" debugId="file-importProject-private" tabIndex="6"/>
                 </g:FlowPanel>
+
+                <g:FlowPanel height="20px" addStyleNames="{style.namePanel}">
+                    <g:CheckBox ui:field="keepDirectory" text="{locale.githubImporterPageKeepDirectory}"
+                                debugId="file-importProject-keepDirectory" addStyleNames="{styles.checkbox}" />
+                </g:FlowPanel>
+
+                <g:FlowPanel height="25px" addStyleNames="{style.namePanel}">
+                    <g:Label text="{locale.githubImporterPageKeepDirectoryField}" addStyleNames="{style.labelPosition}"/>
+                    <g:TextBox width="290px" height="14px" ui:field="directoryName" addStyleNames="{style.inputField} {style.alignRight}"
+                               tabIndex="9" debugId="file-importProject-keepDirectoryName" title="{locale.githubImporterPageProjectNamePrompt}"/>
+                </g:FlowPanel>
+
             </g:FlowPanel>
         </g:north>
         <g:north size="30">

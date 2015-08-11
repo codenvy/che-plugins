@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.importer.page;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ui.Styles;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -32,27 +35,46 @@ import javax.annotation.Nonnull;
  * @author Roman Nikitenko
  */
 public class GitImporterPageViewImpl extends Composite implements GitImporterPageView {
+
     @UiField(provided = true)
     Style       style;
+
     @UiField
     Label       labelUrlError;
+
     @UiField
     TextBox     projectName;
+
     @UiField
     TextArea    projectDescription;
+
     @UiField
     RadioButton projectPrivate;
+
     @UiField
     RadioButton projectPublic;
+
     @UiField
     TextBox     projectUrl;
+
+    @UiField
+    FlowPanel   importerPanel;
+
+    @UiField
+    CheckBox    keepDirectory;
+
+    @UiField
+    TextBox     directoryName;
+
     private ActionDelegate delegate;
+
     @Inject
     public GitImporterPageViewImpl(GitResources resources,
                                    GitImporterPageViewImplUiBinder uiBinder) {
         style = resources.gitImporterPageStyle();
         style.ensureInjected();
         initWidget(uiBinder.createAndBindUi(this));
+
         projectName.getElement().setAttribute("maxlength", "32");
         projectDescription.getElement().setAttribute("maxlength", "256");
     }
@@ -89,6 +111,20 @@ public class GitImporterPageViewImpl extends Composite implements GitImporterPag
     @UiHandler({"projectPublic", "projectPrivate"})
     void visibilityHandler(ValueChangeEvent<Boolean> event) {
         delegate.projectVisibilityChanged(projectPublic.getValue());
+    }
+
+    @UiHandler({"keepDirectory"})
+    void keepDirectoryHandler(ValueChangeEvent<Boolean> event) {
+        delegate.keepDirectorySelected(event.getValue());
+    }
+
+    @UiHandler("directoryName")
+    void onDirectoryNameChanged(KeyUpEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+            return;
+        }
+
+        delegate.keepDirectoryNameChanged(directoryName.getValue());
     }
 
     @Override
@@ -153,9 +189,54 @@ public class GitImporterPageViewImpl extends Composite implements GitImporterPag
     }
 
     @Override
-    public void setVisibility(boolean visible) {
-        projectPublic.setValue(visible, false);
-        projectPrivate.setValue(!visible, false);
+    public void setProjectVisibility(boolean visibility) {
+        projectPublic.setValue(visibility, false);
+        projectPrivate.setValue(!visibility, false);
+    }
+
+    @Override
+    public boolean keepDirectory() {
+        return keepDirectory.getValue();
+    }
+
+    @Override
+    public void setKeepDirectoryChecked(boolean checked) {
+        keepDirectory.setValue(checked);
+    }
+
+    @Override
+    public String getDirectoryName() {
+        return directoryName.getValue();
+    }
+
+    @Override
+    public void setDirectoryName(String directoryName) {
+        this.directoryName.setValue(directoryName);
+    }
+
+    @Override
+    public void enableDirectoryNameField(boolean enable) {
+        directoryName.setEnabled(enable);
+    }
+
+    @Override
+    public void highlightDirectoryNameField(boolean highlight) {
+        if (highlight) {
+            directoryName.addStyleName(style.inputError());
+        } else {
+            directoryName.removeStyleName(style.inputError());
+        }
+    }
+
+    @Override
+    public void focusDirectoryNameFiend() {
+        Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+            @Override
+            public void execute() {
+                directoryName.setFocus(true);
+                directoryName.selectAll();
+            }
+        });
     }
 
     @Override
@@ -189,4 +270,5 @@ public class GitImporterPageViewImpl extends Composite implements GitImporterPag
 
         String horizontalLine();
     }
+
 }

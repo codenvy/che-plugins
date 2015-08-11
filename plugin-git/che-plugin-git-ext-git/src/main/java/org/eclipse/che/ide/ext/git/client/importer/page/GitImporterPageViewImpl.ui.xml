@@ -14,9 +14,27 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
     <ui:with field='locale' type='org.eclipse.che.ide.ext.git.client.GitLocalizationConstant'/>
     <ui:with field="style" type="org.eclipse.che.ide.ext.git.client.importer.page.GitImporterPageViewImpl.Style"/>
+
+    <ui:style field="styles">
+
+        .checkbox {
+            float: left;
+            margin-left: 78px;
+        }
+
+        .checkbox label {
+            line-height: 18px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+    </ui:style>
+
     <g:DockLayoutPanel unit="PX" addStyleNames="{style.mainPanel}">
-        <g:north size="205">
+        <g:north size="300">
+
             <g:FlowPanel ui:field="importerPanel">
+
                 <g:FlowPanel height="37px" addStyleNames="{style.namePanel}">
                     <g:Label text="{locale.gitImporterPageProjectUrl}"
                              addStyleNames="{style.labelPosition}"/>
@@ -24,10 +42,12 @@
                                debugId="file-importProject-projectUrl"/>
                     <g:Label ui:field="labelUrlError" width="290px" wordWrap="true" addStyleNames="{style.labelErrorPosition}"/>
                 </g:FlowPanel>
+
                 <g:FlowPanel height="20px" addStyleNames="{style.namePanel} {style.marginTop}">
                     <g:HTMLPanel addStyleNames="{style.horizontalLine}"/>
                     <g:Label text="{locale.gitImporterPageProjectInfo}" addStyleNames="{style.label}"/>
                 </g:FlowPanel>
+
                 <g:FlowPanel height="25px" addStyleNames="{style.namePanel}">
                     <g:Label text="{locale.gitImporterPageProjectName}"
                              addStyleNames="{style.labelPosition}"/>
@@ -35,6 +55,7 @@
                                tabIndex="4"
                                debugId="file-importProject-projectName" title="{locale.gitImporterPageProjectNamePrompt}"/>
                 </g:FlowPanel>
+
                 <g:FlowPanel height="50px" addStyleNames="{style.namePanel}">
                     <g:Label text="{locale.gitImporterPageProjectDescription}"
                              addStyleNames="{style.labelPosition}"/>
@@ -42,7 +63,8 @@
                                 debugId="file-importProject-projectDescription" title="{locale.gitImporterPageProjectDescriptionPrompt}"
                                 tabIndex="5"/>
                 </g:FlowPanel>
-                <g:FlowPanel height="30px" addStyleNames="{style.namePanel}">
+
+                <g:FlowPanel height="40px" addStyleNames="{style.namePanel}">
                     <g:Label text="{locale.gitImporterPageProjectPrivacy}" addStyleNames="{style.labelPosition}"/>
                     <g:RadioButton name="privacy" text="{locale.gitImporterPageprojectVisibilityPublic}"
                                    addStyleNames="{style.radioButtonPosition}" checked="true"
@@ -51,7 +73,21 @@
                                    addStyleNames="{style.radioButtonPosition}"
                                    ui:field="projectPrivate" debugId="file-importProject-private" tabIndex="6"/>
                 </g:FlowPanel>
+
+                <g:FlowPanel height="20px" addStyleNames="{style.namePanel}">
+                        <g:CheckBox ui:field="keepDirectory" text="{locale.gitImporterPageKeepDirectory}"
+                                    debugId="file-importProject-keepDirectory" addStyleNames="{styles.checkbox}" />
+                </g:FlowPanel>
+
+                <g:FlowPanel height="25px" addStyleNames="{style.namePanel}">
+                    <g:Label text="{locale.gitImporterPageKeepDirectoryField}" addStyleNames="{style.labelPosition}"/>
+                    <g:TextBox width="290px" height="14px" ui:field="directoryName" addStyleNames="{style.inputField} {style.alignRight}"
+                               tabIndex="9" debugId="file-importProject-keepDirectoryName" title="{locale.gitImporterPageProjectNamePrompt}"/>
+                </g:FlowPanel>
+
             </g:FlowPanel>
+
         </g:north>
     </g:DockLayoutPanel>
+
 </ui:UiBinder>

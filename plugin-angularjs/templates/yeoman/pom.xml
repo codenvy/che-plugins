@@ -16,7 +16,7 @@
     <parent>
         <artifactId>angularjs-templates</artifactId>
         <groupId>org.eclipse.che.plugin</groupId>
-        <version>3.11.10-SNAPSHOT</version>
+        <version>3.12.0-SNAPSHOT</version>
     </parent>
     <artifactId>angularjs-template-yeoman</artifactId>
     <packaging>jar</packaging>
