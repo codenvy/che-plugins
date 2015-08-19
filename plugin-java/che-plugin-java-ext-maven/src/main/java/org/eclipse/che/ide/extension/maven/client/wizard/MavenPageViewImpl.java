@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.maven.client.wizard;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.extension.maven.client.MavenArchetype;
 
 import com.google.gwt.core.client.GWT;
@@ -28,6 +26,9 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Evgen Vidolob
@@ -55,11 +56,11 @@ public class MavenPageViewImpl implements MavenPageView {
     @UiField
     ListBox  archetypeField;
     private ActionDelegate        delegate;
-    private Array<MavenArchetype> archetypes;
+    private List<MavenArchetype> archetypes;
 
     public MavenPageViewImpl() {
         rootElement = ourUiBinder.createAndBindUi(this);
-        archetypes = Collections.createArray();
+        archetypes = new ArrayList<>();
 
         artifactId.setFocus(true);
         packagingField.setSelectedIndex(0);
@@ -114,7 +115,7 @@ public class MavenPageViewImpl implements MavenPageView {
     @Override
     public MavenArchetype getArchetype() {
         final String coordinates = archetypeField.getValue(archetypeField.getSelectedIndex());
-        for (MavenArchetype archetype : archetypes.asIterable()) {
+        for (MavenArchetype archetype : archetypes) {
             if (coordinates.equals(archetype.toString())) {
                 return archetype;
             }
@@ -123,11 +124,11 @@ public class MavenPageViewImpl implements MavenPageView {
     }
 
     @Override
-    public void setArchetypes(Array<MavenArchetype> archetypes) {
+    public void setArchetypes(List<MavenArchetype> archetypes) {
         this.archetypes.clear();
         this.archetypes.addAll(archetypes);
         archetypeField.clear();
-        for (MavenArchetype archetype : archetypes.asIterable()) {
+        for (MavenArchetype archetype : archetypes) {
             archetypeField.addItem(archetype.toString(), archetype.toString());
         }
     }

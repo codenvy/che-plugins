@@ -22,7 +22,6 @@ import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -190,7 +189,7 @@ public class BranchPresenter implements BranchView.ActionDelegate {
     @Override
     public void onCheckoutClicked() {
         final List<EditorPartPresenter> openedEditors = new ArrayList<>();
-        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().getValues().asIterable()) {
+        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().values()) {
             openedEditors.add(partPresenter);
         }
 
@@ -246,9 +245,9 @@ public class BranchPresenter implements BranchView.ActionDelegate {
     /** Get the list of branches. */
     private void getBranches() {
         service.branchList(project.getRootProject(), LIST_ALL,
-                           new AsyncRequestCallback<Array<Branch>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Branch.class)) {
+                           new AsyncRequestCallback<List<Branch>>(dtoUnmarshallerFactory.newListUnmarshaller(Branch.class)) {
                                @Override
-                               protected void onSuccess(Array<Branch> result) {
+                               protected void onSuccess(List<Branch> result) {
                                    view.setBranches(result);
                                }
 

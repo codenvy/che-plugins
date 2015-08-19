@@ -11,9 +11,10 @@
 package org.eclipse.che.ide.extension.maven.client.module;
 
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.extension.maven.client.MavenArchetype;
 import com.google.inject.ImplementedBy;
+
+import java.util.List;
 
 /**
  * @author Evgen Vidolob
@@ -23,7 +24,7 @@ public interface CreateMavenModuleView extends View<CreateMavenModuleView.Action
 
     MavenArchetype getArchetype();
 
-    void setArchetypes(Array<MavenArchetype> archetypes);
+    void setArchetypes(List<MavenArchetype> archetypes);
 
     void enableArchetypes(boolean enabled);
 

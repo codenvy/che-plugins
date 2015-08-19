@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.client;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.github.shared.Collaborators;
 import org.eclipse.che.ide.ext.github.shared.GitHubIssueComment;
 import org.eclipse.che.ide.ext.github.shared.GitHubIssueCommentInput;
@@ -25,6 +23,7 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Client service for Samples.
@@ -192,7 +191,7 @@ public interface GitHubClientService {
      * @param callback
      *         callback called when operation is done.
      */
-    void getAllRepositories(@Nonnull AsyncRequestCallback<StringMap<Array<GitHubRepository>>> callback);
+    void getAllRepositories(@Nonnull AsyncRequestCallback<Map<String, List<GitHubRepository>>> callback);
 
     /**
      * Get the list of the organizations, where authorized user is a member.

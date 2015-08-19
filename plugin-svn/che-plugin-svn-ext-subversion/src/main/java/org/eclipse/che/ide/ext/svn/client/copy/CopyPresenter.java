@@ -23,8 +23,11 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.api.project.tree.generic.*;
-import org.eclipse.che.ide.collections.Array;
+import org.eclipse.che.ide.api.project.tree.generic.FileNode;
+import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
+import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
+import org.eclipse.che.ide.api.project.tree.generic.Openable;
+import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
@@ -37,7 +40,7 @@ import org.eclipse.che.ide.util.RegExpUtils;
 import org.eclipse.che.ide.util.loging.Log;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.eclipse.che.ide.api.notification.Notification.Status.FINISHED;
 import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
@@ -134,14 +137,14 @@ public class CopyPresenter extends SubversionActionPresenter implements CopyView
 
         validate();
 
-        treeStructureProvider.get().getRootNodes(new AsyncCallback<Array<TreeNode<?>>>() {
+        treeStructureProvider.get().getRootNodes(new AsyncCallback<List<TreeNode<?>>>() {
             @Override
             public void onFailure(Throwable caught) {
                 notificationManager.showError(constants.copyFailToGetProject());
             }
 
             @Override
-            public void onSuccess(Array<TreeNode<?>> result) {
+            public void onSuccess(List<TreeNode<?>> result) {
                 view.setProjectNodes(result);
             }
         });

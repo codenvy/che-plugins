@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.datasource.client.explorer;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.datasource.client.explorer.DatabaseMetadataEntityDTODataAdapter.EntityTreeNode;
 import org.eclipse.che.ide.ext.datasource.shared.ColumnDTO;
 import org.eclipse.che.ide.ext.datasource.shared.DatabaseDTO;
@@ -45,13 +45,13 @@ public class DatabaseMetadataEntityDTODataAdapter implements NodeDataAdapter<Ent
     }
 
     @Override
-    public Array<EntityTreeNode> getChildren(final EntityTreeNode node) {
+    public List<EntityTreeNode> getChildren(final EntityTreeNode node) {
         final DatabaseMetadataEntityDTO data = node.getData();
         if (data instanceof ColumnDTO) {
             return null;
         }
 
-        Array<EntityTreeNode> children = Collections.<EntityTreeNode> createArray();
+        List<EntityTreeNode> children = new ArrayList<>();
         if (data instanceof DatabaseDTO) {
             Collection<SchemaDTO> schemas = ((DatabaseDTO)data).getSchemas()
                                                                .values();
@@ -120,13 +120,12 @@ public class DatabaseMetadataEntityDTODataAdapter implements NodeDataAdapter<Ent
     }
 
     @Override
-    public Array<String> getNodePath(EntityTreeNode node) {
+    public List<String> getNodePath(EntityTreeNode node) {
         return null;
     }
 
     @Override
-    public EntityTreeNode getNodeByPath(final EntityTreeNode root,
-                                        final Array<String> relativeNodePath) {
+    public EntityTreeNode getNodeByPath(final EntityTreeNode root, final List<String> relativeNodePath) {
         return null;
     }
 

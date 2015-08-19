@@ -15,7 +15,6 @@ import org.eclipse.che.ide.api.build.BuildContext;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.icon.Icon;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
 import org.eclipse.che.ide.ext.java.jdt.Images;
@@ -179,15 +178,15 @@ public class JavaCodeAssistProcessor implements CodeAssistProcessor {
                                        offset, file.getName(), projectPath, file.getPath(),
                                        new JavaParserWorker.WorkerCallback<WorkerProposal>() {
                                            @Override
-                                           public void onResult(final Array<WorkerProposal> problems) {
+                                           public void onResult(final List<WorkerProposal> problems) {
                                                handleCAResponse(callback, problems);
                                            }
                                        });
     }
 
-    private void handleCAResponse(final CodeAssistCallback callback, final Array<WorkerProposal> problems) {
+    private void handleCAResponse(final CodeAssistCallback callback, final List<WorkerProposal> problems) {
         final List<CompletionProposal> proposals = new ArrayList<>(problems.size());
-        for (final WorkerProposal proposal : problems.asIterable()) {
+        for (final WorkerProposal proposal : problems) {
             final CompletionProposal completionProposal =
                                                           new JavaCompletionProposal(
                                                                                      proposal.id(),

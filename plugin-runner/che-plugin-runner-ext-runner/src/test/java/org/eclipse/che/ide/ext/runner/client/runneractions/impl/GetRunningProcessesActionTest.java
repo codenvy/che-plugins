@@ -20,8 +20,6 @@ import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.app.CurrentUser;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.java.JsonArrayListAdapter;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.TestUtil;
 import org.eclipse.che.ide.ext.runner.client.callbacks.AsyncCallbackBuilder;
@@ -79,7 +77,7 @@ public class GetRunningProcessesActionTest {
     private static final String CHANNEL                 =
             PROCESS_STARTED_CHANNEL + WORKSPACE_ID + ':' + PATH_TO_PROJECT + ':' + SOME_USER_ID;
 
-    private static JsonArrayListAdapter<ApplicationProcessDescriptor> result;
+    private static List<ApplicationProcessDescriptor> result;
 
     //mocks for constructor
     @Mock
@@ -93,7 +91,7 @@ public class GetRunningProcessesActionTest {
     @Mock
     private RunnerLocalizationConstant                                          locale;
     @Mock
-    private Provider<AsyncCallbackBuilder<Array<ApplicationProcessDescriptor>>> callbackBuilderProvider;
+    private Provider<AsyncCallbackBuilder<List<ApplicationProcessDescriptor>>> callbackBuilderProvider;
     @Mock
     private WebSocketUtil                                                       webSocketUtil;
     @Mock
@@ -111,7 +109,7 @@ public class GetRunningProcessesActionTest {
     @Captor
     private ArgumentCaptor<SubscriptionHandler<ApplicationProcessDescriptor>>    handlerArgumentCaptor;
     @Captor
-    private ArgumentCaptor<SuccessCallback<Array<ApplicationProcessDescriptor>>> successCallBackCaptor;
+    private ArgumentCaptor<SuccessCallback<List<ApplicationProcessDescriptor>>> successCallBackCaptor;
     @Captor
     private ArgumentCaptor<Notification>                                         notificationCaptor;
     @Captor
@@ -133,11 +131,11 @@ public class GetRunningProcessesActionTest {
     private RunnerAction.StopActionListener                                             listener;
     //another variables
     @Mock
-    private AsyncCallbackBuilder<Array<ApplicationProcessDescriptor>>                   asyncCallbackBuilder;
+    private AsyncCallbackBuilder<List<ApplicationProcessDescriptor>>                   asyncCallbackBuilder;
     @Mock
-    private Unmarshallable<Array<ApplicationProcessDescriptor>>                         arrayUnmarshallable;
+    private Unmarshallable<List<ApplicationProcessDescriptor>>                         arrayUnmarshallable;
     @Mock
-    private AsyncRequestCallback<Array<ApplicationProcessDescriptor>>                   callback;
+    private AsyncRequestCallback<List<ApplicationProcessDescriptor>>                   callback;
     @Mock
     private CurrentUser                                                                 currentUser;
     @Mock
@@ -176,10 +174,10 @@ public class GetRunningProcessesActionTest {
         when(currentUser.getProfile()).thenReturn(profileDescriptor);
         when(profileDescriptor.getId()).thenReturn(SOME_USER_ID);
         when(callbackBuilderProvider.get()).thenReturn(asyncCallbackBuilder);
-        when(dtoUnmarshallerFactory.newArrayUnmarshaller(ApplicationProcessDescriptor.class)).thenReturn(arrayUnmarshallable);
+        when(dtoUnmarshallerFactory.newListUnmarshaller(ApplicationProcessDescriptor.class)).thenReturn(arrayUnmarshallable);
         when(asyncCallbackBuilder.unmarshaller(arrayUnmarshallable)).thenReturn(asyncCallbackBuilder);
         when(asyncCallbackBuilder.failure(any(FailureCallback.class))).thenReturn(asyncCallbackBuilder);
-        when(asyncCallbackBuilder.success(Matchers.<SuccessCallback<Array<ApplicationProcessDescriptor>>>anyObject()))
+        when(asyncCallbackBuilder.success(Matchers.<SuccessCallback<List<ApplicationProcessDescriptor>>>anyObject()))
                 .thenReturn(asyncCallbackBuilder);
         when(asyncCallbackBuilder.build()).thenReturn(callback);
         //preparing project data
@@ -193,11 +191,11 @@ public class GetRunningProcessesActionTest {
         when(processDescriptor.getProcessId()).thenReturn(1234567890L);
         when(runnerManagerPresenter.isRunnerExist(1234567890L)).thenReturn(false);
 
-        List<ApplicationProcessDescriptor> list = new ArrayList<>();
-        list.add(processDescriptor1);
-        list.add(processDescriptor2);
-        list.add(processDescriptor3);
-        result = new JsonArrayListAdapter<>(list);
+        result = new ArrayList<>();
+        result.add(processDescriptor1);
+        result.add(processDescriptor2);
+        result.add(processDescriptor3);
+
 
         when(processDescriptor1.getStatus()).thenReturn(ApplicationStatus.RUNNING);
         when(processDescriptor2.getStatus()).thenReturn(ApplicationStatus.NEW);
@@ -398,7 +396,7 @@ public class GetRunningProcessesActionTest {
         reset(notificationManager);
 
         verify(asyncCallbackBuilder).success(successCallBackCaptor.capture());
-        SuccessCallback<Array<ApplicationProcessDescriptor>> successCallback = successCallBackCaptor.getValue();
+        SuccessCallback<List<ApplicationProcessDescriptor>> successCallback = successCallBackCaptor.getValue();
         successCallback.onSuccess(result);
 
         verify(processDescriptor1).getStatus();
@@ -426,13 +424,13 @@ public class GetRunningProcessesActionTest {
 
     @Test
     public void runnerAndApplicationShouldNotBePreparedBecauseDescriptorsArrayIsEmpty() {
-        result = new JsonArrayListAdapter<>(new ArrayList<ApplicationProcessDescriptor>());
+        result = new ArrayList<>();
         reset(notificationManager,logsAction);
 
         getRunningProcessesAction.perform();
 
         verify(asyncCallbackBuilder).success(successCallBackCaptor.capture());
-        SuccessCallback<Array<ApplicationProcessDescriptor>> successCallback = successCallBackCaptor.getValue();
+        SuccessCallback<List<ApplicationProcessDescriptor>> successCallback = successCallBackCaptor.getValue();
 
         successCallback.onSuccess(result);
 

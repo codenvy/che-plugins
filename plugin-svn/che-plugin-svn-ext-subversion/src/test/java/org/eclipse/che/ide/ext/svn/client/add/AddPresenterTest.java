@@ -15,10 +15,8 @@ import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
-import org.eclipse.che.ide.ext.svn.client.add.AddPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.BaseSubversionPresenterTest;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
 import org.eclipse.che.ide.ext.svn.utils.TestUtils;
@@ -26,7 +24,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -10,15 +10,16 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.datasource.client.ssl;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.datasource.shared.ssl.SslKeyStoreEntry;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
+import java.util.List;
+
 public interface SslKeyStoreClientService {
 
-    void getAllClientKeys(AsyncRequestCallback<Array<SslKeyStoreEntry>> callback);
+    void getAllClientKeys(AsyncRequestCallback<List<SslKeyStoreEntry>> callback);
 
-    void getAllServerCerts(AsyncRequestCallback<Array<SslKeyStoreEntry>> asyncRequestCallback);
+    void getAllServerCerts(AsyncRequestCallback<List<SslKeyStoreEntry>> asyncRequestCallback);
 
     void deleteClientKey(SslKeyStoreEntry entry, AsyncRequestCallback<Void> asyncRequestCallback);
 

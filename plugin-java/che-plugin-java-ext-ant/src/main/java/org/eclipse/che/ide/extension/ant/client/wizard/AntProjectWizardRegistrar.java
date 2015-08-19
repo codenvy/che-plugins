@@ -13,14 +13,15 @@ package org.eclipse.che.ide.extension.ant.client.wizard;
 import org.eclipse.che.api.project.shared.dto.ImportProject;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistrar;
 import org.eclipse.che.ide.api.wizard.WizardPage;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.extension.ant.shared.AntAttributes;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import javax.annotation.Nonnull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.eclipse.che.ide.ext.java.shared.Constants.JAVA_CATEGORY;
 
@@ -30,11 +31,11 @@ import static org.eclipse.che.ide.ext.java.shared.Constants.JAVA_CATEGORY;
  * @author Artem Zatsarynnyy
  */
 public class AntProjectWizardRegistrar implements ProjectWizardRegistrar {
-    private final Array<Provider<? extends WizardPage<ImportProject>>> wizardPages;
+    private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;
 
     @Inject
     public AntProjectWizardRegistrar(Provider<AntPagePresenter> antPagePresenter) {
-        wizardPages = Collections.createArray();
+        wizardPages = new ArrayList<>();
         wizardPages.add(antPagePresenter);
     }
 
@@ -49,7 +50,7 @@ public class AntProjectWizardRegistrar implements ProjectWizardRegistrar {
     }
 
     @Nonnull
-    public Array<Provider<? extends WizardPage<ImportProject>>> getWizardPages() {
+    public List<Provider<? extends WizardPage<ImportProject>>> getWizardPages() {
         return wizardPages;
     }
 }

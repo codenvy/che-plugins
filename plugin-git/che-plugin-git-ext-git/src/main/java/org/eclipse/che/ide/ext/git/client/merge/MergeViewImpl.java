@@ -14,8 +14,6 @@ import elemental.events.KeyboardEvent;
 import elemental.events.MouseEvent;
 
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ui.tree.Tree;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
@@ -33,6 +31,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.eclipse.che.ide.ext.git.client.merge.MergePresenter.LOCAL_BRANCHES_TITLE;
 import static org.eclipse.che.ide.ext.git.client.merge.MergePresenter.REMOTE_BRANCHES_TITLE;
@@ -146,7 +147,9 @@ public class MergeViewImpl extends Window implements MergeView {
 
         remoteBranch = new Reference(REMOTE_BRANCHES_TITLE, REMOTE_BRANCHES_TITLE, REMOTE_BRANCH);
 
-        Array<Reference> branches = Collections.createArray(localBranch, remoteBranch);
+        List<Reference> branches = new ArrayList<>();
+        branches.add(localBranch);
+        branches.add(remoteBranch);
         root.setBranches(branches);
         
         btnCancel = createButton(locale.buttonCancel(), "git-merge-cancel", new ClickHandler() {
@@ -170,14 +173,14 @@ public class MergeViewImpl extends Window implements MergeView {
 
     /** {@inheritDoc} */
     @Override
-    public void setLocalBranches(@Nonnull Array<Reference> references) {
+    public void setLocalBranches(@Nonnull List<Reference> references) {
         localBranch.setBranches(references);
         this.references.renderTree(0);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setRemoteBranches(@Nonnull Array<Reference> references) {
+    public void setRemoteBranches(@Nonnull List<Reference> references) {
         remoteBranch.setBranches(references);
         this.references.renderTree(0);
     }

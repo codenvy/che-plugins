@@ -13,8 +13,9 @@ package org.eclipse.che.ide.ext.datasource.client.ssl;
 import javax.validation.constraints.NotNull;
 
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.datasource.shared.ssl.SslKeyStoreEntry;
+
+import java.util.List;
 
 public interface SslKeyStoreManagerView extends View<SslKeyStoreManagerView.ActionDelegate> {
     public interface ActionDelegate {
@@ -28,7 +29,7 @@ public interface SslKeyStoreManagerView extends View<SslKeyStoreManagerView.Acti
         void onServerCertUploadClicked();
     }
 
-    void setClientKeys(@NotNull Array<SslKeyStoreEntry> keys);
+    void setClientKeys(@NotNull List<SslKeyStoreEntry> keys);
 
-    void setServerCerts(Array<SslKeyStoreEntry> keys);
+    void setServerCerts(List<SslKeyStoreEntry> keys);
 }

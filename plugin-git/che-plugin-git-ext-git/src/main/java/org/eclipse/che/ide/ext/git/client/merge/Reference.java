@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.merge;
 
-import org.eclipse.che.ide.collections.Array;
+import java.util.List;
 
 
 /**
@@ -35,7 +35,7 @@ public class Reference {
     /** Type of the reference. */
     private RefType refType;
 
-    private Array<Reference> branches;
+    private List<Reference> branches;
 
     /**
      * @param fullName full name of the reference
@@ -64,12 +64,12 @@ public class Reference {
     }
 
     /** @return the branches */
-    public Array<Reference> getBranches() {
+    public List<Reference> getBranches() {
         return branches;
     }
 
     /** @param branches the branches to set */
-    public void setBranches(Array<Reference> branches) {
+    public void setBranches(List<Reference> branches) {
         this.branches = branches;
     }
 }

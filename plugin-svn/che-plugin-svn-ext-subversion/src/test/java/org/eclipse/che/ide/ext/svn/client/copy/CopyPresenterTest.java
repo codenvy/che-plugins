@@ -13,8 +13,6 @@ package org.eclipse.che.ide.ext.svn.client.copy;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.svn.client.common.filteredtree.FilteredTreeStructure;
 import org.eclipse.che.ide.ext.svn.client.common.filteredtree.FilteredTreeStructureProvider;
 import org.eclipse.che.test.GwtReflectionUtils;
@@ -25,6 +23,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atMost;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.when;
  */
 public class CopyPresenterTest extends BaseSubversionPresenterTest {
     @Captor
-    private ArgumentCaptor<AsyncCallback<Array<TreeNode<?>>>> asyncRequestCallbackStatusCaptor;
+    private ArgumentCaptor<AsyncCallback<List<TreeNode<?>>>> asyncRequestCallbackStatusCaptor;
 
     private CopyPresenter presenter;
 
@@ -76,11 +77,11 @@ public class CopyPresenterTest extends BaseSubversionPresenterTest {
 
         presenter.showCopy(mock(FileNode.class));
 
-        Array<TreeNode<?>> children = Collections.createArray();
+        List<TreeNode<?>> children = new ArrayList<>();
         children.add(mock(ProjectNode.class));
 
         verify(filteredTreeStructure).getRootNodes(asyncRequestCallbackStatusCaptor.capture());
-        AsyncCallback<Array<TreeNode<?>>> requestCallback = asyncRequestCallbackStatusCaptor.getValue();
+        AsyncCallback<List<TreeNode<?>>> requestCallback = asyncRequestCallbackStatusCaptor.getValue();
         GwtReflectionUtils.callPrivateMethod(requestCallback, "onSuccess", children);
 
         verify(copyView).setProjectNodes(eq(children));

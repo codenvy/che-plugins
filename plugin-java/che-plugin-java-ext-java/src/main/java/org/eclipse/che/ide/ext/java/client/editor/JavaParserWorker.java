@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.collections.js.JsoStringMap;
 import org.eclipse.che.ide.ext.java.jdt.core.compiler.IProblem;
 import org.eclipse.che.ide.ext.java.jdt.text.edits.TextEdit;
@@ -20,6 +18,8 @@ import org.eclipse.che.ide.ext.java.messages.ProblemLocationMessage;
 import org.eclipse.che.ide.ext.java.messages.ProposalAppliedMessage;
 import org.eclipse.che.ide.ext.java.messages.WorkerProposal;
 import org.eclipse.che.ide.ext.java.messages.impl.WorkerCodeBlock;
+
+import java.util.List;
 
 /**
  * @author Evgen Vidolob
@@ -39,7 +39,7 @@ public interface JavaParserWorker {
     void addOutlineUpdateHandler(String filePath, WorkerCallback<WorkerCodeBlock> callback);
 
     void computeQAProposals(String content, int offset, int selectionLength, boolean updatedContent,
-                            JsoArray<ProblemLocationMessage> problems,
+                            List<ProblemLocationMessage> problems,
                             String filePath, WorkerCallback<WorkerProposal> callback);
 
     void removeFqnFromCache(String fqn);
@@ -53,7 +53,7 @@ public interface JavaParserWorker {
     void fileClosed(String path);
 
     public interface WorkerCallback<T> {
-        void onResult(Array<T> problems);
+        void onResult(List<T> problems);
     }
 
     public interface Callback<T>{

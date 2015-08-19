@@ -22,10 +22,11 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.extension.maven.client.event.BeforeModuleOpenEvent;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+
+import java.util.List;
 
 /**
  * Node that represents module of multi-module project.
@@ -51,7 +52,7 @@ public class ModuleNode extends MavenProjectNode {
     }
 
     @Override
-    protected void getChildren(String path, AsyncCallback<Array<ItemReference>> callback) {
+    protected void getChildren(String path, AsyncCallback<List<ItemReference>> callback) {
         if (!isOpened()) {
             eventBus.fireEvent(new BeforeModuleOpenEvent(this));
         }

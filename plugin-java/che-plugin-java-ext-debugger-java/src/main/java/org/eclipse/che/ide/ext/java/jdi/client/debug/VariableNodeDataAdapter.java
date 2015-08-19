@@ -10,13 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.jdi.client.debug;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ui.tree.NodeDataAdapter;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,9 +56,8 @@ public class VariableNodeDataAdapter implements NodeDataAdapter<DebuggerVariable
     /** {@inheritDoc} */
     @Override
     @Nonnull
-    public Array<DebuggerVariable> getChildren(@Nonnull DebuggerVariable data) {
-        List<DebuggerVariable> variables = data.getVariables();
-        return Collections.createArray(variables);
+    public List<DebuggerVariable> getChildren(@Nonnull DebuggerVariable data) {
+        return data.getVariables();
     }
 
     /** {@inheritDoc} */
@@ -112,19 +110,19 @@ public class VariableNodeDataAdapter implements NodeDataAdapter<DebuggerVariable
     /** {@inheritDoc} */
     @Override
     @Nonnull
-    public Array<String> getNodePath(@Nonnull DebuggerVariable data) {
-        return Collections.createArray(data.getVariablePath().getPath());
+    public List<String> getNodePath(@Nonnull DebuggerVariable data) {
+        return new ArrayList<>(data.getVariablePath().getPath());
     }
 
     /** {@inheritDoc} */
     @Override
     @Nullable
-    public DebuggerVariable getNodeByPath(@Nonnull DebuggerVariable root,@Nonnull Array<String> relativeNodePath) {
+    public DebuggerVariable getNodeByPath(@Nonnull DebuggerVariable root,@Nonnull List<String> relativeNodePath) {
         DebuggerVariable localRoot = root;
         for (int i = 0; i < relativeNodePath.size(); i++) {
             String path = relativeNodePath.get(i);
             if (localRoot != null) {
-                Array<DebuggerVariable> variables = Collections.createArray(localRoot.getVariables());
+                List<DebuggerVariable> variables = new ArrayList<>(localRoot.getVariables());
                 localRoot = null;
                 for (int j = 0; j < variables.size(); j++) {
                     DebuggerVariable variable = variables.get(i);

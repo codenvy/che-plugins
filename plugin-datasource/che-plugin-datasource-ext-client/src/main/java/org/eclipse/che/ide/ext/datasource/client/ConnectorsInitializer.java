@@ -13,8 +13,6 @@ package org.eclipse.che.ide.ext.datasource.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.datasource.client.newdatasource.NewDatasourceWizardMessages;
 import org.eclipse.che.ide.ext.datasource.client.newdatasource.connector.AbstractNewDatasourceConnectorPage;
 import org.eclipse.che.ide.ext.datasource.client.newdatasource.connector.NewDatasourceConnector;
@@ -60,7 +58,7 @@ public class ConnectorsInitializer {
         int connectorCounter = 0;
 
         // add a new postgres connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> pgWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> pgWizardPages = new ArrayList<>();
         pgWizardPages.add(pgConnectorPageProvider);
         NewDatasourceConnector connectorPostgres = new NewDatasourceConnector(DatabaseType.POSTGRES.getConnectorId(),
                                                                               connectorCounter, dsMessages.postgresql(),
@@ -72,7 +70,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // Add a new mysql connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> mysqlWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> mysqlWizardPages = new ArrayList<>();
         mysqlWizardPages.add(mysqlConnectorPageProvider);
         NewDatasourceConnector connectorMysql = new NewDatasourceConnector(DatabaseType.MYSQL.getConnectorId(),
                                                                            connectorCounter,
@@ -85,7 +83,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // add a new oracle connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> oracleWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> oracleWizardPages = new ArrayList();
         oracleWizardPages.add(oracleConnectorPageProvider);
         NewDatasourceConnector connectorOracle = new NewDatasourceConnector(DatabaseType.ORACLE.getConnectorId(),
                                                                             connectorCounter,
@@ -97,7 +95,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // add a new SQLserver connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> sqlServerWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> sqlServerWizardPages = new ArrayList();
         sqlServerWizardPages.add(mssqlserverConnectorPageProvider);
         NewDatasourceConnector connectorMs = new NewDatasourceConnector(DatabaseType.JTDS.getConnectorId(),
                                                                         connectorCounter,
@@ -111,7 +109,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // add a new NuoDB connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> nuoDBWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> nuoDBWizardPages = new ArrayList();
         nuoDBWizardPages.add(nuodbConnectorPageProvider);
         NewDatasourceConnector connectorNuoDB = new NewDatasourceConnector(DatabaseType.NUODB.getConnectorId(),
                                                                            connectorCounter,
@@ -124,7 +122,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // add a new GoogleCloudSQL connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> googleCloudSQLWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> googleCloudSQLWizardPages = new ArrayList();
         googleCloudSQLWizardPages.add(googleCloudSqlConnectorPageProvider);
         NewDatasourceConnector connectorGoogle = new NewDatasourceConnector(DatabaseType.GOOGLECLOUDSQL.getConnectorId(),
                                                                             connectorCounter,
@@ -138,7 +136,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // add a new AmazonRDS/Postgres connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> awsPostgresWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> awsPostgresWizardPages = new ArrayList();
         awsPostgresWizardPages.add(awsPostgresConnectorPageProvider);
         NewDatasourceConnector connectorAwsPostg = new NewDatasourceConnector(AwsPostgresConnectorPage.AWSPOSTGRES_DB_ID,
                                                                               connectorCounter,
@@ -152,7 +150,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // add a new AmazonRDS/Mysql connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> awsMysqlWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> awsMysqlWizardPages = new ArrayList();
         awsMysqlWizardPages.add(awsMysqlConnectorPageProvider);
         NewDatasourceConnector connectorAwsMySql = new NewDatasourceConnector(AwsMysqlConnectorPage.AWSMYSQL_DB_ID,
                                                                               connectorCounter,
@@ -166,7 +164,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // add a new AmazonRDS/Oracle connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> awsOracleWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> awsOracleWizardPages = new ArrayList();
         awsOracleWizardPages.add(awsOracleConnectorPageProvider);
         NewDatasourceConnector connectorAwsOracle = new NewDatasourceConnector(AwsOracleConnectorPage.AWSORACLE_DB_ID,
                                                                                connectorCounter,
@@ -180,7 +178,7 @@ public class ConnectorsInitializer {
         connectorCounter++;
 
         // add a new AmazonRDS/SqlServer connector
-        Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> awsSqlServerWizardPages = Collections.createArray();
+        List<Provider< ? extends AbstractNewDatasourceConnectorPage>> awsSqlServerWizardPages = new ArrayList();
         awsSqlServerWizardPages.add(awsSqlServerConnectorPageProvider);
         NewDatasourceConnector connectorAwsMs = new NewDatasourceConnector(AwsSqlServerConnectorPage.AWSSQLSERVER_DB_ID,
                                                                            connectorCounter,

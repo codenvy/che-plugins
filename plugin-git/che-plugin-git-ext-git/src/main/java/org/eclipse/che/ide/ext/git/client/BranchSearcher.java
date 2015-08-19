@@ -11,10 +11,10 @@
 package org.eclipse.che.ide.ext.git.client;
 
 import org.eclipse.che.api.git.shared.Branch;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Sergii Leschenko
@@ -30,7 +30,7 @@ public class BranchSearcher {
      *         remote branches
      */
     @Nonnull
-    public Array<String> getRemoteBranchesToDisplay(@Nonnull String remoteName, @Nonnull Array<Branch> remoteBranches) {
+    public List<String> getRemoteBranchesToDisplay(@Nonnull String remoteName, @Nonnull List<Branch> remoteBranches) {
         return getRemoteBranchesToDisplay(new BranchFilterByRemote(remoteName), remoteBranches);
     }
 
@@ -38,8 +38,8 @@ public class BranchSearcher {
      * Get simple names of remote branches: filter remote branches due to selected remote repository.
      */
     @Nonnull
-    public Array<String> getRemoteBranchesToDisplay(BranchFilterByRemote filterByRemote, @Nonnull Array<Branch> remoteBranches) {
-        Array<String> branches = Collections.createArray();
+    public List<String> getRemoteBranchesToDisplay(BranchFilterByRemote filterByRemote, @Nonnull List<Branch> remoteBranches) {
+        List<String> branches = new ArrayList<>();
 
         if (remoteBranches.isEmpty()) {
             branches.add("master");
@@ -66,15 +66,15 @@ public class BranchSearcher {
      *         local branches
      */
     @Nonnull
-    public Array<String> getLocalBranchesToDisplay(@Nonnull Array<Branch> localBranches) {
-        Array<String> branches = Collections.createArray();
+    public List<String> getLocalBranchesToDisplay(@Nonnull List<Branch> localBranches) {
+        List<String> branches = new ArrayList<>();
 
         if (localBranches.isEmpty()) {
             branches.add("master");
             return branches;
         }
 
-        for (Branch branch : localBranches.asIterable()) {
+        for (Branch branch : localBranches) {
             branches.add(branch.getDisplayName());
         }
 

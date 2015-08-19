@@ -13,8 +13,6 @@ package org.eclipse.che.ide.ext.git.client.url;
 import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.notification.Notification;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
@@ -25,6 +23,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;
@@ -45,7 +45,7 @@ public class ShowProjectGitReadOnlyUrlPresenterTest extends BaseTest {
     private ArgumentCaptor<AsyncRequestCallback<String>> asyncRequestCallbackGitReadOnlyUrlCaptor;
 
     @Captor
-    private ArgumentCaptor<AsyncRequestCallback<Array<Remote>>> asyncRequestCallbackRemoteListCaptor;
+    private ArgumentCaptor<AsyncRequestCallback<List<Remote>>> asyncRequestCallbackRemoteListCaptor;
 
     @Mock
     private ShowProjectGitReadOnlyUrlView      view;
@@ -90,35 +90,35 @@ public class ShowProjectGitReadOnlyUrlPresenterTest extends BaseTest {
 
     @Test
     public void getGitRemoteListAsyncCallbackIsSuccess() throws Exception {
-        final Array<Remote> remotes = Collections.createArray();
+        final List<Remote> remotes = new ArrayList<>();
         remotes.add(mock(Remote.class));
         presenter.showDialog();
         verify(service)
                 .remoteList((ProjectDescriptor)anyObject(), anyString(), anyBoolean(), asyncRequestCallbackRemoteListCaptor.capture());
-        AsyncRequestCallback<Array<Remote>> callback = asyncRequestCallbackRemoteListCaptor.getValue();
+        AsyncRequestCallback<List<Remote>> callback = asyncRequestCallbackRemoteListCaptor.getValue();
 
         Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
         onSuccess.invoke(callback, remotes);
 
         verify(appContext).getCurrentProject();
-        verify(service).remoteList(eq(rootProjectDescriptor), anyString(), eq(true), (AsyncRequestCallback<Array<Remote>>)anyObject());
-        verify(view).setRemotes((Array<Remote>)anyObject());
+        verify(service).remoteList(eq(rootProjectDescriptor), anyString(), eq(true), (AsyncRequestCallback<List<Remote>>)anyObject());
+        verify(view).setRemotes((List<Remote>)anyObject());
     }
 
     @Test
     public void getGitRemoteListAsyncCallbackIsFailed() throws Exception {
-        final Array<Remote> remotes = Collections.createArray();
+        final List<Remote> remotes = new ArrayList<>();
         remotes.add(mock(Remote.class));
         presenter.showDialog();
         verify(service)
                 .remoteList((ProjectDescriptor)anyObject(), anyString(), anyBoolean(), asyncRequestCallbackRemoteListCaptor.capture());
-        AsyncRequestCallback<Array<Remote>> callback = asyncRequestCallbackRemoteListCaptor.getValue();
+        AsyncRequestCallback<List<Remote>> callback = asyncRequestCallbackRemoteListCaptor.getValue();
 
         Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
         onSuccess.invoke(callback, mock(Throwable.class));
 
         verify(appContext).getCurrentProject();
-        verify(service).remoteList(eq(rootProjectDescriptor), anyString(), eq(true), (AsyncRequestCallback<Array<Remote>>)anyObject());
+        verify(service).remoteList(eq(rootProjectDescriptor), anyString(), eq(true), (AsyncRequestCallback<List<Remote>>)anyObject());
         verify(view).setRemotes(null);
         verify(notificationManager).showNotification((Notification)anyObject());
     }

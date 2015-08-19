@@ -15,8 +15,6 @@ import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaSourceFolderUtil;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.JavaProjectNode;
 import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
@@ -30,6 +28,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,12 +62,12 @@ public class MavenProjectNode extends JavaProjectNode {
     /** {@inheritDoc} */
     @Override
     public void refreshChildren(final AsyncCallback<TreeNode<?>> callback) {
-        getModules(getData(), new AsyncCallback<Array<ProjectDescriptor>>() {
+        getModules(getData(), new AsyncCallback<List<ProjectDescriptor>>() {
             @Override
-            public void onSuccess(final Array<ProjectDescriptor> modules) {
-                getChildren(getData().getPath(), new AsyncCallback<Array<ItemReference>>() {
+            public void onSuccess(final List<ProjectDescriptor> modules) {
+                getChildren(getData().getPath(), new AsyncCallback<List<ItemReference>>() {
                     @Override
-                    public void onSuccess(Array<ItemReference> childItems) {
+                    public void onSuccess(List<ItemReference> childItems) {
                         setChildren(getChildNodesForItems(childItems, modules));
                         callback.onSuccess(MavenProjectNode.this);
                     }
@@ -83,9 +82,9 @@ public class MavenProjectNode extends JavaProjectNode {
             @Override
             public void onFailure(Throwable caught) {
                 //can be if pom.xml not found
-                getChildren(getData().getPath(), new AsyncCallback<Array<ItemReference>>() {
+                getChildren(getData().getPath(), new AsyncCallback<List<ItemReference>>() {
                     @Override
-                    public void onSuccess(Array<ItemReference> childItems) {
+                    public void onSuccess(List<ItemReference> childItems) {
                         callback.onSuccess(MavenProjectNode.this);
                     }
 
@@ -107,11 +106,11 @@ public class MavenProjectNode extends JavaProjectNode {
      * @param callback
      *         callback to return retrieved modules
      */
-    protected void getModules(ProjectDescriptor project, final AsyncCallback<Array<ProjectDescriptor>> callback) {
-        final Unmarshallable<Array<ProjectDescriptor>> unmarshaller = dtoUnmarshallerFactory.newArrayUnmarshaller(ProjectDescriptor.class);
-        projectServiceClient.getModules(project.getPath(), new AsyncRequestCallback<Array<ProjectDescriptor>>(unmarshaller) {
+    protected void getModules(ProjectDescriptor project, final AsyncCallback<List<ProjectDescriptor>> callback) {
+        final Unmarshallable<List<ProjectDescriptor>> unmarshaller = dtoUnmarshallerFactory.newListUnmarshaller(ProjectDescriptor.class);
+        projectServiceClient.getModules(project.getPath(), new AsyncRequestCallback<List<ProjectDescriptor>>(unmarshaller) {
             @Override
-            protected void onSuccess(Array<ProjectDescriptor> result) {
+            protected void onSuccess(List<ProjectDescriptor> result) {
                 callback.onSuccess(result);
             }
 
@@ -122,10 +121,10 @@ public class MavenProjectNode extends JavaProjectNode {
         });
     }
 
-    private Array<TreeNode<?>> getChildNodesForItems(Array<ItemReference> childItems, Array<ProjectDescriptor> modules) {
-        Array<TreeNode<?>> oldChildren = Collections.createArray(getChildren().asIterable());
-        Array<TreeNode<?>> newChildren = Collections.createArray();
-        for (ItemReference item : childItems.asIterable()) {
+    private List<TreeNode<?>> getChildNodesForItems(List<ItemReference> childItems, List<ProjectDescriptor> modules) {
+        List<TreeNode<?>> oldChildren = getChildren();
+        List<TreeNode<?>> newChildren =  new ArrayList<>();
+        for (ItemReference item : childItems) {
             AbstractTreeNode node = createChildNode(item, modules);
             if (node != null) {
                 if (oldChildren.contains(node)) {
@@ -151,7 +150,7 @@ public class MavenProjectNode extends JavaProjectNode {
      * @return new node instance or <code>null</code> if the specified item is not supported
      */
     @Nullable
-    protected AbstractTreeNode<?> createChildNode(ItemReference item, Array<ProjectDescriptor> modules) {
+    protected AbstractTreeNode<?> createChildNode(ItemReference item, List<ProjectDescriptor> modules) {
         if ("project".equals(item.getType())) {
             ProjectDescriptor module = getModule(item, modules);
             if (module != null) {
@@ -173,9 +172,9 @@ public class MavenProjectNode extends JavaProjectNode {
      * or null if the folderItem does not correspond to any module from the specified list.
      */
     @Nullable
-    private ProjectDescriptor getModule(ItemReference folderItem, Array<ProjectDescriptor> modules) {
+    private ProjectDescriptor getModule(ItemReference folderItem, List<ProjectDescriptor> modules) {
         if ("project".equals(folderItem.getType())) {
-            for (ProjectDescriptor module : modules.asIterable()) {
+            for (ProjectDescriptor module : modules) {
                 if (folderItem.getName().equals(module.getName())) {
                     return module;
                 }

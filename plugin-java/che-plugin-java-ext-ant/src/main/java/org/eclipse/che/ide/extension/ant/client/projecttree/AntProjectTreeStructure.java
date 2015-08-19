@@ -17,8 +17,6 @@ import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.JavaFolderNode;
@@ -27,6 +25,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tree structure for Ant project.
@@ -44,7 +44,7 @@ public class AntProjectTreeStructure extends JavaTreeStructure {
 
     /** {@inheritDoc} */
     @Override
-    public void getRootNodes(@Nonnull AsyncCallback<Array<TreeNode<?>>> callback) {
+    public void getRootNodes(@Nonnull AsyncCallback<List<TreeNode<?>>> callback) {
         if (projectNode == null) {
             final CurrentProject currentProject = appContext.getCurrentProject();
             if (currentProject != null) {
@@ -54,7 +54,9 @@ public class AntProjectTreeStructure extends JavaTreeStructure {
                 return;
             }
         }
-        callback.onSuccess(Collections.<TreeNode<?>>createArray(projectNode));
+        List<TreeNode<?>> parent = new ArrayList<>();
+        parent.add(projectNode);
+        callback.onSuccess(parent);
     }
 
     @Override

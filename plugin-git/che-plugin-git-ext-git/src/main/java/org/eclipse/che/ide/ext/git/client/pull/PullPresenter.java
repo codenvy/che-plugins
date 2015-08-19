@@ -24,7 +24,6 @@ import org.eclipse.che.ide.api.event.FileEvent;
 import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -99,9 +98,9 @@ public class PullPresenter implements PullView.ActionDelegate {
         view.setEnablePullButton(true);
 
         gitServiceClient.remoteList(project.getRootProject(), null, true,
-                                    new AsyncRequestCallback<Array<Remote>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Remote.class)) {
+                                    new AsyncRequestCallback<List<Remote>>(dtoUnmarshallerFactory.newListUnmarshaller(Remote.class)) {
                                         @Override
-                                        protected void onSuccess(Array<Remote> result) {
+                                        protected void onSuccess(List<Remote> result) {
                                             getBranches(LIST_REMOTE);
                                             view.setRepositories(result);
                                             view.setEnablePullButton(!result.isEmpty());
@@ -128,16 +127,16 @@ public class PullPresenter implements PullView.ActionDelegate {
      */
     private void getBranches(@Nonnull final String remoteMode) {
         gitServiceClient.branchList(project.getRootProject(), remoteMode,
-                                    new AsyncRequestCallback<Array<Branch>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Branch.class)) {
+                                    new AsyncRequestCallback<List<Branch>>(dtoUnmarshallerFactory.newListUnmarshaller(Branch.class)) {
                                         @Override
-                                        protected void onSuccess(Array<Branch> result) {
+                                        protected void onSuccess(List<Branch> result) {
                                             if (LIST_REMOTE.equals(remoteMode)) {
                                                 view.setRemoteBranches(branchSearcher.getRemoteBranchesToDisplay(view.getRepositoryName(),
                                                                                                                  result));
                                                 getBranches(LIST_LOCAL);
                                             } else {
                                                 view.setLocalBranches(branchSearcher.getLocalBranchesToDisplay(result));
-                                                for (Branch branch : result.asIterable()) {
+                                                for (Branch branch : result) {
                                                     if (branch.isActive()) {
                                                         view.selectRemoteBranch(branch.getDisplayName());
                                                         break;
@@ -166,7 +165,7 @@ public class PullPresenter implements PullView.ActionDelegate {
         view.close();
 
         final List<EditorPartPresenter> openedEditors = new ArrayList<>();
-        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().getValues().asIterable()) {
+        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().values()) {
             openedEditors.add(partPresenter);
         }
 

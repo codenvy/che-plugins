@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.datasource.client.sqleditor;
 
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.datasource.client.sqleditor.codeassist.SqlCodeAssistProcessor;
 import org.eclipse.che.ide.ext.datasource.client.store.DatabaseInfoOracle;
 import org.eclipse.che.ide.jseditor.client.codeassist.CodeAssistProcessor;
@@ -20,6 +18,8 @@ import org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner;
 import org.eclipse.che.ide.jseditor.client.texteditor.ConfigurableTextEditor;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SqlEditorConfiguration extends AutoSaveTextEditorConfiguration {
 
@@ -40,8 +40,8 @@ public class SqlEditorConfiguration extends AutoSaveTextEditorConfiguration {
     }
 
     @Override
-    public StringMap<CodeAssistProcessor> getContentAssistantProcessors() {
-        StringMap<CodeAssistProcessor> map = Collections.createStringMap();
+    public Map<String, CodeAssistProcessor> getContentAssistantProcessors() {
+        Map<String, CodeAssistProcessor> map = new HashMap<>();
         map.put(DocumentPartitioner.DEFAULT_CONTENT_TYPE, getOrCreateCodeAssistProcessor());
         return map;
     }

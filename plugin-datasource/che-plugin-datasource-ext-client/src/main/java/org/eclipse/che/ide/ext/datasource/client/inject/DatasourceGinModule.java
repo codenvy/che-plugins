@@ -14,8 +14,6 @@ package org.eclipse.che.ide.ext.datasource.client.inject;
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.preferences.PreferencePagePresenter;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.datasource.client.AvailableJdbcDriversService;
 import org.eclipse.che.ide.ext.datasource.client.AvailableJdbcDriversServiceRestImpl;
 import org.eclipse.che.ide.ext.datasource.client.DatasourceClientService;
@@ -78,6 +76,9 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+
+import java.util.Arrays;
+import java.util.List;
 
 @ExtensionGinModule
 public class DatasourceGinModule extends AbstractGinModule {
@@ -153,10 +154,10 @@ public class DatasourceGinModule extends AbstractGinModule {
     @Named("SQLFileType")
     protected FileType provideSQLFile(final DatasourceUiResources resources) {
         final SqlEditorConstants constants = GWT.create(SqlEditorConstants.class);
-        final Array<String> mimetypes = Collections.createArray(SqlEditorExtension.GENERIC_SQL_MIME_TYPE,
-                                                                SqlEditorExtension.MSSQL_SQL_MIME_TYPE,
-                                                                SqlEditorExtension.MYSQL_SQL_MIME_TYPE,
-                                                                SqlEditorExtension.ORACLE_SQL_MIME_TYPE);
+        final List<String> mimetypes = Arrays.asList(SqlEditorExtension.GENERIC_SQL_MIME_TYPE,
+                                                     SqlEditorExtension.MSSQL_SQL_MIME_TYPE,
+                                                     SqlEditorExtension.MYSQL_SQL_MIME_TYPE,
+                                                     SqlEditorExtension.ORACLE_SQL_MIME_TYPE);
         return new FileType(constants.sqlFiletypeContentDescription(), resources.sqlIcon(),
                             mimetypes, SqlEditorExtension.SQL_FILE_EXTENSION);
     }

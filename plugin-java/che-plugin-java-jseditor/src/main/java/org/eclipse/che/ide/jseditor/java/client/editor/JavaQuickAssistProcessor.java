@@ -13,7 +13,6 @@ package org.eclipse.che.ide.jseditor.java.client.editor;
 import org.eclipse.che.ide.api.icon.Icon;
 import org.eclipse.che.ide.api.text.Position;
 import org.eclipse.che.ide.api.text.annotation.Annotation;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.editor.JavaAnnotation;
@@ -100,7 +99,7 @@ public class JavaQuickAssistProcessor implements QuickAssistProcessor {
                                 final TextEditor textEditor,
                                 final LinearRange range,
                                 final Map<Annotation, Position> annotations) {
-        final JsoArray<ProblemLocationMessage> problems = JsoArray.create();
+        final List<ProblemLocationMessage> problems = new ArrayList<>();
         // collect problem locations and corrections from marker annotations
         if (annotations != null) {
             for (final Entry<Annotation, Position> entry : annotations.entrySet()) {
@@ -117,7 +116,7 @@ public class JavaQuickAssistProcessor implements QuickAssistProcessor {
                                   false, problems, textEditor.getEditorInput().getFile().getPath(),
                                   new JavaParserWorker.WorkerCallback<WorkerProposal>() {
                                       @Override
-                                      public void onResult(final Array<WorkerProposal> problems) {
+                                      public void onResult(final List<WorkerProposal> problems) {
                                           final List<CompletionProposal> proposals = buildProposals(problems);
                                           callback.proposalComputed(proposals);
                                       }
@@ -153,9 +152,9 @@ public class JavaQuickAssistProcessor implements QuickAssistProcessor {
         }
     }
 
-    private List<CompletionProposal> buildProposals(final Array<WorkerProposal> problems) {
+    private List<CompletionProposal> buildProposals(final List<WorkerProposal> problems) {
         final List<CompletionProposal> proposals = new ArrayList<>();
-        for (final WorkerProposal problem : problems.asIterable()) {
+        for (final WorkerProposal problem : problems) {
             final String style = JavaCodeAssistProcessor.insertStyle(javaResources, problem.displayText());
             final Icon icon = new Icon("", JavaCodeAssistProcessor.getImage(javaResources, problem.image()));
             final CompletionProposal proposal = new JavaCompletionProposal(problem.id(), style, icon,

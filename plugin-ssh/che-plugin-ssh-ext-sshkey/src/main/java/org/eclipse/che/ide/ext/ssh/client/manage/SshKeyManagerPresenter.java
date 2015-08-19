@@ -14,7 +14,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentUser;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.preferences.AbstractPreferencePagePresenter;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.ssh.client.SshKeyService;
 import org.eclipse.che.ide.ext.ssh.client.SshLocalizationConstant;
@@ -38,6 +37,7 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The presenter for managing ssh keys.
@@ -226,12 +226,11 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
 
     /** Need to remove failed uploaded keys from local storage if they can't be uploaded to github */
     private void getFailedKey(final String host) {
-        service.getAllKeys(new AsyncRequestCallback<Array<KeyItem>>(dtoUnmarshallerFactory.newArrayUnmarshaller(KeyItem.class)) {
+        service.getAllKeys(new AsyncRequestCallback<List<KeyItem>>(dtoUnmarshallerFactory.newListUnmarshaller(KeyItem.class)) {
             @Override
-            public void onSuccess(Array<KeyItem> result) {
+            public void onSuccess(List<KeyItem> result) {
                 loader.hide(constant.loaderGetSshKeysMessage());
-                for (int i = 0; i < result.size(); i++) {
-                    KeyItem key = result.get(i);
+                for (KeyItem key : result) {
                     if (key.getHost().equals(host)) {
                         removeFailedKey(key);
                         return;
@@ -288,9 +287,9 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
 
     /** Refresh ssh keys. */
     private void refreshKeys() {
-        service.getAllKeys(new AsyncRequestCallback<Array<KeyItem>>(dtoUnmarshallerFactory.newArrayUnmarshaller(KeyItem.class)) {
+        service.getAllKeys(new AsyncRequestCallback<List<KeyItem>>(dtoUnmarshallerFactory.newListUnmarshaller(KeyItem.class)) {
             @Override
-            public void onSuccess(Array<KeyItem> result) {
+            public void onSuccess(List<KeyItem> result) {
                 loader.hide(constant.loaderGetSshKeysMessage());
                 view.setKeys(result);
             }

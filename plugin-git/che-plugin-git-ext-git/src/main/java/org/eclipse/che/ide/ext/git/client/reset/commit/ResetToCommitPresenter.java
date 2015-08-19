@@ -109,7 +109,7 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
         view.close();
 
         openedEditors = new ArrayList<>();
-        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().getValues().asIterable()) {
+        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().values()) {
             openedEditors.add(partPresenter);
         }
         reset();

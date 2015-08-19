@@ -11,7 +11,8 @@
 package org.eclipse.che.ide.ext.java.client.newsourcefile;
 
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
+
+import java.util.List;
 
 /**
  * The view of {@link NewJavaSourceFilePresenter}.
@@ -21,7 +22,7 @@ import org.eclipse.che.ide.collections.Array;
 public interface NewJavaSourceFileView extends View<NewJavaSourceFileView.ActionDelegate> {
 
     /** Set available Java source file types. */
-    void setTypes(Array<JavaSourceFileType> types);
+    void setTypes(List<JavaSourceFileType> types);
 
     /** Returns content of the name field. */
     String getName();

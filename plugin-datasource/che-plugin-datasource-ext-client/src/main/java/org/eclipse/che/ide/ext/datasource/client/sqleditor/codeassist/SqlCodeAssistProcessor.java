@@ -15,8 +15,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.che.ide.api.text.BadLocationException;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.datasource.client.sqleditor.EditorDatasourceOracle;
 import org.eclipse.che.ide.ext.datasource.client.sqleditor.SqlEditorResources;
 import org.eclipse.che.ide.ext.datasource.client.store.DatabaseInfoOracle;
@@ -88,7 +86,7 @@ public class SqlCodeAssistProcessor implements CodeAssistProcessor {
             codeAssistCallback.proposalComputed(null);
             return;
         }
-        Array<SqlCodeCompletionProposal> completionProposals = findAutoCompletions(query);
+        List<SqlCodeCompletionProposal> completionProposals = findAutoCompletions(query);
         InvocationContext invocationContext = new InvocationContext(query, offset, resources, textEditor);
         codeAssistCallback.proposalComputed(jsToList(completionProposals, invocationContext));
     }
@@ -151,15 +149,15 @@ public class SqlCodeAssistProcessor implements CodeAssistProcessor {
         return new SqlCodeQuery(text);
     }
 
-    protected Array<SqlCodeCompletionProposal> findAutoCompletions(SqlCodeQuery query) {
-        Array<SqlCodeCompletionProposal> completionProposals = findTableAutocompletions(query);
+    protected List<SqlCodeCompletionProposal> findAutoCompletions(SqlCodeQuery query) {
+        List<SqlCodeCompletionProposal> completionProposals = findTableAutocompletions(query);
         completionProposals.addAll(findColumnAutocompletions(query));
         completionProposals.addAll(findTemplateAutocompletion(query));
         return completionProposals;
     }
 
-    protected Array<SqlCodeCompletionProposal> findTableAutocompletions(SqlCodeQuery query) {
-        Array<SqlCodeCompletionProposal> array = Collections.createArray();
+    protected List<SqlCodeCompletionProposal> findTableAutocompletions(SqlCodeQuery query) {
+        List<SqlCodeCompletionProposal> array = new ArrayList<>();
         String linePrefix = query.getLastQueryPrefix();
         String linePrefixLowerCase = linePrefix.toLowerCase();
 
@@ -186,8 +184,8 @@ public class SqlCodeAssistProcessor implements CodeAssistProcessor {
         return array;
     }
 
-    protected Array<SqlCodeCompletionProposal> findColumnAutocompletions(SqlCodeQuery query) {
-        Array<SqlCodeCompletionProposal> array = Collections.createArray();
+    protected List<SqlCodeCompletionProposal> findColumnAutocompletions(SqlCodeQuery query) {
+        List<SqlCodeCompletionProposal> list = new ArrayList<>();
         String linePrefix = query.getLastQueryPrefix();
         String linePrefixLowerCase = linePrefix.toLowerCase();
         MatchResult matcher = COLUMN_REGEXP_PATTERN.exec(linePrefixLowerCase);
@@ -237,7 +235,7 @@ public class SqlCodeAssistProcessor implements CodeAssistProcessor {
                                 || (tableLowerCase + "." + columnLowerCase).startsWith(columnPrefixLowerCase)) {
                                 String columnReplacementString = isSelectStatement ? (schema + "." + table + "." + column) : column;
                                 String replacementString = lineReplacementPrefix + columnReplacementString;
-                                array.add(new SqlCodeCompletionProposal(schema + "." + table + "." + column, replacementString,
+                                list.add(new SqlCodeCompletionProposal(schema + "." + table + "." + column, replacementString,
                                                                         replacementString.length()));
                             }
                         }
@@ -245,12 +243,12 @@ public class SqlCodeAssistProcessor implements CodeAssistProcessor {
                 }
             }
         }
-        return array;
+        return list;
     }
 
-    protected Array<SqlCodeCompletionProposal> findTemplateAutocompletion(SqlCodeQuery query) {
-        Array<SqlCodeCompletionProposal> findAndFilterAutocompletions = SqlCodeTemplateTrie.findAndFilterAutocompletions(query);
-        for (SqlCodeCompletionProposal proposal : findAndFilterAutocompletions.asIterable()) {
+    protected List<SqlCodeCompletionProposal> findTemplateAutocompletion(SqlCodeQuery query) {
+        List<SqlCodeCompletionProposal> findAndFilterAutocompletions = SqlCodeTemplateTrie.findAndFilterAutocompletions(query);
+        for (SqlCodeCompletionProposal proposal : findAndFilterAutocompletions) {
             int nextTablePosition = proposal.getReplacementString().indexOf("aTable");
             if (nextTablePosition > 0) {
                 proposal.setCursorPosition(nextTablePosition);
@@ -267,7 +265,7 @@ public class SqlCodeAssistProcessor implements CodeAssistProcessor {
      * @param context the given invocation context
      * @return the array
      */
-    private List<CompletionProposal> jsToList(Array<SqlCodeCompletionProposal> autocompletions,
+    private List<CompletionProposal> jsToList(List<SqlCodeCompletionProposal> autocompletions,
                                                     InvocationContext context) {
         if (autocompletions == null) {
             return null;

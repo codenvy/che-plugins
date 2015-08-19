@@ -33,8 +33,6 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
 import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeDataAdapter;
@@ -48,6 +46,7 @@ import org.eclipse.che.ide.util.input.SignalEvent;
 import org.vectomatic.dom.svg.OMSVGSVGElement;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * Implementation of {@link org.eclipse.che.ide.ext.svn.client.move.MoveView}.
@@ -244,9 +243,9 @@ public class MoveViewImpl extends Window implements MoveView {
 
     /** {@inheritDoc} */
     @Override
-    public void setProjectNodes(Array<TreeNode<?>> rootNodes) {
+    public void setProjectNodes(List<TreeNode<?>> rootNodes) {
         rootNode.setChildren(rootNodes);
-        for (TreeNode<?> treeNode : rootNodes.asIterable()) {
+        for (TreeNode<?> treeNode : rootNodes) {
             treeNode.setParent(rootNode);
         }
 
@@ -273,13 +272,13 @@ public class MoveViewImpl extends Window implements MoveView {
     @Override
     public void updateProjectNode(@Nonnull TreeNode<?> oldNode, @Nonnull TreeNode<?> newNode) {
         // get currently selected node
-        final JsoArray<TreeNode<?>> selectedNodes = (JsoArray<TreeNode<?>>)tree.getSelectionModel().getSelectedNodes();
+        final List<TreeNode<?>> selectedNodes = tree.getSelectionModel().getSelectedNodes();
         TreeNode<?> selectedNode = null;
         if (!selectedNodes.isEmpty()) {
             selectedNode = selectedNodes.get(0);
         }
 
-        Array<Array<String>> pathsToExpand = tree.replaceSubtree(oldNode, newNode, false);
+        List<List<String>> pathsToExpand = tree.replaceSubtree(oldNode, newNode, false);
         tree.expandPaths(pathsToExpand, false);
 
         // restore selected node

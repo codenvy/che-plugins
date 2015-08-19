@@ -21,8 +21,6 @@ import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
 import org.eclipse.che.ide.api.project.tree.generic.ItemNode;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.commons.exception.ServerException;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
 import org.eclipse.che.ide.json.JsonHelper;
@@ -34,6 +32,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.eclipse.che.ide.api.event.FileEvent.FileOperation.OPEN;
 import static org.eclipse.che.ide.api.event.ItemEvent.ItemOperation.CREATED;
@@ -55,21 +56,21 @@ import static org.eclipse.che.ide.ext.java.client.newsourcefile.JavaSourceFileTy
 public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionDelegate {
     private static final String DEFAULT_CONTENT = " {\n}\n";
 
-    private final NewJavaSourceFileView     view;
-    private final SelectionAgent            selectionAgent;
-    private final ProjectServiceClient      projectServiceClient;
-    private final DtoUnmarshallerFactory    dtoUnmarshallerFactory;
-    private final EventBus                  eventBus;
-    private final DialogFactory             dialogFactory;
-    private final Array<JavaSourceFileType> sourceFileTypes;
-    private final AppContext                appContext;
+    private final NewJavaSourceFileView    view;
+    private final SelectionAgent           selectionAgent;
+    private final ProjectServiceClient     projectServiceClient;
+    private final DtoUnmarshallerFactory   dtoUnmarshallerFactory;
+    private final EventBus                 eventBus;
+    private final DialogFactory            dialogFactory;
+    private final List<JavaSourceFileType> sourceFileTypes;
+    private final AppContext               appContext;
 
     @Inject
     public NewJavaSourceFilePresenter(NewJavaSourceFileView view, SelectionAgent selectionAgent, ProjectServiceClient projectServiceClient,
                                       DtoUnmarshallerFactory dtoUnmarshallerFactory, EventBus eventBus, DialogFactory dialogFactory,
                                       AppContext appContext) {
         this.appContext = appContext;
-        sourceFileTypes = Collections.createArray(CLASS, INTERFACE, ENUM, ANNOTATION);
+        sourceFileTypes = Arrays.asList(CLASS, INTERFACE, ENUM, ANNOTATION);
         this.view = view;
         this.selectionAgent = selectionAgent;
         this.projectServiceClient = projectServiceClient;

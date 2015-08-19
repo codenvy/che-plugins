@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.ssh.client.manage;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.ssh.client.SshLocalizationConstant;
 import org.eclipse.che.ide.ext.ssh.client.SshResources;
 import org.eclipse.che.ide.ext.ssh.dto.KeyItem;
@@ -176,7 +175,7 @@ public class SshKeyManagerViewImpl extends Composite implements SshKeyManagerVie
 
     /** {@inheritDoc} */
     @Override
-    public void setKeys(@Nonnull Array<KeyItem> keys) {
+    public void setKeys(@Nonnull List<KeyItem> keys) {
         // Wraps Array in java.util.List
         List<KeyItem> appList = new ArrayList<KeyItem>();
         for (int i = 0; i < keys.size(); i++) {

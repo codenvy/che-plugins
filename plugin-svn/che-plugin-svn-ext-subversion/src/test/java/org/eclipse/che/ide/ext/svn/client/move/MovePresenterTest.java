@@ -18,8 +18,6 @@ import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.svn.client.common.BaseSubversionPresenterTest;
 import org.eclipse.che.ide.ext.svn.client.common.filteredtree.FilteredTreeStructure;
 import org.eclipse.che.ide.ext.svn.client.common.filteredtree.FilteredTreeStructureProvider;
@@ -44,7 +42,7 @@ import static org.mockito.Mockito.when;
  */
 public class MovePresenterTest extends BaseSubversionPresenterTest {
     @Captor
-    private ArgumentCaptor<AsyncCallback<Array<TreeNode<?>>>> asyncRequestCallbackStatusCaptor;
+    private ArgumentCaptor<AsyncCallback<List<TreeNode<?>>>> asyncRequestCallbackStatusCaptor;
 
     private MovePresenter presenter;
 
@@ -103,11 +101,11 @@ public class MovePresenterTest extends BaseSubversionPresenterTest {
 
         presenter.showMove();
 
-        Array<TreeNode<?>> children = Collections.createArray();
+        List<TreeNode<?>> children = new ArrayList<>();
         children.add(mock(ProjectNode.class));
 
         verify(filteredTreeStructure).getRootNodes(asyncRequestCallbackStatusCaptor.capture());
-        AsyncCallback<Array<TreeNode<?>>> requestCallback = asyncRequestCallbackStatusCaptor.getValue();
+        AsyncCallback<List<TreeNode<?>>> requestCallback = asyncRequestCallbackStatusCaptor.getValue();
         GwtReflectionUtils.callPrivateMethod(requestCallback, "onSuccess", children);
 
         verify(view).setProjectNodes(eq(children));

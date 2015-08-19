@@ -12,8 +12,6 @@ package org.eclipse.che.ide.ext.java.client.projecttree.nodes;
 
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
@@ -26,6 +24,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents jar package or non java resource
@@ -72,12 +72,12 @@ public class JarContainerNode extends JarEntryNode {
 
     @Override
     public void refreshChildren(final AsyncCallback<TreeNode<?>> callback) {
-        Unmarshallable<Array<JarEntry>> unmarshaller = dtoUnmarshallerFactory.newArrayUnmarshaller(JarEntry.class);
-        service.getChildren(getProject().getPath(), libId, getData().getPath(), new AsyncRequestCallback<Array<JarEntry>>(unmarshaller) {
+        Unmarshallable<List<JarEntry>> unmarshaller = dtoUnmarshallerFactory.newListUnmarshaller(JarEntry.class);
+        service.getChildren(getProject().getPath(), libId, getData().getPath(), new AsyncRequestCallback<List<JarEntry>>(unmarshaller) {
             @Override
-            protected void onSuccess(Array<JarEntry> result) {
-                Array<TreeNode<?>> nodes = Collections.createArray();
-                for (JarEntry jarNode : result.asIterable()) {
+            protected void onSuccess(List<JarEntry> result) {
+                List<TreeNode<?>> nodes = new ArrayList<>();
+                for (JarEntry jarNode : result) {
                     nodes.add(getTreeStructure().createNodeForJarEntry(JarContainerNode.this, jarNode, libId));
                 }
                 setChildren(nodes);
@@ -90,6 +90,5 @@ public class JarContainerNode extends JarEntryNode {
             }
         });
     }
-
 
 }

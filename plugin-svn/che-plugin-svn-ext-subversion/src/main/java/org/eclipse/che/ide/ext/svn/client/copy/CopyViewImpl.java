@@ -15,8 +15,6 @@ import elemental.events.MouseEvent;
 
 import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeDataAdapter;
 import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeRenderer;
 import org.eclipse.che.ide.ui.Tooltip;
@@ -48,6 +46,7 @@ import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
 import org.vectomatic.dom.svg.OMSVGSVGElement;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * Implementation of {@link org.eclipse.che.ide.ext.svn.client.copy.CopyView}.
@@ -321,9 +320,9 @@ public class CopyViewImpl extends Window implements CopyView {
 
     /** {@inheritDoc} */
     @Override
-    public void setProjectNodes(Array<TreeNode<?>> rootNodes) {
+    public void setProjectNodes(List<TreeNode<?>> rootNodes) {
         rootNode.setChildren(rootNodes);
-        for (TreeNode<?> treeNode : rootNodes.asIterable()) {
+        for (TreeNode<?> treeNode : rootNodes) {
             treeNode.setParent(rootNode);
         }
 
@@ -366,13 +365,13 @@ public class CopyViewImpl extends Window implements CopyView {
     @Override
     public void updateProjectNode(@Nonnull TreeNode<?> oldNode, @Nonnull TreeNode<?> newNode) {
         // get currently selected node
-        final JsoArray<TreeNode<?>> selectedNodes = (JsoArray<TreeNode<?>>)tree.getSelectionModel().getSelectedNodes();
+        final List<TreeNode<?>> selectedNodes = tree.getSelectionModel().getSelectedNodes();
         TreeNode<?> selectedNode = null;
         if (!selectedNodes.isEmpty()) {
             selectedNode = selectedNodes.get(0);
         }
 
-        Array<Array<String>> pathsToExpand = tree.replaceSubtree(oldNode, newNode, false);
+        List<List<String>> pathsToExpand = tree.replaceSubtree(oldNode, newNode, false);
         tree.expandPaths(pathsToExpand, false);
 
         // restore selected node

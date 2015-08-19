@@ -14,8 +14,6 @@ import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.generic.Openable;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
 import org.eclipse.che.ide.ext.java.shared.Jar;
@@ -28,6 +26,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Evgen Vidolob
@@ -77,12 +77,12 @@ public class ExternalLibrariesNode extends AbstractTreeNode<Object> implements O
 
     @Override
     public void refreshChildren(final AsyncCallback<TreeNode<?>> callback) {
-        Unmarshallable<Array<Jar>> unmarshaller = dtoUnmarshallerFactory.newArrayUnmarshaller(Jar.class);
-        service.getExternalLibraries(getParent().getProject().getPath(), new AsyncRequestCallback<Array<Jar>>(unmarshaller) {
+        Unmarshallable<List<Jar>> unmarshaller = dtoUnmarshallerFactory.newListUnmarshaller(Jar.class);
+        service.getExternalLibraries(getParent().getProject().getPath(), new AsyncRequestCallback<List<Jar>>(unmarshaller) {
             @Override
-            protected void onSuccess(Array<Jar> result) {
-                Array<TreeNode<?>> array = Collections.createArray();
-                for (Jar jar : result.asIterable()) {
+            protected void onSuccess(List<Jar> result) {
+                List<TreeNode<?>> array = new ArrayList<>();
+                for (Jar jar : result) {
                     array.add(treeStructure.newJarNode(ExternalLibrariesNode.this, jar));
                 }
                 setChildren(array);

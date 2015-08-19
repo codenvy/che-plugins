@@ -11,10 +11,10 @@
 package org.eclipse.che.ide.ext.ssh.client.manage;
 
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.ssh.dto.KeyItem;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The view of {@link SshKeyManagerPresenter}.
@@ -56,5 +56,5 @@ public interface SshKeyManagerView extends View<SshKeyManagerView.ActionDelegate
      * @param keys
      *         available keys
      */
-    void setKeys(@Nonnull Array<KeyItem> keys);
+    void setKeys(@Nonnull List<KeyItem> keys);
 }

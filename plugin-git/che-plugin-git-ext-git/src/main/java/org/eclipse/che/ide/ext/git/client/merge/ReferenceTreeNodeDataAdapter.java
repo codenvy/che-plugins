@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.merge;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ui.tree.NodeDataAdapter;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * The adapter for reference node.
@@ -38,7 +38,7 @@ public class ReferenceTreeNodeDataAdapter implements NodeDataAdapter<Reference> 
 
     /** {@inheritDoc} */
     @Override
-    public Array<Reference> getChildren(Reference data) {
+    public List<Reference> getChildren(Reference data) {
         return data.getBranches();
     }
 
@@ -86,13 +86,13 @@ public class ReferenceTreeNodeDataAdapter implements NodeDataAdapter<Reference> 
 
     /** {@inheritDoc} */
     @Override
-    public Array<String> getNodePath(Reference data) {
+    public List<String> getNodePath(Reference data) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Reference getNodeByPath(Reference root, Array<String> relativeNodePath) {
+    public Reference getNodeByPath(Reference root, List<String> relativeNodePath) {
         return null;
     }
 

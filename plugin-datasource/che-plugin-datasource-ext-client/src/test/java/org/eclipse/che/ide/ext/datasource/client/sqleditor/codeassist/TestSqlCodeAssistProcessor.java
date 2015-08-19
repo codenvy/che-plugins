@@ -21,12 +21,13 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.datasource.client.sqleditor.EditorDatasourceOracle;
 import org.eclipse.che.ide.ext.datasource.client.sqleditor.SqlEditorResources;
 import org.eclipse.che.ide.ext.datasource.client.store.DatabaseInfoOracle;
 import org.eclipse.che.ide.jseditor.client.texteditor.ConfigurableTextEditor;
 import com.google.gwt.dev.util.collect.Lists;
+
+import java.util.List;
 
 /**
  * Testing template based, table and column completion processing.
@@ -69,19 +70,19 @@ public class TestSqlCodeAssistProcessor {
 
     @Test
     public void completeSelectTemplate() {
-        Array<SqlCodeCompletionProposal> results = codeAssistProcessor.findAutoCompletions(new SqlCodeQuery("SELEC"));
+        List<SqlCodeCompletionProposal> results = codeAssistProcessor.findAutoCompletions(new SqlCodeQuery("SELEC"));
         Assert.assertEquals("For number of results for SELEC autocompletion, we expect ", 5, results.size());
     }
 
     @Test
     public void completeSelectTemplateAfter2statements() {
-        Array<SqlCodeCompletionProposal> results = codeAssistProcessor.findAutoCompletions(new SqlCodeQuery("\nSELEC"));
+        List<SqlCodeCompletionProposal> results = codeAssistProcessor.findAutoCompletions(new SqlCodeQuery("\nSELEC"));
         Assert.assertEquals("For number of results for SELEC autocompletion after two statements, we expect ", 5, results.size());
     }
 
     @Test
     public void completeInsertTemplate() {
-        Array<SqlCodeCompletionProposal> results = codeAssistProcessor.findAutoCompletions(new SqlCodeQuery("inser"));
+        List<SqlCodeCompletionProposal> results = codeAssistProcessor.findAutoCompletions(new SqlCodeQuery("inser"));
         assertEquals("For number of results for inser autocompletion, we expect ", 1, results.size());
         assertEquals("Replacement String should be", "INSERT INTO aTable (column1, column2) VALUES ('value1', 0);",
                      results.get(0).getReplacementString());
@@ -92,15 +93,15 @@ public class TestSqlCodeAssistProcessor {
         testTableCompletion("Select * from ", "for number of results for table autocompletion, we expect ", 4);
     }
 
-    protected Array<SqlCodeCompletionProposal> testTableCompletion(String queryPrefix, String assertMessage, int expectedResultsCount) {
-        Array<SqlCodeCompletionProposal> results = codeAssistProcessor.findTableAutocompletions(new SqlCodeQuery(queryPrefix));
+    protected List<SqlCodeCompletionProposal> testTableCompletion(String queryPrefix, String assertMessage, int expectedResultsCount) {
+        List<SqlCodeCompletionProposal> results = codeAssistProcessor.findTableAutocompletions(new SqlCodeQuery(queryPrefix));
         assertEquals(assertMessage, expectedResultsCount, results.size());
         return results;
     }
 
     @Test
     public void completeTableForFirstLetterSelectFrom() {
-        Array<SqlCodeCompletionProposal> result = testTableCompletion("Select * from t", "for number of results for table autocompletion starting with t, we expect ", 1);
+        List<SqlCodeCompletionProposal> result = testTableCompletion("Select * from t", "for number of results for table autocompletion starting with t, we expect ", 1);
         assertEquals("result completion should be", "Select * from public.table", result.get(0).getReplacementString());
     }
 
@@ -152,7 +153,7 @@ public class TestSqlCodeAssistProcessor {
     }
 
     protected void testColumnCompletion(String queryPrefix, String assertMessage, int expectedResultsCount) {
-        Array<SqlCodeCompletionProposal> results = codeAssistProcessor.findColumnAutocompletions(new SqlCodeQuery(queryPrefix));
+        List<SqlCodeCompletionProposal> results = codeAssistProcessor.findColumnAutocompletions(new SqlCodeQuery(queryPrefix));
         assertEquals(assertMessage, expectedResultsCount, results.size());
     }
 

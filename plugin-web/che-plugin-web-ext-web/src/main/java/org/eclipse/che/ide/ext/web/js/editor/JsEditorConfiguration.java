@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.web.js.editor;
 
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.web.html.editor.AutoEditStrategyFactory;
 import org.eclipse.che.ide.jseditor.client.changeintercept.ChangeInterceptorProvider;
 import org.eclipse.che.ide.jseditor.client.changeintercept.TextChangeInterceptor;
@@ -20,7 +18,9 @@ import org.eclipse.che.ide.jseditor.client.editorconfig.AutoSaveTextEditorConfig
 import org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,11 +46,11 @@ public class JsEditorConfiguration extends AutoSaveTextEditorConfiguration {
     }
 
     @Override
-    public StringMap<CodeAssistProcessor> getContentAssistantProcessors() {
+    public Map<String, CodeAssistProcessor> getContentAssistantProcessors() {
         if (defaultProcessor.getProcessors() == null || defaultProcessor.getProcessors().size() == 0) {
             return null;
         }
-        StringMap<CodeAssistProcessor> map = Collections.createStringMap();
+        Map<String, CodeAssistProcessor> map = new HashMap<>();
         map.put(DocumentPartitioner.DEFAULT_CONTENT_TYPE, defaultProcessor);
         return map;
     }

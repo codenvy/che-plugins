@@ -16,7 +16,6 @@ import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.Notification.Type;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.preferences.AbstractPreferencePagePresenter;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.datasource.client.ssl.upload.UploadSslKeyDialogPresenter;
 import org.eclipse.che.ide.ext.datasource.client.ssl.upload.UploadSslTrustCertDialogPresenter;
@@ -31,6 +30,8 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
+
+import java.util.List;
 
 @Singleton
 public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter implements SslKeyStoreManagerView.ActionDelegate {
@@ -89,9 +90,9 @@ public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter
 
     protected void refreshClientKeys() {
         service.getAllClientKeys(
-                new AsyncRequestCallback<Array<SslKeyStoreEntry>>(dtoUnmarshallerFactory.newArrayUnmarshaller(SslKeyStoreEntry.class)) {
+                new AsyncRequestCallback<List<SslKeyStoreEntry>>(dtoUnmarshallerFactory.newListUnmarshaller(SslKeyStoreEntry.class)) {
                     @Override
-                    public void onSuccess(Array<SslKeyStoreEntry> result) {
+                    public void onSuccess(List<SslKeyStoreEntry> result) {
                         view.setClientKeys(result);
                     }
 
@@ -142,9 +143,9 @@ public class SslKeyStoreManagerPresenter extends AbstractPreferencePagePresenter
 
     protected void refreshServerCerts() {
         service.getAllServerCerts(
-                new AsyncRequestCallback<Array<SslKeyStoreEntry>>(dtoUnmarshallerFactory.newArrayUnmarshaller(SslKeyStoreEntry.class)) {
+                new AsyncRequestCallback<List<SslKeyStoreEntry>>(dtoUnmarshallerFactory.newListUnmarshaller(SslKeyStoreEntry.class)) {
                     @Override
-                    public void onSuccess(Array<SslKeyStoreEntry> result) {
+                    public void onSuccess(List<SslKeyStoreEntry> result) {
                         view.setServerCerts(result);
                     }
 

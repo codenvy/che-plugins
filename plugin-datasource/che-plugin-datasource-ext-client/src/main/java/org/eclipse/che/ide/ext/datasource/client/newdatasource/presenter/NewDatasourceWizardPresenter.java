@@ -183,7 +183,7 @@ public class NewDatasourceWizardPresenter implements InitializableWizardDialog<D
 
         NewDatasourceConnector connector = newDatasourceConnectorAgent.getConnector(id);
         if (connector != null) {
-            for (Provider<? extends AbstractNewDatasourceConnectorPage> provider : connector.getWizardPages().asIterable()) {
+            for (Provider<? extends AbstractNewDatasourceConnectorPage> provider : connector.getWizardPages()) {
                 connectorPage = provider.get();
                 connectorPage.setContext(wizard.getContext());
                 connectorPage.setUpdateDelegate(this);

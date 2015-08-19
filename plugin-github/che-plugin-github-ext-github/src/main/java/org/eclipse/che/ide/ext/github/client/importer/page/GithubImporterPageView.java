@@ -11,11 +11,12 @@
 package org.eclipse.che.ide.ext.github.client.importer.page;
 
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.github.client.load.ProjectData;
 import com.google.inject.ImplementedBy;
 
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Roman Nikitenko
@@ -147,7 +148,7 @@ public interface GithubImporterPageView extends View<GithubImporterPageView.Acti
      * @param repositories
      *         available repositories
      */
-    void setRepositories(@Nonnull Array<ProjectData> repositories);
+    void setRepositories(@Nonnull List<ProjectData> repositories);
 
     /** @return account name */
     @Nonnull
@@ -159,7 +160,7 @@ public interface GithubImporterPageView extends View<GithubImporterPageView.Acti
      * @param names
      *         available names
      */
-    void setAccountNames(@Nonnull Array<String> names);
+    void setAccountNames(@Nonnull Set<String> names);
 
     /**
      * Close github panel.

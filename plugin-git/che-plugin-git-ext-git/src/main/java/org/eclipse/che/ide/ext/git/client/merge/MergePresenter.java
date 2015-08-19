@@ -23,8 +23,6 @@ import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -100,16 +98,15 @@ public class MergePresenter implements MergeView.ActionDelegate {
         view.setEnableMergeButton(false);
 
         service.branchList(project, LIST_LOCAL,
-                           new AsyncRequestCallback<Array<Branch>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Branch.class)) {
+                           new AsyncRequestCallback<List<Branch>>(dtoUnmarshallerFactory.newListUnmarshaller(Branch.class)) {
                                @Override
-                               protected void onSuccess(Array<Branch> result) {
+                               protected void onSuccess(List<Branch> result) {
                                    if (result.isEmpty()) {
                                        return;
                                    }
 
-                                   Array<Reference> references = Collections.createArray();
-                                   for (int i = 0; i < result.size(); i++) {
-                                       Branch branch = result.get(i);
+                                   List<Reference> references = new ArrayList<>();
+                                   for (Branch branch : result) {
                                        if (!branch.isActive()) {
                                            Reference reference = new Reference(branch.getName(), branch.getDisplayName(), LOCAL_BRANCH);
                                            references.add(reference);
@@ -127,16 +124,15 @@ public class MergePresenter implements MergeView.ActionDelegate {
                            });
 
         service.branchList(project, LIST_REMOTE,
-                           new AsyncRequestCallback<Array<Branch>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Branch.class)) {
+                           new AsyncRequestCallback<List<Branch>>(dtoUnmarshallerFactory.newListUnmarshaller(Branch.class)) {
                                @Override
-                               protected void onSuccess(Array<Branch> result) {
+                               protected void onSuccess(List<Branch> result) {
                                    if (result.isEmpty()) {
                                        return;
                                    }
 
-                                   Array<Reference> references = Collections.createArray();
-                                   for (int i = 0; i < result.size(); i++) {
-                                       Branch branch = result.get(i);
+                                   List<Reference> references = new ArrayList<>();
+                                   for (Branch branch : result) {
                                        if (!branch.isActive()) {
                                            Reference reference =
                                                    new Reference(branch.getName(), branch.getDisplayName(), REMOTE_BRANCH);
@@ -169,7 +165,7 @@ public class MergePresenter implements MergeView.ActionDelegate {
         view.close();
 
         final List<EditorPartPresenter> openedEditors = new ArrayList<>();
-        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().getValues().asIterable()) {
+        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().values()) {
             openedEditors.add(partPresenter);
         }
         service.merge(appContext.getCurrentProject().getRootProject(), selectedReference.getDisplayName(),

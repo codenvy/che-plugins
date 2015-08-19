@@ -10,12 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.datasource.client.sqleditor.codeassist;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.util.AbstractTrie;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class SqlCodeTemplateTrie {
-    private static final Array<String> ELEMENTS = Collections.createArray(
+    private static final List<String> ELEMENTS = Arrays.asList(
             "SELECT * FROM aTable;",//
             "SELECT * FROM aTable INNER JOIN anotherTable ON aTable.id = anotherTable.id;",//
             "SELECT * FROM aTable WHERE column = 'value';",//
@@ -25,24 +26,23 @@ public class SqlCodeTemplateTrie {
             "UPDATE aTable SET column2 = 30 WHERE column1 = 'value1';",//
             "SELECT * FROM aTable WHERE column LIKE '%rg%';",//
             "CREATE TABLE aTable (IntColumn int, VarcharColumn1 varchar(255), VarcharColumn2 varchar(255));"
-                                                                         );
+                                                          );
 
     private static final AbstractTrie<SqlCodeCompletionProposal> sqlCodeTrie = createTrie();
 
     private static AbstractTrie<SqlCodeCompletionProposal> createTrie() {
-        AbstractTrie<SqlCodeCompletionProposal> result = new AbstractTrie<SqlCodeCompletionProposal>();
-        for (String name : ELEMENTS.asIterable()) {
+        AbstractTrie<SqlCodeCompletionProposal> result = new AbstractTrie<>();
+        for (String name : ELEMENTS) {
             result.put(name.toLowerCase(), new SqlCodeCompletionProposal(name));
         }
         return result;
     }
 
-    public static Array<SqlCodeCompletionProposal> findAndFilterAutocompletions(SqlCodeQuery query) {
+    public static List<SqlCodeCompletionProposal> findAndFilterAutocompletions(SqlCodeQuery query) {
         String prefix = query.getLastQueryPrefix();
         // remove leading trailing space
         prefix = prefix.replaceAll("^\\s*", "").toLowerCase();
 
-        Array<SqlCodeCompletionProposal> searchedProposals = sqlCodeTrie.search(prefix);
-        return searchedProposals;
+        return sqlCodeTrie.search(prefix);
     }
 }

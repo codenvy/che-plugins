@@ -13,7 +13,6 @@ package org.eclipse.che.plugin.angularjs.core.client.editor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.web.html.editor.HTMLCodeAssistProcessor;
 import org.eclipse.che.ide.jseditor.client.codeassist.CodeAssistCallback;
 import org.eclipse.che.ide.jseditor.client.codeassist.CompletionProposal;
@@ -237,7 +236,7 @@ public class AngularJSHtmlCodeAssistProcessor implements HTMLCodeAssistProcessor
     /**
      * Interface API for computing the code completion
      * 
-     * @param textEditorPartView the editor
+     * @param textEditor the editor
      * @param offset an offset within the document for which completions should be computed
      * @param codeAssistCallback the callback used to provide code completion
      */
@@ -260,7 +259,7 @@ public class AngularJSHtmlCodeAssistProcessor implements HTMLCodeAssistProcessor
         }
 
         InvocationContext invocationContext = new InvocationContext(query, offset, angularJSResources, textEditor);
-        Array<AngularJSCompletionProposal> completionProposals = AngularJSTrie.findAndFilterAutocompletions(query);
+        List<AngularJSCompletionProposal> completionProposals = AngularJSTrie.findAndFilterAutocompletions(query);
         codeAssistCallback.proposalComputed(jsToList(completionProposals, invocationContext));
     }
 
@@ -277,12 +276,11 @@ public class AngularJSHtmlCodeAssistProcessor implements HTMLCodeAssistProcessor
      * @param context the given invocation context
      * @return the array
      */
-    private List<CompletionProposal> jsToList(Array<AngularJSCompletionProposal> autocompletions,
+    private List<CompletionProposal> jsToList(List<AngularJSCompletionProposal> autocompletions,
                                               InvocationContext context) {
         final List<CompletionProposal> proposals = new ArrayList<>();
         if (autocompletions != null) {
-            for (int i = 0; i < autocompletions.size(); i++) {
-                final AngularJSCompletionProposal proposal = autocompletions.get(i);
+            for (AngularJSCompletionProposal proposal : autocompletions) {
                 proposals.add(proposal);
                 proposal.setInvocationContext(context);
             }

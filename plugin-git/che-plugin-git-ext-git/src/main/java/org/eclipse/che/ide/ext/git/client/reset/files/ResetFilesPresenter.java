@@ -21,8 +21,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -56,7 +54,7 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
     private       GitLocalizationConstant constant;
     private       NotificationManager     notificationManager;
     private       CurrentProject          project;
-    private       Array<IndexFile>        indexedFiles;
+    private       List<IndexFile>        indexedFiles;
 
     /** Create presenter. */
     @Inject
@@ -87,8 +85,8 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
                                    return;
                                }
 
-                               Array<IndexFile> values = Collections.createArray();
-                               ArrayList<String> valuesTmp = new ArrayList<>();
+                               List<IndexFile> values = new ArrayList<>();
+                               List<String> valuesTmp = new ArrayList<>();
 
                                valuesTmp.addAll(result.getAdded());
                                valuesTmp.addAll(result.getChanged());
@@ -124,7 +122,7 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
     @Override
     public void onResetClicked() {
         List<String> files = new ArrayList<>();
-        for (IndexFile indexFile : indexedFiles.asIterable()) {
+        for (IndexFile indexFile : indexedFiles) {
             if (!indexFile.isIndexed()) {
                 files.add(indexFile.getPath());
             }

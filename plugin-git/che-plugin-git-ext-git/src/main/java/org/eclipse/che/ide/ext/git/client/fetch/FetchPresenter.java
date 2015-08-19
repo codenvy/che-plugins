@@ -18,7 +18,6 @@ import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -88,9 +87,9 @@ public class FetchPresenter implements FetchView.ActionDelegate {
      */
     private void getRemotes() {
         service.remoteList(project.getRootProject(), null, true,
-                           new AsyncRequestCallback<Array<Remote>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Remote.class)) {
+                           new AsyncRequestCallback<List<Remote>>(dtoUnmarshallerFactory.newListUnmarshaller(Remote.class)) {
                                @Override
-                               protected void onSuccess(Array<Remote> result) {
+                               protected void onSuccess(List<Remote> result) {
                                    view.setRepositories(result);
                                    getBranches(LIST_REMOTE);
                                    view.setEnableFetchButton(!result.isEmpty());
@@ -119,15 +118,15 @@ public class FetchPresenter implements FetchView.ActionDelegate {
      */
     private void getBranches(@Nonnull final String remoteMode) {
         service.branchList(project.getRootProject(), remoteMode,
-                           new AsyncRequestCallback<Array<Branch>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Branch.class)) {
+                           new AsyncRequestCallback<List<Branch>>(dtoUnmarshallerFactory.newListUnmarshaller(Branch.class)) {
                                @Override
-                               protected void onSuccess(Array<Branch> result) {
+                               protected void onSuccess(List<Branch> result) {
                                    if (LIST_REMOTE.equals(remoteMode)) {
                                        view.setRemoteBranches(branchSearcher.getRemoteBranchesToDisplay(view.getRepositoryName(), result));
                                        getBranches(LIST_LOCAL);
                                    } else {
                                        view.setLocalBranches(branchSearcher.getLocalBranchesToDisplay(result));
-                                       for (Branch branch : result.asIterable()) {
+                                       for (Branch branch : result) {
                                            if (branch.isActive()) {
                                                view.selectRemoteBranch(branch.getDisplayName());
                                                break;

@@ -12,9 +12,9 @@ package org.eclipse.che.ide.ext.git.client.pull;
 
 import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The view of {@link PullPresenter}.
@@ -56,7 +56,7 @@ public interface PullView extends View<PullView.ActionDelegate> {
      * @param repositories
      *         available repositories
      */
-    void setRepositories(@Nonnull Array<Remote> repositories);
+    void setRepositories(@Nonnull List<Remote> repositories);
 
     /** @return local branch */
     @Nonnull
@@ -82,7 +82,7 @@ public interface PullView extends View<PullView.ActionDelegate> {
      * @param branches
      *         local branches
      */
-    void setLocalBranches(@Nonnull Array<String> branches);
+    void setLocalBranches(@Nonnull List<String> branches);
 
     /** @return remote branches */
     @Nonnull
@@ -94,7 +94,7 @@ public interface PullView extends View<PullView.ActionDelegate> {
      * @param branches
      *         remote branches
      */
-    void setRemoteBranches(@Nonnull Array<String> branches);
+    void setRemoteBranches(@Nonnull List<String> branches);
 
     /**
      * Change the enable state of the push button.

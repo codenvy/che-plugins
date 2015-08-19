@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.ext.java.worker;
 
 import org.eclipse.che.ide.collections.Jso;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.collections.js.JsoStringMap;
 import org.eclipse.che.ide.ext.java.jdt.CUVariables;
@@ -156,12 +155,9 @@ public class WorkerMessageHandler implements MessageHandler, MessageFilter.Messa
                                                    @Override
                                                    public void onMessageReceived(PreferenceFormatSetMessage message) {
                                                        JsoStringMap<String> settingsJso = message.settings();
-                                                       settingsJso.iterate(new StringMap.IterationCallback<String>() {
-                                                           @Override
-                                                           public void onIteration(String key, String value) {
-                                                               preferenceFormatSettings.put(key, value);
-                                                           }
-                                                       });
+                                                       for (String key: settingsJso.getKeys().asIterable()) {
+                                                           preferenceFormatSettings.put(key, settingsJso.get(key));
+                                                       }
                                                    }
                                                });
         messageFilter.registerMessageRecipient(RoutingTypes.DEPENDENCIES_UPDATED, new MessageFilter.MessageRecipient<DependenciesUpdatedMessage>() {
@@ -204,7 +200,7 @@ public class WorkerMessageHandler implements MessageHandler, MessageFilter.Messa
         textEdit.addField("offSet", edit.getOffset());
 
         if (edit.hasChildren()) {
-            textEdit.addField("children", convertChildrenTextEditToJso(edit.getChildren()));
+            textEdit.addField("children", edit.getChildren());
         }
         if (!(edit instanceof InsertEdit || edit instanceof MoveTargetEdit || edit instanceof CopyTargetEdit)) {
             textEdit.addField("length", edit.getLength());

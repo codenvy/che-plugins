@@ -13,13 +13,13 @@ package org.eclipse.che.ide.ext.python.client.wizard;
 import org.eclipse.che.api.project.shared.dto.ImportProject;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistrar;
 import org.eclipse.che.ide.api.wizard.WizardPage;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.python.shared.ProjectAttributes;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides information for registering Python project type into project wizard.
@@ -27,11 +27,11 @@ import javax.annotation.Nonnull;
  * @author Artem Zatsarynnyy
  */
 public class PythonProjectWizardRegistrar implements ProjectWizardRegistrar {
-    private final Array<Provider<? extends WizardPage<ImportProject>>> wizardPages;
+    private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;
 
     @Inject
     public PythonProjectWizardRegistrar() {
-        wizardPages = Collections.createArray();
+        wizardPages = new ArrayList<>();
     }
 
     @Nonnull
@@ -45,7 +45,7 @@ public class PythonProjectWizardRegistrar implements ProjectWizardRegistrar {
     }
 
     @Nonnull
-    public Array<Provider<? extends WizardPage<ImportProject>>> getWizardPages() {
+    public List<Provider<? extends WizardPage<ImportProject>>> getWizardPages() {
         return wizardPages;
     }
 }

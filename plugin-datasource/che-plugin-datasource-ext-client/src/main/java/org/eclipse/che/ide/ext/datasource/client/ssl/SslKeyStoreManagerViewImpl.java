@@ -16,7 +16,6 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.eclipse.che.ide.Resources;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.datasource.shared.ssl.SslKeyStoreEntry;
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.Cell.Context;
@@ -145,7 +144,7 @@ public class SslKeyStoreManagerViewImpl extends Composite implements SslKeyStore
     }
 
     @Override
-    public void setClientKeys(@NotNull Array<SslKeyStoreEntry> keys) {
+    public void setClientKeys(@NotNull List<SslKeyStoreEntry> keys) {
         // Wraps Array in java.util.List
         List<SslKeyStoreEntry> appList = new ArrayList<SslKeyStoreEntry>();
         for (int i = 0; i < keys.size(); i++) {
@@ -155,9 +154,9 @@ public class SslKeyStoreManagerViewImpl extends Composite implements SslKeyStore
     }
 
     @Override
-    public void setServerCerts(@NotNull Array<SslKeyStoreEntry> keys) {
+    public void setServerCerts(@NotNull List<SslKeyStoreEntry> keys) {
         // Wraps Array in java.util.List
-        List<SslKeyStoreEntry> appList = new ArrayList<SslKeyStoreEntry>();
+        List<SslKeyStoreEntry> appList = new ArrayList<>();
         for (int i = 0; i < keys.size(); i++) {
             appList.add(keys.get(i));
         }

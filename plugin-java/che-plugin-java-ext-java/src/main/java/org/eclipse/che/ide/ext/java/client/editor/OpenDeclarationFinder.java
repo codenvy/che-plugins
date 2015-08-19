@@ -17,7 +17,6 @@ import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeStructure;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
 import org.eclipse.che.ide.ext.java.messages.JavadocHandleComputed;
@@ -31,6 +30,8 @@ import org.eclipse.che.ide.util.loging.Log;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import java.util.Map;
 
 /**
  * @author Evgen Vidolob
@@ -107,8 +108,8 @@ public class OpenDeclarationFinder {
     }
 
     private void handleDescriptor(final OpenDeclarationDescriptor descriptor) {
-        StringMap<EditorPartPresenter> openedEditors = editorAgent.getOpenedEditors();
-        for (String s : openedEditors.getKeys().asIterable()) {
+        Map<String, EditorPartPresenter> openedEditors = editorAgent.getOpenedEditors();
+        for (String s : openedEditors.keySet()) {
             if (descriptor.getPath().equals(s)) {
                 EditorPartPresenter editorPartPresenter = openedEditors.get(s);
                 editorAgent.activateEditor(editorPartPresenter);

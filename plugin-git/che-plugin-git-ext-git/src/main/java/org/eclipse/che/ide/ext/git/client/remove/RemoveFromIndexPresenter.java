@@ -135,7 +135,7 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
     public void onRemoveClicked() {
         final Selection<StorableNode> selection = (Selection<StorableNode>)selectionAgent.getSelection();
         openedEditors = new ArrayList<>();
-        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().getValues().asIterable()) {
+        for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().values()) {
             openedEditors.add(partPresenter);
         }
 

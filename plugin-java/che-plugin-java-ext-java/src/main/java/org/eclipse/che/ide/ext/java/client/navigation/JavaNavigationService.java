@@ -10,11 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.navigation;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
+
+import java.util.List;
 
 /**
  * @author Evgen Vidolob
@@ -35,11 +36,11 @@ public interface JavaNavigationService {
      * @param projectPath path to the project
      * @param callback
      */
-    void getExternalLibraries(String projectPath, AsyncRequestCallback<Array<Jar>> callback);
+    void getExternalLibraries(String projectPath, AsyncRequestCallback<List<Jar>> callback);
 
-    void getLibraryChildren(String projectPath, int libId, AsyncRequestCallback<Array<JarEntry>> callback);
+    void getLibraryChildren(String projectPath, int libId, AsyncRequestCallback<List<JarEntry>> callback);
 
-    void getChildren(String projectPath, int libId, String path, AsyncRequestCallback<Array<JarEntry>> callback);
+    void getChildren(String projectPath, int libId, String path, AsyncRequestCallback<List<JarEntry>> callback);
 
     void getEntry(String projectPath, int libId, String path, AsyncRequestCallback<JarEntry> callback);
 

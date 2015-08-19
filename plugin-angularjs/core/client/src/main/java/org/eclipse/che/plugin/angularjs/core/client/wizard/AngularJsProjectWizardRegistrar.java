@@ -13,13 +13,15 @@ package org.eclipse.che.plugin.angularjs.core.client.wizard;
 import org.eclipse.che.api.project.shared.dto.ImportProject;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistrar;
 import org.eclipse.che.ide.api.wizard.WizardPage;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.plugin.angularjs.core.client.share.Const;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.eclipse.che.plugin.angularjs.core.client.share.Const.ANGULAR_JS_ID;
+import static org.eclipse.che.plugin.angularjs.core.client.share.Const.CATEGORY_JS;
 
 /**
  * Provides information for registering AngularJS project type into project wizard.
@@ -27,25 +29,25 @@ import javax.annotation.Nonnull;
  * @author Vitalii Parfonov
  */
 public class AngularJsProjectWizardRegistrar implements ProjectWizardRegistrar {
-    private final Array<Provider<? extends WizardPage<ImportProject>>> wizardPages;
+    private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;
 
     @Inject
     public AngularJsProjectWizardRegistrar() {
-        wizardPages = Collections.createArray();
+        wizardPages = new ArrayList<>();
     }
 
     @Nonnull
     public String getProjectTypeId() {
-        return Const.ANGULAR_JS_ID;
+        return ANGULAR_JS_ID;
     }
 
     @Nonnull
     public String getCategory() {
-        return Const.CATEGORY_JS;
+        return CATEGORY_JS;
     }
 
     @Nonnull
-    public Array<Provider<? extends WizardPage<ImportProject>>> getWizardPages() {
+    public List<Provider<? extends WizardPage<ImportProject>>> getWizardPages() {
         return wizardPages;
     }
 }

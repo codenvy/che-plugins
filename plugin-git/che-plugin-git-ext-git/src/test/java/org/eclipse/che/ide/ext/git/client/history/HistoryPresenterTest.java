@@ -23,7 +23,6 @@ import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -124,7 +123,7 @@ public class HistoryPresenterTest extends BaseTest {
         verify(view).setCommitBRevision(eq(EMPTY_TEXT));
         verify(view).setDiffContext(eq(EMPTY_TEXT));
         verify(view).setCompareType(anyString());
-        verify(view).setRevisions((Array<Revision>)anyObject());
+        verify(view).setRevisions((List<Revision>)anyObject());
         verify(workspaceAgent).openPart(eq(presenter), eq(PartStackType.TOOLING));
         verify(partStack).getActivePart();
         verify(partStack).setActivePart(eq(presenter));

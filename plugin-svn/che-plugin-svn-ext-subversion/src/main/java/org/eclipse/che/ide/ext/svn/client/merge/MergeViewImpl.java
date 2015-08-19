@@ -19,14 +19,12 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,11 +33,8 @@ import elemental.events.KeyboardEvent;
 import elemental.events.MouseEvent;
 import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
-import org.eclipse.che.ide.ext.svn.shared.SubversionItem;
 import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeDataAdapter;
 import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeRenderer;
 import org.eclipse.che.ide.ui.Tooltip;
@@ -50,6 +45,8 @@ import org.eclipse.che.ide.util.input.SignalEvent;
 import org.vectomatic.dom.svg.OMSVGSVGElement;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An implementation of MergeView, represented as popup modal dialog.
@@ -241,7 +238,7 @@ public class MergeViewImpl extends Window implements MergeView {
 
     @Override
     public void setRootNode(TreeNode<?> node) {
-        Array<TreeNode<?>> children = Collections.createArray();
+        List<TreeNode<?>> children = new ArrayList<>();
         children.add(node);
         rootNode.setChildren(children);
         node.setParent(rootNode);

@@ -19,7 +19,6 @@ import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.commons.exception.UnauthorizedException;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BranchFilterByRemote;
@@ -95,9 +94,9 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
      */
     void updateRemotes() {
         service.remoteList(project.getRootProject(), null, true,
-                           new AsyncRequestCallback<Array<Remote>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Remote.class)) {
+                           new AsyncRequestCallback<List<Remote>>(dtoUnmarshallerFactory.newListUnmarshaller(Remote.class)) {
                                @Override
-                               protected void onSuccess(Array<Remote> result) {
+                               protected void onSuccess(List<Remote> result) {
                                    updateLocalBranches();
                                    view.setRepositories(result);
                                    view.setEnablePushButton(!result.isEmpty());
@@ -120,13 +119,13 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
      */
     void updateLocalBranches() {
         //getting local branches
-        getBranchesForCurrentProject(LIST_LOCAL, new AsyncCallback<Array<Branch>>() {
+        getBranchesForCurrentProject(LIST_LOCAL, new AsyncCallback<List<Branch>>() {
             @Override
-            public void onSuccess(Array<Branch> result) {
-                Array<String> localBranches = branchSearcher.getLocalBranchesToDisplay(result);
+            public void onSuccess(List<Branch> result) {
+                List<String> localBranches = branchSearcher.getLocalBranchesToDisplay(result);
                 view.setLocalBranches(localBranches);
 
-                for (Branch branch : result.asIterable()) {
+                for (Branch branch : result) {
                     if (branch.isActive()) {
                         view.selectLocalBranch(branch.getDisplayName());
                         break;
@@ -150,9 +149,9 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
      * Update list of remote branches on view.
      */
     void updateRemoteBranches() {
-        getBranchesForCurrentProject(LIST_REMOTE, new AsyncCallback<Array<Branch>>() {
+        getBranchesForCurrentProject(LIST_REMOTE, new AsyncCallback<List<Branch>>() {
             @Override
-            public void onSuccess(final Array<Branch> result) {
+            public void onSuccess(final List<Branch> result) {
                 // Need to add the upstream of local branch in the list of remote branches
                 // to be able to push changes to the remote upstream branch
                 getUpstreamBranch(new AsyncCallback<Branch>() {
@@ -160,7 +159,7 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
                     public void onSuccess(Branch upstream) {
                         BranchFilterByRemote remoteRefsHandler = new BranchFilterByRemote(view.getRepository());
 
-                        final Array<String> remoteBranches = branchSearcher.getRemoteBranchesToDisplay(remoteRefsHandler, result);
+                        final List<String> remoteBranches = branchSearcher.getRemoteBranchesToDisplay(remoteRefsHandler, result);
 
                         String selectedRemoteBranch = null;
                         if (upstream != null && upstream.isRemote() && remoteRefsHandler.isLinkedTo(upstream)) {
@@ -242,12 +241,12 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
      *         is a remote mode
      */
     void getBranchesForCurrentProject(@Nonnull final String remoteMode,
-                                      final AsyncCallback<Array<Branch>> asyncResult) {
+                                      final AsyncCallback<List<Branch>> asyncResult) {
         service.branchList(project.getRootProject(),
                            remoteMode,
-                           new AsyncRequestCallback<Array<Branch>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Branch.class)) {
+                           new AsyncRequestCallback<List<Branch>>(dtoUnmarshallerFactory.newListUnmarshaller(Branch.class)) {
                                @Override
-                               protected void onSuccess(Array<Branch> result) {
+                               protected void onSuccess(List<Branch> result) {
                                    asyncResult.onSuccess(result);
                                }
 

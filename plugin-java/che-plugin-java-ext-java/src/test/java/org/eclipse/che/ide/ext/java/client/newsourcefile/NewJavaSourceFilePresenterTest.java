@@ -20,7 +20,6 @@ import org.eclipse.che.ide.api.project.tree.TreeStructure;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFolderNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -41,6 +40,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import static org.eclipse.che.ide.ext.java.client.newsourcefile.JavaSourceFileType.ANNOTATION;
 import static org.eclipse.che.ide.ext.java.client.newsourcefile.JavaSourceFileType.CLASS;
@@ -146,7 +146,7 @@ public class NewJavaSourceFilePresenterTest {
     @Test
     public void shouldShowDialog() {
         presenter.showDialog();
-        verify(view).setTypes(Matchers.<Array<JavaSourceFileType>>anyObject());
+        verify(view).setTypes(Matchers.<List<JavaSourceFileType>>anyObject());
         verify(view).showDialog();
     }
 

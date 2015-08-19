@@ -11,8 +11,6 @@
 package org.eclipse.che.ide.extension.builder.client.build;
 
 import org.eclipse.che.api.builder.dto.BuildTaskDescriptor;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.IntegerMap;
 import org.eclipse.che.ide.commons.exception.UnmarshallerException;
 import org.eclipse.che.ide.extension.builder.client.BuilderExtension;
 import org.eclipse.che.ide.extension.builder.client.console.BuilderConsolePresenter;
@@ -25,6 +23,9 @@ import org.eclipse.che.ide.websocket.rest.Unmarshallable;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.Timer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class listens for log messages from the server
@@ -41,7 +42,7 @@ class LogMessagesHandler extends SubscriptionHandler<LogMessage> {
     private final BuilderConsolePresenter console;
     private final MessageBus              messageBus;
     private       int                     lastPrintedMessageNum;
-    private IntegerMap<LogMessage> postponedMessages = Collections.createIntegerMap();
+    private Map<Integer, LogMessage> postponedMessages = new HashMap<>();
     private Timer flushTimer;
 
     LogMessagesHandler(BuildTaskDescriptor buildTaskDescriptor, BuilderConsolePresenter console, MessageBus messageBus) {
@@ -83,7 +84,7 @@ class LogMessagesHandler extends SubscriptionHandler<LogMessage> {
         while (nextLogMessage != null) {
             printLine(nextLogMessage);
 
-            postponedMessages.erase(nextLogMessage.num);
+            postponedMessages.remove(nextLogMessage.num);
             nextLogMessage = postponedMessages.get(nextLogMessage.num + 1);
         }
     }
@@ -94,7 +95,7 @@ class LogMessagesHandler extends SubscriptionHandler<LogMessage> {
             LogMessage nextLogMessage = postponedMessages.get(i);
             if (nextLogMessage != null) {
                 printLine(nextLogMessage);
-                postponedMessages.erase(i);
+                postponedMessages.remove(i);
             }
         }
     }

@@ -12,9 +12,9 @@ package org.eclipse.che.ide.ext.git.client.url;
 
 import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The view of {@link ShowProjectGitReadOnlyUrlPresenter}.
@@ -42,7 +42,7 @@ public interface ShowProjectGitReadOnlyUrlView extends View<ShowProjectGitReadOn
      * @param remotes
      *         remote URLs what will be shown on view
      */
-    void setRemotes(Array<Remote> remotes);
+    void setRemotes(List<Remote> remotes);
 
     /** Close dialog. */
     void close();

@@ -13,9 +13,7 @@ package org.eclipse.che.ide.ext.java.client.editor;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.event.ProjectActionHandler;
 import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.collections.Jso;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.collections.js.JsoStringMap;
 import org.eclipse.che.ide.ext.java.jdt.core.compiler.IProblem;
@@ -60,6 +58,11 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.google.web.bindery.event.shared.EventBus;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * The type Java parser worker impl.
  *
@@ -67,14 +70,14 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class JavaParserWorkerImpl implements JavaParserWorker, ProjectActionHandler, MessageFilter.MessageRecipient<ProblemsMessage> {
 
-    private final MessageFilter                messageFilter;
-    private final String                       workspaceId;
-    private       String                       javaCAPath;
-    private       Worker                       worker;
-    private       String                       restContext;
-    private       StringMap<WorkerCallback<?>> arrayCallbacks;
-    private StringMap<WorkerCallback<WorkerCodeBlock>> outlineCallbacks = Collections.createStringMap();
-    private StringMap<Callback<?>>                     callbacks        = Collections.createStringMap();
+    private final MessageFilter                  messageFilter;
+    private final String                         workspaceId;
+    private       String                         javaCAPath;
+    private       Worker                         worker;
+    private       String                         restContext;
+    private       Map<String, WorkerCallback<?>> arrayCallbacks;
+    private Map<String, WorkerCallback<WorkerCodeBlock>> outlineCallbacks = new HashMap<>();
+    private Map<String, Callback<?>>                     callbacks        = new HashMap<>();
 
 
     @Inject
@@ -85,7 +88,7 @@ public class JavaParserWorkerImpl implements JavaParserWorker, ProjectActionHand
         this.javaCAPath = javaCAPath;
         eventBus.addHandler(ProjectActionEvent.TYPE, this);
         messageFilter = new MessageFilter();
-        arrayCallbacks = Collections.createStringMap();
+        arrayCallbacks = new HashMap<>();
         messageFilter.registerMessageRecipient(RoutingTypes.PROBLEMS, this);
         messageFilter.registerMessageRecipient(RoutingTypes.CA_PROPOSALS_COMPUTED,
                                                new MessageFilter.MessageRecipient<CAProposalsComputedMessage>() {
@@ -240,7 +243,7 @@ public class JavaParserWorkerImpl implements JavaParserWorker, ProjectActionHand
     private void handleUpdateOutline(OutlineUpdateMessage message) {
         if (outlineCallbacks.containsKey(message.getFilePath())) {
             WorkerCallback<WorkerCodeBlock> callback = outlineCallbacks.get(message.getFilePath());
-            callback.onResult(message.getBlocks());
+            callback.onResult(message.getBlocks().toList());
         }
     }
 
@@ -259,7 +262,7 @@ public class JavaParserWorkerImpl implements JavaParserWorker, ProjectActionHand
         }
 
         WorkerCallback<WorkerProposal> callback = (WorkerCallback<WorkerProposal>)arrayCallbacks.remove(message.id());
-        callback.onResult(message.proposals());
+        callback.onResult(message.proposals().toList());
     }
 
     @Override
@@ -366,14 +369,14 @@ public class JavaParserWorkerImpl implements JavaParserWorker, ProjectActionHand
 
     @Override
     public void computeQAProposals(String content, int offset, int selectionLength, boolean updatedContent,
-                                   JsoArray<ProblemLocationMessage> problems, String filePath, WorkerCallback<WorkerProposal> callback) {
+                                   List<ProblemLocationMessage> problems, String filePath, WorkerCallback<WorkerProposal> callback) {
         MessagesImpls.ComputeCorrMessageImpl corrMessage = MessagesImpls.ComputeCorrMessageImpl.make();
 
         corrMessage.setDocumentContent(content)
                    .setDocumentOffset(offset)
                    .setDocumentSelectionLength(selectionLength)
                    .setUpdatedOffset(updatedContent)
-                   .setProblemLocations(problems)
+                   .setProblemLocations(JsoArray.from(problems))
                    .setFilePath(filePath);
 
         String uuid = UUID.uuid();
@@ -437,7 +440,7 @@ public class JavaParserWorkerImpl implements JavaParserWorker, ProjectActionHand
             return;
         }
         Array<Problem> problems = message.problems();
-        Array<IProblem> iProblems = Collections.createArray();
+        List<IProblem> iProblems = new ArrayList<>();
         for (Problem p : problems.asIterable()) {
             String[] arg = new String[p.stringArguments().size()];
             for (int i = 0; i < p.stringArguments().size(); i++) {

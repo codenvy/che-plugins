@@ -13,12 +13,13 @@ package org.eclipse.che.ide.ext.tutorials.client.wizard;
 import org.eclipse.che.api.project.shared.dto.ImportProject;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistrar;
 import org.eclipse.che.ide.api.wizard.WizardPage;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import javax.annotation.Nonnull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.eclipse.che.ide.Constants.ECLIPSE_CHE_CATEGORY;
 import static org.eclipse.che.ide.Constants.CODENVY_PLUGIN_ID;
@@ -29,11 +30,11 @@ import static org.eclipse.che.ide.Constants.CODENVY_PLUGIN_ID;
  * @author Artem Zatsarynnyy
  */
 public class ExtensionProjectWizardRegistrar implements ProjectWizardRegistrar {
-    private final Array<Provider<? extends WizardPage<ImportProject>>> wizardPages;
+    private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;
 
     @Inject
     public ExtensionProjectWizardRegistrar(Provider<ExtensionPagePresenter> provider) {
-        wizardPages = Collections.createArray();
+        wizardPages = new ArrayList<>();
         wizardPages.add(provider);
     }
 
@@ -48,7 +49,7 @@ public class ExtensionProjectWizardRegistrar implements ProjectWizardRegistrar {
     }
 
     @Nonnull
-    public Array<Provider<? extends WizardPage<ImportProject>>> getWizardPages() {
+    public List<Provider<? extends WizardPage<ImportProject>>> getWizardPages() {
         return wizardPages;
     }
 }

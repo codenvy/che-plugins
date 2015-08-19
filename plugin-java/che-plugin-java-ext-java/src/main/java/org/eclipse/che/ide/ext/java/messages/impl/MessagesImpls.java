@@ -11,8 +11,6 @@
 // GENERATED SOURCE. DO NOT EDIT.
 package org.eclipse.che.ide.ext.java.messages.impl;
 
-
-
 @SuppressWarnings({"unchecked", "cast"})
 public class MessagesImpls {
 

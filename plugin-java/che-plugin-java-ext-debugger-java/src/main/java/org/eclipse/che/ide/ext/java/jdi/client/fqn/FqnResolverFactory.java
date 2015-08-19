@@ -10,23 +10,23 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.jdi.client.fqn;
 
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
 /** @author Evgen Vidolob */
 @Singleton
 public class FqnResolverFactory {
-    private StringMap<FqnResolver> resolvers;
+    private Map<String, FqnResolver> resolvers;
 
     /** Create factory. */
     @Inject
     protected FqnResolverFactory() {
-        this.resolvers = Collections.createStringMap();
+        this.resolvers = new HashMap<>();
     }
 
     public void addResolver(@Nonnull String mimeType, @Nonnull FqnResolver resolver) {

@@ -11,12 +11,8 @@
 package org.eclipse.che.ide.ext.github.client.importer.page;
 
 import org.eclipse.che.api.project.shared.dto.ImportProject;
-import org.eclipse.che.api.project.shared.dto.NewProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.commons.exception.UnauthorizedException;
 import org.eclipse.che.ide.dto.DtoFactory;
@@ -36,9 +32,12 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * @author Roman Nikitenko
@@ -65,7 +64,7 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
     private       NotificationManager                notificationManager;
     private       GitHubClientService                gitHubClientService;
     private       EventBus                           eventBus;
-    private       StringMap<Array<GitHubRepository>> repositories;
+    private       Map<String, List<GitHubRepository>> repositories;
     private       GitHubLocalizationConstant         locale;
     private       GithubImporterPageView             view;
     private       GitHubAuthenticator                gitHubAuthenticator;
@@ -215,9 +214,9 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
     private void getUserRepos() {
         showProcessing(true);
         gitHubClientService.getAllRepositories(
-                new AsyncRequestCallback<StringMap<Array<GitHubRepository>>>(new AllRepositoriesUnmarshaller(dtoFactory)) {
+                new AsyncRequestCallback<Map<String, List<GitHubRepository>>>(new AllRepositoriesUnmarshaller(dtoFactory)) {
                     @Override
-                    protected void onSuccess(StringMap<Array<GitHubRepository>> result) {
+                    protected void onSuccess(Map<String, List<GitHubRepository>> result) {
                         showProcessing(false);
                         onListLoaded(result);
                     }
@@ -276,9 +275,9 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
      * @param repositories
      *         loaded list of repositories
      */
-    private void onListLoaded(@Nonnull StringMap<Array<GitHubRepository>> repositories) {
+    private void onListLoaded(@Nonnull Map<String, List<GitHubRepository>> repositories) {
         this.repositories = repositories;
-        view.setAccountNames(repositories.getKeys());
+        view.setAccountNames(repositories.keySet());
         refreshProjectList();
         view.showGithubPanel();
     }
@@ -287,20 +286,20 @@ public class GithubImporterPagePresenter extends AbstractWizardPage<ImportProjec
      * Refresh project list on view.
      */
     private void refreshProjectList() {
-        Array<ProjectData> projectsData = Collections.createArray();
+        List<ProjectData> projectsData = new ArrayList<>();
 
         String accountName = view.getAccountName();
         if (repositories.containsKey(accountName)) {
-            Array<GitHubRepository> repo = repositories.get(accountName);
+            List<GitHubRepository> repo = repositories.get(accountName);
 
-            for (GitHubRepository repository : repo.asIterable()) {
+            for (GitHubRepository repository : repo) {
                 ProjectData projectData =
                         new ProjectData(repository.getName(), repository.getDescription(), null, null, repository.getSshUrl(),
                                         repository.getGitUrl());
                 projectsData.add(projectData);
             }
 
-            projectsData.sort(new Comparator<ProjectData>() {
+            Collections.sort(projectsData, new Comparator<ProjectData>() {
                 @Override
                 public int compare(ProjectData o1, ProjectData o2) {
                     return o1.getName().compareTo(o2.getName());

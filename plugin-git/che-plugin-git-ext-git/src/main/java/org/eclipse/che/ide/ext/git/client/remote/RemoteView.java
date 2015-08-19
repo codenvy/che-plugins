@@ -12,9 +12,9 @@ package org.eclipse.che.ide.ext.git.client.remote;
 
 import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The view of {@link RemotePresenter}.
@@ -48,7 +48,7 @@ public interface RemoteView extends View<RemoteView.ActionDelegate> {
      * @param remotes
      *         list of available remote repositories.
      */
-    void setRemotes(@Nonnull Array<Remote> remotes);
+    void setRemotes(@Nonnull List<Remote> remotes);
 
     /**
      * Change the enable state of the delete button.

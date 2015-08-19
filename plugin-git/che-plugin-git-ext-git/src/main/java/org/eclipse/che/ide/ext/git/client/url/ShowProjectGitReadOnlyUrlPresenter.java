@@ -17,13 +17,14 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.StringUnmarshaller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import java.util.List;
 
 import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 
@@ -69,9 +70,9 @@ public class ShowProjectGitReadOnlyUrlPresenter implements ShowProjectGitReadOnl
         final CurrentProject project = appContext.getCurrentProject();
         view.showDialog();
         service.remoteList(project.getRootProject(), null, true,
-                           new AsyncRequestCallback<Array<Remote>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Remote.class)) {
+                           new AsyncRequestCallback<List<Remote>>(dtoUnmarshallerFactory.newListUnmarshaller(Remote.class)) {
                                @Override
-                               protected void onSuccess(Array<Remote> result) {
+                               protected void onSuccess(List<Remote> result) {
                                    view.setRemotes(result);
                                }
 

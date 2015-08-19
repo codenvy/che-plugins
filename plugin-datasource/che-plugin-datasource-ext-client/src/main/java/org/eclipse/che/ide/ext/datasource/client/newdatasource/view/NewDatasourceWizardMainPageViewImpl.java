@@ -17,11 +17,10 @@ import static org.eclipse.che.ide.ext.datasource.client.DatabaseCategoryType.NOT
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.che.ide.Resources;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.datasource.client.newdatasource.connector.NewDatasourceConnector;
 import org.eclipse.che.ide.ui.tree.NodeDataAdapter;
 import org.eclipse.che.ide.ui.tree.NodeRenderer;
@@ -228,9 +227,9 @@ public class NewDatasourceWizardMainPageViewImpl implements NewDatasourceWizardM
         }
 
         @Override
-        public Array<String> getChildren(String data) {
+        public List<String> getChildren(String data) {
             if ("".equals(data)) {
-                Array<String> array = Collections.createArray();
+                List<String> array = new ArrayList<>();
                 if (!notCloudCollection.isEmpty()) {
                     array.add(NOTCLOUD.toString());
                 }
@@ -243,7 +242,7 @@ public class NewDatasourceWizardMainPageViewImpl implements NewDatasourceWizardM
                 return array;
             }
             if (NOTCLOUD.toString().equals(data)) {
-                Array<String> array = Collections.createArray();
+                List<String> array = new ArrayList<>();
                 for (NewDatasourceConnector connector : notCloudCollection) {
                     String datasourceName = connector.getTitle();
                     array.add(datasourceName);
@@ -251,7 +250,7 @@ public class NewDatasourceWizardMainPageViewImpl implements NewDatasourceWizardM
                 return array;
             }
             if (GOOGLE.toString().equals(data)) {
-                Array<String> array = Collections.createArray();
+                List<String> array = new ArrayList<>();
                 for (NewDatasourceConnector connector : googleCollection) {
                     String datasourceName = connector.getTitle();
                     array.add(datasourceName);
@@ -259,7 +258,7 @@ public class NewDatasourceWizardMainPageViewImpl implements NewDatasourceWizardM
                 return array;
             }
             if (AMAZON.toString().equals(data)) {
-                Array<String> array = Collections.createArray();
+                List<String> array = new ArrayList<>();
                 for (NewDatasourceConnector connector : amazonCollection) {
                     String datasourceName = connector.getTitle();
                     array.add(datasourceName);
@@ -306,12 +305,12 @@ public class NewDatasourceWizardMainPageViewImpl implements NewDatasourceWizardM
         }
 
         @Override
-        public Array<String> getNodePath(String data) {
+        public List<String> getNodePath(String data) {
             return PathUtils.getNodePath(this, data);
         }
 
         @Override
-        public String getNodeByPath(String root, Array<String> relativeNodePath) {
+        public String getNodeByPath(String root, List<String> relativeNodePath) {
             return null;
         }
     }

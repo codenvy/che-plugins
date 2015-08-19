@@ -17,9 +17,6 @@ import org.eclipse.che.api.user.shared.dto.ProfileDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentUser;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.StringMap;
-import org.eclipse.che.ide.collections.java.JsonArrayListAdapter;
 import org.eclipse.che.ide.ext.github.client.GitHubLocalizationConstant;
 import org.eclipse.che.ide.ext.ssh.client.SshKeyProvider;
 import org.eclipse.che.ide.ext.ssh.client.SshKeyService;
@@ -40,6 +37,9 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyObject;
@@ -69,7 +69,7 @@ public class GitHubAuthenticatorImplTest {
     private ArgumentCaptor<AsyncCallback<Void>> generateKeyCallbackCaptor;
 
     @Captor
-    private ArgumentCaptor<AsyncRequestCallback<Array<KeyItem>>> getAllKeysCallbackCaptor;
+    private ArgumentCaptor<AsyncRequestCallback<List<KeyItem>>> getAllKeysCallbackCaptor;
 
     @Mock
     private GitHubAuthenticatorView    view;
@@ -106,14 +106,16 @@ public class GitHubAuthenticatorImplTest {
     public void onAuthenticatedWhenGenerateKeysIsSelected() throws Exception {
         String userId = "userId";
         OAuthStatus authStatus = mock(OAuthStatus.class);
-        StringMap<SshKeyProvider> providers = mock(StringMap.class);
+
         SshKeyProvider keyProvider = mock(SshKeyProvider.class);
+        Map<String, SshKeyProvider> providers = new HashMap<>();
+        providers.put(GITHUB_HOST, keyProvider);
+
         CurrentUser user = mock(CurrentUser.class);
         ProfileDescriptor profile = mock(ProfileDescriptor.class);
         when(view.isGenerateKeysSelected()).thenReturn(true);
         when(sshKeyService.getSshKeyProviders()).thenReturn(providers);
-        when(providers.get(GITHUB_HOST)).thenReturn(keyProvider);
-        when(providers.containsKey(GITHUB_HOST)).thenReturn(true);
+
         when(appContext.getCurrentUser()).thenReturn(user);
         when(user.getProfile()).thenReturn(profile);
         when(profile.getId()).thenReturn(userId);
@@ -130,14 +132,13 @@ public class GitHubAuthenticatorImplTest {
     public void onAuthenticatedWhenGenerateKeysIsNotSelected() throws Exception {
         String userId = "userId";
         OAuthStatus authStatus = mock(OAuthStatus.class);
-        StringMap<SshKeyProvider> providers = mock(StringMap.class);
+        Map<String, SshKeyProvider> providers = new HashMap<>();
         SshKeyProvider keyProvider = mock(SshKeyProvider.class);
+        providers.put(GITHUB_HOST, keyProvider);
+
         CurrentUser user = mock(CurrentUser.class);
         ProfileDescriptor profile = mock(ProfileDescriptor.class);
         when(view.isGenerateKeysSelected()).thenReturn(false);
-        when(sshKeyService.getSshKeyProviders()).thenReturn(providers);
-        when(providers.get(GITHUB_HOST)).thenReturn(keyProvider);
-        when(providers.containsKey(GITHUB_HOST)).thenReturn(true);
         when(appContext.getCurrentUser()).thenReturn(user);
         when(user.getProfile()).thenReturn(profile);
         when(profile.getId()).thenReturn(userId);
@@ -154,14 +155,15 @@ public class GitHubAuthenticatorImplTest {
     public void onAuthenticatedWhenGenerateKeysIsSuccess() throws Exception {
         String userId = "userId";
         OAuthStatus authStatus = mock(OAuthStatus.class);
-        StringMap<SshKeyProvider> providers = mock(StringMap.class);
         SshKeyProvider keyProvider = mock(SshKeyProvider.class);
+        Map<String, SshKeyProvider> providers = new HashMap<>();
+        providers.put(GITHUB_HOST, keyProvider);
+
         CurrentUser user = mock(CurrentUser.class);
         ProfileDescriptor profile = mock(ProfileDescriptor.class);
         when(view.isGenerateKeysSelected()).thenReturn(true);
         when(sshKeyService.getSshKeyProviders()).thenReturn(providers);
-        when(providers.get(GITHUB_HOST)).thenReturn(keyProvider);
-        when(providers.containsKey(GITHUB_HOST)).thenReturn(true);
+
         when(appContext.getCurrentUser()).thenReturn(user);
         when(user.getProfile()).thenReturn(profile);
         when(profile.getId()).thenReturn(userId);
@@ -183,15 +185,17 @@ public class GitHubAuthenticatorImplTest {
     public void onAuthenticatedWhenGenerateKeysIsFailure() throws Exception {
         String userId = "userId";
         OAuthStatus authStatus = mock(OAuthStatus.class);
-        StringMap<SshKeyProvider> providers = mock(StringMap.class);
+
         SshKeyProvider keyProvider = mock(SshKeyProvider.class);
+        Map<String, SshKeyProvider> providers = new HashMap<>();
+        providers.put(GITHUB_HOST, keyProvider);
+
         CurrentUser user = mock(CurrentUser.class);
         ProfileDescriptor profile = mock(ProfileDescriptor.class);
         MessageDialog messageDialog = mock(MessageDialog.class);
         when(view.isGenerateKeysSelected()).thenReturn(true);
         when(sshKeyService.getSshKeyProviders()).thenReturn(providers);
-        when(providers.get(GITHUB_HOST)).thenReturn(keyProvider);
-        when(providers.containsKey(GITHUB_HOST)).thenReturn(true);
+
         when(appContext.getCurrentUser()).thenReturn(user);
         when(user.getProfile()).thenReturn(profile);
         when(profile.getId()).thenReturn(userId);
@@ -209,25 +213,26 @@ public class GitHubAuthenticatorImplTest {
         verify(appContext).getCurrentUser();
         verify(dialogFactory).createMessageDialog(anyString(), anyString(), Matchers.<ConfirmCallback>anyObject());
         verify(messageDialog).show();
-        verify(sshKeyService).getAllKeys(Matchers.<AsyncRequestCallback<Array<KeyItem>>> anyObject());
+        verify(sshKeyService).getAllKeys(Matchers.<AsyncRequestCallback<List<KeyItem>>> anyObject());
     }
 
     @Test
     public void onAuthenticatedWhenGetFailedKeyIsSuccess() throws Exception {
         String userId = "userId";
         KeyItem key = mock(KeyItem.class);
-        Array<KeyItem> keys = new JsonArrayListAdapter<KeyItem>(new ArrayList<KeyItem>());
+        List<KeyItem> keys = new ArrayList<>();
         keys.add(key);
         OAuthStatus authStatus = mock(OAuthStatus.class);
-        StringMap<SshKeyProvider> providers = mock(StringMap.class);
         SshKeyProvider keyProvider = mock(SshKeyProvider.class);
+        Map<String, SshKeyProvider> providers = new HashMap<>();
+        providers.put(GITHUB_HOST, keyProvider);
+
         CurrentUser user = mock(CurrentUser.class);
         ProfileDescriptor profile = mock(ProfileDescriptor.class);
         MessageDialog messageDialog = mock(MessageDialog.class);
         when(view.isGenerateKeysSelected()).thenReturn(true);
         when(sshKeyService.getSshKeyProviders()).thenReturn(providers);
-        when(providers.get(GITHUB_HOST)).thenReturn(keyProvider);
-        when(providers.containsKey(GITHUB_HOST)).thenReturn(true);
+
         when(appContext.getCurrentUser()).thenReturn(user);
         when(user.getProfile()).thenReturn(profile);
         when(profile.getId()).thenReturn(userId);
@@ -242,7 +247,7 @@ public class GitHubAuthenticatorImplTest {
         generateKeyCallback.onFailure(new Exception(""));
 
         verify(sshKeyService).getAllKeys(getAllKeysCallbackCaptor.capture());
-        AsyncRequestCallback<Array<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
+        AsyncRequestCallback<List<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(getAllKeysCallback, keys);
 
         verify(view).isGenerateKeysSelected();
@@ -250,7 +255,7 @@ public class GitHubAuthenticatorImplTest {
         verify(appContext).getCurrentUser();
         verify(dialogFactory).createMessageDialog(anyString(), anyString(), Matchers.<ConfirmCallback>anyObject());
         verify(messageDialog).show();
-        verify(sshKeyService).getAllKeys(Matchers.<AsyncRequestCallback<Array<KeyItem>>>anyObject());
+        verify(sshKeyService).getAllKeys(Matchers.<AsyncRequestCallback<List<KeyItem>>>anyObject());
         verify(sshKeyService).deleteKey(Matchers.<KeyItem>anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
     }
 

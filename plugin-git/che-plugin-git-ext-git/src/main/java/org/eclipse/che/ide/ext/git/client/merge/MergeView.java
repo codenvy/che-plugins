@@ -11,9 +11,9 @@
 package org.eclipse.che.ide.ext.git.client.merge;
 
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The view of {@link MergePresenter}.
@@ -44,7 +44,7 @@ public interface MergeView extends View<MergeView.ActionDelegate> {
      * @param references
      *         local branches
      */
-    void setLocalBranches(@Nonnull Array<Reference> references);
+    void setLocalBranches(@Nonnull List<Reference> references);
 
     /**
      * Set remote branches.
@@ -52,7 +52,7 @@ public interface MergeView extends View<MergeView.ActionDelegate> {
      * @param references
      *         remote branches
      */
-    void setRemoteBranches(@Nonnull Array<Reference> references);
+    void setRemoteBranches(@Nonnull List<Reference> references);
 
     /**
      * Change the enable state of the merge button.

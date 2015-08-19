@@ -11,11 +11,13 @@
 package org.eclipse.che.ide.ext.java.client.projecttree.nodes;
 
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -45,7 +47,7 @@ public class JavaProjectNodeTest extends BaseNodeTest {
         ExternalLibrariesNode externalLibrariesNode = mock(ExternalLibrariesNode.class);
         when(treeStructure.newExternalLibrariesNode(any(JavaProjectNode.class))).thenReturn(externalLibrariesNode);
 
-        Array<TreeNode<?>> children = Collections.createArray();
+        List<TreeNode<?>> children = new ArrayList<>();
         javaProjectNode.setChildren(children);
 
         verify(treeStructure).newExternalLibrariesNode(any(JavaProjectNode.class));
@@ -56,7 +58,7 @@ public class JavaProjectNodeTest extends BaseNodeTest {
     public void shouldNotAddExternalLibrariesNode() {
         when(javaTreeSettings.isShowExternalLibraries()).thenReturn(Boolean.FALSE);
 
-        javaProjectNode.setChildren(Collections.<TreeNode<?>>createArray());
+        javaProjectNode.setChildren(Collections.<TreeNode<?>>emptyList());
 
         verify(treeStructure, never()).newExternalLibrariesNode(any(JavaProjectNode.class));
     }

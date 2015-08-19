@@ -21,7 +21,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.callbacks.AsyncCallbackBuilder;
 import org.eclipse.che.ide.ext.runner.client.callbacks.FailureCallback;
@@ -34,10 +33,13 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.container.Propertie
 import org.eclipse.che.ide.ext.runner.client.util.WebSocketUtil;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.util.loging.Log;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
 
 import javax.annotation.Nonnull;
+
+import java.util.List;
 
 import static org.eclipse.che.api.runner.ApplicationStatus.NEW;
 import static org.eclipse.che.api.runner.ApplicationStatus.RUNNING;
@@ -60,7 +62,7 @@ public class GetRunningProcessesAction extends AbstractRunnerAction {
     private final AppContext                                                          appContext;
     private final RunnerLocalizationConstant                                          locale;
     private final GetLogsAction                                                       logsAction;
-    private final Provider<AsyncCallbackBuilder<Array<ApplicationProcessDescriptor>>> callbackBuilderProvider;
+    private final Provider<AsyncCallbackBuilder<List<ApplicationProcessDescriptor>>> callbackBuilderProvider;
     private final WebSocketUtil                                                       webSocketUtil;
     private final RunnerManagerPresenter                                              runnerManagerPresenter;
     private final String                                                              workspaceId;
@@ -76,7 +78,7 @@ public class GetRunningProcessesAction extends AbstractRunnerAction {
                                      DtoUnmarshallerFactory dtoUnmarshallerFactory,
                                      AppContext appContext,
                                      RunnerLocalizationConstant locale,
-                                     Provider<AsyncCallbackBuilder<Array<ApplicationProcessDescriptor>>> callbackBuilderProvider,
+                                     Provider<AsyncCallbackBuilder<List<ApplicationProcessDescriptor>>> callbackBuilderProvider,
                                      WebSocketUtil webSocketUtil,
                                      RunnerActionFactory actionFactory,
                                      RunnerManagerPresenter runnerManagerPresenter,
@@ -107,19 +109,22 @@ public class GetRunningProcessesAction extends AbstractRunnerAction {
 
         startCheckingNewProcesses();
 
-        AsyncRequestCallback<Array<ApplicationProcessDescriptor>> callback = callbackBuilderProvider
+        Unmarshallable<List<ApplicationProcessDescriptor>> unmarshallable = dtoUnmarshallerFactory
+                                                                            .newListUnmarshaller(ApplicationProcessDescriptor.class);
+
+        AsyncRequestCallback<List<ApplicationProcessDescriptor>> callback = callbackBuilderProvider
                 .get()
-                .unmarshaller(dtoUnmarshallerFactory.newArrayUnmarshaller(ApplicationProcessDescriptor.class))
-                .success(new SuccessCallback<Array<ApplicationProcessDescriptor>>() {
+                .unmarshaller(unmarshallable)
+                .success(new SuccessCallback<List<ApplicationProcessDescriptor>>() {
                     @Override
-                    public void onSuccess(Array<ApplicationProcessDescriptor> result) {
+                    public void onSuccess(List<ApplicationProcessDescriptor> result) {
                         if (result.isEmpty()) {
                             return;
                         }
 
                         propertiesContainer.setVisible(true);
 
-                        for (ApplicationProcessDescriptor processDescriptor : result.asIterable()) {
+                        for (ApplicationProcessDescriptor processDescriptor : result) {
                             if (isNewOrRunningProcess(processDescriptor)) {
                                 prepareRunnerWithRunningApp(processDescriptor);
                             }

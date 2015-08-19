@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.git.client.url;
 
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.shared.Remote;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ui.window.Window;
 import org.eclipse.che.ide.ui.zeroClipboard.ClipboardButtonBuilder;
@@ -31,6 +30,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The implementation of View.
@@ -98,14 +98,14 @@ public class ShowProjectGitReadOnlyUrlViewImpl extends Window implements ShowPro
     }
 
     @Override
-    public void setRemotes(Array<Remote> remotes) {
+    public void setRemotes(List<Remote> remotes) {
         remotePanel.clear();
         if (remotes == null || remotes.size() == 0) {
             return;
         }
         remotePanel.add(new Label(
                 remotes.size() > 1 ? locale.projectReadOnlyGitRemoteUrlsTitle() : locale.projectReadOnlyGitRemoteUrlTitle()));
-        for (Remote remote : remotes.asIterable()) {
+        for (Remote remote : remotes) {
             if (remote == null || remote.getUrl() == null) {
                 continue;
             }

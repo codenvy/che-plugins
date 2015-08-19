@@ -17,13 +17,14 @@ import org.eclipse.che.ide.api.event.ItemHandler;
 import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PropertyListener;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
+
+import java.util.Map;
 
 /**
  * @author Evgen Vidolob
@@ -92,14 +93,12 @@ public class FileWatcher {
     }
 
     private void reparseAllOpenedFiles() {
-        editorAgent.getOpenedEditors().iterate(new StringMap.IterationCallback<EditorPartPresenter>() {
-            @Override
-            public void onIteration(final String s, final EditorPartPresenter editorPartPresenter) {
-                if (editorPartPresenter instanceof EmbeddedTextEditorPresenter) {
-                    final EmbeddedTextEditorPresenter< ? > editor = (EmbeddedTextEditorPresenter< ? >)editorPartPresenter;
-                    editor.refreshEditor();
-                }
+        Map<String, EditorPartPresenter> openedEditors = editorAgent.getOpenedEditors();
+        for (EditorPartPresenter editorPartPresenter: openedEditors.values()) {
+            if (editorPartPresenter instanceof EmbeddedTextEditorPresenter) {
+                final EmbeddedTextEditorPresenter< ? > editor = (EmbeddedTextEditorPresenter< ? >)editorPartPresenter;
+                editor.refreshEditor();
             }
-        });
+        }
     }
 }

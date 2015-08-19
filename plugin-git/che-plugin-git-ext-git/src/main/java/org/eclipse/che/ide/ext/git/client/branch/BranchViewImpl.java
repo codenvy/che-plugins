@@ -16,7 +16,6 @@ import elemental.html.TableElement;
 
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.shared.Branch;
-import org.eclipse.che.ide.collections.Array;
 
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
@@ -40,6 +39,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The implementation of {@link BranchView}.
@@ -193,7 +193,7 @@ public class BranchViewImpl extends Window implements BranchView {
 
     /** {@inheritDoc} */
     @Override
-    public void setBranches(@Nonnull Array<Branch> branches) {
+    public void setBranches(@Nonnull List<Branch> branches) {
         this.branches.render(branches);
     }
 

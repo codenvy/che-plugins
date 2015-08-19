@@ -19,8 +19,6 @@ import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -33,6 +31,8 @@ import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -76,7 +76,7 @@ public class RemoveFromIndexPresenterTest extends BaseTest {
                                                  selectionAgent,
                                                  notificationManager,
                                                  editorAgent);
-        StringMap<EditorPartPresenter> partPresenterMap = Collections.createStringMap();
+        NavigableMap<String, EditorPartPresenter> partPresenterMap = new TreeMap<>();
         partPresenterMap.put("partPresenter", partPresenter);
 
         when(editorAgent.getOpenedEditors()).thenReturn(partPresenterMap);

@@ -12,8 +12,8 @@ package org.eclipse.che.ide.ext.git.client.push;
 
 import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 
+import java.util.List;
 import javax.annotation.Nonnull;
 
 /**
@@ -52,7 +52,7 @@ public interface PushToRemoteView extends View<PushToRemoteView.ActionDelegate> 
      * @param repositories
      *         available repositories
      */
-    void setRepositories(@Nonnull Array<Remote> repositories);
+    void setRepositories(@Nonnull List<Remote> repositories);
 
     /** @return local branch */
     @Nonnull
@@ -64,7 +64,7 @@ public interface PushToRemoteView extends View<PushToRemoteView.ActionDelegate> 
      * @param branches
      *         local branches
      */
-    void setLocalBranches(@Nonnull Array<String> branches);
+    void setLocalBranches(@Nonnull List<String> branches);
 
     /** @return remote branches */
     @Nonnull
@@ -76,7 +76,7 @@ public interface PushToRemoteView extends View<PushToRemoteView.ActionDelegate> 
      * @param branches
      *         remote branches
      */
-    void setRemoteBranches(@Nonnull Array<String> branches);
+    void setRemoteBranches(@Nonnull List<String> branches);
 
     /**
      * Add remote branch into view.

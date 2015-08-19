@@ -12,13 +12,15 @@ package org.eclipse.che.ide.extension.maven.client.projecttree;
 
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -53,7 +55,7 @@ public class MavenFolderNodeTest extends BaseNodeTest {
 
         ProjectDescriptor moduleDescriptor = mock(ProjectDescriptor.class);
         when(moduleDescriptor.getName()).thenReturn("my_module");
-        Array<ProjectDescriptor> modules = Collections.createArray(moduleDescriptor);
+        List<ProjectDescriptor> modules = Arrays.asList(moduleDescriptor);
 
         mavenFolderNode.createChildNode(projectItem, modules);
 
@@ -65,7 +67,7 @@ public class MavenFolderNodeTest extends BaseNodeTest {
         ItemReference sourceFolderItem = mock(ItemReference.class);
         when(sourceFolderItem.getType()).thenReturn("folder");
         when(sourceFolderItem.getPath()).thenReturn("/project/src/main/java");
-        Array<ProjectDescriptor> modules = Collections.createArray();
+        List<ProjectDescriptor> modules = new ArrayList<>();
 
         mavenFolderNode.createChildNode(sourceFolderItem, modules);
 
@@ -76,7 +78,7 @@ public class MavenFolderNodeTest extends BaseNodeTest {
     public void shouldCreateChildJavaFolderNode() {
         ItemReference folderItem = mock(ItemReference.class);
         when(folderItem.getType()).thenReturn("folder");
-        Array<ProjectDescriptor> modules = Collections.createArray();
+        List<ProjectDescriptor> modules = new ArrayList<>();
 
         mavenFolderNode.createChildNode(folderItem, modules);
 

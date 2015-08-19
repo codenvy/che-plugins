@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.git.client.remote;
 
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.shared.Remote;
-import org.eclipse.che.ide.collections.Array;
 
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
@@ -164,11 +163,11 @@ public class RemoteViewImpl extends Window implements RemoteView {
 
     /** {@inheritDoc} */
     @Override
-    public void setRemotes(@Nonnull Array<Remote> remotes) {
+    public void setRemotes(@Nonnull List<Remote> remotes) {
         // Wraps Array in java.util.List
-        List<Remote> list = new ArrayList<Remote>();
-        for (int i = 0; i < remotes.size(); i++) {
-            list.add(remotes.get(i));
+        List<Remote> list = new ArrayList<>();
+        for (Remote remote : remotes) {
+            list.add(remote);
         }
         repositories.setRowData(list);
     }

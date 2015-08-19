@@ -13,9 +13,9 @@ package org.eclipse.che.ide.ext.svn.client.move;
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.api.parts.base.BaseActionDelegate;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * View for {@link org.eclipse.che.ide.ext.svn.client.move.MovePresenter}.
@@ -41,7 +41,7 @@ public interface MoveView extends View<MoveView.ActionDelegate> {
     }
 
     /** Set project tree nodes. */
-    void setProjectNodes(Array<TreeNode<?>> rootNodes);
+    void setProjectNodes(List<TreeNode<?>> rootNodes);
 
     /** Update project tree node. */
     void updateProjectNode(@Nonnull TreeNode<?> oldNode, @Nonnull TreeNode<?> newNode);

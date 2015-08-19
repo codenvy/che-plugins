@@ -14,13 +14,14 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.svn.client.common.BaseSubversionPresenterTest;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.verify;
  */
 public class ExportPresenterTest extends BaseSubversionPresenterTest {
     @Captor
-    private ArgumentCaptor<AsyncCallback<Array<TreeNode<?>>>> asyncRequestCallbackStatusCaptor;
+    private ArgumentCaptor<AsyncCallback<List<TreeNode<?>>>> asyncRequestCallbackStatusCaptor;
 
     private ExportPresenter presenter;
 
@@ -56,4 +57,4 @@ public class ExportPresenterTest extends BaseSubversionPresenterTest {
 
         verify(exportView).onShow();
     }
- }
+}

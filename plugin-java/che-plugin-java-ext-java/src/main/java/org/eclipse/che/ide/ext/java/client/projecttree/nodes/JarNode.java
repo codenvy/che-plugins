@@ -13,8 +13,6 @@ package org.eclipse.che.ide.ext.java.client.projecttree.nodes;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
 import org.eclipse.che.ide.ext.java.shared.Jar;
@@ -28,6 +26,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Evgen Vidolob
@@ -77,13 +77,13 @@ public class JarNode extends AbstractTreeNode<Jar> {
 
     @Override
     public void refreshChildren(final AsyncCallback<TreeNode<?>> callback) {
-        Unmarshallable<Array<JarEntry>> unmarshaller = factory.newArrayUnmarshaller(JarEntry.class);
+        Unmarshallable<List<JarEntry>> unmarshaller = factory.newListUnmarshaller(JarEntry.class);
         service.getLibraryChildren(getParent().getProject().getPath(), getData().getId(),
-                                   new AsyncRequestCallback<Array<JarEntry>>(unmarshaller) {
+                                   new AsyncRequestCallback<List<JarEntry>>(unmarshaller) {
                                        @Override
-                                       protected void onSuccess(Array<JarEntry> result) {
-                Array<TreeNode<?>> nodes = Collections.createArray();
-                for (JarEntry jarNode : result.asIterable()) {
+                                       protected void onSuccess(List<JarEntry> result) {
+                List<TreeNode<?>> nodes = new ArrayList();
+                for (JarEntry jarNode : result) {
                     nodes.add(createNode(jarNode));
                 }
                 setChildren(nodes);

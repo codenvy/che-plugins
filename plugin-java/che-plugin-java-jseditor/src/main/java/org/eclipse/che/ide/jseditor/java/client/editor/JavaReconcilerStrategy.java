@@ -34,6 +34,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class JavaReconcilerStrategy implements ReconcilingStrategy, JavaParserWorker.WorkerCallback<IProblem> {
 
@@ -109,7 +110,7 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy, JavaParserWo
     }
 
     @Override
-    public void onResult(final Array<IProblem> problems) {
+    public void onResult(final List<IProblem> problems) {
         if (!first) {
             codeAssistProcessor.enableCodeAssistant();
         }
@@ -128,7 +129,7 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy, JavaParserWo
         try {
             boolean error = false;
             boolean warning = false;
-            for (IProblem problem : problems.asIterable()) {
+            for (IProblem problem : problems) {
                 if (!error) {
                     error = problem.isError();
                 }

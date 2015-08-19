@@ -20,8 +20,6 @@ import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.google.web.bindery.event.shared.Event;
@@ -37,6 +35,8 @@ import org.mockito.stubbing.Answer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import static org.eclipse.che.api.git.shared.ResetRequest.ResetType.HARD;
 import static org.eclipse.che.api.git.shared.ResetRequest.ResetType.MIXED;
@@ -88,7 +88,7 @@ public class ResetToCommitPresenterTest extends BaseTest {
                                                notificationManager,
                                                dtoUnmarshallerFactory);
 
-        StringMap<EditorPartPresenter> partPresenterMap = Collections.createStringMap();
+        NavigableMap<String, EditorPartPresenter> partPresenterMap = new TreeMap<>();
         partPresenterMap.put("partPresenter", partPresenter);
 
         when(view.isMixMode()).thenReturn(IS_MIXED);

@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.worker;
 
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:evidolob@exoplatform.com">Evgen Vidolob</a>
@@ -29,7 +29,7 @@ public class Preferences {
 
     public static final String QUALIFIED_TYPE_NAMEHISTORY = "Qualified_Type_Name_History_";
 
-    private StringMap<String> storage = Collections.createStringMap();
+    private Map<String, String> storage = new HashMap<>();
 
     /**
      *
@@ -43,7 +43,7 @@ public class Preferences {
      * @param string
      */
     public void setValue(String key, String string) {
-         storage.put(key, string);
+        storage.put(key, string);
     }
 
     /**

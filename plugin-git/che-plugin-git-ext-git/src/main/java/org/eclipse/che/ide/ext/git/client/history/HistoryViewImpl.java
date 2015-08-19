@@ -21,7 +21,6 @@ import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.parts.PartStackUIResources;
 import org.eclipse.che.ide.api.parts.base.BaseView;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.editor.codemirror.highlighter.client.HighlightMode;
 import org.eclipse.che.ide.editor.codemirror.highlighter.client.Highlighter;
 import org.eclipse.che.ide.editor.codemirror.highlighter.client.HighlighterProvider;
@@ -205,11 +204,11 @@ public class HistoryViewImpl extends BaseView<HistoryView.ActionDelegate> implem
 
     /** {@inheritDoc} */
     @Override
-    public void setRevisions(@Nonnull Array<Revision> revisions) {
+    public void setRevisions(@Nonnull List<Revision> revisions) {
         // Wraps Array in java.util.List
-        List<Revision> list = new ArrayList<Revision>();
-        for (int i = 0; i < revisions.size(); i++) {
-            list.add(revisions.get(i));
+        List<Revision> list = new ArrayList<>();
+        for (Revision revision : revisions) {
+            list.add(revision);
         }
         this.commits.setRowData(list);
     }

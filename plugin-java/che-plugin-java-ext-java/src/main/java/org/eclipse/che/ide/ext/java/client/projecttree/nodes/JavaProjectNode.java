@@ -14,7 +14,6 @@ import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import com.google.inject.Inject;
@@ -22,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * Node that represents Java project.
@@ -50,7 +50,7 @@ public class JavaProjectNode extends ProjectNode {
     }
 
     @Override
-    public void setChildren(Array<TreeNode<?>> children) {
+    public void setChildren(List<TreeNode<?>> children) {
         if (getTreeStructure().getSettings().isShowExternalLibraries() && shouldAddExternalLibrariesNode) {
             ExternalLibrariesNode librariesNode = getTreeStructure().newExternalLibrariesNode(this);
             children.add(librariesNode);

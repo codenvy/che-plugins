@@ -27,6 +27,9 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -91,6 +94,9 @@ public class LogMessagesHandlerTest {
         when(message1.getHeaders()).thenReturn(headers);
         when(message2.getHeaders()).thenReturn(headers);
         when(message3.getHeaders()).thenReturn(headers);
+        List<Pair> list = new ArrayList<>();
+        list.add(pair1);
+        when(headers.toList()).thenReturn(list);
 
         when(logMessage1.getText()).thenReturn(MESSAGE1);
         when(logMessage2.getText()).thenReturn(MESSAGE2);

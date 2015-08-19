@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.newsourcefile;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ui.window.Window;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,6 +27,9 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Implementation of {@link NewJavaSourceFileView}.
  *
@@ -44,7 +45,7 @@ public class NewJavaSourceFileViewImpl extends Window implements NewJavaSourceFi
     ListBox typeField;
     private ActionDelegate delegate;
 
-    private Array<JavaSourceFileType> sourceFileTypes = Collections.createArray();
+    private List<JavaSourceFileType> sourceFileTypes = new ArrayList<>();
 
     @Inject
     public NewJavaSourceFileViewImpl(AddToIndexViewImplUiBinder uiBinder, JavaLocalizationConstant constant) {
@@ -84,11 +85,11 @@ public class NewJavaSourceFileViewImpl extends Window implements NewJavaSourceFi
     }
 
     @Override
-    public void setTypes(Array<JavaSourceFileType> types) {
+    public void setTypes(List<JavaSourceFileType> types) {
         sourceFileTypes.clear();
         typeField.clear();
         sourceFileTypes.addAll(types);
-        for (JavaSourceFileType type : sourceFileTypes.asIterable()) {
+        for (JavaSourceFileType type : sourceFileTypes) {
             typeField.addItem(type.toString());
         }
     }

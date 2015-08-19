@@ -13,11 +13,9 @@ package org.eclipse.che.ide.ext.github.client.authenticator;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.github.client.GitHubLocalizationConstant;
 import org.eclipse.che.ide.ext.ssh.client.SshKeyService;
 import org.eclipse.che.ide.ext.ssh.dto.KeyItem;
@@ -32,6 +30,7 @@ import org.eclipse.che.security.oauth.OAuthStatus;
 import org.eclipse.che.ide.util.Config;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * @author Roman Nikitenko
@@ -136,11 +135,10 @@ public class GitHubAuthenticatorImpl implements GitHubAuthenticator, OAuthCallba
 
     /** Need to remove failed uploaded keys from local storage if they can't be uploaded to github */
     private void getFailedKey() {
-        sshKeyService.getAllKeys(new AsyncRequestCallback<Array<KeyItem>>(dtoUnmarshallerFactory.newArrayUnmarshaller(KeyItem.class)) {
+        sshKeyService.getAllKeys(new AsyncRequestCallback<List<KeyItem>>(dtoUnmarshallerFactory.newListUnmarshaller(KeyItem.class)) {
             @Override
-            public void onSuccess(Array<KeyItem> result) {
-                for (int i = 0; i < result.size(); i++) {
-                    KeyItem key = result.get(i);
+            public void onSuccess(List<KeyItem> result) {
+                for (KeyItem key : result) {
                     if (key.getHost().equals(GITHUB_HOST)) {
                         removeFailedKey(key);
                         return;

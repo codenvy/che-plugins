@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.worker;
 
-import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.ext.java.jdt.core.IType;
 import org.eclipse.che.ide.ext.java.jdt.core.Signature;
 import org.eclipse.che.ide.ext.java.jdt.core.search.Type;
@@ -81,14 +80,14 @@ public class WorkerTypeInfoStorage {
     }
 
     public void removeFqn(String fqn) {
-        JsoArray<String> fqnToRemove = JsoArray.create();
+        List<String> fqnToRemove = new ArrayList<>();
         for (String key : storage.keySet()) {
             if (key.startsWith(fqn)) {
                 fqnToRemove.add(key);
             }
         }
 
-        for (String key : fqnToRemove.asIterable()) {
+        for (String key : fqnToRemove) {
             storage.remove(key);
         }
     }

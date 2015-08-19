@@ -15,7 +15,6 @@ import org.eclipse.che.ide.api.text.Region;
 import org.eclipse.che.ide.api.text.RegionImpl;
 import org.eclipse.che.ide.collections.Jso;
 import org.eclipse.che.ide.collections.JsonObject;
-import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.ext.java.jdt.core.CompletionProposal;
 import org.eclipse.che.ide.ext.java.jdt.core.Signature;
 import org.eclipse.che.ide.ext.java.jdt.core.util.CharUtil;
@@ -24,6 +23,7 @@ import org.eclipse.che.ide.ext.java.jdt.text.Document;
 import org.eclipse.che.ide.ext.java.worker.WorkerTypeInfoStorage;
 import org.eclipse.che.ide.ext.java.worker.env.BinaryType;
 import org.eclipse.che.ide.ext.java.worker.env.json.BinaryTypeJso;
+import java.util.List;
 
 
 /**
@@ -329,11 +329,11 @@ public final class LazyGenericTypeProposal extends LazyJavaTypeCompletionProposa
             if (shortTypesInfo == null) {
                 return null;
             }
-            Jso jso = Jso.deserialize(shortTypesInfo);
+            Jso jso = Jso.deserialize(shortTypesInfo).cast();
             if (jso.hasOwnProperty("types")) {
-                JsoArray<JsonObject> array = jso.getArrayField("types");
-                for (int i = 0; i < array.size(); i++) {
-                    Jso obj = (Jso)array.get(i);
+                List<JsonObject> array = jso.getArrayField("types").toList();
+                for (JsonObject anArray : array) {
+                    Jso obj = (Jso)anArray;
                     if (fqn.equals(obj.getStringField("name"))) {
                         type = new BinaryType(obj.<BinaryTypeJso>cast());
                         break;

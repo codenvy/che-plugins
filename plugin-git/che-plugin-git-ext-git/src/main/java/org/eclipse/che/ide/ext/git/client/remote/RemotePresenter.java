@@ -17,7 +17,6 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.remote.add.AddRemoteRepositoryPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -27,6 +26,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
+
+import java.util.List;
 
 import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 
@@ -76,9 +77,9 @@ public class RemotePresenter implements RemoteView.ActionDelegate {
      */
     private void getRemotes() {
         service.remoteList(project, null, true,
-                           new AsyncRequestCallback<Array<Remote>>(dtoUnmarshallerFactory.newArrayUnmarshaller(Remote.class)) {
+                           new AsyncRequestCallback<List<Remote>>(dtoUnmarshallerFactory.newListUnmarshaller(Remote.class)) {
                                @Override
-                               protected void onSuccess(Array<Remote> result) {
+                               protected void onSuccess(List<Remote> result) {
                                    view.setEnableDeleteButton(selectedRemote != null);
                                    view.setRemotes(result);
                                    if (!view.isShown()) {

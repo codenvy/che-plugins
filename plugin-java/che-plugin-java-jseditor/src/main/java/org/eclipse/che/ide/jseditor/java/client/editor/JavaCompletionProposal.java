@@ -13,7 +13,6 @@ package org.eclipse.che.ide.jseditor.java.client.editor;
 import elemental.dom.Element;
 
 import org.eclipse.che.ide.api.icon.Icon;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
 import org.eclipse.che.ide.ext.java.messages.Change;
 import org.eclipse.che.ide.ext.java.messages.ProposalAppliedMessage;
@@ -21,6 +20,8 @@ import org.eclipse.che.ide.jseditor.client.codeassist.Completion;
 import org.eclipse.che.ide.jseditor.client.codeassist.CompletionProposal;
 import org.eclipse.che.ide.jseditor.client.document.EmbeddedDocument;
 import org.eclipse.che.ide.jseditor.client.text.LinearRange;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:evidolob@codenvy.com">Evgen Vidolob</a>
@@ -62,17 +63,17 @@ public class JavaCompletionProposal implements CompletionProposal {
         worker.applyCAProposal(id, new JavaParserWorker.Callback<ProposalAppliedMessage>() {
             @Override
             public void onCallback(final ProposalAppliedMessage message) {
-                callback.onCompletion(new CompletionImpl(message.changes(), message.selectionRegion()));
+                callback.onCompletion(new CompletionImpl(message.changes().toList(), message.selectionRegion()));
             }
         });
     }
 
     private class CompletionImpl implements Completion {
 
-        private final Array<Change> changes;
+        private final List<Change>                                 changes;
         private final org.eclipse.che.ide.ext.java.messages.Region region;
 
-        private CompletionImpl(final Array<Change> changes, final org.eclipse.che.ide.ext.java.messages.Region region) {
+        private CompletionImpl(final List<Change> changes, final org.eclipse.che.ide.ext.java.messages.Region region) {
             this.changes = changes;
             this.region = region;
         }
@@ -80,7 +81,7 @@ public class JavaCompletionProposal implements CompletionProposal {
         /** {@inheritDoc} */
         @Override
         public void apply(final EmbeddedDocument document) {
-            for (final Change change : changes.asIterable()) {
+            for (final Change change : changes) {
                 document.replace(change.offset(), change.length(), change.text());
             }
         }

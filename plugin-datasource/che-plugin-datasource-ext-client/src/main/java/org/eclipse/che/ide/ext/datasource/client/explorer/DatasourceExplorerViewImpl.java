@@ -11,12 +11,12 @@
 package org.eclipse.che.ide.ext.datasource.client.explorer;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.vectomatic.dom.svg.ui.SVGButtonBase;
 import org.vectomatic.dom.svg.ui.SVGPushButton;
 
 import org.eclipse.che.ide.api.parts.base.BaseView;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.datasource.client.DatasourceUiResources;
 import org.eclipse.che.ide.ext.datasource.shared.DatabaseMetadataEntityDTO;
 import org.eclipse.che.ide.ext.datasource.shared.ExploreTableType;
@@ -132,7 +132,7 @@ public class DatasourceExplorerViewImpl extends BaseView<DatasourceExplorerView.
             @Override
             public void onNodeSelected(final TreeNodeElement<DatabaseMetadataEntityDTODataAdapter.EntityTreeNode> node, final SignalEvent event) {
                 // we must force single selection and check unselection
-                final Array<DatabaseMetadataEntityDTODataAdapter.EntityTreeNode> selectedNodes = tree.getSelectionModel().getSelectedNodes();
+                final List<DatabaseMetadataEntityDTODataAdapter.EntityTreeNode> selectedNodes = tree.getSelectionModel().getSelectedNodes();
                 if (selectedNodes.isEmpty()) {
                     // this was a unselection
                     Log.debug(DatasourceExplorerViewImpl.class, "Unselect tree item (CTRL+click) - send null as selected item.");

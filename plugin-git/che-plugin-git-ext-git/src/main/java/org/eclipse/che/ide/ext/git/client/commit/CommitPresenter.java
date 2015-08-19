@@ -20,7 +20,6 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -136,9 +135,9 @@ public class CommitPresenter implements CommitView.ActionDelegate {
 
     private List<String> buildFileList(final Selection<StorableNode<?>> selection) {
         final List<String> filePattern = new ArrayList<>();
-        final Array<StorableNode<?>> selected = selection.getAll();
+        final List<StorableNode<?>> selected = selection.getAll();
         final String base = appContext.getCurrentProject().getRootProject().getPath();
-        for (final StorableNode<?> node : selected.asIterable()) {
+        for (final StorableNode<?> node : selected) {
             filePattern.add(getPath(node, base));
         }
         return filePattern;

@@ -12,9 +12,9 @@ package org.eclipse.che.ide.ext.git.client.branch;
 
 import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.ide.api.mvp.View;
-import org.eclipse.che.ide.collections.Array;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The view of {@link BranchPresenter}.
@@ -54,7 +54,7 @@ public interface BranchView extends View<BranchView.ActionDelegate> {
      * @param branches
      *         git branches
      */
-    void setBranches(@Nonnull Array<Branch> branches);
+    void setBranches(@Nonnull List<Branch> branches);
 
     /**
      * Change the enable state of the delete button.

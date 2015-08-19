@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.git.client.push;
 
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.shared.Remote;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ui.window.Window;
 import com.google.gwt.core.client.GWT;
@@ -29,6 +28,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The implementation of {@link PushToRemoteView}.
@@ -97,7 +97,7 @@ public class PushToRemoteViewImpl extends Window implements PushToRemoteView {
 
     /** {@inheritDoc} */
     @Override
-    public void setRepositories(@Nonnull Array<Remote> repositories) {
+    public void setRepositories(@Nonnull List<Remote> repositories) {
         this.repository.clear();
         for (int i = 0; i < repositories.size(); i++) {
             Remote repository = repositories.get(i);
@@ -115,7 +115,7 @@ public class PushToRemoteViewImpl extends Window implements PushToRemoteView {
 
     /** {@inheritDoc} */
     @Override
-    public void setLocalBranches(@Nonnull Array<String> branches) {
+    public void setLocalBranches(@Nonnull List<String> branches) {
         this.localBranch.clear();
         for (int i = 0; i < branches.size(); i++) {
             String branch = branches.get(i);
@@ -133,7 +133,7 @@ public class PushToRemoteViewImpl extends Window implements PushToRemoteView {
 
     /** {@inheritDoc} */
     @Override
-    public void setRemoteBranches(@Nonnull Array<String> branches) {
+    public void setRemoteBranches(@Nonnull List<String> branches) {
         this.remoteBranch.clear();
         for (int i = 0; i < branches.size(); i++) {
             String branch = branches.get(i);

@@ -18,9 +18,6 @@ import org.eclipse.che.api.project.shared.dto.Source;
 import org.eclipse.che.api.user.gwt.client.UserServiceClient;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.wizard.Wizard;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.commons.exception.UnauthorizedException;
 import org.eclipse.che.ide.dto.DtoFactory;
@@ -48,8 +45,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -72,7 +72,7 @@ public class GithubImporterPagePresenterTest {
     private ArgumentCaptor<AsyncCallback<OAuthStatus>> asyncCallbackCaptor;
 
     @Captor
-    private ArgumentCaptor<AsyncRequestCallback<StringMap<Array<GitHubRepository>>>> asyncRequestCallbackRepoListCaptor;
+    private ArgumentCaptor<AsyncRequestCallback<Map<String, List<GitHubRepository>>>> asyncRequestCallbackRepoListCaptor;
 
     @Mock
     private Wizard.UpdateDelegate       updateDelegate;
@@ -139,22 +139,15 @@ public class GithubImporterPagePresenterTest {
 
     @Test
     public void onLoadRepoClickedWhenGetUserReposIsSuccessful() throws Exception {
-        final StringMap repositories = mock(StringMap.class);
-        Array repo = mock(Array.class);
-        Iterable iterable = mock(Iterable.class);
-        Iterator iterator = mock(Iterator.class);
-        when(repositories.get(anyString())).thenReturn(repo);
-        when(repo.asIterable()).thenReturn(iterable);
-        when(iterable.iterator()).thenReturn(iterator);
-        when(iterator.hasNext()).thenReturn(false);
-        when(repositories.getKeys()).thenReturn(repo);
+        final Map<String, List<GitHubRepository>> repositories = new HashMap<>();
+        List<GitHubRepository> repo = new ArrayList<>();
+        repositories.put("AccountName", repo);
         when(view.getAccountName()).thenReturn("AccountName");
-        when(repositories.containsKey(anyString())).thenReturn(true);
 
         presenter.onLoadRepoClicked();
 
         verify(gitHubClientService).getAllRepositories(asyncRequestCallbackRepoListCaptor.capture());
-        AsyncRequestCallback<StringMap<Array<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
+        AsyncRequestCallback<Map<String, List<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(asyncRequestCallback, repositories);
 
         verify(notificationManager, never()).showError(anyString());
@@ -162,10 +155,10 @@ public class GithubImporterPagePresenterTest {
         verify(view).setInputsEnableState(eq(false));
         verify(view).setLoaderVisibility(eq(false));
         verify(view).setInputsEnableState(eq(true));
-        verify(gitHubClientService).getAllRepositories(Matchers.<AsyncRequestCallback<StringMap<Array<GitHubRepository>>>>anyObject());
-        verify(view).setAccountNames((Array<String>)anyObject());
+        verify(gitHubClientService).getAllRepositories(Matchers.<AsyncRequestCallback<Map<String, List<GitHubRepository>>>>anyObject());
+        verify(view).setAccountNames(Matchers.<Set>anyObject());
         verify(view, times(2)).showGithubPanel();
-        verify(view).setRepositories(Matchers.<Array<ProjectData>>anyObject());
+        verify(view).setRepositories(Matchers.<List<ProjectData>>anyObject());
         verify(view).reset();
     }
 
@@ -177,7 +170,7 @@ public class GithubImporterPagePresenterTest {
         presenter.onLoadRepoClicked();
 
         verify(gitHubClientService).getAllRepositories(asyncRequestCallbackRepoListCaptor.capture());
-        AsyncRequestCallback<StringMap<Array<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
+        AsyncRequestCallback<Map<String, List<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
         GwtReflectionUtils.callOnFailure(asyncRequestCallback,exception);
 
         verify(notificationManager).showError(anyString());
@@ -186,15 +179,15 @@ public class GithubImporterPagePresenterTest {
         verify(view).setInputsEnableState(eq(false));
         verify(view).setLoaderVisibility(eq(false));
         verify(view).setInputsEnableState(eq(true));
-        verify(gitHubClientService).getAllRepositories(Matchers.<AsyncRequestCallback<StringMap<Array<GitHubRepository>>>>anyObject());
-        verify(view, never()).setAccountNames((Array<String>)anyObject());
+        verify(gitHubClientService).getAllRepositories(Matchers.<AsyncRequestCallback<Map<String, List<GitHubRepository>>>>anyObject());
+        verify(view, never()).setAccountNames((Set<String>)anyObject());
         verify(view, never()).showGithubPanel();
-        verify(view, never()).setRepositories(Matchers.<Array<ProjectData>>anyObject());
+        verify(view, never()).setRepositories(Matchers.<List<ProjectData>>anyObject());
     }
 
     @Test
     public void onRepositorySelectedTest() {
-        ProjectData projectData = new ProjectData("name", "description", "type", Collections.<String>createArray(), "repoUrl", "readOnlyUrl");
+        ProjectData projectData = new ProjectData("name", "description", "type", new ArrayList<String>(), "repoUrl", "readOnlyUrl");
 
         presenter.onRepositorySelected(projectData);
 
@@ -380,7 +373,7 @@ public class GithubImporterPagePresenterTest {
         presenter.onLoadRepoClicked();
 
         verify(gitHubClientService).getAllRepositories(asyncRequestCallbackRepoListCaptor.capture());
-        AsyncRequestCallback<StringMap<Array<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
+        AsyncRequestCallback<Map<String, List<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
         GwtReflectionUtils.callOnFailure(asyncRequestCallback, exception);
 
         verify(gitHubAuthenticator).authorize(asyncCallbackCaptor.capture());
@@ -390,10 +383,10 @@ public class GithubImporterPagePresenterTest {
         verify(view, times(2)).setLoaderVisibility(eq(true));
         verify(view, times(2)).setInputsEnableState(eq(false));
         verify(view, times(2)).setInputsEnableState(eq(true));
-        verify(gitHubClientService).getAllRepositories(Matchers.<AsyncRequestCallback<StringMap<Array<GitHubRepository>>>>anyObject());
-        verify(view, never()).setAccountNames((Array<String>)anyObject());
+        verify(gitHubClientService).getAllRepositories(Matchers.<AsyncRequestCallback<Map<String, List<GitHubRepository>>>>anyObject());
+        verify(view, never()).setAccountNames((Set<String>)anyObject());
         verify(view, never()).showGithubPanel();
-        verify(view, never()).setRepositories(Matchers.<Array<ProjectData>>anyObject());
+        verify(view, never()).setRepositories(Matchers.<List<ProjectData>>anyObject());
     }
 
     @Test
@@ -403,7 +396,7 @@ public class GithubImporterPagePresenterTest {
         presenter.onLoadRepoClicked();
 
         verify(gitHubClientService).getAllRepositories(asyncRequestCallbackRepoListCaptor.capture());
-        AsyncRequestCallback<StringMap<Array<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
+        AsyncRequestCallback<Map<String, List<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
         GwtReflectionUtils.callOnFailure(asyncRequestCallback, exception);
 
         verify(gitHubAuthenticator).authorize(asyncCallbackCaptor.capture());
@@ -413,7 +406,7 @@ public class GithubImporterPagePresenterTest {
         verify(view, times(3)).setLoaderVisibility(eq(true));
         verify(view, times(3)).setInputsEnableState(eq(false));
         verify(view, times(2)).setInputsEnableState(eq(true));
-        verify(gitHubClientService, times(2)).getAllRepositories(Matchers.<AsyncRequestCallback<StringMap<Array<GitHubRepository>>>>anyObject());
+        verify(gitHubClientService, times(2)).getAllRepositories(Matchers.<AsyncRequestCallback<Map<String, List<GitHubRepository>>>>anyObject());
     }
 
     private void verifyInvocationsForCorrectUrl(String correctUrl) {

@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.client.load;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="oksana.vereshchaka@gmail.com">Oksana Vereshchaka</a>
@@ -25,9 +25,9 @@ public class ProjectData {
     private String        repositoryUrl;
     /** Url to clone from GitHub (readOnly). */
     private String        readOnlyUrl;
-    private Array<String> targets;
+    private List<String> targets;
 
-    public ProjectData(String name, String description, String type, Array<String> targets, String repositoryUrl, String readOnlyUrl) {
+    public ProjectData(String name, String description, String type, List<String> targets, String repositoryUrl, String readOnlyUrl) {
         this.name = name;
         this.description = description;
         this.type = type;
@@ -81,9 +81,9 @@ public class ProjectData {
     }
 
     /** @return the targets */
-    public Array<String> getTargets() {
+    public List<String> getTargets() {
         if (targets == null) {
-            targets = Collections.createArray();
+            targets = new ArrayList<>();
         }
         return targets;
     }
@@ -92,7 +92,7 @@ public class ProjectData {
      * @param targets
      *         the targets to set
      */
-    public void setTargets(Array<String> targets) {
+    public void setTargets(List<String> targets) {
         this.targets = targets;
     }
 

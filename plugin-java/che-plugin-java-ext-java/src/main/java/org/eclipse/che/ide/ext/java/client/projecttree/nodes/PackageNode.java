@@ -16,7 +16,6 @@ import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import com.google.inject.Inject;
@@ -24,6 +23,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
+
+import java.util.List;
 
 import static org.eclipse.che.ide.ext.java.client.projecttree.JavaSourceFolderUtil.getSourceFolders;
 
@@ -110,7 +111,7 @@ public class PackageNode extends AbstractSourceContainerNode {
     }
 
     private boolean hasOneChildPackageOnly(PackageNode pack) {
-        Array<TreeNode<?>> children = pack.getChildren();
+        List<TreeNode<?>> children = pack.getChildren();
         return children.size() == 1 && children.get(0) instanceof PackageNode;
     }
 }

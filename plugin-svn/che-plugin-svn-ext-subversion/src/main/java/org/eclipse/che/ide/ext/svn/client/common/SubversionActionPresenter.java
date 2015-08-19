@@ -306,7 +306,7 @@ public class SubversionActionPresenter {
         final Collection<PathTypeFilter> filters = Collections.singleton(ALL);
 
         if (selection != null && !selection.isEmpty()) {
-            for (final Object item : selection.getAll().asIterable()) {
+            for (final Object item : selection.getAll()) {
                 if (matchesFilter(item, filters)) {
                     final StorableNode node = (StorableNode)item;
                     if (node instanceof FileNode) {

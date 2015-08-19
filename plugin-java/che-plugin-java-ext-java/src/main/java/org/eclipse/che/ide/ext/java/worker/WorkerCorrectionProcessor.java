@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.java.worker;
 
 import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.collections.js.JsoArray;
-import org.eclipse.che.ide.collections.js.JsoStringMap;
 import org.eclipse.che.ide.ext.java.jdt.MultiStatus;
 import org.eclipse.che.ide.ext.java.jdt.codeassistant.api.IProblemLocation;
 import org.eclipse.che.ide.ext.java.jdt.codeassistant.api.JavaCompletionProposal;
@@ -40,6 +39,8 @@ import com.google.gwt.webworker.client.messages.MessageFilter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * WorkerCorrectionProcessor 
@@ -158,7 +159,7 @@ public class WorkerCorrectionProcessor {
 //    }
 
     public void computateProposals(ComputeCorrMessage message) {
-        JsoStringMap<JavaCompletionProposal> proposalMap = JsoStringMap.create();
+        Map<String, JavaCompletionProposal> proposalMap = new HashMap<>();
         int documentOffset = message.documentOffset();
 
         WorkerDocument document = new WorkerDocument(message.documentContent());

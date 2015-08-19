@@ -12,13 +12,12 @@ package org.eclipse.che.ide.ext.java.client.projecttree.nodes;
 
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -68,7 +67,7 @@ public class PackageNodeTest extends BaseNodeTest {
                                       dtoUnmarshallerFactory,
                                       iconRegistry);
 
-        final Array<TreeNode<?>> children = Collections.createArray();
+        final List<TreeNode<?>> children = new ArrayList<>();
         when(projectNode.getChildren()).thenReturn(children);
     }
 

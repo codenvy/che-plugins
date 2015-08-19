@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.ssh.client;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.ssh.dto.KeyItem;
 import org.eclipse.che.ide.ext.ssh.dto.PublicKey;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The client service for working with ssh key.
@@ -30,7 +30,7 @@ public interface SshKeyService {
      *
      * @return {@link org.eclipse.che.ide.collections.StringMap}
      */
-    StringMap<SshKeyProvider> getSshKeyProviders();
+    Map<String, SshKeyProvider> getSshKeyProviders();
 
     /**
      * Register SSH key provider
@@ -47,7 +47,7 @@ public interface SshKeyService {
      *
      * @param callback
      */
-    void getAllKeys(@Nonnull AsyncRequestCallback<Array<KeyItem>> callback);
+    void getAllKeys(@Nonnull AsyncRequestCallback<List<KeyItem>> callback);
 
     /**
      * Generate new ssh key pare

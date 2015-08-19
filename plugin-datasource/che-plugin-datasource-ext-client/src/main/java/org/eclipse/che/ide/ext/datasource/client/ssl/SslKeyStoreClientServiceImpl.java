@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.datasource.client.ssl;
 
 import javax.validation.constraints.NotNull;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.datasource.client.inject.DatasourceGinModule;
 import org.eclipse.che.ide.ext.datasource.shared.ssl.SslKeyStoreEntry;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -22,6 +21,8 @@ import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+
+import java.util.List;
 
 @Singleton
 public class SslKeyStoreClientServiceImpl implements SslKeyStoreClientService {
@@ -41,14 +42,14 @@ public class SslKeyStoreClientServiceImpl implements SslKeyStoreClientService {
 
     /** {@inheritDoc} */
     @Override
-    public void getAllClientKeys(@NotNull AsyncRequestCallback<Array<SslKeyStoreEntry>> callback) {
+    public void getAllClientKeys(@NotNull AsyncRequestCallback<List<SslKeyStoreEntry>> callback) {
         asyncRequestFactory.createGetRequest(baseUrl + "/ssl-keystore/keystore")
                 .loader(loader,"Retrieving SSL Client keys....")
                 .send(callback);
     }
 
     @Override
-    public void getAllServerCerts(AsyncRequestCallback<Array<SslKeyStoreEntry>> callback) {
+    public void getAllServerCerts(AsyncRequestCallback<List<SslKeyStoreEntry>> callback) {
         asyncRequestFactory.createGetRequest(baseUrl + "/ssl-keystore/truststore")
                 .loader(loader, "Retrieving SSL Server certs....")
                 .send(callback);

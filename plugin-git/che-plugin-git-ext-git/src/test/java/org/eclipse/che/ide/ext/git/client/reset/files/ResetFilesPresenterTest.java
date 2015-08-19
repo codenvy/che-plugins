@@ -15,7 +15,6 @@ import org.eclipse.che.api.git.shared.ResetRequest;
 import org.eclipse.che.api.git.shared.Status;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.notification.Notification;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
@@ -82,7 +81,7 @@ public class ResetFilesPresenterTest extends BaseTest {
 
         verify(appContext).getCurrentProject();
         verify(service).status(eq(rootProjectDescriptor), (AsyncRequestCallback<Status>)anyObject());
-        verify(view).setIndexedFiles((Array<IndexFile>)anyObject());
+        verify(view).setIndexedFiles((List<IndexFile>)anyObject());
         verify(view).showDialog();
     }
 
@@ -116,7 +115,7 @@ public class ResetFilesPresenterTest extends BaseTest {
         verify(service).status(eq(rootProjectDescriptor), (AsyncRequestCallback<Status>)anyObject());
         verify(dialogFactory).createMessageDialog(eq("Warning"), eq("Index is Empty"),
                                                  (ConfirmCallback)anyObject());
-        verify(view, never()).setIndexedFiles((Array<IndexFile>)anyObject());
+        verify(view, never()).setIndexedFiles((List<IndexFile>)anyObject());
         verify(view, never()).showDialog();
     }
 

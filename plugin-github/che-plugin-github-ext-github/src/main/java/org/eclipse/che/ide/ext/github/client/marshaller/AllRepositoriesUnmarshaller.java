@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.client.marshaller;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.commons.exception.UnmarshallerException;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.github.shared.GitHubRepository;
@@ -22,6 +19,9 @@ import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,10 +29,10 @@ import java.util.Set;
  *
  * @author <a href="mailto:dvishinskiy@codenvy.com">Dmitriy Vyshinskiy</a>
  */
-public class AllRepositoriesUnmarshaller implements Unmarshallable<StringMap<Array<GitHubRepository>>> {
+public class AllRepositoriesUnmarshaller implements Unmarshallable<Map<String, List<GitHubRepository>>> {
     /** Repositories list. */
-    private StringMap<Array<GitHubRepository>> repositories;
-    private DtoFactory                         dtoFactory;
+    private Map<String, List<GitHubRepository>> repositories;
+    private DtoFactory                          dtoFactory;
 
     public AllRepositoriesUnmarshaller(DtoFactory dtoFactory) {
         this.dtoFactory = dtoFactory;
@@ -48,18 +48,18 @@ public class AllRepositoriesUnmarshaller implements Unmarshallable<StringMap<Arr
         }
 
         Set<String> keys = jsonObj.keySet();
-        repositories = Collections.createStringMap();
+        repositories = new HashMap<>();
 
         for (String key : keys) {
             JSONArray jsonArray = jsonObj.get(key).isArray();
-            Array<GitHubRepository> repos = dtoFactory.createListDtoFromJson(jsonArray.toString(), GitHubRepository.class);
+            List<GitHubRepository> repos = dtoFactory.createListDtoFromJson(jsonArray.toString(), GitHubRepository.class);
             repositories.put(key, repos);
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public StringMap<Array<GitHubRepository>> getPayload() {
+    public Map<String, List<GitHubRepository>> getPayload() {
         return repositories;
     }
 }

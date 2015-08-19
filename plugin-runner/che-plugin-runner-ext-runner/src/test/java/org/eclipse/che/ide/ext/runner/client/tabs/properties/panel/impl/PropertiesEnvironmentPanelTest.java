@@ -36,8 +36,6 @@ import org.eclipse.che.ide.api.project.tree.TreeStructure;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.api.texteditor.HandlesUndoRedo;
 import org.eclipse.che.ide.api.texteditor.UndoableEditor;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.java.JsonArrayListAdapter;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.TestEditor;
@@ -76,6 +74,7 @@ import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.eclipse.che.ide.ext.runner.client.models.EnvironmentImpl.ROOT_FOLDER;
@@ -111,7 +110,7 @@ public class PropertiesEnvironmentPanelTest {
 
     private static final String TEXT  = "someText";
     private static final String TEXT2 = "someText2";
-    private Array<ItemReference> result;
+    private List<ItemReference> result;
 
     //mocks for constructors
     @Mock
@@ -143,7 +142,7 @@ public class PropertiesEnvironmentPanelTest {
     @Mock
     private AsyncCallbackBuilder<ItemReference>        asyncCallbackBuilder;
     @Mock
-    private AsyncCallbackBuilder<Array<ItemReference>> asyncArrayCallbackBuilder;
+    private AsyncCallbackBuilder<List<ItemReference>> asyncArrayCallbackBuilder;
     @Mock
     private AsyncCallbackBuilder<Void>                 voidAsyncCallbackBuilder;
     @Mock
@@ -168,7 +167,7 @@ public class PropertiesEnvironmentPanelTest {
     @Mock
     private Timer                                      timer;
     @Mock
-    private Unmarshallable<Array<ItemReference>>       unmarshaller;
+    private Unmarshallable<List<ItemReference>>        unmarshaller;
     @Mock
     private ProjectDescriptor                          projectDescriptor;
     @Mock
@@ -184,7 +183,7 @@ public class PropertiesEnvironmentPanelTest {
     @Mock
     private AsyncRequestCallback<ItemReference>        asyncRequestCallback;
     @Mock
-    private AsyncRequestCallback<Array<ItemReference>> arrayAsyncCallback;
+    private AsyncRequestCallback<List<ItemReference>> arrayAsyncCallback;
     @Mock
     private AsyncRequestCallback<ProjectDescriptor>    descriptorCallback;
     @Mock
@@ -216,7 +215,7 @@ public class PropertiesEnvironmentPanelTest {
     @Captor
     private ArgumentCaptor<TimerFactory.TimerCallBack>                 timerCaptor;
     @Captor
-    private ArgumentCaptor<AsyncRequestCallback<Array<ItemReference>>> asyncRequestCallbackArgCaptor;
+    private ArgumentCaptor<AsyncRequestCallback<List<ItemReference>>> asyncRequestCallbackArgCaptor;
     @Captor
     private ArgumentCaptor<PropertyListener>                           propertyListenerArgCaptor;
     @Captor
@@ -230,7 +229,7 @@ public class PropertiesEnvironmentPanelTest {
     @Captor
     private ArgumentCaptor<AsyncCallback<EditorInput>>                 editorInputCaptor;
     @Captor
-    private ArgumentCaptor<SuccessCallback<Array<ItemReference>>>      successCallback;
+    private ArgumentCaptor<SuccessCallback<List<ItemReference>>>      successCallback;
     @Captor
     private ArgumentCaptor<FailureCallback>                            failureCaptor;
     @Captor
@@ -244,7 +243,7 @@ public class PropertiesEnvironmentPanelTest {
 
     @Before
     public void setUp() throws Exception {
-        result = new JsonArrayListAdapter<>(Arrays.asList(itemReference1, itemReference2));
+        result = Arrays.asList(itemReference1, itemReference2);
 
         runnerConfigs = new HashMap<>();
 
@@ -255,7 +254,7 @@ public class PropertiesEnvironmentPanelTest {
         when(projectDescriptor.getRunners()).thenReturn(runnersDescriptor);
         when(runnersDescriptor.getConfigs()).thenReturn(runnerConfigs);
         when(runner.getRAM()).thenReturn(MB_500.getValue());
-        when(unmarshallerFactory.newArrayUnmarshaller(ItemReference.class)).thenReturn(unmarshaller);
+        when(unmarshallerFactory.newListUnmarshaller(ItemReference.class)).thenReturn(unmarshaller);
 
         when(environment.getScope()).thenReturn(SYSTEM);
         when(environment.getPath()).thenReturn(TEXT);
@@ -291,9 +290,9 @@ public class PropertiesEnvironmentPanelTest {
         when(itemReference1.getPath()).thenReturn("/this is a path/Dockerfile");
         when(itemReference2.getPath()).thenReturn("/this is a path/Dockerfile");
 
-        when(unmarshallerFactory.newArrayUnmarshaller(ItemReference.class)).thenReturn(unmarshaller);
+        when(unmarshallerFactory.newListUnmarshaller(ItemReference.class)).thenReturn(unmarshaller);
         when(asyncArrayCallbackBuilder.unmarshaller(unmarshaller)).thenReturn(asyncArrayCallbackBuilder);
-        when(asyncArrayCallbackBuilder.success(Matchers.<SuccessCallback<Array<ItemReference>>>anyObject()))
+        when(asyncArrayCallbackBuilder.success(Matchers.<SuccessCallback<List<ItemReference>>>anyObject()))
                 .thenReturn(asyncArrayCallbackBuilder);
         when(asyncArrayCallbackBuilder.failure(any(FailureCallback.class))).thenReturn(asyncArrayCallbackBuilder);
         when(asyncArrayCallbackBuilder.build()).thenReturn(arrayAsyncCallback);
@@ -929,7 +928,7 @@ public class PropertiesEnvironmentPanelTest {
         view.setVisibleDeleteButton(true);
         view.setVisibleCancelButton(true);
 
-        verify(unmarshallerFactory).newArrayUnmarshaller(ItemReference.class);
+        verify(unmarshallerFactory).newListUnmarshaller(ItemReference.class);
 
         verify(asyncArrayCallbackBuilder).success(successCallback.capture());
         successCallback.getValue().onSuccess(result);

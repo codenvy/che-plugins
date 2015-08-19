@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.datasource.client.newdatasource.connector;
 
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.datasource.client.DatabaseCategoryType;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.inject.Provider;
 
+import java.util.List;
 
 public class NewDatasourceConnector implements Comparable<NewDatasourceConnector> {
 
@@ -23,7 +23,7 @@ public class NewDatasourceConnector implements Comparable<NewDatasourceConnector
     private final String                                                         title;
     private final ImageResource                                                  image;
     private final String                                                         jdbcClassName;
-    private final Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> wizardPages;
+    private final List<Provider< ? extends AbstractNewDatasourceConnectorPage>>  wizardPages;
 
     private final DatabaseCategoryType                                           categoryType;
 
@@ -32,7 +32,7 @@ public class NewDatasourceConnector implements Comparable<NewDatasourceConnector
                                   final String title,
                                   final ImageResource logo,
                                   final String jdbcClassName,
-                                  final Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> wizardPages,
+                                  final List<Provider< ? extends AbstractNewDatasourceConnectorPage>> wizardPages,
                                   final DatabaseCategoryType categoryType) {
         this.id = connectorId;
         this.priority = priority;
@@ -59,7 +59,7 @@ public class NewDatasourceConnector implements Comparable<NewDatasourceConnector
         return jdbcClassName;
     }
 
-    public Array<Provider< ? extends AbstractNewDatasourceConnectorPage>> getWizardPages() {
+    public List<Provider< ? extends AbstractNewDatasourceConnectorPage>> getWizardPages() {
         return wizardPages;
     }
 

@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.ext.java.worker;
 
 import org.eclipse.che.ide.collections.js.JsoArray;
-import org.eclipse.che.ide.collections.js.JsoStringMap;
 import org.eclipse.che.ide.ext.java.jdt.codeassistant.api.JavaCompletionProposal;
 import org.eclipse.che.ide.ext.java.messages.ApplyProposalMessage;
 import org.eclipse.che.ide.ext.java.messages.Change;
@@ -23,13 +22,16 @@ import org.eclipse.che.ide.ext.java.jdt.text.DocumentListener;
 import org.eclipse.che.ide.api.text.Region;
 import com.google.gwt.webworker.client.messages.MessageFilter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class WorkerProposalApplier {
 
     private final JavaParserWorker worker;
-    private JsoStringMap<JavaCompletionProposal> caProposalMap    = JsoStringMap.create();
-    private JsoStringMap<JavaCompletionProposal> quickProposalMap = JsoStringMap.create();
+    private Map<String, JavaCompletionProposal> caProposalMap    = new HashMap<>();
+    private Map<String, JavaCompletionProposal> quickProposalMap = new HashMap<>();
     private Document caDocument;
-    private Document   quickDocument;
+    private Document quickDocument;
 
 
     public WorkerProposalApplier(JavaParserWorker worker, MessageFilter messageFilter) {
@@ -87,11 +89,11 @@ public class WorkerProposalApplier {
         this.quickDocument = quickDocument;
     }
 
-    public void setCaProposalMap(JsoStringMap<JavaCompletionProposal> caProposalMap) {
+    public void setCaProposalMap(Map<String, JavaCompletionProposal> caProposalMap) {
         this.caProposalMap = caProposalMap;
     }
 
-    public void setQuickProposalMap(JsoStringMap<JavaCompletionProposal> quickProposalMap) {
+    public void setQuickProposalMap(Map<String, JavaCompletionProposal> quickProposalMap) {
         this.quickProposalMap = quickProposalMap;
     }
 }

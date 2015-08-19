@@ -13,8 +13,6 @@ package org.eclipse.che.ide.ext.web.inject;
 import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 import org.eclipse.che.ide.api.filetypes.FileType;
-import org.eclipse.che.ide.collections.ArrayIterator;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.web.html.editor.HtmlEditorConfiguration;
 import org.eclipse.che.ide.ext.web.js.editor.JsEditorConfigurationProvider;
 import org.eclipse.che.ide.ext.web.WebExtensionResource;
@@ -75,6 +73,6 @@ public class WebModule extends AbstractGinModule {
     @Singleton
     @Named("PHPFileType")
     protected FileType providePHPFile(WebExtensionResource res) {
-        return new FileType("PHP file", res.phpFile(), Collections.createArray(MimeType.APPLICATION_X_PHP, "text/x-php"), "php");
+        return new FileType("PHP file", res.phpFile(), Arrays.asList(MimeType.APPLICATION_X_PHP, "text/x-php"), "php");
     }
 }

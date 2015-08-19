@@ -26,7 +26,6 @@ import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.generic.Openable;
 import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
@@ -96,14 +95,14 @@ public class MovePresenter extends SubversionActionPresenter implements MoveView
         sources = selection.getAllElements();
         projectPath = getCurrentProjectPath();
 
-        treeStructureProvider.get().getRootNodes(new AsyncCallback<Array<TreeNode<?>>>() {
+        treeStructureProvider.get().getRootNodes(new AsyncCallback<List<TreeNode<?>>>() {
             @Override
             public void onFailure(Throwable caught) {
                 notificationManager.showError(locale.moveFailToGetProject());
             }
 
             @Override
-            public void onSuccess(Array<TreeNode<?>> result) {
+            public void onSuccess(List<TreeNode<?>> result) {
                 view.setProjectNodes(result);
             }
         });

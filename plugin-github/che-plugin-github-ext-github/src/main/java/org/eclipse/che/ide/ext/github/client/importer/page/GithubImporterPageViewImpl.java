@@ -13,7 +13,6 @@ package org.eclipse.che.ide.ext.github.client.importer.page;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.ui.CheckBox;
 import org.eclipse.che.ide.Resources;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.github.client.GitHubLocalizationConstant;
 import org.eclipse.che.ide.ext.github.client.GitHubResources;
 import org.eclipse.che.ide.ext.github.client.load.ProjectData;
@@ -54,6 +53,7 @@ import com.google.inject.Inject;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Roman Nikitenko
@@ -371,11 +371,11 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
     }
 
     @Override
-    public void setRepositories(@Nonnull Array<ProjectData> repositories) {
+    public void setRepositories(@Nonnull List<ProjectData> repositories) {
         // Wraps Array in java.util.List
         List<ProjectData> list = new ArrayList<ProjectData>();
-        for (int i = 0; i < repositories.size(); i++) {
-            list.add(repositories.get(i));
+        for (ProjectData repository : repositories) {
+            list.add(repository);
         }
         this.repositories.setRowData(list);
     }
@@ -388,10 +388,9 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
     }
 
     @Override
-    public void setAccountNames(@Nonnull Array<String> names) {
+    public void setAccountNames(@Nonnull Set<String> names) {
         this.accountName.clear();
-        for (int i = 0; i < names.size(); i++) {
-            String name = names.get(i);
+        for (String name : names) {
             this.accountName.addItem(name);
         }
     }

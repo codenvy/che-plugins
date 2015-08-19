@@ -12,7 +12,6 @@ package org.eclipse.che.ide.ext.git.client.reset.files;
 
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.shared.IndexFile;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ui.window.Window;
 
@@ -144,11 +143,11 @@ public class ResetFilesViewImpl extends Window implements ResetFilesView {
 
     /** {@inheritDoc} */
     @Override
-    public void setIndexedFiles(@Nonnull Array<IndexFile> indexedFiles) {
+    public void setIndexedFiles(@Nonnull List<IndexFile> indexedFiles) {
         // Wraps Array in java.util.List
-        List<IndexFile> appList = new ArrayList<IndexFile>();
-        for (int i = 0; i < indexedFiles.size(); i++) {
-            appList.add(indexedFiles.get(i));
+        List<IndexFile> appList = new ArrayList<>();
+        for (IndexFile indexedFile : indexedFiles) {
+            appList.add(indexedFile);
         }
         indexFiles.setRowData(appList);
     }

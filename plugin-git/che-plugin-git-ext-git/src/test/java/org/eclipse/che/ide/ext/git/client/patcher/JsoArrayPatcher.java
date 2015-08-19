@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.patcher;
 
-import org.eclipse.che.ide.collections.js.JsoArray;
 import com.googlecode.gwt.test.patchers.PatchClass;
 import com.googlecode.gwt.test.patchers.PatchMethod;
+
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 
@@ -21,18 +22,18 @@ import static org.mockito.Mockito.mock;
  *
  * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
  */
-@PatchClass(JsoArray.class)
+@PatchClass(List.class)
 public class JsoArrayPatcher {
 
     /** Patch create method. */
     @PatchMethod(override = true)
-    public static <T> JsoArray<T> create() {
-        return mock(JsoArray.class);
+    public static <T> List<T> create() {
+        return mock(List.class);
     }
 
     /** Patch add method. */
     @PatchMethod
-    public static <T> void add(JsoArray array, T value) {
+    public static <T> void add(List array, T value) {
         // do nothing
     }
 }

@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.ext.java.worker;
 
 import org.eclipse.che.ide.collections.js.JsoArray;
-import org.eclipse.che.ide.collections.js.JsoStringMap;
 import org.eclipse.che.ide.ext.java.jdt.codeassistant.AbstractJavaCompletionProposal;
 import org.eclipse.che.ide.ext.java.jdt.codeassistant.CompletionProposalCollector;
 import org.eclipse.che.ide.ext.java.jdt.codeassistant.FillArgumentNamesCompletionProposalCollector;
@@ -38,9 +37,11 @@ import com.google.gwt.webworker.client.messages.MessageFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -108,7 +109,7 @@ public class WorkerCodeAssist {
     private void handleCAMessage(ComputeCAProposalsMessage message) {
         setProjectPath(message.projectPath());
         nameEnvironment.setProjectPath(message.projectPath());
-        JsoStringMap<JavaCompletionProposal> proposalMap = JsoStringMap.create();
+        Map<String, JavaCompletionProposal> proposalMap = new HashMap<>();
         documentContent = message.docContent();
 
         JavaCompletionProposal[] proposals =

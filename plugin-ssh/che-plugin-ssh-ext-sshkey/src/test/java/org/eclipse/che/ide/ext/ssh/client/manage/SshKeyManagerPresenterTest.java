@@ -18,8 +18,6 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.java.JsonArrayListAdapter;
 import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.ssh.client.SshKeyService;
 import org.eclipse.che.ide.ext.ssh.client.SshLocalizationConstant;
@@ -47,6 +45,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -73,7 +72,7 @@ public class SshKeyManagerPresenterTest {
     private ArgumentCaptor<AsyncRequestCallback<Void>> asyncRequestCallbackCaptor;
 
     @Captor
-    private ArgumentCaptor<AsyncRequestCallback<Array<KeyItem>>> getAllKeysCallbackCaptor;
+    private ArgumentCaptor<AsyncRequestCallback<List<KeyItem>>> getAllKeysCallbackCaptor;
 
     @Captor
     private ArgumentCaptor<AsyncCallback<Void>> asyncCallbackCaptor;
@@ -118,7 +117,7 @@ public class SshKeyManagerPresenterTest {
 
         presenter.go(container);
 
-        verify(service).getAllKeys(Matchers.<AsyncRequestCallback<Array<KeyItem>>>anyObject());
+        verify(service).getAllKeys(Matchers.<AsyncRequestCallback<List<KeyItem>>>anyObject());
         verify(container).setWidget(eq(view));
     }
 
@@ -225,7 +224,7 @@ public class SshKeyManagerPresenterTest {
         verify(confirmDialog).show();
         verify(service).deleteKey((KeyItem)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(loader).hide(anyString());
-        verify(service).getAllKeys(Matchers.<AsyncRequestCallback<Array<KeyItem>>>anyObject());
+        verify(service).getAllKeys(Matchers.<AsyncRequestCallback<List<KeyItem>>>anyObject());
     }
 
     @Test
@@ -253,7 +252,7 @@ public class SshKeyManagerPresenterTest {
         verify(service).deleteKey((KeyItem)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(loader).hide(anyString());
         verify(notificationManager).showError(anyString());
-        verify(service, never()).getAllKeys(Matchers.<AsyncRequestCallback<Array<KeyItem>>>anyObject());
+        verify(service, never()).getAllKeys(Matchers.<AsyncRequestCallback<List<KeyItem>>>anyObject());
     }
 
     @Test
@@ -261,7 +260,7 @@ public class SshKeyManagerPresenterTest {
         KeyItem keyItem = mock(KeyItem.class);
         SafeHtml safeHtml = mock(SafeHtml.class);
         ConfirmDialog confirmDialog = mock(ConfirmDialog.class);
-        Array<KeyItem> keyItemArray = new JsonArrayListAdapter<>(new ArrayList<KeyItem>());
+        List<KeyItem> keyItemList = new ArrayList<>();
         when(keyItem.getHost()).thenReturn(GITHUB_HOST);
         when(constant.deleteSshKeyQuestion(anyString())).thenReturn(safeHtml);
         when(safeHtml.asString()).thenReturn("");
@@ -279,14 +278,14 @@ public class SshKeyManagerPresenterTest {
         GwtReflectionUtils.callOnSuccess(asyncRequestCallback, (Void)null);
 
         verify(service).getAllKeys(getAllKeysCallbackCaptor.capture());
-        AsyncRequestCallback<Array<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
-        GwtReflectionUtils.callOnSuccess(getAllKeysCallback, keyItemArray);
+        AsyncRequestCallback<List<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
+        GwtReflectionUtils.callOnSuccess(getAllKeysCallback, keyItemList);
 
         verify(confirmDialog).show();
         verify(service).deleteKey((KeyItem)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(loader, times(2)).hide(anyString());
-        verify(service).getAllKeys(Matchers.<AsyncRequestCallback<Array<KeyItem>>>anyObject());
-        verify(view).setKeys(eq(keyItemArray));
+        verify(service).getAllKeys(Matchers.<AsyncRequestCallback<List<KeyItem>>>anyObject());
+        verify(view).setKeys(eq(keyItemList));
     }
 
     @Test
@@ -294,7 +293,7 @@ public class SshKeyManagerPresenterTest {
         KeyItem keyItem = mock(KeyItem.class);
         SafeHtml safeHtml = mock(SafeHtml.class);
         ConfirmDialog confirmDialog = mock(ConfirmDialog.class);
-        Array<KeyItem> keyItemArray = new JsonArrayListAdapter<>(new ArrayList<KeyItem>());
+        List<KeyItem> keyItemArray = new ArrayList<>();
         when(keyItem.getHost()).thenReturn(GITHUB_HOST);
         when(constant.deleteSshKeyQuestion(anyString())).thenReturn(safeHtml);
         when(safeHtml.asString()).thenReturn("");
@@ -312,13 +311,13 @@ public class SshKeyManagerPresenterTest {
         GwtReflectionUtils.callOnSuccess(asyncRequestCallback, (Void)null);
 
         verify(service).getAllKeys(getAllKeysCallbackCaptor.capture());
-        AsyncRequestCallback<Array<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
+        AsyncRequestCallback<List<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
         GwtReflectionUtils.callOnFailure(getAllKeysCallback, new Exception(""));
 
         verify(confirmDialog).show();
         verify(service).deleteKey((KeyItem)anyObject(), Matchers.<AsyncRequestCallback<Void>>anyObject());
         verify(loader, times(2)).hide(anyString());
-        verify(service).getAllKeys(Matchers.<AsyncRequestCallback<Array<KeyItem>>>anyObject());
+        verify(service).getAllKeys(Matchers.<AsyncRequestCallback<List<KeyItem>>>anyObject());
         verify(view, never()).setKeys(eq(keyItemArray));
         verify(notificationManager).showError(anyString());
         verify(eventBus).fireEvent(Matchers.<ExceptionThrownEvent>anyObject());
@@ -326,7 +325,7 @@ public class SshKeyManagerPresenterTest {
 
     @Test
     public void testShouldRefreshKeysAfterSuccessfulUploadKey() {
-        Array<KeyItem> keyItemArray = new JsonArrayListAdapter<>(new ArrayList<KeyItem>());
+        List<KeyItem> keyItemArray = new ArrayList<>();
 
         presenter.onUploadClicked();
 
@@ -335,7 +334,7 @@ public class SshKeyManagerPresenterTest {
         asyncCallback.onSuccess(null);
 
         verify(service).getAllKeys(getAllKeysCallbackCaptor.capture());
-        AsyncRequestCallback<Array<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
+        AsyncRequestCallback<List<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(getAllKeysCallback, keyItemArray);
 
         verify(loader).hide(anyString());
@@ -344,7 +343,7 @@ public class SshKeyManagerPresenterTest {
 
     @Test
     public void testFailedRefreshKeysAfterSuccessfulUploadKey() {
-        Array<KeyItem> keyItemArray = new JsonArrayListAdapter<>(new ArrayList<KeyItem>());
+        List<KeyItem> keyItemArray = new ArrayList<>();
 
         presenter.onUploadClicked();
 
@@ -353,7 +352,7 @@ public class SshKeyManagerPresenterTest {
         asyncCallback.onSuccess(null);
 
         verify(service).getAllKeys(getAllKeysCallbackCaptor.capture());
-        AsyncRequestCallback<Array<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
+        AsyncRequestCallback<List<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
         GwtReflectionUtils.callOnFailure(getAllKeysCallback, new Exception(""));
 
         verify(loader).hide(anyString());
@@ -408,15 +407,15 @@ public class SshKeyManagerPresenterTest {
         AsyncRequestCallback asyncRequestCallback = asyncRequestCallbackCaptor.getValue();
         GwtReflectionUtils.callOnFailure(asyncRequestCallback, new Exception(""));
 
-        verify(service, never()).getAllKeys((AsyncRequestCallback<Array<KeyItem>>)anyObject());
-        verify(view, never()).setKeys((Array<KeyItem>)anyObject());
+        verify(service, never()).getAllKeys((AsyncRequestCallback<List<KeyItem>>)anyObject());
+        verify(view, never()).setKeys((List<KeyItem>)anyObject());
         verify(eventBus).fireEvent(Matchers.<ExceptionThrownEvent>anyObject());
         verify(notificationManager).showError(anyString());
     }
 
     @Test
     public void testShouldRefreshKeysAfterSuccessfulGenerateKey() {
-        Array<KeyItem> keyItemArray = new JsonArrayListAdapter<>(new ArrayList<KeyItem>());
+        List<KeyItem> keyItemArray = new ArrayList<>();
         InputDialog inputDialog = mock(InputDialog.class);
         when(dialogFactory.createInputDialog(anyString(), anyString(), (InputCallback)anyObject(), (CancelCallback)anyObject()))
                 .thenReturn(inputDialog);
@@ -434,7 +433,7 @@ public class SshKeyManagerPresenterTest {
 
 
         verify(service).getAllKeys(getAllKeysCallbackCaptor.capture());
-        AsyncRequestCallback<Array<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
+        AsyncRequestCallback<List<KeyItem>> getAllKeysCallback = getAllKeysCallbackCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(getAllKeysCallback, keyItemArray);
 
         verify(loader).hide(anyString());

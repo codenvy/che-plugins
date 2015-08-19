@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.angularjs.core.client.editor;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.util.AbstractTrie;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Holder of all possible AngularJS attributes.
@@ -20,7 +22,7 @@ import org.eclipse.che.ide.util.AbstractTrie;
  * @author Florent Benoit
  */
 public class AngularJSTrie {
-    private static final Array<String> ELEMENTS = Collections.createArray(
+    private static final List<String> ELEMENTS = Arrays.asList(
             "ng-app",//
             "ng-bind",//
             "ng-bindHtml",//
@@ -80,7 +82,7 @@ public class AngularJSTrie {
 
     private static AbstractTrie<AngularJSCompletionProposal> createTrie() {
         AbstractTrie<AngularJSCompletionProposal> result = new AbstractTrie<>();
-        for (String name : ELEMENTS.asIterable()) {
+        for (String name : ELEMENTS) {
             result.put(name, new AngularJSCompletionProposal(name));
         }
         return result;
@@ -94,16 +96,16 @@ public class AngularJSTrie {
      * @return an array of autocompletions, or an empty array if there are no
      * autocompletion proposals
      */
-    public static Array<AngularJSCompletionProposal> findAndFilterAutocompletions(AngularJSQuery query) {
+    public static List<AngularJSCompletionProposal> findAndFilterAutocompletions(AngularJSQuery query) {
         // use tolower case
         String prefix = query.getPrefix();
 
         // search attributes
-        Array<AngularJSCompletionProposal> searchedProposals = angularJSTrie.search(prefix);
+        List<AngularJSCompletionProposal> searchedProposals = angularJSTrie.search(prefix);
 
         // Filter out the existing attributes that may be present in the HTML element
-        Array<AngularJSCompletionProposal> result = Collections.createArray();
-        for (AngularJSCompletionProposal proposal : searchedProposals.asIterable()) {
+        List<AngularJSCompletionProposal> result = new ArrayList<>();
+        for (AngularJSCompletionProposal proposal : searchedProposals) {
             if (!query.getExistingAttributes().contains(proposal.getName())) {
                 result.add(proposal);
             }

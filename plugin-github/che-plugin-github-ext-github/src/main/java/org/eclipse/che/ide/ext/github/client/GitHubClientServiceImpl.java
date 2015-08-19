@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.client;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.github.shared.Collaborators;
 import org.eclipse.che.ide.ext.github.shared.GitHubIssueComment;
 import org.eclipse.che.ide.ext.github.shared.GitHubIssueCommentInput;
@@ -28,10 +26,10 @@ import org.eclipse.che.ide.rest.RestContext;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation for {@link GitHubClientService}.
@@ -139,7 +137,7 @@ public class GitHubClientServiceImpl implements GitHubClientService {
 
     /** {@inheritDoc} */
     @Override
-    public void getAllRepositories(@Nonnull AsyncRequestCallback<StringMap<Array<GitHubRepository>>> callback) {
+    public void getAllRepositories(@Nonnull AsyncRequestCallback<Map<String, List<GitHubRepository>>> callback) {
         String url = baseUrl + LIST_ALL;
         asyncRequestFactory.createGetRequest(url).loader(loader).send(callback);
     }

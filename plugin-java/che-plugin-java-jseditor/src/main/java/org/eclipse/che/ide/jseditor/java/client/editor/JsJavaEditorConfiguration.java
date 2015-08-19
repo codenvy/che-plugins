@@ -15,8 +15,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import org.eclipse.che.ide.api.texteditor.outline.OutlineModel;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.editor.outline.JavaNodeRenderer;
 import org.eclipse.che.ide.jseditor.client.annotation.AnnotationModel;
@@ -33,6 +31,9 @@ import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresente
 import org.eclipse.che.ide.util.executor.BasicIncrementalScheduler;
 import org.eclipse.che.ide.util.executor.UserActivityManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.eclipse.che.ide.jseditor.client.partition.DefaultPartitioner.DEFAULT_PARTITIONING;
 import static org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner.DEFAULT_CONTENT_TYPE;
 
@@ -42,7 +43,7 @@ import static org.eclipse.che.ide.jseditor.client.partition.DocumentPartitioner.
 public class JsJavaEditorConfiguration extends DefaultTextEditorConfiguration {
 
     private final OutlineModel outlineModel;
-    private final StringMap<CodeAssistProcessor> codeAssistProcessors;
+    private final Map<String, CodeAssistProcessor> codeAssistProcessors;
     private final UserActivityManager userActivityManager;
     private final Reconciler reconciler;
     private final DocumentPartitioner partitioner;
@@ -68,7 +69,7 @@ public class JsJavaEditorConfiguration extends DefaultTextEditorConfiguration {
         this.outlineModel = new OutlineModel(new JavaNodeRenderer(javaResources));
 
         final JavaCodeAssistProcessor codeAssistProcessor = codeAssistProcessorFactory.create(editor);
-        this.codeAssistProcessors = Collections.createStringMap();
+        this.codeAssistProcessors = new HashMap<>();
         this.codeAssistProcessors.put(DEFAULT_CONTENT_TYPE, codeAssistProcessor);
         this.quickAssistProcessors = quickAssistProcessorFactory.create(editor);
 
@@ -94,7 +95,7 @@ public class JsJavaEditorConfiguration extends DefaultTextEditorConfiguration {
     }
 
     @Override
-    public StringMap<CodeAssistProcessor> getContentAssistantProcessors() {
+    public Map<String, CodeAssistProcessor> getContentAssistantProcessors() {
         return this.codeAssistProcessors;
     }
 

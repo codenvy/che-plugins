@@ -32,7 +32,6 @@ import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 import org.eclipse.che.ide.api.texteditor.HandlesUndoRedo;
 import org.eclipse.che.ide.api.texteditor.UndoableEditor;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.actions.ChooseRunnerAction;
@@ -93,7 +92,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     private final NotificationManager                        notificationManager;
     private final DtoUnmarshallerFactory                     unmarshallerFactory;
     private final AsyncCallbackBuilder<ItemReference>        asyncCallbackBuilder;
-    private final AsyncCallbackBuilder<Array<ItemReference>> asyncArrayCallbackBuilder;
+    private final AsyncCallbackBuilder<List<ItemReference>> asyncArrayCallbackBuilder;
     private final AsyncCallbackBuilder<Void>                 voidAsyncCallbackBuilder;
     private final AsyncCallbackBuilder<ProjectDescriptor>    asyncDescriptorCallbackBuilder;
     private final DialogFactory                              dialogFactory;
@@ -123,7 +122,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
                                       NotificationManager notificationManager,
                                       DtoUnmarshallerFactory unmarshallerFactory,
                                       AsyncCallbackBuilder<ItemReference> asyncCallbackBuilder,
-                                      AsyncCallbackBuilder<Array<ItemReference>> asyncArrayCallbackBuilder,
+                                      AsyncCallbackBuilder<List<ItemReference>> asyncArrayCallbackBuilder,
                                       AsyncCallbackBuilder<Void> voidAsyncCallbackBuilder,
                                       AsyncCallbackBuilder<ProjectDescriptor> asyncDescriptorCallbackBuilder,
                                       TemplatesContainer templatesContainer,
@@ -216,14 +215,14 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     }
 
     private void getProjectEnvironmentDocker() {
-        Unmarshallable<Array<ItemReference>> unmarshaller = unmarshallerFactory.newArrayUnmarshaller(ItemReference.class);
+        Unmarshallable<List<ItemReference>> unmarshaller = unmarshallerFactory.newListUnmarshaller(ItemReference.class);
 
-        AsyncRequestCallback<Array<ItemReference>> arrayAsyncCallback =
+        AsyncRequestCallback<List<ItemReference>> arrayAsyncCallback =
                 asyncArrayCallbackBuilder.unmarshaller(unmarshaller)
-                                         .success(new SuccessCallback<Array<ItemReference>>() {
+                                         .success(new SuccessCallback<List<ItemReference>>() {
                                              @Override
-                                             public void onSuccess(Array<ItemReference> result) {
-                                                 for (ItemReference item : result.asIterable()) {
+                                             public void onSuccess(List<ItemReference> result) {
+                                                 for (ItemReference item : result) {
                                                      ProjectNode project = new ProjectNode(null,
                                                                                            projectDescriptor,
                                                                                            null,

@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.ssh.client;
 
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
-import org.eclipse.che.ide.collections.StringMap;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.ssh.dto.GenKeyRequest;
 import org.eclipse.che.ide.ext.ssh.dto.KeyItem;
@@ -27,6 +24,9 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The implementation of {@link SshKeyService}.
@@ -35,12 +35,12 @@ import javax.annotation.Nonnull;
  */
 @Singleton
 public class SshKeyServiceImpl implements SshKeyService {
-    private final String                    baseUrl;
-    private final String                    workspaceId;
-    private final AsyncRequestLoader        loader;
-    private final DtoFactory                dtoFactory;
-    private final AsyncRequestFactory       asyncRequestFactory;
-    private final StringMap<SshKeyProvider> sshKeyProviders;
+    private final String                      baseUrl;
+    private final String                      workspaceId;
+    private final AsyncRequestLoader          loader;
+    private final DtoFactory                  dtoFactory;
+    private final AsyncRequestFactory         asyncRequestFactory;
+    private final Map<String, SshKeyProvider> sshKeyProviders;
 
     @Inject
     protected SshKeyServiceImpl(@RestContext String baseUrl,
@@ -53,12 +53,12 @@ public class SshKeyServiceImpl implements SshKeyService {
         this.loader = loader;
         this.dtoFactory = dtoFactory;
         this.asyncRequestFactory = asyncRequestFactory;
-        this.sshKeyProviders = Collections.createStringMap();
+        this.sshKeyProviders = new HashMap<>();
     }
 
     /** {@inheritDoc} */
     @Override
-    public void getAllKeys(@Nonnull AsyncRequestCallback<Array<KeyItem>> callback) {
+    public void getAllKeys(@Nonnull AsyncRequestCallback<List<KeyItem>> callback) {
         loader.show("Getting SSH keys....");
         asyncRequestFactory.createGetRequest(baseUrl + "/ssh-keys/" + workspaceId + "/all").send(callback);
     }
@@ -91,7 +91,7 @@ public class SshKeyServiceImpl implements SshKeyService {
 
     /** {@inheritDoc} */
     @Override
-    public StringMap<SshKeyProvider> getSshKeyProviders() {
+    public Map<String, SshKeyProvider> getSshKeyProviders() {
         return sshKeyProviders;
     }
 

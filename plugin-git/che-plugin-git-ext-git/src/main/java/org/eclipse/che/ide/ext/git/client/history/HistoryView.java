@@ -13,9 +13,9 @@ package org.eclipse.che.ide.ext.git.client.history;
 import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.api.parts.base.BaseActionDelegate;
-import org.eclipse.che.ide.collections.Array;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * The view of {@link HistoryPresenter}.
@@ -58,7 +58,7 @@ public interface HistoryView extends View<HistoryView.ActionDelegate> {
      * @param revisions
      *         git revisions
      */
-    void setRevisions(@Nonnull Array<Revision> revisions);
+    void setRevisions(@Nonnull List<Revision> revisions);
 
     /**
      * Change the selected state of the changes in project button.

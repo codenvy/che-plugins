@@ -13,8 +13,6 @@ package org.eclipse.che.ide.ext.git.client.fetch;
 import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -28,6 +26,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Matchers.anyBoolean;
@@ -70,27 +69,27 @@ public class FetchPresenterTest extends BaseTest {
 
     @Test
     public void testShowDialogWhenBranchListRequestIsSuccessful() throws Exception {
-        final Array<Remote> remotes = Collections.createArray();
+        final List<Remote> remotes = new ArrayList<>();
         remotes.add(mock(Remote.class));
-        final Array<Branch> branches = Collections.createArray();
+        final List<Branch> branches = new ArrayList<>();
         branches.add(branch);
 
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
-                AsyncRequestCallback<Array<Remote>> callback = (AsyncRequestCallback<Array<Remote>>)arguments[3];
+                AsyncRequestCallback<List<Remote>> callback = (AsyncRequestCallback<List<Remote>>)arguments[3];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, remotes);
                 return callback;
             }
         }).when(service)
-          .remoteList((ProjectDescriptor)anyObject(), anyString(), anyBoolean(), (AsyncRequestCallback<Array<Remote>>)anyObject());
+          .remoteList((ProjectDescriptor)anyObject(), anyString(), anyBoolean(), (AsyncRequestCallback<List<Remote>>)anyObject());
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
-                AsyncRequestCallback<Array<Branch>> callback = (AsyncRequestCallback<Array<Branch>>)arguments[2];
+                AsyncRequestCallback<List<Branch>> callback = (AsyncRequestCallback<List<Branch>>)arguments[2];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, branches);
                 return callback;
@@ -99,48 +98,48 @@ public class FetchPresenterTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
-                AsyncRequestCallback<Array<Branch>> callback = (AsyncRequestCallback<Array<Branch>>)arguments[2];
+                AsyncRequestCallback<List<Branch>> callback = (AsyncRequestCallback<List<Branch>>)arguments[2];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, branches);
                 return callback;
             }
-        }).when(service).branchList((ProjectDescriptor)anyObject(), anyString(), (AsyncRequestCallback<Array<Branch>>)anyObject());
+        }).when(service).branchList((ProjectDescriptor)anyObject(), anyString(), (AsyncRequestCallback<List<Branch>>)anyObject());
 
         presenter.showDialog();
 
         verify(appContext).getCurrentProject();
         verify(service).remoteList(eq(rootProjectDescriptor), anyString(), eq(SHOW_ALL_INFORMATION),
-                                   (AsyncRequestCallback<Array<Remote>>)anyObject());
+                                   (AsyncRequestCallback<List<Remote>>)anyObject());
         verify(view).setEnableFetchButton(eq(ENABLE_BUTTON));
-        verify(view).setRepositories((Array<Remote>)anyObject());
+        verify(view).setRepositories((List<Remote>)anyObject());
         verify(view).setRemoveDeleteRefs(eq(NO_REMOVE_DELETE_REFS));
         verify(view).setFetchAllBranches(eq(FETCH_ALL_BRANCHES));
         verify(view).showDialog();
-        verify(view).setRemoteBranches((Array<String>)anyObject());
-        verify(view).setLocalBranches((Array<String>)anyObject());
+        verify(view).setRemoteBranches((List<String>)anyObject());
+        verify(view).setLocalBranches((List<String>)anyObject());
     }
 
     @Test
     public void testShowDialogWhenBranchListRequestIsFailed() throws Exception {
-        final Array<Remote> remotes = Collections.createArray();
+        final List<Remote> remotes = new ArrayList<>();
         remotes.add(mock(Remote.class));
 
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
-                AsyncRequestCallback<Array<Remote>> callback = (AsyncRequestCallback<Array<Remote>>)arguments[3];
+                AsyncRequestCallback<List<Remote>> callback = (AsyncRequestCallback<List<Remote>>)arguments[3];
                 Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
                 onSuccess.invoke(callback, remotes);
                 return callback;
             }
         }).when(service).remoteList((ProjectDescriptor)anyObject(), anyString(), anyBoolean(),
-                                    (AsyncRequestCallback<Array<Remote>>)anyObject());
+                                    (AsyncRequestCallback<List<Remote>>)anyObject());
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
-                AsyncRequestCallback<Array<Branch>> callback = (AsyncRequestCallback<Array<Branch>>)arguments[2];
+                AsyncRequestCallback<List<Branch>> callback = (AsyncRequestCallback<List<Branch>>)arguments[2];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
@@ -149,18 +148,18 @@ public class FetchPresenterTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
-                AsyncRequestCallback<Array<Branch>> callback = (AsyncRequestCallback<Array<Branch>>)arguments[2];
+                AsyncRequestCallback<List<Branch>> callback = (AsyncRequestCallback<List<Branch>>)arguments[2];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
-        }).when(service).branchList((ProjectDescriptor)anyObject(), anyString(), (AsyncRequestCallback<Array<Branch>>)anyObject());
+        }).when(service).branchList((ProjectDescriptor)anyObject(), anyString(), (AsyncRequestCallback<List<Branch>>)anyObject());
 
         presenter.showDialog();
 
         verify(appContext).getCurrentProject();
         verify(service).remoteList(eq(rootProjectDescriptor), anyString(), eq(SHOW_ALL_INFORMATION),
-                                   (AsyncRequestCallback<Array<Remote>>)anyObject());
+                                   (AsyncRequestCallback<List<Remote>>)anyObject());
         verify(constant).branchesListFailed();
         verify(notificationManager).showError(anyString());
         verify(view).setEnableFetchButton(eq(DISABLE_BUTTON));
@@ -172,19 +171,19 @@ public class FetchPresenterTest extends BaseTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Object[] arguments = invocation.getArguments();
-                AsyncRequestCallback<Array<Remote>> callback = (AsyncRequestCallback<Array<Remote>>)arguments[3];
+                AsyncRequestCallback<List<Remote>> callback = (AsyncRequestCallback<List<Remote>>)arguments[3];
                 Method onFailure = GwtReflectionUtils.getMethod(callback.getClass(), "onFailure");
                 onFailure.invoke(callback, mock(Throwable.class));
                 return callback;
             }
         }).when(service).remoteList((ProjectDescriptor)anyObject(), anyString(), anyBoolean(),
-                                    (AsyncRequestCallback<Array<Remote>>)anyObject());
+                                    (AsyncRequestCallback<List<Remote>>)anyObject());
 
         presenter.showDialog();
 
         verify(appContext).getCurrentProject();
         verify(service).remoteList(eq(rootProjectDescriptor), anyString(), eq(SHOW_ALL_INFORMATION),
-                                   (AsyncRequestCallback<Array<Remote>>)anyObject());
+                                   (AsyncRequestCallback<List<Remote>>)anyObject());
         verify(constant).remoteListFailed();
         verify(view).setEnableFetchButton(eq(DISABLE_BUTTON));
     }

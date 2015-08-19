@@ -13,9 +13,11 @@ package org.eclipse.che.ide.ext.java.client.editor.outline;
 import org.eclipse.che.ide.api.texteditor.outline.CodeBlock;
 import org.eclipse.che.ide.api.texteditor.outline.OutlineModel;
 import org.eclipse.che.ide.collections.Array;
-import org.eclipse.che.ide.collections.Collections;
+import org.eclipse.che.ide.collections.js.JsoArray;
 import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
 import org.eclipse.che.ide.ext.java.messages.impl.WorkerCodeBlock;
+
+import java.util.List;
 
 /**
  * OutlineUpdater receive messages from worker and updates OutlineModel
@@ -33,15 +35,15 @@ public class OutlineUpdater implements JavaParserWorker.WorkerCallback<WorkerCod
         root = JavaCodeBlock.make();
         root.setType(CodeBlock.ROOT_TYPE);
         root.setOffset(0);
-        root.setChildren(Collections.<JavaCodeBlock>createArray());
+        root.setChildren(JsoArray.<JavaCodeBlock>create());
         outlineModel.updateRoot(root);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void onResult(Array<WorkerCodeBlock> problems) {
-        Array<CodeBlock> blockArray = Collections.createArray();
-        for (WorkerCodeBlock jcb : problems.asIterable()) {
+    public void onResult(List<WorkerCodeBlock> problems) {
+        Array<CodeBlock> blockArray = JsoArray.<CodeBlock>create();
+        for (WorkerCodeBlock jcb : problems) {
             JavaCodeBlock codeBlock = jcb.cast();
             codeBlock.setParent(root);
             blockArray.add(codeBlock);
