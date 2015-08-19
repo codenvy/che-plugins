@@ -10,11 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.angularjs.core.client.javascript;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.inject.Inject;
+import com.google.gwt.core.client.JsArray;
 
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.web.js.editor.JsCodeAssistProcessor;
@@ -29,12 +25,17 @@ import org.eclipse.che.plugin.angularjs.completion.dto.Method;
 import org.eclipse.che.plugin.angularjs.completion.dto.Param;
 import org.eclipse.che.plugin.angularjs.completion.dto.TemplateDotProvider;
 import org.eclipse.che.plugin.angularjs.completion.dto.Templating;
-import org.eclipse.che.plugin.angularjs.core.client.javascript.contentassist.IContentAssistProvider;
 import org.eclipse.che.plugin.angularjs.core.client.javascript.contentassist.ContextFactory;
+import org.eclipse.che.plugin.angularjs.core.client.javascript.contentassist.IContentAssistProvider;
 import org.eclipse.che.plugin.angularjs.core.client.javascript.contentassist.IContext;
 import org.eclipse.che.plugin.angularjs.core.client.javascript.contentassist.JSNIContextFactory;
 import org.eclipse.che.plugin.angularjs.core.client.javascript.contentassist.JsProposal;
-import com.google.gwt.core.client.JsArray;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author Florent Benoit
@@ -164,7 +165,7 @@ public class JavaScriptCodeAssistProcessor implements JsCodeAssistProcessor {
                 }
             }
             List<String> result = subTrie.search(suffixVal);
-            result.sort(String.CASE_INSENSITIVE_ORDER);
+            Collections.sort(result, String.CASE_INSENSITIVE_ORDER);
             for (String st : result) {
                 TemplateProposal templateProposal =
                                                     new TemplateProposal(templatePrefix, st, prefixVal.concat(".").concat(st), offset,
@@ -175,7 +176,7 @@ public class JavaScriptCodeAssistProcessor implements JsCodeAssistProcessor {
         } else if (dot == -1) {
             // Perform completion only if there is no dot
             List<TemplateDotProvider> result = trie.search(prefix);
-            result.sort(new Comparator<TemplateDotProvider>() {
+            Collections.sort(result, new Comparator<TemplateDotProvider>() {
                 @Override
                 public int compare(TemplateDotProvider o1, TemplateDotProvider o2) {
                     return o1.getName().compareTo(o2.getName());
