@@ -40,7 +40,6 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Shutdown;
 import org.eclipse.che.ide.ui.switcher.Switcher;
-import org.eclipse.che.ide.util.Config;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -185,13 +184,6 @@ public class PropertiesPanelViewImpl extends Composite implements PropertiesPane
 
         projectDefault.addValueChangeHandler(valueChangeHandler);
 
-        if (Config.isSdkProject()) {
-            hideSwitcher();
-            hideButtonsPanel();
-
-            editorPanel.setVisible(false);
-            dockerLabel.setVisible(false);
-        }
         portMappingHeader.setVisible(false);
     }
 
