@@ -669,7 +669,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
 
     /** {@inheritDoc} */
     @Override
-    public void onProjectOpened(@Nonnull ProjectActionEvent projectActionEvent) {
+    public void onProjectCreated(@Nonnull ProjectActionEvent projectActionEvent) {
         view.setEnableReRunButton(false);
         view.setEnableStopButton(false);
         view.setEnableLogsButton(false);
@@ -694,7 +694,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
     }
 
     @Override
-    public void onProjectClosing(ProjectActionEvent event) {
+    public void onProjectDeleted(ProjectActionEvent event) {
     }
 
     /** {@inheritDoc} */

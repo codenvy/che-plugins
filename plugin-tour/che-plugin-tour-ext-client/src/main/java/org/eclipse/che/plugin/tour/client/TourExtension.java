@@ -98,17 +98,12 @@ public class TourExtension implements GuidedTourLifeCycle {
         // Initialize the tour when project is opened
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectCreated(ProjectActionEvent event) {
                 initTour(event);
             }
 
             @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent projectActionEvent) {
+            public void onProjectDeleted(ProjectActionEvent event) {
 
             }
         });

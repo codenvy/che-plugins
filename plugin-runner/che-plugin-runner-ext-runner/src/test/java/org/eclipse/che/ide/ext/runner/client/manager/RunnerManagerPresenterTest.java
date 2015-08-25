@@ -818,7 +818,7 @@ public class RunnerManagerPresenterTest {
     public void shouldHideDebugPortAfterCloseProject() {
         presenter.addRunner(processDescriptor);
         presenter.onRunButtonClicked();
-        presenter.onProjectOpened(projectActionEvent);
+        presenter.onProjectCreated(projectActionEvent);
         presenter.setPartStack(partStack);
 
         presenter.onProjectClosed(projectActionEvent);
@@ -1265,7 +1265,7 @@ public class RunnerManagerPresenterTest {
     public void openProjectActionsShouldBePerformedWhenCurrentProjectIsNotNull() {
         when(descriptor.getPermissions()).thenReturn(Arrays.asList("run"));
 
-        presenter.onProjectOpened(projectActionEvent);
+        presenter.onProjectCreated(projectActionEvent);
 
         verify(view).setEnableRunButton(true);
         verify(templates).setVisible(true);
@@ -1290,7 +1290,7 @@ public class RunnerManagerPresenterTest {
     public void runningProcessActionShouldNotBePerformedWhenRunPermissionIsDenied() {
         when(runnerUtil.hasRunPermission()).thenReturn(false);
 
-        presenter.onProjectOpened(projectActionEvent);
+        presenter.onProjectCreated(projectActionEvent);
 
         verify(templates).setVisible(true);
 
@@ -1309,7 +1309,7 @@ public class RunnerManagerPresenterTest {
         presenter.addRunner(processDescriptor);
         presenter.onRunButtonClicked();
         presenter.setPartStack(partStack);
-        presenter.onProjectOpened(projectActionEvent);
+        presenter.onProjectCreated(projectActionEvent);
 
         reset(view);
 

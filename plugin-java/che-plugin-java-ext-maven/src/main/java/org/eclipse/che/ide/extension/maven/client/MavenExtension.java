@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.extension.maven.client;
 
 import com.google.gwt.user.client.Timer;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -55,7 +54,7 @@ import static org.eclipse.che.ide.api.action.IdeActions.GROUP_FILE_NEW;
 @Extension(title = "Maven", version = "3.0.0")
 public class MavenExtension {
     private static List<MavenArchetype> archetypes;
-    private        ProjectDescriptor     project;
+    private        ProjectDescriptor    project;
 
     @Inject
     public MavenExtension(TreeStructureProviderRegistry treeStructureProviderRegistry,
@@ -88,16 +87,12 @@ public class MavenExtension {
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectCreated(ProjectActionEvent event) {
                 project = event.getProject();
             }
 
             @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
+            public void onProjectDeleted(ProjectActionEvent event) {
             }
         });
 

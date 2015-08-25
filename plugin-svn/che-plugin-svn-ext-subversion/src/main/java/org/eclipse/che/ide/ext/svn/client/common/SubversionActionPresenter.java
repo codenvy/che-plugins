@@ -88,20 +88,15 @@ public class SubversionActionPresenter {
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(final ProjectActionEvent event) {
+            public void onProjectCreated(final ProjectActionEvent event) {
             }
 
             @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosed(final ProjectActionEvent event) {
+            public void onProjectDeleted(ProjectActionEvent event) {
                 isViewClosed = true;
                 console.clear();
                 workspaceAgent.hidePart(console);
             }
-
         });
     }
 
@@ -185,8 +180,7 @@ public class SubversionActionPresenter {
             if (filter == ALL && node instanceof StorableNode
                 || filter == PathTypeFilter.FILE && node instanceof FileNode
                 || filter == PathTypeFilter.FOLDER && node instanceof FolderNode
-                || filter == PathTypeFilter.PROJECT && (node instanceof ProjectNode
-                    || node instanceof org.eclipse.che.ide.part.projectexplorer.ProjectListStructure.ProjectNode)) {
+                || filter == PathTypeFilter.PROJECT && (node instanceof ProjectNode)) {
                 return true;
             }
         }

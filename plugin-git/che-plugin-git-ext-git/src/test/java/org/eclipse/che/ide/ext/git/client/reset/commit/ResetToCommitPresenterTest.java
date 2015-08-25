@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.reset.commit;
 
+import com.google.web.bindery.event.shared.Event;
+import com.googlecode.gwt.test.utils.GwtReflectionUtils;
+
 import org.eclipse.che.api.git.shared.LogResponse;
 import org.eclipse.che.api.git.shared.ResetRequest;
 import org.eclipse.che.api.git.shared.Revision;
@@ -17,14 +20,11 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
+import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import com.google.web.bindery.event.shared.Event;
-import com.googlecode.gwt.test.utils.GwtReflectionUtils;
-
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -174,7 +174,7 @@ public class ResetToCommitPresenterTest extends BaseTest {
         verify(appContext).getCurrentProject();
         verify(service).reset((ProjectDescriptor)anyObject(), eq(PROJECT_PATH), eq(HARD), (List<String>)anyObject(),
                               (AsyncRequestCallback<Void>)anyObject());
-        verify(eventBus).fireEvent(Matchers.<Event<OpenProjectEvent>>anyObject());
+        verify(eventBus).fireEvent(Matchers.<Event<ProjectActionEvent>>anyObject());
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 
@@ -207,7 +207,7 @@ public class ResetToCommitPresenterTest extends BaseTest {
         verify(appContext).getCurrentProject();
         verify(service).reset((ProjectDescriptor)anyObject(), eq(PROJECT_PATH), eq(HARD), (List<String>)anyObject(),
                               (AsyncRequestCallback<Void>)anyObject());
-        verify(eventBus).fireEvent(Matchers.<Event<OpenProjectEvent>>anyObject());
+        verify(eventBus).fireEvent(Matchers.<Event<ProjectActionEvent>>anyObject());
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 

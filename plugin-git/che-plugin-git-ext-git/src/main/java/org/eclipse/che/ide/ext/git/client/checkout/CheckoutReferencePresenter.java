@@ -14,12 +14,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
+import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 /**
@@ -71,10 +71,7 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                new AsyncRequestCallback<String>() {
                                    @Override
                                    protected void onSuccess(String result) {
-                                       String projectPath = project.getPath();
-                                       //In this case we can have unconfigured state of the project,
-                                       //so we must repeat the logic which is performed when we open a project
-                                       eventBus.fireEvent(new OpenProjectEvent(projectPath));
+                                       eventBus.fireEvent(ProjectActionEvent.createProjectCreatedEvent(project));
                                    }
 
                                    @Override

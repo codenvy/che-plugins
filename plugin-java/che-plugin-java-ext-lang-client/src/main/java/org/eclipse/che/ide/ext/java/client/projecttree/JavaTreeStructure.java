@@ -57,7 +57,7 @@ public class JavaTreeStructure extends GenericTreeStructure {
     protected final JavaNavigationService navigationService;
     protected final Map<String, ExternalLibrariesNode> librariesNodeMap = new HashMap<>();
     private final JavaTreeSettings settings;
-    protected       JavaProjectNode  projectNode;
+    protected     JavaProjectNode  projectNode;
 
     protected JavaTreeStructure(JavaNodeFactory nodeFactory, EventBus eventBus, AppContext appContext,
                                 ProjectServiceClient projectServiceClient, IconRegistry iconRegistry,
@@ -99,7 +99,9 @@ public class JavaTreeStructure extends GenericTreeStructure {
         navigationService.getEntry(projectPath, libId, path, new AsyncRequestCallback<JarEntry>(unmarshaller) {
             @Override
             protected void onSuccess(JarEntry result) {
-                callback.onSuccess(createNodeForJarEntry(newJavaProjectNode(appContext.getCurrentProject().getProjectDescription()), result, libId));
+                callback.onSuccess(createNodeForJarEntry(newJavaProjectNode(appContext.getCurrentProject().getProjectDescription()),
+                                                         result,
+                                                         libId));
             }
 
             @Override

@@ -171,15 +171,11 @@ public class OutputsContainerPresenter extends BasePresenter implements OutputsC
     }
 
     @Override
-    public void onProjectOpened(ProjectActionEvent event) {
+    public void onProjectCreated(ProjectActionEvent event) {
     }
 
     @Override
-    public void onProjectClosing(ProjectActionEvent event) {
-    }
-
-    @Override
-    public void onProjectClosed(ProjectActionEvent event) {
+    public void onProjectDeleted(ProjectActionEvent event) {
         consoles.clear();
         view.removeAllConsoles();
     }

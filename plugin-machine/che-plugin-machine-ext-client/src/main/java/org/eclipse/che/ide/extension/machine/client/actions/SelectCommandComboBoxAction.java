@@ -141,16 +141,12 @@ public class SelectCommandComboBoxAction extends AbstractPerspectiveAction imple
     }
 
     @Override
-    public void onProjectOpened(ProjectActionEvent event) {
+    public void onProjectCreated(ProjectActionEvent event) {
         loadCommands(null);
     }
 
     @Override
-    public void onProjectClosing(ProjectActionEvent event) {
-    }
-
-    @Override
-    public void onProjectClosed(ProjectActionEvent event) {
+    public void onProjectDeleted(ProjectActionEvent event) {
         setCommandConfigurations(Collections.<CommandConfiguration>emptyList(), null);
     }
 

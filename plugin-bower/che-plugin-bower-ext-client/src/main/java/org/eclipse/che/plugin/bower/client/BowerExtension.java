@@ -10,14 +10,19 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.bower.client;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.project.shared.dto.TreeElement;
 import org.eclipse.che.ide.Constants;
 import org.eclipse.che.ide.api.action.ActionManager;
-import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
+import org.eclipse.che.ide.api.action.IdeActions;
+import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.event.ProjectActionHandler;
 import org.eclipse.che.ide.api.extension.Extension;
@@ -27,21 +32,18 @@ import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.plugin.bower.client.menu.BowerInstallAction;
 import org.eclipse.che.plugin.bower.client.menu.LocalizationConstant;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
-
 import java.util.List;
 import java.util.Map;
 
+import static org.eclipse.che.ide.api.action.IdeActions.GROUP_BUILD_CONTEXT_MENU;
 import static org.eclipse.che.ide.api.constraints.Anchor.AFTER;
-import static org.eclipse.che.ide.api.action.IdeActions.GROUP_BUILD;
 
 
 /**
  * Extension registering Bower commands
+ *
  * @author Florent Benoit
  */
 @Singleton
@@ -60,7 +62,7 @@ public class BowerExtension {
         actionManager.registerAction(localizationConstantBower.bowerInstallId(), bowerInstallAction);
 
         // Get Build menu
-        DefaultActionGroup buildMenuActionGroup = (DefaultActionGroup)actionManager.getAction(GROUP_BUILD);
+        DefaultActionGroup buildMenuActionGroup = (DefaultActionGroup)actionManager.getAction(GROUP_BUILD_CONTEXT_MENU);
 
         // create constraint
         Constraints afterBuildConstraints = new Constraints(AFTER, builderLocalizationConstant.buildProjectControlId());
@@ -71,7 +73,7 @@ public class BowerExtension {
         // Install Bower dependencies when projects is being opened and that there is no app/bower_components
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectCreated(ProjectActionEvent event) {
 
                 final ProjectDescriptor project = event.getProject();
                 boolean isBowerJsProject = isBowerJsProject(project);
@@ -135,15 +137,9 @@ public class BowerExtension {
             }
 
             @Override
-            public void onProjectClosing(ProjectActionEvent event) {
+            public void onProjectDeleted(ProjectActionEvent event) {
 
             }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
-
-            }
-
         });
 
     }

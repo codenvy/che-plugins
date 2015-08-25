@@ -234,7 +234,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectCreated(ProjectActionEvent event) {
                 CurrentProject currentProject = appContext.getCurrentProject();
 
                 if (currentProject == null) {
@@ -255,12 +255,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             }
 
             @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
-                // application will be stopped after closing a project
+            public void onProjectDeleted(ProjectActionEvent event) {
                 if (debuggerInfo != null) {
                     changeButtonsEnableState(false);
                     onDebuggerDisconnected();

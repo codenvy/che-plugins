@@ -10,12 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.branch;
 
+import com.google.web.bindery.event.shared.Event;
+
 import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
+import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.dto.DtoFactory;
@@ -25,8 +27,6 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.CancelCallback;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
-import com.google.web.bindery.event.shared.Event;
-
 import org.eclipse.che.ide.ui.dialogs.InputCallback;
 import org.eclipse.che.ide.ui.dialogs.confirm.ConfirmDialog;
 import org.eclipse.che.ide.ui.dialogs.input.InputDialog;
@@ -43,8 +43,8 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static org.eclipse.che.ide.ext.git.client.patcher.WindowPatcher.RETURNED_MESSAGE;
 import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_ALL;
+import static org.eclipse.che.ide.ext.git.client.patcher.WindowPatcher.RETURNED_MESSAGE;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -183,14 +183,16 @@ public class BranchPresenterTest extends BaseTest {
         inputCallback.accepted(RETURNED_MESSAGE);
 
 
-        verify(service).branchRename(eq(rootProjectDescriptor), eq(BRANCH_NAME), eq(RETURNED_MESSAGE), asyncRequestCallbackCaptor.capture());
+        verify(service)
+                .branchRename(eq(rootProjectDescriptor), eq(BRANCH_NAME), eq(RETURNED_MESSAGE), asyncRequestCallbackCaptor.capture());
         AsyncRequestCallback<String> renameBranchCallback = asyncRequestCallbackCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(renameBranchCallback, PROJECT_PATH);
 
         verify(selectedBranch, times(2)).getDisplayName();
         verify(service, times(2))
                 .branchList(eq(rootProjectDescriptor), eq(LIST_ALL), (AsyncRequestCallback<List<Branch>>)anyObject());
-        verify(dialogFactory, never()).createConfirmDialog(anyString(), anyString(), (ConfirmCallback)anyObject(), (CancelCallback)anyObject());
+        verify(dialogFactory, never())
+                .createConfirmDialog(anyString(), anyString(), (ConfirmCallback)anyObject(), (CancelCallback)anyObject());
         verify(notificationManager, never()).showError(anyString());
         verify(constant, never()).branchRenameFailed();
     }
@@ -211,7 +213,7 @@ public class BranchPresenterTest extends BaseTest {
         selectBranch();
         presenter.onRenameClicked();
 
-        verify(dialogFactory).createConfirmDialog(anyString(), anyString(),confirmCallbackCaptor.capture(), (CancelCallback)anyObject());
+        verify(dialogFactory).createConfirmDialog(anyString(), anyString(), confirmCallbackCaptor.capture(), (CancelCallback)anyObject());
         ConfirmCallback confirmCallback = confirmCallbackCaptor.getValue();
         confirmCallback.accepted();
 
@@ -221,7 +223,8 @@ public class BranchPresenterTest extends BaseTest {
         inputCallback.accepted(RETURNED_MESSAGE);
 
 
-        verify(service).branchRename(eq(rootProjectDescriptor), eq(REMOTE_BRANCH_NAME), eq(RETURNED_MESSAGE), asyncRequestCallbackCaptor.capture());
+        verify(service).branchRename(eq(rootProjectDescriptor), eq(REMOTE_BRANCH_NAME), eq(RETURNED_MESSAGE),
+                                     asyncRequestCallbackCaptor.capture());
         AsyncRequestCallback<String> renameBranchCallback = asyncRequestCallbackCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(renameBranchCallback, PROJECT_PATH);
 
@@ -255,7 +258,8 @@ public class BranchPresenterTest extends BaseTest {
         InputCallback inputCallback = inputCallbackCaptor.getValue();
         inputCallback.accepted(RETURNED_MESSAGE);
 
-        verify(service).branchRename(eq(rootProjectDescriptor), eq(BRANCH_NAME), eq(RETURNED_MESSAGE), asyncRequestCallbackCaptor.capture());
+        verify(service)
+                .branchRename(eq(rootProjectDescriptor), eq(BRANCH_NAME), eq(RETURNED_MESSAGE), asyncRequestCallbackCaptor.capture());
         AsyncRequestCallback<String> renameBranchCallback = asyncRequestCallbackCaptor.getValue();
         GwtReflectionUtils.callOnFailure(renameBranchCallback, mock(Throwable.class));
 
@@ -313,7 +317,7 @@ public class BranchPresenterTest extends BaseTest {
         verify(appContext).getCurrentProject();
         verify(notificationManager, never()).showError(anyString());
         verify(constant, never()).branchCheckoutFailed();
-        verify(eventBus).fireEvent(Matchers.<Event<OpenProjectEvent>>anyObject());
+        verify(eventBus).fireEvent(Matchers.<Event<ProjectActionEvent>>anyObject());
     }
 
     @Test
@@ -332,7 +336,7 @@ public class BranchPresenterTest extends BaseTest {
         verify(selectedBranch).isRemote();
         verify(service, times(2)).branchList(eq(rootProjectDescriptor), eq(LIST_ALL), (AsyncRequestCallback<List<Branch>>)anyObject());
         verify(appContext).getCurrentProject();
-        verify(eventBus).fireEvent(Matchers.<Event<OpenProjectEvent>>anyObject());
+        verify(eventBus).fireEvent(Matchers.<Event<ProjectActionEvent>>anyObject());
     }
 
     @Test

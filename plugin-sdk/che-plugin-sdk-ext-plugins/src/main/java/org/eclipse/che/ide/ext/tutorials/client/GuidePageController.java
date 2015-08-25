@@ -10,14 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.tutorials.client;
 
-import org.eclipse.che.ide.api.event.ProjectActionEvent;
-import org.eclipse.che.ide.api.event.ProjectActionHandler;
-import org.eclipse.che.ide.api.parts.PartStackType;
-import org.eclipse.che.ide.api.parts.WorkspaceAgent;
-import org.eclipse.che.ide.ext.tutorials.shared.Constants;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
+
+import org.eclipse.che.ide.api.parts.PartStackType;
+import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 
 /**
  * Controls a tutorial page state: shows or hides it.
@@ -31,38 +28,13 @@ public class GuidePageController {
     private GuidePage      guidePage;
 
     @Inject
-    public GuidePageController(EventBus eventBus, WorkspaceAgent workspaceAgent, GuidePage guidePage) {
+    public GuidePageController(WorkspaceAgent workspaceAgent, GuidePage guidePage) {
         this.workspaceAgent = workspaceAgent;
         this.guidePage = guidePage;
-
-        eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
-            @Override
-            public void onProjectOpened(ProjectActionEvent event) {
-                if (event.getProject().getType().equals(Constants.TUTORIAL_ID)) {
-//                    openTutorialGuide();
-                }
-            }
-
-            @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
-                if (event.getProject().getDescription().equals(Constants.TUTORIAL_ID)) {
-//                    closeTutorialGuide();
-                }
-            }
-        });
     }
 
     /** Open tutorial guide page. */
     public void openTutorialGuide() {
         workspaceAgent.openPart(guidePage, PartStackType.EDITING);
-    }
-
-    /** Close tutorial guide page. */
-    public void closeTutorialGuide() {
-        workspaceAgent.removePart(guidePage);
     }
 }

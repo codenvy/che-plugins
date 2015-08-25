@@ -11,7 +11,7 @@
 package org.eclipse.che.ide.ext.git.client.checkout;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
+import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.test.GwtReflectionUtils;
@@ -125,8 +125,7 @@ public class CheckoutReferenceTest extends BaseTest {
         GwtReflectionUtils.callOnSuccess(callback, "");
 
         verify(view).close();
-        verify(rootProjectDescriptor).getPath();
-        verify(eventBus).fireEvent(Matchers.<OpenProjectEvent>anyObject());
+        verify(eventBus).fireEvent(Matchers.<ProjectActionEvent>anyObject());
     }
 
     @Test
@@ -143,7 +142,7 @@ public class CheckoutReferenceTest extends BaseTest {
         GwtReflectionUtils.callOnFailure(callback, mock(Throwable.class));
 
         verify(view).close();
-        verify(eventBus, never()).fireEvent(Matchers.<OpenProjectEvent>anyObject());
+        verify(eventBus, never()).fireEvent(Matchers.<ProjectActionEvent>anyObject());
         verify(notificationManager).showError(anyString());
     }
 }

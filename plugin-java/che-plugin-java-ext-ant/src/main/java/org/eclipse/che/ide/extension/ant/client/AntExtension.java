@@ -51,7 +51,7 @@ public class AntExtension {
         // Handle project opened event to fire update dependencies.
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectCreated(ProjectActionEvent event) {
                 ProjectDescriptor project = event.getProject();
                 if (AntAttributes.ANT_ID.equals(project.getType())
                     && project.getAttributes().containsKey(Constants.LANGUAGE)
@@ -61,11 +61,7 @@ public class AntExtension {
             }
 
             @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
+            public void onProjectDeleted(ProjectActionEvent event) {
             }
         });
 
