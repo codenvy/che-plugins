@@ -154,7 +154,7 @@ public class MachineManager {
         });
     }
 
-    private void machineRunning(final String machineId) {
+    public void machineRunning(final String machineId) {
         machineServiceClient.getMachine(machineId).then(new Operation<MachineDescriptor>() {
             @Override
             public void apply(MachineDescriptor machineDescriptor) throws OperationException {

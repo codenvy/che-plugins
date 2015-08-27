@@ -65,6 +65,8 @@ public class MachineComponent implements Component {
                     if (descriptor.isDev() && descriptor.getStatus() == RUNNING) {
                         appContext.setDevMachineId(descriptor.getId());
 
+                        machineManager.machineRunning(descriptor.getId());
+
                         callback.onSuccess(MachineComponent.this);
                         return;
                     }
