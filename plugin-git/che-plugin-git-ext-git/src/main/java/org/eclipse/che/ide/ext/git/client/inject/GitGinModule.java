@@ -10,9 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.inject;
 
-import org.eclipse.che.api.git.gwt.client.GitServiceClient;
-import org.eclipse.che.api.git.gwt.client.GitServiceClientImpl;
+import com.google.gwt.inject.client.AbstractGinModule;
+import com.google.gwt.inject.client.multibindings.GinMultibinder;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
+import org.eclipse.che.ide.api.preferences.PreferencePagePresenter;
 import org.eclipse.che.ide.api.project.wizard.ImportWizardRegistrar;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartView;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartViewImpl;
@@ -29,6 +32,7 @@ import org.eclipse.che.ide.ext.git.client.history.HistoryViewImpl;
 import org.eclipse.che.ide.ext.git.client.importer.GitImportWizardRegistrar;
 import org.eclipse.che.ide.ext.git.client.merge.MergeView;
 import org.eclipse.che.ide.ext.git.client.merge.MergeViewImpl;
+import org.eclipse.che.ide.ext.git.client.preference.CommitterPreferencePresenter;
 import org.eclipse.che.ide.ext.git.client.pull.PullView;
 import org.eclipse.che.ide.ext.git.client.pull.PullViewImpl;
 import org.eclipse.che.ide.ext.git.client.push.PushToRemoteView;
@@ -46,10 +50,6 @@ import org.eclipse.che.ide.ext.git.client.reset.files.ResetFilesViewImpl;
 import org.eclipse.che.ide.ext.git.client.url.ShowProjectGitReadOnlyUrlView;
 import org.eclipse.che.ide.ext.git.client.url.ShowProjectGitReadOnlyUrlViewImpl;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.gwt.inject.client.multibindings.GinMultibinder;
-import com.google.inject.Singleton;
-
 /** @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a> */
 @ExtensionGinModule
 public class GitGinModule extends AbstractGinModule {
@@ -59,6 +59,7 @@ public class GitGinModule extends AbstractGinModule {
 //        bind(GitServiceClient.class).to(GitServiceClientImpl.class).in(Singleton.class);
 
         GinMultibinder.newSetBinder(binder(), ImportWizardRegistrar.class).addBinding().to(GitImportWizardRegistrar.class);
+        GinMultibinder.newSetBinder(binder(), PreferencePagePresenter.class).addBinding().to(CommitterPreferencePresenter.class);
 
         bind(AddToIndexView.class).to(AddToIndexViewImpl.class).in(Singleton.class);
         bind(ResetToCommitView.class).to(ResetToCommitViewImpl.class).in(Singleton.class);

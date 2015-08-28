@@ -662,4 +662,10 @@ public interface GitLocalizationConstant extends Messages {
      */
     @Key("project.name")
     String projectName();
+
+    @Key("committer.preference.category")
+    String committerPreferenceCategory();
+
+    @Key("committer.title")
+    String committerTitle();
 }
