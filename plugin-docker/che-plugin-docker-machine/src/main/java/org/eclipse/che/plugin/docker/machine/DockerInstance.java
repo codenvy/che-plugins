@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
+
 import com.google.inject.assistedinject.Assisted;
 
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.util.LineConsumer;
+import org.eclipse.che.api.core.util.ListLineConsumer;
 import org.eclipse.che.api.core.util.ValueHolder;
 import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.api.machine.server.impl.AbstractInstance;
@@ -39,6 +41,7 @@ import org.eclipse.che.plugin.docker.client.json.ProgressStatus;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -69,7 +72,7 @@ public class DockerInstance extends AbstractInstance {
     private final DockerNode           node;
     private final String               workspaceId;
     private final boolean              workspaceIsBound;
-    private final int memorySizeMB;
+    private final int                  memorySizeMB;
 
     private ContainerInfo containerInfo;
 
@@ -304,6 +307,55 @@ public class DockerInstance extends AbstractInstance {
     @Override
     public DockerNode getNode() {
         return node;
+    }
+
+    /**
+     * Reads file content by specified file path.
+     *
+     * TODO:
+     * add file size checking,
+     * note that size checking and file content reading
+     * should be done in an atomic way,
+     * which means that two separate instance processes is not the case.
+     *
+     * @param filePath
+     *         path to file on machine instance
+     * @param startFrom
+     *         line number to start reading from
+     * @param limit
+     *         limitation on line
+     * @return if {@code limit} and {@code startFrom} grater than 0
+     * content from {@code startFrom} to {@code startFrom + limit} will be returned,
+     * if file contains less lines than {@code startFrom} empty content will be returned
+     * @throws MachineException
+     *         if any error occurs with file reading
+     */
+    @Override
+    public String readFileContent(String filePath, int startFrom, int limit) throws MachineException {
+        if (limit <= 0 || startFrom <= 0) {
+            throw new MachineException("Impossible to read file " + limit + " lines from " + startFrom + " line");
+        }
+
+        // command sed getting file content from startFrom line to (startFrom + limit)
+        String bashCommand = String.format("sed -n \'%1$2s, %2$2sp\' %3$2s", startFrom, startFrom + limit, filePath);
+
+        final String[] command = {"/bin/bash", "-c", bashCommand};
+
+        ListLineConsumer lines = new ListLineConsumer();
+        try {
+            Exec exec = docker.createExec(container, false, command);
+            docker.startExec(exec.getId(), new LogMessagePrinter(lines, LogMessage::getContent));
+        } catch (IOException e) {
+            throw new MachineException(String.format("Error occurs while initializing command %s in docker container %s: %s",
+                                                     Arrays.toString(command), container, e.getLocalizedMessage()), e);
+        }
+
+        String content = lines.getText();
+        if (content.contains("sed: can't read " + filePath + ": No such file or directory") ||
+            content.contains("cat: " + filePath + ": No such file or directory")) {
+            throw new MachineException("File with path " + filePath + " not found");
+        }
+        return content;
     }
 
     @Override
