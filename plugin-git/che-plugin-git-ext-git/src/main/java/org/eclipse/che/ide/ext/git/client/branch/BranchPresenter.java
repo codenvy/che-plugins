@@ -24,13 +24,13 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
@@ -50,20 +50,21 @@ import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_ALL;
  */
 @Singleton
 public class BranchPresenter implements BranchView.ActionDelegate {
-    private DtoFactory              dtoFactory;
-    private DtoUnmarshallerFactory  dtoUnmarshallerFactory;
-    private BranchView              view;
-    private GitOutputPartPresenter  gitConsole;
-    private WorkspaceAgent          workspaceAgent;
-    private DialogFactory           dialogFactory;
-    private EventBus                eventBus;
-    private CurrentProject          project;
-    private GitServiceClient        service;
-    private GitLocalizationConstant constant;
-    private EditorAgent             editorAgent;
-    private Branch                  selectedBranch;
-    private AppContext              appContext;
-    private NotificationManager     notificationManager;
+    private       DtoFactory                  dtoFactory;
+    private       DtoUnmarshallerFactory      dtoUnmarshallerFactory;
+    private       BranchView                  view;
+    private       GitOutputPartPresenter      gitConsole;
+    private       WorkspaceAgent              workspaceAgent;
+    private       DialogFactory               dialogFactory;
+    private final NewProjectExplorerPresenter projectExplorer;
+    private       EventBus                    eventBus;
+    private       CurrentProject              project;
+    private       GitServiceClient            service;
+    private       GitLocalizationConstant     constant;
+    private       EditorAgent                 editorAgent;
+    private       Branch                      selectedBranch;
+    private       AppContext                  appContext;
+    private       NotificationManager         notificationManager;
 
     /** Create presenter. */
     @Inject
@@ -78,12 +79,14 @@ public class BranchPresenter implements BranchView.ActionDelegate {
                            DtoUnmarshallerFactory dtoUnmarshallerFactory,
                            GitOutputPartPresenter gitConsole,
                            WorkspaceAgent workspaceAgent,
-                           DialogFactory dialogFactory) {
+                           DialogFactory dialogFactory,
+                           NewProjectExplorerPresenter projectExplorer) {
         this.view = view;
         this.dtoFactory = dtoFactory;
         this.gitConsole = gitConsole;
         this.workspaceAgent = workspaceAgent;
         this.dialogFactory = dialogFactory;
+        this.projectExplorer = projectExplorer;
         this.view.setDelegate(this);
         this.eventBus = eventBus;
         this.editorAgent = editorAgent;
@@ -212,10 +215,11 @@ public class BranchPresenter implements BranchView.ActionDelegate {
             @Override
             protected void onSuccess(String result) {
                 getBranches();
-                String projectPath = project.getRootProject().getPath();
+//                String projectPath = project.getRootProject().getPath();
                 //In this case we can have unconfigured state of the project,
                 //so we must repeat the logic which is performed when we open a project
-                eventBus.fireEvent(new OpenProjectEvent(projectPath));
+                projectExplorer.synchronizeTree();
+//                eventBus.fireEvent(new OpenProjectEvent(projectPath));
             }
 
             @Override

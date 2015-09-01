@@ -399,7 +399,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             return "";
         }
 
-        return activeFile.getProject().getPath() + "/" + srcFolder + "/" + location.getClassName().replace(".", "/") + ".java";
+        return activeFile.getProject().getProjectDescriptor().getPath() + "/" + srcFolder + "/" + location.getClassName().replace(".", "/") + ".java";
     }
 
     private void openFile(@Nonnull Location location, @Nullable VirtualFile activeFile, final AsyncCallback<FileNode> callback) {

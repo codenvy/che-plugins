@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
 /**
  * Testing {@link MergePresenter} functionality.
  *
- * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
+ * @author Andrey Plotnikov
  */
 public class MergePresenterTest extends BaseTest {
     public static final String DISPLAY_NAME = "displayName";
@@ -88,7 +88,7 @@ public class MergePresenterTest extends BaseTest {
         super.disarm();
 
         presenter = new MergePresenter(view, eventBus, editorAgent, service, constant, appContext, notificationManager,
-                                       dtoUnmarshallerFactory);
+                                       dtoUnmarshallerFactory, projectExplorer);
         NavigableMap<String, EditorPartPresenter> partPresenterMap = new TreeMap<>();
         partPresenterMap.put("partPresenter", partPresenter);
 

@@ -17,9 +17,9 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.web.bindery.event.shared.Event;
@@ -52,12 +52,12 @@ import static org.mockito.Mockito.when;
 /**
  * Testing {@link PullPresenter} functionality.
  *
- * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
+ * @author Andrey Plotnikov
  */
 public class PullPresenterTest extends BaseTest {
     public static final boolean SHOW_ALL_INFORMATION = true;
     @Mock
-    private FileNode            file;
+    private FileReferenceNode   file;
     @Mock
     private PullView            view;
     @Mock
@@ -293,7 +293,7 @@ public class PullPresenterTest extends BaseTest {
         verify(service).pull(eq(rootProjectDescriptor), anyString(), eq(REPOSITORY_NAME), (AsyncRequestCallback)anyObject());
         verify(notificationManager).showInfo(anyString());
         verify(appContext).getCurrentProject();
-        verify(eventBus, times(2)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
+        verify(eventBus, times(1)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
         verify(partPresenter).getEditorInput();
     }
 
@@ -343,7 +343,7 @@ public class PullPresenterTest extends BaseTest {
         verify(service).pull(eq(rootProjectDescriptor), anyString(), eq(REPOSITORY_NAME), (AsyncRequestCallback)anyObject());
         verify(notificationManager).showError(anyString());
         verify(appContext).getCurrentProject();
-        verify(eventBus, times(2)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
+        verify(eventBus, times(1)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
         verify(partPresenter).getEditorInput();
     }
 

@@ -23,8 +23,8 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
@@ -54,7 +54,7 @@ public class ResolvePresenter extends SubversionActionPresenter implements Resol
                                final DialogFactory dialogFactory,
                                final SubversionClientService subversionClientService,
                                final ResolveView view,
-                               final ProjectExplorerPart projectExplorerPart) {
+                               final NewProjectExplorerPresenter projectExplorerPart) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
 
         this.subversionClientService = subversionClientService;

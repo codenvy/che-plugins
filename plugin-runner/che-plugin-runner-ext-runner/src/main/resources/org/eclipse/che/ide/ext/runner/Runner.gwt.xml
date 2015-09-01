@@ -25,6 +25,7 @@
     <inherits name="org.eclipse.che.ide.collections.Collections"/>
     <inherits name="org.eclipse.che.api.Runner"/>
     <inherits name="org.eclipse.che.api.Account"/>
+    <inherits name="org.eclipse.che.ide.Core"/>
 
     <source path='client'/>
 </module>

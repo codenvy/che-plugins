@@ -95,22 +95,4 @@ public class CopyPresenterTest extends BaseSubversionPresenterTest {
 
         verify(copyView).showErrorMarker("message");
     }
-
-    @Test
-    public void testEmptyItemEqualMessageAlertShouldBeAppear() throws Exception {
-        FileNode node = mock(FileNode.class);
-        FileNode checkNode = mock(FileNode.class);
-
-        when(treeStructureProvider.get()).thenReturn(filteredTreeStructure);
-        when(constants.copyItemEqual()).thenReturn("message");
-        when(node.getPath()).thenReturn("/foo");
-        when(checkNode.getPath()).thenReturn("/");
-
-        presenter.showCopy(node);
-        presenter.onNewNameChanged("foo");
-        presenter.onNodeSelected(checkNode);
-
-
-        verify(copyView, atMost(2)).showErrorMarker("message");
-    }
 }

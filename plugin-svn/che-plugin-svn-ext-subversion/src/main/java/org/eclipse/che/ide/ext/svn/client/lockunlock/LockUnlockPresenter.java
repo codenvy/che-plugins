@@ -10,20 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.lockunlock;
 
-import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
-import org.apache.commons.io.comparator.PathFileComparator;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
@@ -35,14 +27,20 @@ import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.threechoices.ChoiceDialog;
 import org.eclipse.che.ide.ext.svn.client.common.threechoices.ChoiceDialogFactory;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 
 /**
  * Handler for the {@link LockAction} and {@link UnlockAction} actions.
@@ -71,7 +69,7 @@ public class LockUnlockPresenter extends SubversionActionPresenter {
                                   final SubversionExtensionLocalizationConstants constants,
                                   final SubversionClientService service,
                                   final WorkspaceAgent workspaceAgent,
-                                  final ProjectExplorerPart projectExplorerPart) {
+                                  final NewProjectExplorerPresenter projectExplorerPart) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
 
         this.service = service;

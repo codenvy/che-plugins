@@ -10,17 +10,17 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.common;
 
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-import com.google.web.bindery.event.shared.EventBus;
-
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
+import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -61,7 +61,7 @@ public abstract class BaseSubversionPresenterTest {
     @Mock
     protected WorkspaceAgent                           workspaceAgent;
     @Mock
-    protected ProjectExplorerPart                      projectExplorerPart;
+    protected NewProjectExplorerPresenter              projectExplorerPart;
 
     @Before
     public void setUp() throws Exception {

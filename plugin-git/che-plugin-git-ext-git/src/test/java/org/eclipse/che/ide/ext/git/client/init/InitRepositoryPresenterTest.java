@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.ext.git.client.init;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.GitRepositoryInitializer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -51,7 +50,8 @@ public class InitRepositoryPresenterTest extends BaseTest {
                                                 eventBus,
                                                 constant,
                                                 notificationManager,
-                                                gitRepositoryInitializer);
+                                                gitRepositoryInitializer,
+                                                projectExplorer);
     }
 
     @Test
@@ -71,7 +71,6 @@ public class InitRepositoryPresenterTest extends BaseTest {
 
         verify(gitRepositoryInitializer).initGitRepository(eq(rootProjectDescriptor), (AsyncCallback<Void>)anyObject());
         verify(notificationManager).showInfo(eq(constant.initSuccess()));
-        verify(eventBus).fireEvent(Matchers.<RefreshProjectTreeEvent>anyObject());
     }
 
     @Test

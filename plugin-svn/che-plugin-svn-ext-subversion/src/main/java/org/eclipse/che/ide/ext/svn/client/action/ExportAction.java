@@ -10,18 +10,17 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.action;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
 import org.eclipse.che.ide.ext.svn.client.export.ExportPresenter;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * Extension of {@link SubversionAction} for implementing the "svn export" command.
@@ -59,8 +58,8 @@ public class ExportAction extends SubversionAction {
         return true;
     }
 
-    private TreeNode<?> getSelectedNode() {
-        Object selectedNode = selectionAgent.getSelection().getFirstElement();
-        return selectedNode != null && selectedNode instanceof StorableNode ? (StorableNode)selectedNode : null;
+    private HasStorablePath getSelectedNode() {
+        Object selectedNode = selectionAgent.getSelection().getHeadElement();
+        return selectedNode != null && selectedNode instanceof HasStorablePath ? (HasStorablePath)selectedNode : null;
     }
 }

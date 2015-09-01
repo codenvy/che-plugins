@@ -10,17 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.commit;
 
-import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
+import com.google.common.base.Joiner;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.notification.Notification;
+import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.commit.CommitView.ActionDelegate;
@@ -30,20 +27,21 @@ import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputParser;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
-
-import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.notification.Notification;
-import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.svn.shared.StatusItem;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.util.loging.Log;
 
-import com.google.common.base.Joiner;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 
 /**
  * Presenter for the {@link org.eclipse.che.ide.ext.svn.client.commit.CommitView}.
@@ -77,7 +75,7 @@ public class CommitPresenter extends SubversionActionPresenter implements Action
                            final SubversionExtensionLocalizationConstants constants,
                            final SubversionClientService subversionService,
                            final WorkspaceAgent workspaceAgent,
-                           final ProjectExplorerPart projectExplorerPart,
+                           final NewProjectExplorerPresenter projectExplorerPart,
                            final DiffViewerPresenter diffViewerPresenter) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
         this.subversionService = subversionService;

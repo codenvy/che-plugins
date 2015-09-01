@@ -15,10 +15,9 @@ import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.ProjectAction;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
-
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.vectomatic.dom.svg.ui.SVGResource;
 
 import java.util.List;
@@ -29,13 +28,13 @@ import java.util.List;
 public abstract class GitAction extends ProjectAction {
 
     protected final AppContext     appContext;
-    protected       SelectionAgent selectionAgent;
+    protected       NewProjectExplorerPresenter projectExplorer;
 
     public GitAction(String text, String description, SVGResource svgIcon, AppContext appContext,
-                     SelectionAgent selectionAgent) {
+                     NewProjectExplorerPresenter projectExplorer) {
         super(text, description, svgIcon);
         this.appContext = appContext;
-        this.selectionAgent = selectionAgent;
+        this.projectExplorer = projectExplorer;
     }
 
     protected boolean isGitRepository() {
@@ -53,8 +52,8 @@ public abstract class GitAction extends ProjectAction {
     }
 
     protected boolean isItemSelected() {
-        Selection<?> selection = selectionAgent.getSelection();
-        return selection != null && selection.getFirstElement() != null && selection.getFirstElement() instanceof StorableNode;
+        Selection<?> selection = projectExplorer.getSelection();
+        return selection != null && selection.getHeadElement() != null && selection.getHeadElement() instanceof HasStorablePath;
     }
 
     protected CurrentProject getActiveProject() {

@@ -21,6 +21,7 @@ import org.eclipse.che.api.runner.dto.PortMapping;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorProvider;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.ext.runner.client.RunnerLocalizationConstant;
 import org.eclipse.che.ide.ext.runner.client.models.Runner;
 import org.eclipse.che.ide.ext.runner.client.runneractions.impl.launch.common.RunnerApplicationStatusEventHandler;
@@ -81,7 +82,7 @@ public class PropertiesRunnerPanel extends PropertiesPanelPresenter {
 
                 timer.cancel();
 
-                DockerFile file = dockerFileFactory.newInstance(dockerUrl);
+                VirtualFile file = dockerFileFactory.newInstance(dockerUrl);
                 initializeEditor(file, editorProvider, fileTypeRegistry);
                 view.selectMemory(runner.getRAM());
             }

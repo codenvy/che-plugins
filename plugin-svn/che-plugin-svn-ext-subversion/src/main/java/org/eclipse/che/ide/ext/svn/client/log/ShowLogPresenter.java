@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.log;
 
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
@@ -21,6 +20,7 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.svn.shared.InfoResponse;
 import org.eclipse.che.ide.ext.svn.shared.SubversionItem;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import com.google.inject.Inject;
@@ -49,7 +49,7 @@ public class ShowLogPresenter extends SubversionActionPresenter {
                                final RawOutputPresenter console,
                                final SubversionClientService subversionClientService,
                                final NotificationManager notificationManager,
-                               final ProjectExplorerPart projectExplorerPart,
+                               final NewProjectExplorerPresenter projectExplorerPart,
                                final ShowLogsView view) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
 

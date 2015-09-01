@@ -16,10 +16,9 @@ import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.ProjectAction;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
-
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
 import org.eclipse.che.ide.ext.svn.shared.SubversionTypeConstant;
@@ -89,7 +88,7 @@ public abstract class SubversionAction extends ProjectAction {
         final Selection<?> selection = selectionAgent.getSelection();
 
         return selection != null && selection.getHeadElement() != null &&
-               selection.getHeadElement() instanceof StorableNode;
+               selection.getHeadElement() instanceof HasStorablePath;
     }
 
     /**

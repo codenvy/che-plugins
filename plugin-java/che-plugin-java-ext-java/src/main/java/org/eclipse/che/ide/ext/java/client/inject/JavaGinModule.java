@@ -12,6 +12,8 @@ package org.eclipse.che.ide.ext.java.client.inject;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
+import com.google.gwt.inject.client.multibindings.GinMapBinder;
+import com.google.gwt.inject.client.multibindings.GinMultibinder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -19,6 +21,8 @@ import com.google.inject.name.Named;
 import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 import org.eclipse.che.ide.api.filetypes.FileType;
+import org.eclipse.che.ide.api.project.node.interceptor.NodeInterceptor;
+import org.eclipse.che.ide.api.project.node.settings.SettingsProvider;
 import org.eclipse.che.ide.ext.java.client.JavaExtension;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.dependenciesupdater.JavaNameEnvironmentServiceClient;
@@ -32,7 +36,12 @@ import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationServiceImpl;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileView;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileViewImpl;
-import org.eclipse.che.ide.ext.java.client.projecttree.JavaNodeFactory;
+import org.eclipse.che.ide.ext.java.client.project.interceptor.AbstractExternalLibrariesNodeInterceptor;
+import org.eclipse.che.ide.ext.java.client.project.interceptor.JavaClassInterceptor;
+import org.eclipse.che.ide.ext.java.client.project.interceptor.PackageNodeInterceptor;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaNodeFactory;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaNodeManager;
+import org.eclipse.che.ide.ext.java.client.project.settings.JavaNodeSettingsProvider;
 
 /**
  * @author Evgen Vidolob
@@ -50,6 +59,15 @@ public class JavaGinModule extends AbstractGinModule {
         bind(QuickDocumentation.class).to(QuickDocPresenter.class).in(Singleton.class);
         bind(JavaNavigationService.class).to(JavaNavigationServiceImpl.class);
         bind(JavaNameEnvironmentServiceClient.class).to(JavaNameEnvironmentServiceClientImpl.class);
+
+        bind(JavaNodeManager.class);
+
+        GinMapBinder<String, SettingsProvider> mapBinder =
+                GinMapBinder.newMapBinder(binder(), String.class, SettingsProvider.class);
+        mapBinder.addBinding("java").to(JavaNodeSettingsProvider.class);
+
+        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(PackageNodeInterceptor.class);
+        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(JavaClassInterceptor.class);
 
         install(new GinFactoryModuleBuilder().build(JavaNodeFactory.class));
     }

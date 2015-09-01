@@ -10,17 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.action;
 
-import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.client.fetch.FetchPresenter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-/** @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a> */
+import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
+import org.eclipse.che.ide.api.action.ActionEvent;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.ext.git.client.GitResources;
+import org.eclipse.che.ide.ext.git.client.fetch.FetchPresenter;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
+
+/** @author Andrey Plotnikov */
 @Singleton
 public class FetchAction extends GitAction {
     private final FetchPresenter       presenter;
@@ -32,8 +33,8 @@ public class FetchAction extends GitAction {
                        GitResources resources,
                        GitLocalizationConstant constant,
                        AnalyticsEventLogger eventLogger,
-                       SelectionAgent selectionAgent) {
-        super(constant.fetchControlTitle(), constant.fetchControlPrompt(), resources.fetch(), appContext, selectionAgent);
+                       NewProjectExplorerPresenter projectExplorer) {
+        super(constant.fetchControlTitle(), constant.fetchControlPrompt(), resources.fetch(), appContext, projectExplorer);
         this.presenter = presenter;
         this.eventLogger = eventLogger;
     }

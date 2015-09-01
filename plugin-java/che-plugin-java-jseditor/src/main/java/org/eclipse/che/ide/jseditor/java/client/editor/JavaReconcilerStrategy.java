@@ -10,17 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.jseditor.java.client.editor;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+
 import org.eclipse.che.ide.api.build.BuildContext;
 import org.eclipse.che.ide.api.editor.EditorWithErrors;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.text.Region;
 import org.eclipse.che.ide.api.texteditor.outline.OutlineModel;
-import org.eclipse.che.ide.collections.Array;
 import org.eclipse.che.ide.ext.java.client.editor.JavaParserWorker;
 import org.eclipse.che.ide.ext.java.client.editor.outline.OutlineUpdater;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.JarClassNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
+import org.eclipse.che.ide.ext.java.client.project.node.jar.JarFileNode;
 import org.eclipse.che.ide.ext.java.jdt.core.IProblemRequestor;
 import org.eclipse.che.ide.ext.java.jdt.core.compiler.IProblem;
 import org.eclipse.che.ide.jseditor.client.annotation.AnnotationModel;
@@ -29,9 +30,8 @@ import org.eclipse.che.ide.jseditor.client.document.EmbeddedDocument;
 import org.eclipse.che.ide.jseditor.client.reconciler.DirtyRegion;
 import org.eclipse.che.ide.jseditor.client.reconciler.ReconcilingStrategy;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
 import org.eclipse.che.ide.util.loging.Log;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -72,7 +72,7 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy, JavaParserWo
     public void setDocument(final EmbeddedDocument document) {
         this.document = document;
         file = editor.getEditorInput().getFile();
-        sourceFromClass = file instanceof JarClassNode;
+        sourceFromClass = file instanceof JarFileNode && (file.getName().endsWith(".class") || file.getName().endsWith(".java"));
         new OutlineUpdater(file.getPath(), outlineModel, worker);
     }
 
@@ -91,13 +91,17 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy, JavaParserWo
         }
 
         String packageName = "";
-        if (file instanceof SourceFileNode) {
-            if (((SourceFileNode)file).getParent() instanceof PackageNode) {
-                packageName = ((PackageNode)((SourceFileNode)file).getParent()).getQualifiedName();
+        if (file.getName().endsWith(".java")) {
+            if (((FileReferenceNode)file).getParent() instanceof PackageNode) {
+                FileReferenceNode fileNode = (FileReferenceNode)file;
+
+                if (fileNode.getParent() != null && fileNode.getParent() instanceof PackageNode) {
+                    packageName = ((PackageNode)fileNode.getParent()).getQualifiedName();
+                }
             }
         }
 
-        worker.parse(document.getContents(), file.getName(), file.getPath(), packageName, file.getProject().getPath(), false, this);
+        worker.parse(document.getContents(), file.getName(), file.getPath(), packageName, file.getProject().getProjectDescriptor().getPath(), false, this);
     }
 
     @Override
