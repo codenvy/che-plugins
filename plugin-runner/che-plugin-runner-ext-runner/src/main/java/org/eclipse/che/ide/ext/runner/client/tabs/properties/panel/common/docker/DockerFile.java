@@ -10,23 +10,26 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker;
 
-import org.eclipse.che.api.core.rest.shared.dto.Link;
-import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
-import org.eclipse.che.api.project.shared.dto.ItemReference;
-import org.eclipse.che.ide.api.editor.EditorAgent;
-import org.eclipse.che.ide.api.project.tree.TreeStructure;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-import org.eclipse.che.ide.util.loging.Log;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.web.bindery.event.shared.EventBus;
+
+import org.eclipse.che.api.core.rest.shared.dto.Link;
+import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
+import org.eclipse.che.api.project.shared.dto.ItemReference;
+import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
+import org.eclipse.che.ide.api.project.node.HasProjectDescriptor;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
+import org.eclipse.che.ide.rest.AsyncRequestCallback;
+import org.eclipse.che.ide.util.loging.Log;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * The file node that represents recipe file item in the project explorer tree. It needs just for opening recipe for editing (it is a
@@ -36,17 +39,16 @@ import javax.annotation.Nonnull;
  * @author Andrey Plotnikov
  * @author Dmitry Shnurenko
  */
-public class DockerFile extends FileNode {
+public class DockerFile implements VirtualFile {
 
     public static final String GET_CONTENT = "get content";
+    private final ProjectServiceClient projectServiceClient;
+    private final ItemReference data;
 
-    public DockerFile(@Nonnull EventBus eventBus,
-                      @Nonnull ProjectServiceClient projectServiceClient,
-                      @Nonnull DtoUnmarshallerFactory dtoUnmarshallerFactory,
-                      @Nonnull ItemReference data,
-                      @Nonnull TreeStructure treeStructure,
-                      @Nonnull EditorAgent editorAgent) {
-        super(null, data, treeStructure, eventBus, projectServiceClient, dtoUnmarshallerFactory, editorAgent);
+    public DockerFile(@Nonnull ProjectServiceClient projectServiceClient,
+                      @Nonnull ItemReference data) {
+        this.projectServiceClient = projectServiceClient;
+        this.data = data;
     }
 
     /** {@inheritDoc} */
@@ -57,13 +59,18 @@ public class DockerFile extends FileNode {
 
     /** {@inheritDoc} */
     @Override
-    public void getContent(AsyncCallback<String> callback) {
-        for (Link link : getData().getLinks()) {
-            if (GET_CONTENT.equals(link.getRel())) {
-                sendRequest(callback, link.getHref());
-                break;
+    public Promise<String> getContent() {
+        return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<String>() {
+            @Override
+            public void makeCall(AsyncCallback<String> callback) {
+                for (Link link : data.getLinks()) {
+                    if (GET_CONTENT.equals(link.getRel())) {
+                        sendRequest(callback, link.getHref());
+                        break;
+                    }
+                }
             }
-        }
+        });
     }
 
     private void sendRequest(@Nonnull final AsyncCallback<String> callback, @Nonnull String href) {
@@ -84,4 +91,65 @@ public class DockerFile extends FileNode {
         }
     }
 
+    @Nonnull
+    @Override
+    public String getPath() {
+        return data.getPath();
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return data.getName();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return data.getName();
+    }
+
+    @Nullable
+    @Override
+    public String getMediaType() {
+        return data.getMediaType();
+    }
+
+    @Nullable
+    @Override
+    public HasProjectDescriptor getProject() {
+        return null;
+    }
+
+    @Override
+    public String getContentUrl() {
+        List<Link> links = data.getLinks();
+        Link li = null;
+        for (Link link : links) {
+            if (link.getRel().equals("get content")) {
+                li = link;
+                break;
+            }
+        }
+        return li == null ? null : li.getHref();
+    }
+
+    @Override
+    public Promise<Void> updateContent(final String content) {
+        return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<Void>() {
+            @Override
+            public void makeCall(final AsyncCallback<Void> callback) {
+                projectServiceClient.updateFile(getPath(), content, null, new AsyncRequestCallback<Void>() {
+                    @Override
+                    protected void onSuccess(Void result) {
+                        callback.onSuccess(result);
+                    }
+
+                    @Override
+                    protected void onFailure(Throwable exception) {
+                        callback.onFailure(exception);
+                    }
+                });
+            }
+        });
+    }
 }

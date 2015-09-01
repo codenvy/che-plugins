@@ -45,6 +45,7 @@ public class MavenProjectType extends ProjectType {
         addVariableDefinition(MavenAttributes.PACKAGING, "", false, mavenValueProviderFactory);
         addVariableDefinition(MavenAttributes.SOURCE_FOLDER, "", false, mavenValueProviderFactory);
         addVariableDefinition(MavenAttributes.TEST_SOURCE_FOLDER, "", false, mavenValueProviderFactory);
+        addVariableDefinition(MavenAttributes.RESOURCE_FOLDER, "", false, mavenValueProviderFactory);
         addRunnerCategories(Arrays.asList(JAVA.toString()));
 
         addParent(javaProjectType);

@@ -36,6 +36,14 @@ import com.google.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.che.ide.extension.maven.client.MavenArchetype;
+import org.eclipse.che.ide.projecttype.wizard.ProjectWizardResources;
+import org.eclipse.che.ide.ui.buttonLoader.ButtonLoaderResources;
+import org.eclipse.che.ide.ui.window.Window;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Evgen Vidolob
  */

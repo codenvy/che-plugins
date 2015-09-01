@@ -20,7 +20,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
@@ -28,6 +27,7 @@ import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
 import org.eclipse.che.ide.ext.svn.shared.Depth;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
@@ -58,7 +58,7 @@ public class PropertyEditorPresenter extends SubversionActionPresenter implement
                                       EventBus eventBus,
                                       RawOutputPresenter console,
                                       WorkspaceAgent workspaceAgent,
-                                      ProjectExplorerPart projectExplorerPart,
+                                      NewProjectExplorerPresenter projectExplorerPart,
                                       PropertyEditorView view,
                                       SubversionClientService service,
                                       DtoUnmarshallerFactory dtoUnmarshallerFactory,

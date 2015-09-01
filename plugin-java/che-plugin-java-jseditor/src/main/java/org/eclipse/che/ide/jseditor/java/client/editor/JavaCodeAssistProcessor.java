@@ -23,6 +23,7 @@ import org.eclipse.che.ide.jseditor.client.codeassist.CodeAssistCallback;
 import org.eclipse.che.ide.jseditor.client.codeassist.CodeAssistProcessor;
 import org.eclipse.che.ide.jseditor.client.codeassist.CompletionProposal;
 import org.eclipse.che.ide.jseditor.client.texteditor.TextEditor;
+
 import com.google.gwt.resources.client.ImageResource;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -32,10 +33,10 @@ import java.util.List;
 
 public class JavaCodeAssistProcessor implements CodeAssistProcessor {
 
-    private final BuildContext buildContext;
-    private final EditorPartPresenter editor;
-    private final JavaParserWorker worker;
-    private final JavaResources javaResources;
+    private final BuildContext         buildContext;
+    private final EditorPartPresenter  editor;
+    private final JavaParserWorker     worker;
+    private final JavaResources        javaResources;
     private final AnalyticsEventLogger eventLogger;
 
     private String errorMessage;
@@ -173,7 +174,7 @@ public class JavaCodeAssistProcessor implements CodeAssistProcessor {
         }
         this.eventLogger.log(this, "Autocompleting");
         final VirtualFile file = editor.getEditorInput().getFile();
-        final String projectPath = file.getProject().getPath();
+        final String projectPath = file.getProject().getProjectDescriptor().getPath();
         this.worker.computeCAProposals(textEditor.getDocument().getContents(),
                                        offset, file.getName(), projectPath, file.getPath(),
                                        new JavaParserWorker.WorkerCallback<WorkerProposal>() {
@@ -188,11 +189,11 @@ public class JavaCodeAssistProcessor implements CodeAssistProcessor {
         final List<CompletionProposal> proposals = new ArrayList<>(problems.size());
         for (final WorkerProposal proposal : problems) {
             final CompletionProposal completionProposal =
-                                                          new JavaCompletionProposal(
-                                                                                     proposal.id(),
-                                                                                     insertStyle(javaResources, proposal.displayText()),
-                                                                                     new Icon("", getImage(javaResources, proposal.image())),
-                                                                                     worker);
+                    new JavaCompletionProposal(
+                            proposal.id(),
+                            insertStyle(javaResources, proposal.displayText()),
+                            new Icon("", getImage(javaResources, proposal.image())),
+                            worker);
             proposals.add(completionProposal);
         }
 

@@ -38,6 +38,8 @@ public interface MavenAttributes {
     final String SOURCE_FOLDER      = "maven.source.folder";
     final String TEST_SOURCE_FOLDER = "maven.test.source.folder";
 
+    final String RESOURCE_FOLDER      = "maven.resource.folder";
+
     final String DEFAULT_SOURCE_FOLDER      = "src/main/java";
     final String DEFAULT_TEST_SOURCE_FOLDER = "src/test/java";
     final String DEFAULT_VERSION            = "1.0-SNAPSHOT";

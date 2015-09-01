@@ -22,11 +22,11 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileEvent;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 
@@ -51,15 +51,16 @@ import static org.eclipse.che.ide.ext.git.client.merge.Reference.RefType.REMOTE_
 public class MergePresenter implements MergeView.ActionDelegate {
     public static final String LOCAL_BRANCHES_TITLE  = "Local Branches";
     public static final String REMOTE_BRANCHES_TITLE = "Remote Branches";
-    private final DtoUnmarshallerFactory  dtoUnmarshallerFactory;
-    private       MergeView               view;
-    private       GitServiceClient        service;
-    private       EventBus                eventBus;
-    private       GitLocalizationConstant constant;
-    private       EditorAgent             editorAgent;
-    private       AppContext              appContext;
-    private       Reference               selectedReference;
-    private       NotificationManager     notificationManager;
+    private final DtoUnmarshallerFactory      dtoUnmarshallerFactory;
+    private       MergeView                   view;
+    private final NewProjectExplorerPresenter projectExplorer;
+    private       GitServiceClient            service;
+    private       EventBus                    eventBus;
+    private       GitLocalizationConstant     constant;
+    private       EditorAgent                 editorAgent;
+    private       AppContext                  appContext;
+    private       Reference                   selectedReference;
+    private       NotificationManager         notificationManager;
 
     /**
      * Create presenter.
@@ -79,8 +80,10 @@ public class MergePresenter implements MergeView.ActionDelegate {
                           GitLocalizationConstant constant,
                           AppContext appContext,
                           NotificationManager notificationManager,
-                          DtoUnmarshallerFactory dtoUnmarshallerFactory) {
+                          DtoUnmarshallerFactory dtoUnmarshallerFactory,
+                          NewProjectExplorerPresenter projectExplorer) {
         this.view = view;
+        this.projectExplorer = projectExplorer;
         this.view.setDelegate(this);
         this.service = service;
         this.eventBus = eventBus;
@@ -190,7 +193,7 @@ public class MergePresenter implements MergeView.ActionDelegate {
      *         editors that corresponds to open files
      */
     private void refreshProject(final List<EditorPartPresenter> openedEditors) {
-        eventBus.fireEvent(new RefreshProjectTreeEvent());
+        projectExplorer.synchronizeTree();
         for (EditorPartPresenter partPresenter : openedEditors) {
             final VirtualFile file = partPresenter.getEditorInput().getFile();
             eventBus.fireEvent(new FileEvent(file, FileEvent.FileOperation.CLOSE));
@@ -231,7 +234,7 @@ public class MergePresenter implements MergeView.ActionDelegate {
 
 
         String commitText = commitsMessage.toString();
-        message += (!commitText.isEmpty()) ? " " +constant.mergedCommits(commitText) : "";
+        message += (!commitText.isEmpty()) ? " " + constant.mergedCommits(commitText) : "";
         message += (mergeResult.getNewHead() != null) ? " " + constant.mergedNewHead(mergeResult.getNewHead()) : "";
         return message;
     }

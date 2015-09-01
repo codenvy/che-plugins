@@ -18,10 +18,10 @@ import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 /**
@@ -31,13 +31,14 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
  */
 @Singleton
 public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionDelegate {
-    private final NotificationManager     notificationManager;
+    private final NotificationManager         notificationManager;
+    private       GitServiceClient            service;
+    private       AppContext                  appContext;
+    private       EventBus                    eventBus;
+    private       GitLocalizationConstant     constant;
+    private       CheckoutReferenceView       view;
+    private final NewProjectExplorerPresenter projectExplorer;
     private final DtoFactory              dtoFactory;
-    private final GitServiceClient        service;
-    private final AppContext              appContext;
-    private final EventBus                eventBus;
-    private final GitLocalizationConstant constant;
-    private final CheckoutReferenceView   view;
 
     @Inject
     public CheckoutReferencePresenter(CheckoutReferenceView view,
@@ -46,8 +47,10 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                       AppContext appContext,
                                       GitLocalizationConstant constant,
                                       NotificationManager notificationManager,
+                                      NewProjectExplorerPresenter projectExplorer,
                                       DtoFactory dtoFactory) {
         this.view = view;
+        this.projectExplorer = projectExplorer;
         this.dtoFactory = dtoFactory;
         this.view.setDelegate(this);
         this.service = service;
@@ -79,10 +82,10 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                new AsyncRequestCallback<String>() {
                                    @Override
                                    protected void onSuccess(String result) {
-                                       String projectPath = project.getPath();
+//                                       String projectPath = project.getPath();
                                        //In this case we can have unconfigured state of the project,
                                        //so we must repeat the logic which is performed when we open a project
-                                       eventBus.fireEvent(new OpenProjectEvent(projectPath));
+                                       projectExplorer.synchronizeTree();
                                    }
 
                                    @Override

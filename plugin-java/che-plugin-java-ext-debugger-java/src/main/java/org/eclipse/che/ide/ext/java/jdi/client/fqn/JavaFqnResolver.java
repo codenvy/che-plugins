@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.java.jdi.client.fqn;
 
 import org.eclipse.che.api.project.shared.dto.BuildersDescriptor;
+import org.eclipse.che.ide.api.project.node.HasProjectDescriptor;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 import com.google.inject.Singleton;
@@ -28,24 +29,24 @@ public class JavaFqnResolver implements FqnResolver {
     @Nonnull
     @Override
     public String resolveFqn(@Nonnull final VirtualFile file) {
-        final ProjectNode project = file.getProject();
-        final BuildersDescriptor builders = project.getData().getBuilders();
+        final HasProjectDescriptor project = file.getProject();
+        final BuildersDescriptor builders = project.getProjectDescriptor().getBuilders();
         final List<String> sourceFolders = new ArrayList<>();
         if (builders != null) {
             final String builderName = builders.getDefault();
             if (builderName != null) {
-                List<String> list = project.getAttributeValues(builderName + ".source.folder");
+                List<String> list = project.getProjectDescriptor().getAttributes().get(builderName + ".source.folder");
                 if (list != null) {
                     sourceFolders.addAll(list);
                 }
-                list = project.getAttributeValues(builderName + ".test.source.folder");
+                list = project.getProjectDescriptor().getAttributes().get(builderName + ".test.source.folder");
                 if (list != null) {
                     sourceFolders.addAll(list);
                 }
             }
         }
 
-        final String projectPath = project.getPath();
+        final String projectPath = project.getProjectDescriptor().getPath();
         String path = file.getPath();
         int i = 1;
         int j = path.lastIndexOf('.');

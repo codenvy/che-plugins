@@ -20,6 +20,7 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.ConsolePart;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.dto.DtoFactory;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import com.google.web.bindery.event.shared.EventBus;
@@ -84,6 +85,8 @@ public abstract class BaseTest {
     protected DialogFactory           dialogFactory;
     @Mock
     protected ProjectServiceClient    projectServiceClient;
+    @Mock
+    protected NewProjectExplorerPresenter projectExplorer;
 
     @Before
     public void disarm() {

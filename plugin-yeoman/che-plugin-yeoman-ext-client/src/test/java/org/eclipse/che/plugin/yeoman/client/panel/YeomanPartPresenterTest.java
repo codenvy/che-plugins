@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.yeoman.client.panel;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.builder.BuildStatus;
 import org.eclipse.che.api.builder.dto.BuildOptions;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.dto.DtoFactory;
+import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.plugin.yeoman.client.builder.BuilderAgent;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.web.bindery.event.shared.EventBus;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -104,6 +104,9 @@ public class YeomanPartPresenterTest {
     @Mock
     private CurrentProject activeProject;
 
+    @Mock
+    private NewProjectExplorerPresenter projectExplorer;
+
     @Captor
     ArgumentCaptor<BuildOptions> buildOptionsArgumentCaptor;
 
@@ -114,7 +117,7 @@ public class YeomanPartPresenterTest {
     @Before
     public void setUp() {
         this.presenter = new YeomanPartPresenter(yeomanPartView, eventBus, foldingPanelFactory,
-                                                 generatedItemViewFactory, appContext, dtoFactory, builderAgent);
+                                                 generatedItemViewFactory, dtoFactory, builderAgent, projectExplorer);
 
         // Mock folding panel factory
         doReturn(foldingPanelController).when(foldingPanelFactory).create(CONTROLLER.getLabelName());
@@ -495,8 +498,6 @@ public class YeomanPartPresenterTest {
         assertEquals(2, presenter.getNamesByTypes().size());
 
         presenter.onFinished(BuildStatus.SUCCESSFUL);
-
-        verify(eventBus).fireEvent(any(RefreshProjectTreeEvent.class));
 
         // check that all has been removed
         assertEquals(0, presenter.getWidgetByTypes().size());

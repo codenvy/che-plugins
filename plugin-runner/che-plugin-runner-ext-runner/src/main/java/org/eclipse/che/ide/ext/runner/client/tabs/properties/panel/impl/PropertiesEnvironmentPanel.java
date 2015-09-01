@@ -22,14 +22,16 @@ import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.project.shared.dto.RunnerConfiguration;
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorProvider;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
-import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.texteditor.HandlesUndoRedo;
 import org.eclipse.che.ide.api.texteditor.UndoableEditor;
 import org.eclipse.che.ide.dto.DtoFactory;
@@ -45,7 +47,6 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.PropertiesPan
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.EnvironmentScript;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.RAM;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
-import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFile;
 import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.docker.DockerFileFactory;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.TemplatesContainer;
 import org.eclipse.che.ide.ext.runner.client.util.EnvironmentIdValidator;
@@ -219,21 +220,9 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
                                              @Override
                                              public void onSuccess(List<ItemReference> result) {
                                                  for (ItemReference item : result) {
-                                                     ProjectNode project = new ProjectNode(null,
-                                                                                           projectDescriptor,
-                                                                                           null,
-                                                                                           eventBus,
-                                                                                           projectService,
-                                                                                           unmarshallerFactory);
-
-                                                     FileNode file = new EnvironmentScript(project,
-                                                                                           item,
-                                                                                           currentProject.getCurrentTree(),
-                                                                                           eventBus,
-                                                                                           projectService,
-                                                                                           unmarshallerFactory,
-                                                                                           environment.getName(),
-                                                                                           editorAgent);
+                                                     VirtualFile file = new EnvironmentScript(item,
+                                                                                              projectService,
+                                                                                              environment.getName());
 
                                                      initializeEditor(file, editorProvider, fileTypeRegistry);
                                                  }
@@ -252,7 +241,7 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     }
 
     private void getSystemEnvironmentDocker() {
-        DockerFile file = dockerFileFactory.newInstance(environment.getPath());
+        VirtualFile file = dockerFileFactory.newInstance(environment.getPath());
         initializeEditor(file, editorProvider, fileTypeRegistry);
     }
 
@@ -284,15 +273,16 @@ public class PropertiesEnvironmentPanel extends PropertiesPanelPresenter {
     }
 
     private void getEditorContent(@Nonnull final String fileName) {
-        editor.getEditorInput().getFile().getContent(new AsyncCallback<String>() {
+
+        editor.getEditorInput().getFile().getContent().then(new Operation<String>() {
             @Override
-            public void onSuccess(String content) {
+            public void apply(String content) throws OperationException {
                 createFile(content, fileName);
             }
-
+        }).catchError(new Operation<PromiseError>() {
             @Override
-            public void onFailure(Throwable throwable) {
-                notificationManager.showError(throwable.getMessage());
+            public void apply(PromiseError arg) throws OperationException {
+                notificationManager.showError(arg.getMessage());
             }
         });
     }

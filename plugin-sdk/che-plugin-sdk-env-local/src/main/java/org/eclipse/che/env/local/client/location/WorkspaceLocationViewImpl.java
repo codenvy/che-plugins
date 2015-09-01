@@ -27,7 +27,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.env.local.client.LocalizationConstant;
 import org.eclipse.che.env.local.client.WorkspaceToDirectoryMappingServiceClient;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
+import org.eclipse.che.ide.api.project.node.event.ProjectPartLoadEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.json.JsonHelper;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -88,7 +88,8 @@ public class WorkspaceLocationViewImpl extends Window implements WorkspaceLocati
                                      new AsyncRequestCallback<Map<String, String>>(new StringMapUnmarshaller()) {
                                          @Override
                                          protected void onSuccess(Map<String, String> result) {
-                                             eventBus.fireEvent(new RefreshProjectTreeEvent());
+                                             eventBus.fireEvent(new ProjectPartLoadEvent());
+//                                             eventBus.fireEvent(new RefreshProjectTreeEvent());
                                              closeDialog();
                                          }
 
