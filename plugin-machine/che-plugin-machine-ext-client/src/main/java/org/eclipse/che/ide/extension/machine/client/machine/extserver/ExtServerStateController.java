@@ -11,11 +11,17 @@
 package org.eclipse.che.ide.extension.machine.client.machine.extserver;
 
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.extension.machine.client.machine.events.ExtServerStateEvent;
+import org.eclipse.che.ide.websocket.MessageBus;
+import org.eclipse.che.ide.websocket.MessageBusImpl;
 import org.eclipse.che.ide.websocket.WebSocket;
 import org.eclipse.che.ide.websocket.events.ConnectionClosedHandler;
 import org.eclipse.che.ide.websocket.events.ConnectionErrorHandler;
@@ -24,24 +30,26 @@ import org.eclipse.che.ide.websocket.events.WebSocketClosedEvent;
 
 /**
  * @author Roman Nikitenko
+ * @author Valeriy Svydenko
  */
+@Singleton
 public class ExtServerStateController implements ConnectionOpenedHandler, ConnectionClosedHandler, ConnectionErrorHandler {
 
     private final Timer               retryConnectionTimer;
     private final EventBus            eventBus;
     private final NotificationManager notificationManager;
 
-    private ExtServerState state;
-    private String         wsUrl;
-    private int            countRetry;
-
+    private ExtServerState            state;
+    private String                    wsUrl;
+    private int                       countRetry;
+    private MessageBus                messageBus;
+    private AsyncCallback<MessageBus> messageBusCallback;
 
     @Inject
     public ExtServerStateController(EventBus eventBus,
                                     NotificationManager notificationManager) {
         this.eventBus = eventBus;
         this.notificationManager = notificationManager;
-
         retryConnectionTimer = new Timer() {
             @Override
             public void run() {
@@ -55,6 +63,7 @@ public class ExtServerStateController implements ConnectionOpenedHandler, Connec
         this.wsUrl = wsUrl;
         this.countRetry = 5;
         this.state = ExtServerState.STOPPED;
+
         connect();
     }
 
@@ -83,10 +92,27 @@ public class ExtServerStateController implements ConnectionOpenedHandler, Connec
         state = ExtServerState.STARTED;
         notificationManager.showInfo("Extension server started");
         eventBus.fireEvent(ExtServerStateEvent.createExtServerStartedEvent());
+
+        messageBus = new MessageBusImpl(wsUrl);
+
+        messageBusCallback.onSuccess(messageBus);
     }
 
     public ExtServerState getState() {
         return state;
+    }
+
+    public Promise<MessageBus> getMessageBus() {
+        return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<MessageBus>() {
+            @Override
+            public void makeCall(AsyncCallback<MessageBus> callback) {
+                if (messageBus != null) {
+                    callback.onSuccess(messageBus);
+                } else {
+                    ExtServerStateController.this.messageBusCallback = callback;
+                }
+            }
+        });
     }
 
     private void connect() {
