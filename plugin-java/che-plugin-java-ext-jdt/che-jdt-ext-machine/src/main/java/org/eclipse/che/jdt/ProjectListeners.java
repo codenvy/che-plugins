@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.project.server.notification.ProjectItemModifiedEvent;
 import org.eclipse.che.jdt.core.resources.ResourceChangedEvent;
 import org.eclipse.core.filebuffers.FileBuffers;

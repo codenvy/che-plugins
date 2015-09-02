@@ -12,7 +12,7 @@
 package org.eclipse.che.jdt.core.resources;
 
 import org.eclipse.che.api.project.server.notification.ProjectItemModifiedEvent;
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;

@@ -48,7 +48,7 @@ public class MachineInfoViewImpl extends Composite implements MachineInfoView {
     @UiField
     Label type;
     @UiField
-    Label workspaceBound;
+    Label dev;
     @UiField
     Label workspaceId;
 
@@ -66,7 +66,7 @@ public class MachineInfoViewImpl extends Composite implements MachineInfoView {
         machineId.setText(machine.getId());
         status.setText(String.valueOf(machine.getStatus()));
         type.setText(machine.getType());
-        workspaceBound.setText(String.valueOf(machine.isWorkspaceBound()));
+        dev.setText(String.valueOf(machine.isDev()));
     }
 
     /** {@inheritDoc} */

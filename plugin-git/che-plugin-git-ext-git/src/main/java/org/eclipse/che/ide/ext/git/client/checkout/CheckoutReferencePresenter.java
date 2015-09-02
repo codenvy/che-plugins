@@ -14,12 +14,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.dto.DtoFactory;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 /**
@@ -30,11 +32,12 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 @Singleton
 public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionDelegate {
     private final NotificationManager     notificationManager;
-    private       GitServiceClient        service;
-    private       AppContext              appContext;
-    private       EventBus                eventBus;
-    private       GitLocalizationConstant constant;
-    private       CheckoutReferenceView   view;
+    private final DtoFactory              dtoFactory;
+    private final GitServiceClient        service;
+    private final AppContext              appContext;
+    private final EventBus                eventBus;
+    private final GitLocalizationConstant constant;
+    private final CheckoutReferenceView   view;
 
     @Inject
     public CheckoutReferencePresenter(CheckoutReferenceView view,
@@ -42,8 +45,10 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                       EventBus eventBus,
                                       AppContext appContext,
                                       GitLocalizationConstant constant,
-                                      NotificationManager notificationManager) {
+                                      NotificationManager notificationManager,
+                                      DtoFactory dtoFactory) {
         this.view = view;
+        this.dtoFactory = dtoFactory;
         this.view.setDelegate(this);
         this.service = service;
         this.appContext = appContext;
@@ -67,7 +72,10 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
     public void onCheckoutClicked(final String reference) {
         view.close();
         final ProjectDescriptor project = appContext.getCurrentProject().getRootProject();
-        service.branchCheckout(project, reference, null, false,
+        service.branchCheckout(project,
+                               dtoFactory.createDto(BranchCheckoutRequest.class)
+                                         .withName(reference)
+                                         .withCreateNew(false),
                                new AsyncRequestCallback<String>() {
                                    @Override
                                    protected void onSuccess(String result) {
@@ -86,7 +94,6 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                    }
                                }
                               );
-
     }
 
     @Override

@@ -22,10 +22,11 @@
     <packaging>pom</packaging>
     <name>Che Plugin :: Java :: Extension JDT</name>
     <modules>
-        <module>che-plugin-java-jdt-core-repack</module>
         <module>org-eclipse-core-filesystem</module>
+        <module>org-eclipse-core-resources</module>
         <module>org-eclipse-core-filebuffers</module>
         <module>org-eclipse-ltk-core-refactoring</module>
+        <module>che-plugin-java-jdt-core-repack</module>
         <module>che-jdt-ext-machine</module>
     </modules>
 </project>

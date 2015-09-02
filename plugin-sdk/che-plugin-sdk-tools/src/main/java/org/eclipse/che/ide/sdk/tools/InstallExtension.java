@@ -85,9 +85,11 @@ public class InstallExtension {
                                      extension.artifactId,
                                      extension.artifactVersion));
             model.writeTo(pom);
-
-            final Path ideGwtXmlPath = IoUtil.findFile(IDE_GWT_XML_FILE_NAME, extResourcesWorkDirPath.toFile()).toPath();
-            GwtXmlUtils.inheritGwtModule(ideGwtXmlPath, extension.gwtModuleName);
+            // Add GWT module if there is one
+            if (extension.gwtModuleName != null) {
+                final Path ideGwtXmlPath = IoUtil.findFile(IDE_GWT_XML_FILE_NAME, extResourcesWorkDirPath.toFile()).toPath();
+                GwtXmlUtils.inheritGwtModule(ideGwtXmlPath, extension.gwtModuleName);
+            }
         }
     }
 
@@ -102,8 +104,17 @@ public class InstallExtension {
         List<Extension> extensions = new ArrayList<>();
         for (File file : files) {
             Extension extension = getExtensionFromFile(file.toPath());
-            extensions.add(extension);
-            System.out.println(String.format("Extension %s found", extension.gwtModuleName));
+            if (extension != null) {
+                extensions.add(extension);
+                System.out.println(String.format("Extension found %s:%s:%s", extension.groupId, extension.artifactId, extension.artifactVersion));
+                if (extension.gwtModuleName != null) {
+                    System.out.println(String.format("    Including GWT module %s", extension.gwtModuleName));
+                }
+            } else {
+                System.err.println(
+                        String.format("Rejecting file %s it doesn't contain a pom.xml file", file.toPath().toString()));
+
+            }
         }
         System.out.println(String.format("Found: %d extension(s)", extensions.size()));
         return extensions;
@@ -130,12 +141,15 @@ public class InstallExtension {
             }
 
             // TODO consider Codenvy extension validator
-            if (gwtXmlEntry == null || pomEntry == null) {
-                throw new IllegalArgumentException(String.format("%s is not a valid Codenvy extension", zipPath.toString()));
+            if (pomEntry == null) {
+                return null;
             }
 
-            String gwtModuleName = gwtXmlEntry.getName().replace(File.separatorChar, '.');
-            gwtModuleName = gwtModuleName.substring(0, gwtModuleName.length() - GwtXmlUtils.GWT_MODULE_XML_SUFFIX.length());
+            String gwtModuleName = null;
+            if (gwtXmlEntry != null) {
+                gwtModuleName = gwtXmlEntry.getName().replace(File.separatorChar, '.');
+                gwtModuleName = gwtModuleName.substring(0, gwtModuleName.length() - GwtXmlUtils.GWT_MODULE_XML_SUFFIX.length());
+            }
             Model pom = Model.readFrom(zipFile.getInputStream(pomEntry));
             return new Extension(gwtModuleName, MavenUtils.getGroupId(pom), pom.getArtifactId(), MavenUtils.getVersion(pom));
         }

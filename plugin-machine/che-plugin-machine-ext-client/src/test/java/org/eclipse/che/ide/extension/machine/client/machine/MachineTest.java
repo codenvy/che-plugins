@@ -149,7 +149,7 @@ public class MachineTest {
 
     @Test
     public void boundedStateShouldBeReturned() {
-        machine.isWorkspaceBound();
+        machine.isDev();
 
         verify(descriptor).isDev();
     }

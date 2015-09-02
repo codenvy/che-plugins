@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.github.client.importer.page;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwtmockito.GwtMockitoTestRunner;
+
 import org.eclipse.che.api.project.shared.dto.ImportProject;
 import org.eclipse.che.api.project.shared.dto.ImportSourceDescriptor;
 import org.eclipse.che.api.project.shared.dto.NewProject;
@@ -18,7 +22,6 @@ import org.eclipse.che.api.project.shared.dto.Source;
 import org.eclipse.che.api.user.gwt.client.UserServiceClient;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.wizard.Wizard;
-import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.commons.exception.UnauthorizedException;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.github.client.GitHubClientService;
@@ -30,12 +33,6 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.security.oauth.OAuthStatus;
 import org.eclipse.che.test.GwtReflectionUtils;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwtmockito.GwtMockitoTestRunner;
-import com.google.web.bindery.event.shared.EventBus;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,8 +85,6 @@ public class GithubImporterPagePresenterTest {
     private DtoUnmarshallerFactory      dtoUnmarshallerFactory;
     @Mock
     private NotificationManager         notificationManager;
-    @Mock
-    private EventBus                    eventBus;
     @Mock
     private GitHubLocalizationConstant  locale;
     @Mock
@@ -171,10 +166,9 @@ public class GithubImporterPagePresenterTest {
 
         verify(gitHubClientService).getAllRepositories(asyncRequestCallbackRepoListCaptor.capture());
         AsyncRequestCallback<Map<String, List<GitHubRepository>>> asyncRequestCallback = asyncRequestCallbackRepoListCaptor.getValue();
-        GwtReflectionUtils.callOnFailure(asyncRequestCallback,exception);
+        GwtReflectionUtils.callOnFailure(asyncRequestCallback, exception);
 
         verify(notificationManager).showError(anyString());
-        verify(eventBus).fireEvent(Matchers.<ExceptionThrownEvent>anyObject());
         verify(view).setLoaderVisibility(eq(true));
         verify(view).setInputsEnableState(eq(false));
         verify(view).setLoaderVisibility(eq(false));

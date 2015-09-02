@@ -32,26 +32,26 @@ import java.util.Set;
 @Singleton
 public class DockerVersionVerifier {
 
-    //private final DockerConnector dockerConnector;
+    private final DockerConnector dockerConnector;
     private final Set<String>     supportedVersions;
 
     private static final Logger LOG = LoggerFactory.getLogger(DockerVersionVerifier.class);
 
     @Inject
-    public DockerVersionVerifier(/*DockerConnector dockerConnector, */@Named("machine.supported_docker_version") String[] supportedVersions) {
-        //this.dockerConnector = dockerConnector;
+    public DockerVersionVerifier(DockerConnector dockerConnector, @Named("machine.supported_docker_version") String[] supportedVersions) {
+        this.dockerConnector = dockerConnector;
         this.supportedVersions = Sets.newHashSet(supportedVersions);
     }
 
     /**
      * Check docker version compatibility.
      */
-    //@PostConstruct
-    public void checkCompatibility(DockerConnector dockerConnector) throws ServerException {
+    @PostConstruct
+    void checkCompatibility() throws ServerException {
         try {
             Version versionInfo = dockerConnector.getVersion();
             if (!supportedVersions.contains(versionInfo.getVersion())) {
-                throw new ServerException("Unsupported docker version " + versionInfo.getVersion() );
+                throw new ServerException("Unsupported docker version " + versionInfo.getVersion());
             }
         } catch (IOException e) {
             LOG.info(e.getMessage());

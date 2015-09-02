@@ -85,8 +85,8 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
-            <artifactId>che-plugin-java-ext-shared</artifactId>
-            <version>${project.version}</version>
+            <artifactId>che-plugin-java-ext-lang-shared</artifactId>
+            <version>${che.core.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.gwt</groupId>

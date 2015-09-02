@@ -10,14 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.delete;
 
+import com.googlecode.gwt.test.utils.GwtReflectionUtils;
+
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
-import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.window.Window;
-import com.googlecode.gwt.test.utils.GwtReflectionUtils;
-
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -107,6 +106,5 @@ public class DeleteRepositoryPresenterTest extends BaseTest {
         verify(appContext).getCurrentProject();
         verify(service).deleteRepository(eq(rootProjectDescriptor), (AsyncRequestCallback<Void>)anyObject());
         verify(notificationManager).showError(anyString());
-        verify(eventBus).fireEvent((ExceptionThrownEvent)anyObject());
     }
 }

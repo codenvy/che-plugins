@@ -211,55 +211,6 @@ public interface GitLocalizationConstant extends Messages {
     @Key("importProject.messageHostIncorrect")
     String importProjectMessageHostIncorrect();
 
-    // ----InitRequestHandler
-    @Key("init.started")
-    String initStarted(String repo);
-
-    @Key("init.finished")
-    String initFinished(String repo);
-
-    // ----CloneRequestHandler-------------
-    @Key("clone.started")
-    String cloneStarted(String projectPath, String remoteName);
-
-    @Key("clone.finished")
-    String cloneFinished(String projectName, String remoteUri);
-
-    // ----PushRequestHandler
-    @Key("push.started")
-    String pushStarted(String projectName, String localBranch, String remoteBranch);
-
-    @Key("push.finished")
-    String pushFinished(String projectName, String localBranch, String remoteBranch);
-
-    // ----PullRequestHandler
-    @Key("pull.started")
-    String pullStarted(String projectName, String remoteBranch, String localBranch);
-
-    @Key("pull.finished")
-    String pullFinished(String projectName, String remoteBranch, String localBranch);
-
-    // ----FetchRequestHandler
-    @Key("fetch.started")
-    String fetchStarted(String projectName, String remoteBranch, String localBranch);
-
-    @Key("fetch.finished")
-    String fetchFinished(String projectName, String remoteBranch, String localBranch);
-
-    // ----AddRequestHandler
-    @Key("add.started")
-    String addStarted(String projectName);
-
-    @Key("add.finished")
-    String addFinished(String projectName);
-
-    // ----CommitRequestHandler
-    @Key("commit.started")
-    String commitStarted(String projectName, String comment);
-
-    @Key("commit.finished")
-    String commitFinished(String projectName, String comment);
-
     // ----VIEWS------------------------------------------------------------------
 
     // GitImporterPage

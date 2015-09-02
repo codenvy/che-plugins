@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.core.filebuffers;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.internal.filebuffers.FileBuffersPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;

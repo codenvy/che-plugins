@@ -146,7 +146,7 @@ public class Machine {
      *
      * @return <code>true</code> machine is bounded to workspace,<code>false</code> machine isn't bounded to workspace
      */
-    public boolean isWorkspaceBound() {
+    public boolean isDev() {
         return descriptor.isDev();
     }
 

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.jdt.internal.core;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;

@@ -13,16 +13,16 @@ package org.eclipse.che.jdt;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
-import org.eclipse.jdt.internal.core.JavaModel;
-import org.eclipse.jdt.internal.core.JavaModelManager;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.JavaProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.JavaModel;
+import org.eclipse.jdt.internal.core.JavaModelManager;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -89,5 +89,12 @@ public class JavaNavigationService {
                                @QueryParam("root") int rootId) throws CoreException {
         IJavaProject project = MODEL.getJavaProject(projectPath);
         return navigation.getEntry(project, rootId, path);
+    }
+
+    @GET
+    @Path("get/projects/and/packages")
+    @Produces("application/json")
+    public List<JavaProject> getProjectsAndPackages(@QueryParam("includepackages") boolean includePackages) throws JavaModelException {
+        return navigation.getAllProjectsAndPackages(includePackages);
     }
 }

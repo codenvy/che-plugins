@@ -12,19 +12,14 @@
  *******************************************************************************/
 package org.eclipse.ltk.internal.core.refactoring;
 
-import org.osgi.framework.BundleContext;
-
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-
-import org.eclipse.core.resources.ResourcesPlugin;
-
 import org.eclipse.ltk.core.refactoring.IRefactoringCoreStatusCodes;
 import org.eclipse.ltk.core.refactoring.IUndoManager;
 import org.eclipse.ltk.core.refactoring.RefactoringCore;
@@ -32,75 +27,80 @@ import org.eclipse.ltk.core.refactoring.history.IRefactoringHistoryListener;
 import org.eclipse.ltk.internal.core.refactoring.history.RefactoringContributionManager;
 import org.eclipse.ltk.internal.core.refactoring.history.RefactoringHistorySerializer;
 import org.eclipse.ltk.internal.core.refactoring.history.RefactoringHistoryService;
+import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RefactoringCorePlugin extends Plugin {
+    private static final Logger LOG = LoggerFactory.getLogger(RefactoringCorePlugin.class);
+    private static RefactoringCorePlugin fgDefault;
+    private static IUndoManager fgUndoManager = null;
 
-	private static RefactoringCorePlugin fgDefault;
-	private static IUndoManager fgUndoManager= null;
+    private static IUndoContext fRefactoringUndoContext;
 
-	private static IUndoContext fRefactoringUndoContext;
+    private IRefactoringHistoryListener fRefactoringHistoryListener = null;
 
-	private IRefactoringHistoryListener fRefactoringHistoryListener= null;
+    public RefactoringCorePlugin() {
+        fgDefault = this;
+    }
 
-	public RefactoringCorePlugin() {
-		fgDefault= this;
-	}
+    public static RefactoringCorePlugin getDefault() {
+        return fgDefault;
+    }
 
-	public static RefactoringCorePlugin getDefault() {
-		return fgDefault;
-	}
+    public static String getPluginId() {
+        return RefactoringCore.ID_PLUGIN;
+    }
 
-	public static String getPluginId() {
-		return RefactoringCore.ID_PLUGIN;
-	}
+    public static IUndoContext getUndoContext() {
+        if (fRefactoringUndoContext == null) {
+            fRefactoringUndoContext = new RefactoringUndoContext();
+            IUndoContext workspaceContext = (IUndoContext)ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
+            if (workspaceContext instanceof ObjectUndoContext) {
+                ((ObjectUndoContext)workspaceContext).addMatch(fRefactoringUndoContext);
+            }
+            IOperationHistory operationHistory = OperationHistoryFactory.getOperationHistory();
+            operationHistory.setLimit(fRefactoringUndoContext, 5);
+        }
+        return fRefactoringUndoContext;
+    }
 
-	public static IUndoContext getUndoContext() {
-		if (fRefactoringUndoContext == null) {
-			fRefactoringUndoContext= new RefactoringUndoContext();
-			IUndoContext workspaceContext= (IUndoContext)ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
-			if (workspaceContext instanceof ObjectUndoContext) {
-				((ObjectUndoContext)workspaceContext).addMatch(fRefactoringUndoContext);
-			}
-			IOperationHistory operationHistory= OperationHistoryFactory.getOperationHistory();
-			operationHistory.setLimit(fRefactoringUndoContext, 5);
-		}
-		return fRefactoringUndoContext;
-	}
+    public static void log(IStatus status) {
+//        getDefault().getLog().log(status);
+    LOG.error(status.getMessage(), status.getException());
+    }
 
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
+    public static void log(Throwable t) {
+        IStatus status = new Status(
+                IStatus.ERROR, getPluginId(),
+                IRefactoringCoreStatusCodes.INTERNAL_ERROR,
+                RefactoringCoreMessages.RefactoringCorePlugin_internal_error,
+                t);
+        log(status);
+    }
 
-	public static void log(Throwable t) {
-		IStatus status= new Status(
-			IStatus.ERROR, getPluginId(),
-			IRefactoringCoreStatusCodes.INTERNAL_ERROR,
-			RefactoringCoreMessages.RefactoringCorePlugin_internal_error,
-			t);
-		ResourcesPlugin.getPlugin().getLog().log(status);
-	}
+    public static void logRemovedListener(Throwable t) {
+        IStatus status = new Status(
+                IStatus.ERROR, getPluginId(),
+                IRefactoringCoreStatusCodes.INTERNAL_ERROR,
+                RefactoringCoreMessages.RefactoringCorePlugin_listener_removed,
+                t);
+       log(status);
+    }
 
-	public static void logRemovedListener(Throwable t) {
-		IStatus status= new Status(
-			IStatus.ERROR, getPluginId(),
-			IRefactoringCoreStatusCodes.INTERNAL_ERROR,
-			RefactoringCoreMessages.RefactoringCorePlugin_listener_removed,
-			t);
-		ResourcesPlugin.getPlugin().getLog().log(status);
-	}
+    public static void logRemovedParticipant(ParticipantDescriptor descriptor, Throwable t) {
+        IStatus status = new Status(
+                IStatus.ERROR, getPluginId(),
+                IRefactoringCoreStatusCodes.PARTICIPANT_DISABLED,
+                Messages.format(
+                        RefactoringCoreMessages.RefactoringCorePlugin_participant_removed,
+                        descriptor.getId()),
+                t);
+        log(status);
+    }
 
-	public static void logRemovedParticipant(ParticipantDescriptor descriptor, Throwable t) {
-		IStatus status= new Status(
-			IStatus.ERROR, getPluginId(),
-			IRefactoringCoreStatusCodes.PARTICIPANT_DISABLED,
-			Messages.format(
-				RefactoringCoreMessages.RefactoringCorePlugin_participant_removed,
-				descriptor.getId()),
-			t);
-		ResourcesPlugin.getPlugin().getLog().log(status);
-	}
 
-	public static void logErrorMessage(String message) {
+    public static void logErrorMessage(String message) {
 		log(new Status(IStatus.ERROR, getPluginId(), IRefactoringCoreStatusCodes.INTERNAL_ERROR, message, null));
 	}
 

@@ -93,8 +93,11 @@
                                         <exclude name="**/org/eclipse/jdt/internal/core/SetContainerOperation**" />
                                         <exclude name="**/org/eclipse/jdt/internal/core/SourceMapper**" />
                                         <exclude name="**/org/eclipse/jdt/core/JavaConventions**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/search/JavaSearchDocument**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/search/IndexSelector**" />
                                         <exclude name="**/org/eclipse/jdt/internal/core/search/indexing/IndexManager**" />
                                         <exclude name="**/org/eclipse/jdt/internal/core/util/Util**" />
+                                        <exclude name="**/org/eclipse/jdt/internal/core/util/HandleFactory**" />
                                     </patternset>
                                 </unzip>
                             </target>

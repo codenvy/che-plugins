@@ -13,7 +13,7 @@ package org.eclipse.che.jdt.testplugin;
 
 import junit.framework.TestCase;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -33,6 +33,11 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.core.search.TypeNameRequestor;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
@@ -383,50 +388,50 @@ public class JavaProjectHelper {
     }
 //
 
-//	public static void mustPerformDummySearch() throws JavaModelException {
-//		performDummySearch(SearchEngine.createWorkspaceScope(), true);
-//	}
-//
-//	public static void mustPerformDummySearch(IJavaElement element) throws JavaModelException {
-//		performDummySearch(SearchEngine.createJavaSearchScope(new IJavaElement[] { element }), true);
-//	}
-//
-//	public static void performDummySearch() throws JavaModelException {
-//		performDummySearch(SearchEngine.createWorkspaceScope(), PERFORM_DUMMY_SEARCH);
-//	}
-//
-//	public static void performDummySearch(IJavaElement element) throws JavaModelException {
-//		performDummySearch(SearchEngine.createJavaSearchScope(new IJavaElement[] { element }), PERFORM_DUMMY_SEARCH);
-//	}
-//
-//	private static void performDummySearch(IJavaSearchScope searchScope, boolean doIt) throws JavaModelException {
-//		/*
-//		 * Workaround for intermittent test failures. The problem is that the Java indexer
-//		 * may still be reading a file that has just been created, but a test already tries to delete
-//		 * the file again.
-//		 *
-//		 * This can theoretically also happen in real life, but it's expected to be very rare,
-//		 * and there's no good solution for the problem, since the Java indexer should not
-//		 * take a workspace lock for these files.
-//		 *
-//		 * performDummySearch() was found to be a performance bottleneck, so we've disabled it in most situations.
-//		 * Use a mustPerformDummySearch() method if you really need it and you can't
-//		 * use a delete(..) method that retries a few times before failing.
-//		 */
-//		if (!doIt)
-//			return;
-//
-//		new SearchEngine().searchAllTypeNames(
-//				null,
-//				SearchPattern.R_EXACT_MATCH,
-//				"XXXXXXXXX".toCharArray(), // make sure we search a concrete name. This is faster according to Kent
-//				SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE,
-//				IJavaSearchConstants.CLASS,
-//				searchScope,
-//				new Requestor(),
-//				IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
-//				null);
-//	}
+	public static void mustPerformDummySearch() throws JavaModelException {
+		performDummySearch(SearchEngine.createWorkspaceScope(), true);
+	}
+
+	public static void mustPerformDummySearch(IJavaElement element) throws JavaModelException {
+		performDummySearch(SearchEngine.createJavaSearchScope(new IJavaElement[] { element }), true);
+	}
+
+	public static void performDummySearch() throws JavaModelException {
+		performDummySearch(SearchEngine.createWorkspaceScope(), PERFORM_DUMMY_SEARCH);
+	}
+
+	public static void performDummySearch(IJavaElement element) throws JavaModelException {
+		performDummySearch(SearchEngine.createJavaSearchScope(new IJavaElement[] { element }), PERFORM_DUMMY_SEARCH);
+	}
+
+	private static void performDummySearch(IJavaSearchScope searchScope, boolean doIt) throws JavaModelException {
+		/*
+		 * Workaround for intermittent test failures. The problem is that the Java indexer
+		 * may still be reading a file that has just been created, but a test already tries to delete
+		 * the file again.
+		 *
+		 * This can theoretically also happen in real life, but it's expected to be very rare,
+		 * and there's no good solution for the problem, since the Java indexer should not
+		 * take a workspace lock for these files.
+		 *
+		 * performDummySearch() was found to be a performance bottleneck, so we've disabled it in most situations.
+		 * Use a mustPerformDummySearch() method if you really need it and you can't
+		 * use a delete(..) method that retries a few times before failing.
+		 */
+		if (!doIt)
+			return;
+
+		new SearchEngine().searchAllTypeNames(
+				null,
+				SearchPattern.R_EXACT_MATCH,
+				"XXXXXXXXX".toCharArray(), // make sure we search a concrete name. This is faster according to Kent
+				SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE,
+				IJavaSearchConstants.CLASS,
+				searchScope,
+				new Requestor(),
+				IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
+				null);
+	}
 
     /**
      * Adds a source container to a IJavaProject.
@@ -903,10 +908,10 @@ public class JavaProjectHelper {
 //			return ALL;
 //		}
 //	}
-//
-//	private static class Requestor extends TypeNameRequestor{
-//	}
-//
+
+	private static class Requestor extends TypeNameRequestor {
+	}
+
 //	public static void emptyDisplayLoop() {
 //		boolean showDebugInfo= false;
 //

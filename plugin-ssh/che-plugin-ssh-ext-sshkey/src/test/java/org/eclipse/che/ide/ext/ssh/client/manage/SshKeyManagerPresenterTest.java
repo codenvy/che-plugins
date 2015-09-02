@@ -14,11 +14,9 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
-import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.ssh.client.SshKeyService;
 import org.eclipse.che.ide.ext.ssh.client.SshLocalizationConstant;
 import org.eclipse.che.ide.ext.ssh.client.SshResources;
@@ -101,8 +99,6 @@ public class SshKeyManagerPresenterTest {
     @Mock
     private SshResources            resources;
     @Mock
-    private EventBus                eventBus;
-    @Mock
     private AsyncRequestLoader      loader;
     @Mock
     private UploadSshKeyPresenter   uploadSshKeyPresenter;
@@ -155,7 +151,6 @@ public class SshKeyManagerPresenterTest {
         verify(dialogFactory, never()).createMessageDialog(anyString(), anyString(), (ConfirmCallback)anyObject());
         verify(messageDialog, never()).show();
         verify(notificationManager).showError(anyString());
-        verify(eventBus).fireEvent(Matchers.<ExceptionThrownEvent>anyObject());
     }
 
     @Test
@@ -320,7 +315,6 @@ public class SshKeyManagerPresenterTest {
         verify(service).getAllKeys(Matchers.<AsyncRequestCallback<List<KeyItem>>>anyObject());
         verify(view, never()).setKeys(eq(keyItemArray));
         verify(notificationManager).showError(anyString());
-        verify(eventBus).fireEvent(Matchers.<ExceptionThrownEvent>anyObject());
     }
 
     @Test
@@ -357,7 +351,6 @@ public class SshKeyManagerPresenterTest {
 
         verify(loader).hide(anyString());
         verify(view, never()).setKeys(eq(keyItemArray));
-        verify(eventBus).fireEvent(Matchers.<ExceptionThrownEvent>anyObject());
     }
 
     @Test
@@ -409,7 +402,6 @@ public class SshKeyManagerPresenterTest {
 
         verify(service, never()).getAllKeys((AsyncRequestCallback<List<KeyItem>>)anyObject());
         verify(view, never()).setKeys((List<KeyItem>)anyObject());
-        verify(eventBus).fireEvent(Matchers.<ExceptionThrownEvent>anyObject());
         verify(notificationManager).showError(anyString());
     }
 

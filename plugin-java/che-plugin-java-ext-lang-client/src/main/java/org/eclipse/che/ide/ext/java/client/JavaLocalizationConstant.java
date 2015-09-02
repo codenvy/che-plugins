@@ -122,4 +122,46 @@ public interface JavaLocalizationConstant extends Messages {
 
     @Key("redundant.null.check")
     String redundantNullCheck();
+
+    @Key("move.action.name")
+    String moveActionName();
+
+    @Key("move.action.description")
+    String moveActionDescription();
+
+    @Key("move.div.tree.title")
+    String moveDivTreeTitle();
+
+    @Key("move.dialog.title")
+    String moveDialogTitle();
+
+    @Key("move.update.references")
+    String moveUpdateReferences();
+
+    @Key("move.update.full.names")
+    String moveUpdateFullNames();
+
+    @Key("move.file.name.patterns")
+    String moveFileNamePatterns();
+
+    @Key("move.patterns.info")
+    String movePatternsInfo();
+
+    @Key("move.dialog.button.ok")
+    String moveDialogButtonOk();
+
+    @Key("move.dialog.button.preview")
+    String moveDialogButtonPreview();
+
+    @Key("move.dialog.button.cancel")
+    String moveDialogButtonCancel();
+
+    @Key("move.dialog.button.back")
+    String moveDialogButtonBack();
+
+    @Key("multi.selection.destination")
+    String multiSelectionDestination(int count);
+
+    @Key("multi.selection.references")
+    String multiSelectionReferences(int count);
 }

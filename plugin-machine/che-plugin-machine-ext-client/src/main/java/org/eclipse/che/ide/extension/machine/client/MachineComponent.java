@@ -15,13 +15,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.machine.gwt.client.MachineServiceClient;
-import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
 import org.eclipse.che.api.machine.shared.dto.MachineStateDescriptor;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.extension.machine.client.machine.extserver.ProjectApiComponentInitializer;
 import org.eclipse.che.ide.core.Component;
 import org.eclipse.che.ide.extension.machine.client.machine.MachineManager;
 
@@ -29,31 +27,19 @@ import java.util.List;
 
 import static org.eclipse.che.api.machine.shared.MachineStatus.RUNNING;
 
-/**
- * {@link Component} that provides running a Dev-machine after loading IDE.
- *
- * @author Artem Zatsarynnyy
- */
+/** @author Artem Zatsarynnyy */
 @Singleton
 public class MachineComponent implements Component {
 
-    public static final String DEFAULT_RECIPE =
-            "https://gist.githubusercontent.com/vparfonov/5c633534bfb0c127854f/raw/f176ee3428c2d39d08c7b4762aee6855dc5c8f75/jdk8_maven3_tomcat8";
-
-    private final MachineServiceClient           machineServiceClient;
-    private final AppContext                     appContext;
-    private final MachineManager                 machineManager;
-    private       ProjectApiComponentInitializer projectApiComponentInitializer;
+    private final MachineServiceClient machineServiceClient;
+    private final AppContext           appContext;
+    private final MachineManager       machineManager;
 
     @Inject
-    public MachineComponent(MachineServiceClient machineServiceClient,
-                            AppContext appContext,
-                            MachineManager machineManager,
-                            ProjectApiComponentInitializer projectApiComponentInitializer) {
+    public MachineComponent(MachineServiceClient machineServiceClient, AppContext appContext, MachineManager machineManager) {
         this.machineServiceClient = machineServiceClient;
         this.appContext = appContext;
         this.machineManager = machineManager;
-        this.projectApiComponentInitializer = projectApiComponentInitializer;
     }
 
     @Override
@@ -61,20 +47,18 @@ public class MachineComponent implements Component {
         machineServiceClient.getMachinesStates(null).then(new Operation<List<MachineStateDescriptor>>() {
             @Override
             public void apply(List<MachineStateDescriptor> arg) throws OperationException {
-                for (MachineStateDescriptor descriptor : arg) {
-                    if (descriptor.isDev() && descriptor.getStatus() == RUNNING) {
-                        appContext.setDevMachineId(descriptor.getId());
-
-                        machineManager.machineRunning(descriptor.getId());
-
-                        callback.onSuccess(MachineComponent.this);
-                        return;
+                if (arg.isEmpty()) {
+                    callback.onSuccess(MachineComponent.this);
+                } else {
+                    for (MachineStateDescriptor descriptor : arg) {
+                        if (descriptor.isDev() && descriptor.getStatus() == RUNNING) {
+                            appContext.setDevMachineId(descriptor.getId());
+                            machineManager.onMachineRunning(descriptor.getId());
+                            break;
+                        }
                     }
+                    callback.onSuccess(MachineComponent.this);
                 }
-
-                machineManager.startDevMachine(DEFAULT_RECIPE, "Dev");
-
-                callback.onSuccess(MachineComponent.this);
             }
         }).catchError(new Operation<PromiseError>() {
             @Override

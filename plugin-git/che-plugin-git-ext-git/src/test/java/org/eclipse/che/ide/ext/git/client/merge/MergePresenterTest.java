@@ -27,6 +27,8 @@
 */
 package org.eclipse.che.ide.ext.git.client.merge;
 
+import com.googlecode.gwt.test.utils.GwtReflectionUtils;
+
 import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.api.git.shared.MergeResult;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
@@ -34,11 +36,8 @@ import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.notification.Notification;
-import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import com.googlecode.gwt.test.utils.GwtReflectionUtils;
-
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -134,7 +133,6 @@ public class MergePresenterTest extends BaseTest {
         verify(service).branchList(eq(rootProjectDescriptor), eq(LIST_REMOTE), (AsyncRequestCallback<List<Branch>>)anyObject());
         verify(view).setRemoteBranches((List<Reference>)anyObject());
         verify(view).setLocalBranches((List<Reference>)anyObject());
-        verify(eventBus, never()).fireEvent((ExceptionThrownEvent)anyObject());
         verify(notificationManager, never()).showNotification((Notification)anyObject());
     }
 
@@ -165,7 +163,6 @@ public class MergePresenterTest extends BaseTest {
 
         verify(service).branchList(eq(rootProjectDescriptor), eq(LIST_LOCAL), (AsyncRequestCallback<List<Branch>>)anyObject());
         verify(service).branchList(eq(rootProjectDescriptor), eq(LIST_REMOTE), (AsyncRequestCallback<List<Branch>>)anyObject());
-        verify(eventBus, times(2)).fireEvent((ExceptionThrownEvent)anyObject());
         verify(notificationManager, times(2)).showNotification((Notification)anyObject());
     }
 

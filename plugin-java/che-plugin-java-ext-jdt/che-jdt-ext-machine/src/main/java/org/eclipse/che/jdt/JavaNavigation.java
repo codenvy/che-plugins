@@ -21,6 +21,9 @@ import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.JarEntry.JarEntryType;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.JavaProject;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.PackageFragment;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.PackageFragmentRoot;
 import org.eclipse.jdt.internal.core.JarEntryDirectory;
 import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jdt.internal.core.JarEntryResource;
@@ -39,6 +42,7 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.JavaModel;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,20 +173,15 @@ public class JavaNavigation {
         IJavaElement originalElement = null;
         IType type = project.findType(fqn);
         ICodeAssist codeAssist;
-//        IBuffer buffer;
         if(type.isBinary()){
             codeAssist = type.getClassFile();
-//            buffer = type.getClassFile().getBuffer();
         } else {
             codeAssist = type.getCompilationUnit();
-//            buffer = type.getCompilationUnit().getBuffer();
         }
 
-//        DocumentAdapter adapter = new DocumentAdapter(buffer);
-//        org.eclipse.jface.text.IRegion region = JavaWordFinder.findWord(adapter, offset);
         IJavaElement[] elements = null;
         if(codeAssist != null) {
-            elements = codeAssist.codeSelect(/*region.getOffset(), region.getLength()*/ offset, 0);
+            elements = codeAssist.codeSelect(offset, 0);
         }
 
         if(elements != null && elements.length > 0){
@@ -622,5 +621,57 @@ public class JavaNavigation {
         }
 
         return null;
+    }
+
+    public List<JavaProject> getAllProjectsAndPackages(boolean includePackages) throws JavaModelException {
+        JavaModel javaModel = JavaModelManager.getJavaModelManager().getJavaModel();
+        IJavaProject[] javaProjects = javaModel.getJavaProjects();
+        List<JavaProject> result = new ArrayList<>();
+        for (IJavaProject javaProject : javaProjects) {
+            if(javaProject.exists()) {
+                JavaProject project = DtoFactory.newDto(JavaProject.class);
+                project.setName(javaProject.getElementName());
+                project.setPath(javaProject.getPath().toOSString());
+                project.setPackageFragmentRoots(toPackageRoots(javaProject, includePackages));
+                result.add(project);
+            }
+        }
+        return result;
+    }
+
+    private List<PackageFragmentRoot> toPackageRoots(IJavaProject javaProject, boolean includePackages) throws JavaModelException {
+        IPackageFragmentRoot[] packageFragmentRoots = javaProject.getPackageFragmentRoots();
+        List<PackageFragmentRoot> result = new ArrayList<>();
+        for (IPackageFragmentRoot packageFragmentRoot : packageFragmentRoots) {
+            if(packageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE){
+                PackageFragmentRoot root = DtoFactory.newDto(PackageFragmentRoot.class);
+                root.setPath(packageFragmentRoot.getPath().toOSString());
+                root.setProjectPath(packageFragmentRoot.getJavaProject().getPath().toOSString());
+                if(includePackages) {
+                    root.setPackageFragments(toPackageFragments(packageFragmentRoot));
+                }
+                result.add(root);
+            }
+        }
+        return result;
+    }
+
+    private List<PackageFragment> toPackageFragments(IPackageFragmentRoot packageFragmentRoot) throws JavaModelException {
+        IJavaElement[] children = packageFragmentRoot.getChildren();
+        if(children == null){
+            return null;
+        }
+        List<PackageFragment> result = new ArrayList<>();
+        for (IJavaElement child : children) {
+            if(child instanceof IPackageFragment){
+                IPackageFragment packageFragment = (IPackageFragment)child;
+                PackageFragment fragment = DtoFactory.newDto(PackageFragment.class);
+                fragment.setName(packageFragment.getElementName());
+                fragment.setPath(packageFragment.getPath().toOSString());
+                fragment.setProjectPath(packageFragment.getJavaProject().getPath().toOSString());
+                result.add(fragment);
+            }
+        }
+        return result;
     }
 }

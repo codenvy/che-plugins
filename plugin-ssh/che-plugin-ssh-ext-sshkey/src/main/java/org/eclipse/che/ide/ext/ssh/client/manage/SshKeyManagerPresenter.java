@@ -10,11 +10,16 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.ssh.client.manage;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentUser;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.preferences.AbstractPreferencePagePresenter;
-import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.ext.ssh.client.SshKeyService;
 import org.eclipse.che.ide.ext.ssh.client.SshLocalizationConstant;
 import org.eclipse.che.ide.ext.ssh.client.SshResources;
@@ -28,13 +33,6 @@ import org.eclipse.che.ide.ui.dialogs.CancelCallback;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.ui.dialogs.InputCallback;
-
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -54,7 +52,6 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
     private SshKeyManagerView       view;
     private SshKeyService           service;
     private SshLocalizationConstant constant;
-    private EventBus                eventBus;
     private AsyncRequestLoader      loader;
     private UploadSshKeyPresenter   uploadSshKeyPresenter;
     private NotificationManager     notificationManager;
@@ -66,7 +63,6 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
                                   SshResources resources,
                                   AppContext appContext,
                                   SshLocalizationConstant constant,
-                                  EventBus eventBus,
                                   AsyncRequestLoader loader,
                                   UploadSshKeyPresenter uploadSshKeyPresenter,
                                   NotificationManager notificationManager,
@@ -81,7 +77,6 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;
-        this.eventBus = eventBus;
         this.loader = loader;
         this.uploadSshKeyPresenter = uploadSshKeyPresenter;
         this.notificationManager = notificationManager;
@@ -101,7 +96,6 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
             public void onFailure(Throwable exception) {
                 loader.hide(constant.loaderGetPublicSshKeyMessage(key.getHost()));
                 notificationManager.showError(SafeHtmlUtils.fromString(exception.getMessage()).asString());
-                eventBus.fireEvent(new ExceptionThrownEvent(exception));
             }
         });
     }
@@ -145,7 +139,6 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
             public void onFailure(Throwable exception) {
                 loader.hide(constant.loaderDeleteSshKeyMessage(key.getHost()));
                 notificationManager.showError(SafeHtmlUtils.fromString(exception.getMessage()).asString());
-                eventBus.fireEvent(new ExceptionThrownEvent(exception));
             }
         });
     }
@@ -179,7 +172,6 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
             @Override
             protected void onFailure(Throwable exception) {
                 notificationManager.showError(SafeHtmlUtils.fromString(exception.getMessage()).asString());
-                eventBus.fireEvent(new ExceptionThrownEvent(exception));
             }
         });
     }
@@ -244,7 +236,6 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
                 loader.hide(constant.loaderGetSshKeysMessage());
                 refreshKeys();
                 notificationManager.showError(exception.getMessage());
-                eventBus.fireEvent(new ExceptionThrownEvent(exception));
             }
         });
     }
@@ -298,7 +289,6 @@ public class SshKeyManagerPresenter extends AbstractPreferencePagePresenter impl
             public void onFailure(Throwable exception) {
                 loader.hide(constant.loaderGetSshKeysMessage());
                 notificationManager.showError(exception.getMessage());
-                eventBus.fireEvent(new ExceptionThrownEvent(exception));
             }
         });
     }

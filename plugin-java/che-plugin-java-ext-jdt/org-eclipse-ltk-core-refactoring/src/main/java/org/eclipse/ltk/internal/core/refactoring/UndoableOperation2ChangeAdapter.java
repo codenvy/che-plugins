@@ -10,15 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ltk.internal.core.refactoring;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IAdvancedUndoableOperation;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.commands.operations.OperationHistoryEvent;
-
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,15 +24,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
-
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.ChangeDescriptor;
 import org.eclipse.ltk.core.refactoring.IValidationCheckResultQuery;
 import org.eclipse.ltk.core.refactoring.RefactoringCore;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class UndoableOperation2ChangeAdapter implements IUndoableOperation, IAdvancedUndoableOperation  {

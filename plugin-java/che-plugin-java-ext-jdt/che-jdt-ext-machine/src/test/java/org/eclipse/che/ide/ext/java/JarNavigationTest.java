@@ -12,6 +12,8 @@ package org.eclipse.che.ide.ext.java;
 
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.JavaProject;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.PackageFragmentRoot;
 import org.eclipse.che.jdt.JavaNavigation;
 import org.eclipse.che.jdt.SourcesFromBytecodeGenerator;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -196,5 +198,26 @@ public class JarNavigationTest extends BaseTest {
         assertThat(entry.getType()).isEqualTo(JarEntry.JarEntryType.CLASS_FILE);
         assertThat(entry.getPath()).isEqualTo("java.lang.Object");
 
+    }
+
+    @Test
+    public void testAllProjectsAndPackages() throws Exception {
+        List<JavaProject> packages = navigation.getAllProjectsAndPackages(true);
+        assertThat(packages).isNotNull().isNotEmpty();
+        JavaProject project = packages.get(0);
+        assertThat(packages.get(0).getPackageFragmentRoots()).isNotNull().isNotEmpty();
+        assertThat(project.getPackageFragmentRoots()).isNotNull().isNotEmpty();
+        PackageFragmentRoot fragmentRoot = project.getPackageFragmentRoots().get(0);
+        assertThat(fragmentRoot.getPackageFragments()).isNotEmpty();
+    }
+
+    @Test
+    public void testAllProjectsWithoutPackages() throws Exception {
+        List<JavaProject> packages = navigation.getAllProjectsAndPackages(false);
+        assertThat(packages).isNotNull().isNotEmpty();
+        JavaProject project = packages.get(0);
+        assertThat(project.getPackageFragmentRoots()).isNotNull().isNotEmpty();
+        PackageFragmentRoot fragmentRoot = project.getPackageFragmentRoots().get(0);
+        assertThat(fragmentRoot.getPackageFragments()).isNullOrEmpty();
     }
 }

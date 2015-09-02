@@ -10,25 +10,8 @@
  *******************************************************************************/
 package org.eclipse.jdt.internal.core.search.indexing;
 
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.jdt.core.search.SearchDocument;
-import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.core.search.SearchParticipant;
-import org.eclipse.jdt.internal.core.ClasspathEntry;
-import org.eclipse.jdt.internal.core.JavaModel;
-import org.eclipse.jdt.internal.core.JavaModelManager;
-import org.eclipse.jdt.internal.core.JavaProject;
-import org.eclipse.jdt.internal.core.search.BasicSearchEngine;
-import org.eclipse.jdt.internal.core.search.PatternSearchJob;
-import org.eclipse.jdt.internal.core.search.indexing.AddFolderToIndex;
-import org.eclipse.jdt.internal.core.search.indexing.AddJarFileToIndex;
-import org.eclipse.jdt.internal.core.search.indexing.IndexAllProject;
-import org.eclipse.jdt.internal.core.search.indexing.IndexRequest;
-import org.eclipse.jdt.internal.core.search.indexing.RemoveFolderFromIndex;
-import org.eclipse.jdt.internal.core.search.indexing.RemoveFromIndex;
-import org.eclipse.jdt.internal.core.search.processing.JobManager;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,22 +19,31 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.CharOperation;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchDocument;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.internal.compiler.ISourceElementRequestor;
 import org.eclipse.jdt.internal.compiler.SourceElementParser;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.util.SimpleLookupTable;
 import org.eclipse.jdt.internal.compiler.util.SimpleSet;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
+import org.eclipse.jdt.internal.core.JavaModel;
+import org.eclipse.jdt.internal.core.JavaModelManager;
+import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jdt.internal.core.index.DiskIndex;
 import org.eclipse.jdt.internal.core.index.FileIndexLocation;
 import org.eclipse.jdt.internal.core.index.Index;
 import org.eclipse.jdt.internal.core.index.IndexLocation;
-import org.eclipse.jdt.internal.core.search.indexing.IIndexConstants;
-import org.eclipse.jdt.internal.core.search.indexing.IndexingParser;
-import org.eclipse.jdt.internal.core.search.indexing.ReadWriteMonitor;
+import org.eclipse.jdt.internal.core.search.BasicSearchEngine;
+import org.eclipse.jdt.internal.core.search.PatternSearchJob;
 import org.eclipse.jdt.internal.core.search.processing.IJob;
+import org.eclipse.jdt.internal.core.search.processing.JobManager;
 import org.eclipse.jdt.internal.core.util.Messages;
 import org.eclipse.jdt.internal.core.util.Util;
 
@@ -265,22 +257,22 @@ public class IndexManager extends JobManager implements IIndexConstants {
         // disable task tags to speed up parsing
         Map options = project.getOptions(true);
         options.put(JavaCore.COMPILER_TASK_TAGS, ""); //$NON-NLS-1$
-        try{
-        SourceElementParser parser = new IndexingParser(
-                requestor,
-                new DefaultProblemFactory(Locale.getDefault()),
-                new CompilerOptions(options),
-                true, // index local declarations
-                true, // optimize string literals
-                false); // do not use source javadoc parser to speed up parsing
-        parser.reportOnlyOneSyntaxError = true;
+        try {
+            SourceElementParser parser = new IndexingParser(
+                    requestor,
+                    new DefaultProblemFactory(Locale.getDefault()),
+                    new CompilerOptions(options),
+                    true, // index local declarations
+                    true, // optimize string literals
+                    false); // do not use source javadoc parser to speed up parsing
+            parser.reportOnlyOneSyntaxError = true;
 
-        // Always check javadoc while indexing
-        parser.javadocParser.checkDocComment = true;
-        parser.javadocParser.reportProblems = false;
+            // Always check javadoc while indexing
+            parser.javadocParser.checkDocComment = true;
+            parser.javadocParser.reportProblems = false;
 
-        return parser;
-        }catch (Exception e){
+            return parser;
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -724,18 +716,17 @@ public class IndexManager extends JobManager implements IIndexConstants {
 
         updateIndexState(indexLocation, REBUILDING_STATE);
         IndexRequest request = null;
-        //TODO
-//        if (target instanceof IProject) {
-//            IProject p = (IProject)target;
-//            if (JavaProject.hasJavaNature(p))
-//                request = new IndexAllProject(p, this);
-////	} else if (target instanceof IFolder) {
-////		request = new IndexBinaryFolder((IFolder) target, this);
-////	} else if (target instanceof IFile) {
-////		request = new AddJarFileToIndex((IFile) target, null, this);
-//        } else if (target instanceof File) {
-//            request = new AddJarFileToIndex(containerPath, null, this);
-//        }
+        if (target instanceof IProject) {
+            IProject p = (IProject)target;
+            if (JavaProject.hasJavaNature(p))
+                request = new IndexAllProject(p, this);
+        } else if (target instanceof IFolder) {
+            request = new IndexBinaryFolder((IFolder)target, this);
+        } else if (target instanceof IFile) {
+            request = new AddJarFileToIndex((IFile)target, null, this);
+        } else if (target instanceof File) {
+            request = new AddJarFileToIndex(containerPath, null, this);
+        }
         if (request != null)
             request(request);
     }

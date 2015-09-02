@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.bower.client.builder;
 
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+
 import org.eclipse.che.api.builder.BuildStatus;
 import org.eclipse.che.api.builder.dto.BuildOptions;
 import org.eclipse.che.api.builder.dto.BuildTaskDescriptor;
@@ -23,7 +26,6 @@ import org.eclipse.che.api.project.shared.dto.Source;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
 import org.eclipse.che.ide.commons.exception.UnmarshallerException;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.extension.builder.client.BuilderExtension;
@@ -37,9 +39,6 @@ import org.eclipse.che.ide.websocket.WebSocketException;
 import org.eclipse.che.ide.websocket.rest.StringUnmarshallerWS;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
 import org.eclipse.che.ide.websocket.rest.Unmarshallable;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
-import com.google.web.bindery.event.shared.EventBus;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -71,9 +70,6 @@ public class BuilderAgent {
 
     @Inject
     private MessageBus messageBus;
-
-    @Inject
-    private EventBus eventBus;
 
     @Inject
     private BuilderConsolePresenter console;
@@ -196,7 +192,6 @@ public class BuilderAgent {
                 notification.setType(ERROR);
                 notification.setStatus(FINISHED);
                 notification.setMessage(exception.getMessage());
-                eventBus.fireEvent(new ExceptionThrownEvent(exception));
                 if (buildFinishedCallback != null) {
                     buildFinishedCallback.onFinished(BuildStatus.FAILED);
                 }

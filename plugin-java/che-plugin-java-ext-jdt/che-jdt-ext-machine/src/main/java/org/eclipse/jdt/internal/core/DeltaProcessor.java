@@ -2142,7 +2142,7 @@ public class DeltaProcessor {
                 return;
 
             case IResourceChangeEvent.POST_BUILD:
-                JavaBuilder.buildFinished();
+//                JavaBuilder.buildFinished();
                 return;
         }
     }

@@ -40,7 +40,6 @@ import org.eclipse.che.ide.ext.runner.client.tabs.properties.panel.common.Scope;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.defaultrunnerinfo.DefaultRunnerInfo;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.environment.EnvironmentWidget;
 import org.eclipse.che.ide.ext.runner.client.tabs.templates.filterwidget.FilterWidget;
-import org.eclipse.che.ide.util.Config;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -127,18 +126,12 @@ public class TemplatesViewImpl extends Composite implements TemplatesView {
 
         addDefaultRunnerInfoHandler();
 
-        if (Config.isSdkProject()) {
-            templatesPanel.remove(defaultRunnerPanel);
-            templatesPanel.remove(defaultRunner);
-            templatesPanel.remove(filterPanel);
-        } else {
-            createNewButton.addDomHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    delegate.createNewEnvironment();
-                }
-            }, ClickEvent.getType());
-        }
+        createNewButton.addDomHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                delegate.createNewEnvironment();
+            }
+        }, ClickEvent.getType());
     }
 
     private void addDefaultRunnerInfoHandler() {

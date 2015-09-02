@@ -11,9 +11,7 @@
 package org.eclipse.che.plugin.docker.machine;
 
 import com.google.inject.Inject;
-
 import org.eclipse.che.api.core.NotFoundException;
-import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.util.FileCleaner;
 import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.machine.server.exception.InvalidRecipeException;
@@ -37,7 +35,6 @@ import org.eclipse.che.plugin.docker.client.json.ProgressStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Named;
 import java.io.File;
 import java.io.IOException;
@@ -70,9 +67,6 @@ public class DockerInstanceProvider implements InstanceProvider {
     private final Map<String, Map<String, String>> portsToExpose;
     private final Set<String>                      systemVolumes;
 
-    @Inject(optional = true)
-    private DockerVersionVerifier versionChecker = null;
-
     @Inject
     @Named("local.storage.path")
     private String localStorage;
@@ -94,13 +88,6 @@ public class DockerInstanceProvider implements InstanceProvider {
             portsToExpose.put(serverConf.getPort(), Collections.<String, String>emptyMap());
             containerLabels.put("che:server:" + serverConf.getPort() + ":ref", serverConf.getRef());
             containerLabels.put("che:server:" + serverConf.getPort() + ":protocol", serverConf.getProtocol());
-        }
-    }
-
-    @PostConstruct
-    public void checkVersion() throws ServerException {
-        if (this.versionChecker != null) {
-            this.versionChecker.checkCompatibility(docker);
         }
     }
 
@@ -179,7 +166,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                     }
                 }
             };
-            return docker.buildImage(null, progressMonitor, files.toArray(new File[files.size()]));
+            return docker.buildImage(null, progressMonitor, null, files.toArray(new File[files.size()]));
         } catch (IOException | InterruptedException e) {
             throw new MachineException(e.getMessage(), e);
         } finally {
@@ -310,13 +297,8 @@ public class DockerInstanceProvider implements InstanceProvider {
             volumes.add(String.format("%s:%s", hostProjectsFolder, "/projects"));
             volumes.add(String.format("%s:%s", localStorage, "/local-storage"));
 
-//            String[] extraHosts =  {"host:172.19.20.170"};
-
             HostConfig hostConfig = new HostConfig().withPublishAllPorts(true)
                                                     .withBinds(volumes.toArray(new String[volumes.size()]));
-
-//                                                  .withNetworkMode("host")
-//                                                  .withExtraHosts(extraHosts)
 
             docker.startContainer(containerId, hostConfig,
                                   new LogMessagePrinter(outputConsumer));
@@ -335,12 +317,5 @@ public class DockerInstanceProvider implements InstanceProvider {
         } catch (IOException e) {
             throw new MachineException(e);
         }
-    }
-
-    private boolean versionCompatible() throws IOException {
-        // TODO make algo for comparison  with COMPATIBLE_VERSION (like if version is moreThan(COMPATIBLE_VERSION))
-        String v = docker.getVersion().getVersion();
-        return (v.startsWith("1.6") || v.startsWith("1.7"));
-
     }
 }

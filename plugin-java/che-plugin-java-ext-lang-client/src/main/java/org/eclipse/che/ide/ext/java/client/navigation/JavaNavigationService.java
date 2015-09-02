@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.navigation;
 
+import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.JavaProject;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 import java.util.List;
@@ -24,8 +26,9 @@ public interface JavaNavigationService {
 
     /**
      * Find declaration of the binding key
-     * @param projectPath path to the project
-     * @param keyBinding binding key
+     *
+     * @param projectPath
+     *         path to the project
      * @param callback
      */
     void findDeclaration(String projectPath, String fqn, int offset, AsyncRequestCallback<OpenDeclarationDescriptor> callback);
@@ -33,7 +36,9 @@ public interface JavaNavigationService {
 
     /**
      * Receive all jar dependency's
-     * @param projectPath path to the project
+     *
+     * @param projectPath
+     *         path to the project
      * @param callback
      */
     void getExternalLibraries(String projectPath, AsyncRequestCallback<List<Jar>> callback);
@@ -45,6 +50,8 @@ public interface JavaNavigationService {
     void getEntry(String projectPath, int libId, String path, AsyncRequestCallback<JarEntry> callback);
 
     void getContent(String projectPath, int libId, String path, AsyncRequestCallback<String> callback);
+
+    Promise<List<JavaProject>> getProjectsAndPackages(boolean includePackage);
 
     /**
      * @param projectPath

@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
-            <artifactId>che-plugin-java-ext-shared</artifactId>
+            <artifactId>che-plugin-java-ext-lang-shared</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

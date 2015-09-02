@@ -34,11 +34,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.birt.runtime</groupId>
-            <artifactId>org.eclipse.core.resources</artifactId>
-            <version>${org.eclipse.core.resources.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.birt.runtime</groupId>
             <artifactId>org.eclipse.core.runtime</artifactId>
             <version>${org.eclipse.core.runtime.version}</version>
         </dependency>
@@ -50,6 +45,11 @@
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-api-project</artifactId>
+            <version>${che.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-commons-schedule</artifactId>
             <version>${che.core.version}</version>
         </dependency>
         <!--<dependency>-->
@@ -69,8 +69,8 @@
         <!--</dependency>-->
         <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
-            <artifactId>che-plugin-java-ext-shared</artifactId>
-            <version>${project.version}</version>
+            <artifactId>che-plugin-java-ext-lang-shared</artifactId>
+            <version>${che.plugins.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
@@ -96,17 +96,22 @@
         <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
             <artifactId>org.eclipse.core.filebuffers</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
             <artifactId>org.eclipse.core.filesystem</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.plugin</groupId>
+            <artifactId>org.eclipse.core.resources</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
             <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.core</groupId>
@@ -203,6 +208,9 @@
                         <version>${version.surefire.plugin}</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <runOrder>random</runOrder>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
@@ -219,6 +227,7 @@
                         <exclude>**/*.rsc</exclude>
                         <exclude>**/*.json</exclude>
                         <exclude>**/readableNames</exclude>
+                        <exclude>**/RenameType/**</exclude>
                         <exclude>**/projects/**</exclude>
                         <exclude>**/org/eclipse/che/jdt/javadoc/**</exclude>
                         <exclude>**/org/eclipse/jdt/**</exclude>
@@ -229,6 +238,7 @@
                         <exclude>**/org/eclipse/core/**</exclude>
                         <exclude>**/org/eclipse/search/**</exclude>
                         <exclude>**/org/eclipse/jface/**</exclude>
+                        <exclude>**/org/eclipse/ltk/**</exclude>
                         <exclude>**/templates/**</exclude>
                         <exclude>**/org/eclipse/che/jdt/core/**</exclude>
                         <exclude>**/org/eclipse/che/jdt/dom/**</exclude>

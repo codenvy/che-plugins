@@ -36,9 +36,6 @@ import static org.eclipse.che.plugin.docker.client.DockerConnector.UNIX_SOCKET_U
  */
 public class DockerConnectorConfiguration {
 
-    /**
-     * Logger.
-     */
     private static final Logger LOG = LoggerFactory.getLogger(DockerConnectorConfiguration.class);
 
     @Inject(optional = true)
@@ -50,17 +47,17 @@ public class DockerConnectorConfiguration {
     private String dockerCertificatesDirectoryPath = dockerMachineCertsDirectoryPath();
 
     @Inject
-    private InitialAuthConfig initialAuthConfig;
+    private InitialAuthConfig authConfigs;
 
     @Inject
     public DockerConnectorConfiguration(InitialAuthConfig initialAuthConfig) {
-        this.initialAuthConfig = initialAuthConfig;
+        this.authConfigs = initialAuthConfig;
     }
 
     public DockerConnectorConfiguration(URI dockerDaemonUri,
                                         String dockerCertificatesDirectoryPath,
-                                        InitialAuthConfig initialAuthConfig) {
-        this.initialAuthConfig = initialAuthConfig;
+                                        InitialAuthConfig authConfigs) {
+        this.authConfigs = authConfigs;
         this.dockerDaemonUri = dockerDaemonUri;
         this.dockerCertificatesDirectoryPath = dockerCertificatesDirectoryPath;
     }
@@ -157,8 +154,8 @@ public class DockerConnectorConfiguration {
         return dockerDaemonUri;
     }
 
-    public InitialAuthConfig getInitialAuthConfig() {
-        return initialAuthConfig;
+    public InitialAuthConfig getAuthConfigs() {
+        return authConfigs;
     }
 
     public DockerCertificates getDockerCertificates() {

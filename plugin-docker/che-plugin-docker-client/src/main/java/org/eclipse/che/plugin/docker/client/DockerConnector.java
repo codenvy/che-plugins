@@ -14,6 +14,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jna.ptr.LongByReference;
 
+import org.apache.commons.codec.binary.Base64;
 import org.eclipse.che.api.core.util.FileCleaner;
 import org.eclipse.che.api.core.util.SystemInfo;
 import org.eclipse.che.api.core.util.ValueHolder;
@@ -27,6 +28,7 @@ import org.eclipse.che.plugin.docker.client.connection.DockerConnection;
 import org.eclipse.che.plugin.docker.client.connection.DockerResponse;
 import org.eclipse.che.plugin.docker.client.connection.TcpConnection;
 import org.eclipse.che.plugin.docker.client.connection.UnixSocketConnection;
+import org.eclipse.che.plugin.docker.client.dto.AuthConfigs;
 import org.eclipse.che.plugin.docker.client.json.ContainerCommited;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.eclipse.che.plugin.docker.client.json.ContainerCreated;
@@ -42,6 +44,7 @@ import org.eclipse.che.plugin.docker.client.json.HostConfig;
 import org.eclipse.che.plugin.docker.client.json.Image;
 import org.eclipse.che.plugin.docker.client.json.ImageInfo;
 import org.eclipse.che.plugin.docker.client.json.ProgressStatus;
+import org.eclipse.che.plugin.docker.client.json.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,8 +117,7 @@ public class DockerConnector {
                                                                   + separatorChar + "machines"
                                                                   + separatorChar + "default";
 
-
-    private final URI                      dockerDaemonUri;
+    private final URI dockerDaemonUri;
     private final DockerCertificates       dockerCertificates;
     private final InitialAuthConfig        initialAuthConfig;
     private final ExecutorService          executor;
@@ -137,7 +139,7 @@ public class DockerConnector {
     private DockerConnector(DockerConnectorConfiguration connectorConfiguration) {
         this(connectorConfiguration.getDockerDaemonUri(),
              connectorConfiguration.getDockerCertificates(),
-             connectorConfiguration.getInitialAuthConfig());
+             connectorConfiguration.getAuthConfigs());
     }
 
     /**
@@ -155,8 +157,7 @@ public class DockerConnector {
                 final String msg = CharStreams.toString(new InputStreamReader(response.getInputStream()));
                 throw new DockerException(String.format("Error response from docker API, status: %d, message: %s", status, msg), status);
             }
-            return JsonHelper.fromJson(response.getInputStream(), org.eclipse.che.plugin.docker.client.json.SystemInfo.class, null,
-                                       FIRST_LETTER_LOWERCASE);
+            return JsonHelper.fromJson(response.getInputStream(), org.eclipse.che.plugin.docker.client.json.SystemInfo.class, null, FIRST_LETTER_LOWERCASE);
         } catch (JsonParseException e) {
             throw new IOException(e.getMessage(), e);
         } finally {
@@ -170,7 +171,7 @@ public class DockerConnector {
      * @return information about version docker
      * @throws IOException
      */
-    public org.eclipse.che.plugin.docker.client.json.Version getVersion() throws IOException {
+    public Version getVersion() throws IOException {
         final DockerConnection connection = openConnection(dockerDaemonUri);
         try {
             final DockerResponse response = connection.method("GET").path("/version").request();
@@ -179,7 +180,7 @@ public class DockerConnector {
                 final String msg = CharStreams.toString(new InputStreamReader(response.getInputStream()));
                 throw new DockerException(String.format("Error response from docker API, status: %d, message: %s", status, msg), status);
             }
-            return JsonHelper.fromJson(response.getInputStream(), org.eclipse.che.plugin.docker.client.json.Version.class, null,
+            return JsonHelper.fromJson(response.getInputStream(), Version.class, null,
                                        FIRST_LETTER_LOWERCASE);
         } catch (JsonParseException e) {
             throw new IOException(e.getMessage(), e);
@@ -218,6 +219,8 @@ public class DockerConnector {
      *         full repository name to be applied to newly created image
      * @param progressMonitor
      *         ProgressMonitor for images creation process
+     * @param authConfigs
+     *         Authentication configuration for private registries. Can be null.
      * @param files
      *         files that are needed for creation docker images (e.g. file of directories used in ADD instruction in Dockerfile), one of
      *         them must be Dockerfile.
@@ -226,20 +229,39 @@ public class DockerConnector {
      * @throws InterruptedException
      *         if build process was interrupted
      */
-    public String buildImage(String repository, ProgressMonitor progressMonitor, File... files) throws IOException, InterruptedException {
+    public String buildImage(String repository, ProgressMonitor progressMonitor, AuthConfigs authConfigs, File... files)
+            throws IOException, InterruptedException {
         final File tar = Files.createTempFile(null, ".tar").toFile();
         try {
             createTarArchive(tar, files);
-            return buildImage(repository, tar, progressMonitor);
+            return buildImage(repository, tar, progressMonitor, authConfigs);
         } finally {
             FileCleaner.addFile(tar);
         }
     }
 
+    /**
+     * Builds new docker image from specified tar archive that must contain Dockerfile.
+     *
+     * @param repository
+     *         full repository name to be applied to newly created image
+     * @param tar
+     *         archived files that are needed for creation docker images (e.g. file of directories used in ADD instruction in Dockerfile).
+     *         One of them must be Dockerfile.
+     * @param progressMonitor
+     *         ProgressMonitor for images creation process
+     * @param authConfigs
+     *         Authentication configuration for private registries. Can be null.
+     * @return image id
+     * @throws IOException
+     * @throws InterruptedException
+     *         if build process was interrupted
+     */
     protected String buildImage(String repository,
                                 File tar,
-                                final ProgressMonitor progressMonitor) throws IOException, InterruptedException {
-        return doBuildImage(repository, tar, progressMonitor, dockerDaemonUri);
+                                final ProgressMonitor progressMonitor,
+                                AuthConfigs authConfigs) throws IOException, InterruptedException {
+        return doBuildImage(repository, tar, progressMonitor, dockerDaemonUri, authConfigs);
     }
 
 
@@ -680,15 +702,39 @@ public class DockerConnector {
         }
     }
 
+    /**
+     * Builds new docker image from specified tar archive that must contain Dockerfile.
+     *
+     * @param repository
+     *         full repository name to be applied to newly created image
+     * @param tar
+     *         archived files that are needed for creation docker images (e.g. file of directories used in ADD instruction in Dockerfile).
+     *         One of them must be Dockerfile.
+     * @param progressMonitor
+     *         ProgressMonitor for images creation process
+     * @param dockerDaemonUri
+     *         Uri for remote access to docker API
+     * @param authConfigs
+     *         Authentication configuration for private registries. Can be null.
+     * @return image id
+     * @throws IOException
+     * @throws InterruptedException
+     *         if build process was interrupted
+     */
     protected String doBuildImage(String repository,
                                   File tar,
                                   final ProgressMonitor progressMonitor,
-                                  URI dockerDaemonUri) throws IOException, InterruptedException {
+                                  URI dockerDaemonUri,
+                                  AuthConfigs authConfigs) throws IOException, InterruptedException {
+        if (authConfigs == null) {
+            authConfigs = initialAuthConfig.getAuthConfigs();
+        }
         DockerConnection connection = openConnection(dockerDaemonUri);
         try {
-            final List<Pair<String, ?>> headers = new ArrayList<>(2);
+            final List<Pair<String, ?>> headers = new ArrayList<>(3);
             headers.add(Pair.of("Content-Type", "application/x-compressed-tar"));
             headers.add(Pair.of("Content-Length", tar.length()));
+            headers.add(Pair.of("X-Registry-Config", Base64.encodeBase64String(JsonHelper.toJson(authConfigs).getBytes())));
             final DockerResponse response;
             try (InputStream tarInput = new FileInputStream(tar)) {
                 response = connection.method("POST").path(String.format("/build?t=%s&rm=%d&pull=%d", repository, 1, 1)).headers(headers)
@@ -1001,7 +1047,7 @@ public class DockerConnector {
     }
 
     // Unfortunately we can't use generated DTO here.
-// Docker uses uppercase in first letter in names of json objects, e.g. {"Id":"123"} instead of {"id":"123"}
+    // Docker uses uppercase in first letter in names of json objects, e.g. {"Id":"123"} instead of {"id":"123"}
     protected static JsonNameConvention FIRST_LETTER_LOWERCASE = new JsonNameConvention() {
         @Override
         public String toJsonName(String javaName) {
@@ -1032,7 +1078,6 @@ public class DockerConnector {
     private void createTarArchive(File tar, File... files) throws IOException {
         TarUtils.tarFiles(tar, 0, files);
     }
-
 
     // OOM detect
 

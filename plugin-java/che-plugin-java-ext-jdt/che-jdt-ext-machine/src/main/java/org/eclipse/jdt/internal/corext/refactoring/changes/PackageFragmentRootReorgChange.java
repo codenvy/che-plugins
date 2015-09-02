@@ -30,7 +30,6 @@ import org.eclipse.jdt.internal.corext.refactoring.reorg.IPackageFragmentRootMan
 import org.eclipse.jdt.internal.corext.refactoring.util.JavaElementUtil;
 import org.eclipse.jdt.internal.corext.util.JavaElementResourceMapping;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.participants.ReorgExecutionLog;
 import org.eclipse.ltk.core.refactoring.resource.ResourceChange;
 
 abstract class PackageFragmentRootReorgChange extends ResourceChange {
@@ -147,10 +146,10 @@ abstract class PackageFragmentRootReorgChange extends ResourceChange {
 	}
 
 	private void markAsExecuted(IPackageFragmentRoot root, ResourceMapping mapping) {
-		ReorgExecutionLog log= (ReorgExecutionLog)getAdapter(ReorgExecutionLog.class);
-		if (log != null) {
-			log.markAsProcessed(root);
-			log.markAsProcessed(mapping);
-		}
+//		ReorgExecutionLog log= (ReorgExecutionLog)getAdapter(ReorgExecutionLog.class);
+//		if (log != null) {
+//			log.markAsProcessed(root);
+//			log.markAsProcessed(mapping);
+//		}
 	}
 }

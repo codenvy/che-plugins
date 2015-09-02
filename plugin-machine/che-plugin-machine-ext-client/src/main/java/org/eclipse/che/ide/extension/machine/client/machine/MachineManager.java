@@ -100,9 +100,9 @@ public class MachineManager {
             public void apply(Void arg) throws OperationException {
                 final String recipeUrl = recipeProvider.getRecipeUrl();
                 final String displayName = machine.getDisplayName();
-                final boolean isWSBound = machine.isWorkspaceBound();
+                final boolean isDev = machine.isDev();
 
-                startMachine(recipeUrl, displayName, isWSBound, RESTART);
+                startMachine(recipeUrl, displayName, isDev, RESTART);
             }
         });
     }
@@ -143,7 +143,7 @@ public class MachineManager {
                     runningListener = new RunningListener() {
                         @Override
                         public void onRunning() {
-                            machineRunning(machineDescriptor.getId());
+                            onMachineRunning(machineDescriptor.getId());
                         }
                     };
                 }
@@ -154,14 +154,13 @@ public class MachineManager {
         });
     }
 
-    public void machineRunning(final String machineId) {
+    public void onMachineRunning(final String machineId) {
         machineServiceClient.getMachine(machineId).then(new Operation<MachineDescriptor>() {
             @Override
             public void apply(MachineDescriptor machineDescriptor) throws OperationException {
                 appContext.setDevMachineId(machineId);
                 devMachine = entityFactory.createMachine(machineDescriptor);
-                extServerStateController
-                        .initialize(devMachine.getWsServerExtensionsUrl() + "/" + appContext.getWorkspace().getId());
+                extServerStateController.initialize(devMachine.getWsServerExtensionsUrl() + "/" + appContext.getWorkspace().getId());
             }
         });
     }
