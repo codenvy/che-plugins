@@ -11,8 +11,9 @@
 
 package org.eclipse.jdt.internal.core;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
-import org.eclipse.che.core.resources.ProjectScope;
+import org.eclipse.che.core.internal.resources.WorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -91,20 +92,20 @@ public class JavaProject extends Openable implements IJavaProject, SuffixConstan
     /**
      * Name of file containing project classpath
      */
-    public static final String INNER_DIR = ".codenvy";
-    public static final String CLASSPATH_FILENAME = INNER_DIR +"/classpath";
+    public static final String INNER_DIR = WorkspaceRoot.PROJECT_INNER_SETTING_DIR;
+    public static final String CLASSPATH_FILENAME = INNER_DIR + "/classpath";
 
     /**
      * Whether the underlying file system is case sensitive.
      */
     protected static final boolean                                    IS_CASE_SENSITIVE = !new File("Temp").equals(new File("temp"));
-            //$NON-NLS-1$ //$NON-NLS-2$
+    //$NON-NLS-1$ //$NON-NLS-2$
     /**
      * Value of the project's raw classpath if the .classpath file contains invalid entries.
      */
     public static final    IClasspathEntry[]                          INVALID_CLASSPATH = new IClasspathEntry[0];
     private static final   Logger                                     LOG               = LoggerFactory.getLogger(JavaProject.class);
-    private final DirectoryStream.Filter<java.nio.file.Path> jarFilter = new DirectoryStream.Filter<java.nio.file.Path>() {
+    private final          DirectoryStream.Filter<java.nio.file.Path> jarFilter         = new DirectoryStream.Filter<java.nio.file.Path>() {
         @Override
         public boolean accept(java.nio.file.Path entry) throws IOException {
             return entry.getFileName().toString().endsWith("jar");
@@ -876,7 +877,14 @@ public class JavaProject extends Openable implements IJavaProject, SuffixConstan
 
     @Override
     public IPackageFragment findPackageFragment(IPath path) throws JavaModelException {
-        throw new UnsupportedOperationException();
+        return findPackageFragment0(path);
+    }
+
+    private IPackageFragment findPackageFragment0(IPath path)
+            throws JavaModelException {
+
+        NameLookup lookup = newNameLookup((WorkingCopyOwner)null/*no need to look at working copies for pkgs*/);
+        return lookup.findPackageFragment(path);
     }
 
     @Override
@@ -1391,7 +1399,7 @@ public class JavaProject extends Openable implements IJavaProject, SuffixConstan
 
     @Override
     public Object[] getNonJavaResources() throws JavaModelException {
-        throw new UnsupportedOperationException();
+        return ((JavaProjectElementInfo) getElementInfo()).getNonJavaResources(this);
     }
 
     @Override
@@ -1469,7 +1477,15 @@ public class JavaProject extends Openable implements IJavaProject, SuffixConstan
 
     @Override
     public IPath getOutputLocation() throws JavaModelException {
-        throw new UnsupportedOperationException();
+       return defaultOutputLocation();
+    }
+
+    /**
+     * Returns a default output location.
+     * This is the project bin folder
+     */
+    protected IPath defaultOutputLocation() {
+        return this.project.getFullPath().append("bin"); //$NON-NLS-1$
     }
 
     @Override
@@ -1479,7 +1495,18 @@ public class JavaProject extends Openable implements IJavaProject, SuffixConstan
 
     @Override
     public IPackageFragmentRoot[] getPackageFragmentRoots() throws JavaModelException {
-        throw new UnsupportedOperationException();
+        Object[] children;
+        int length;
+        IPackageFragmentRoot[] roots;
+
+        System.arraycopy(
+                children = getChildren(),
+                0,
+                roots = new IPackageFragmentRoot[length = children.length],
+                0,
+                length);
+
+        return roots;
     }
 
     @Override
@@ -1671,10 +1698,6 @@ public class JavaProject extends Openable implements IJavaProject, SuffixConstan
         return false;
     }
 
-    @Override
-    public boolean isStructureKnown() throws JavaModelException {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public Object getAdapter(Class aClass) {
@@ -1701,10 +1724,6 @@ public class JavaProject extends Openable implements IJavaProject, SuffixConstan
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean isConsistent() {
-        throw new UnsupportedOperationException();
-    }
 
 //    @Override
 //    public boolean isOpen() {

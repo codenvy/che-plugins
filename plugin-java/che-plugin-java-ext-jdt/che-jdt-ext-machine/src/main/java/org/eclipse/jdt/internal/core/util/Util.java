@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.jdt.internal.core.util;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.che.ide.runtime.Assert;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.util.IClassFileAttribute;
@@ -2988,6 +2988,46 @@ public class Util {
         return -1;
     }
 
+    /**
+     * Foundation replacement for <code>String#replaceAll(String,
+     * String)</code>, but <strong>without support for regular
+     * expressions</strong>.
+     *
+     * @param src the original string
+     * @param find the string to find
+     * @param replacement the replacement string
+     * @return the new string, with all occurrences of <code>find</code>
+     *         replaced by <code>replacement</code> (not using regular
+     *         expressions)
+     * @since 3.4
+     */
+    public static final String replaceAll(String src, String find, String replacement) {
+        final int len = src.length();
+        final int findLen = find.length();
+
+        int idx = src.indexOf(find);
+        if (idx < 0) {
+            return src;
+        }
+
+        StringBuffer buf = new StringBuffer();
+        int beginIndex = 0;
+        while (idx != -1 && idx < len) {
+            buf.append(src.substring(beginIndex, idx));
+            buf.append(replacement);
+
+            beginIndex = idx + findLen;
+            if (beginIndex < len) {
+                idx = src.indexOf(find, beginIndex);
+            } else {
+                idx = -1;
+            }
+        }
+        if (beginIndex<len) {
+            buf.append(src.substring(beginIndex, (idx==-1?len:idx)));
+        }
+        return buf.toString();
+    }
 
     public interface Comparable {
         /** Returns 0 if this and c are equal, >0 if this is greater than c, or <0 if this is less than c. */

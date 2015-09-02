@@ -11,11 +11,8 @@
 package org.eclipse.che.plugin.docker.client;
 
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Structure;
 import com.sun.jna.ptr.LongByReference;
-
-import org.eclipse.che.api.core.util.SystemInfo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +26,7 @@ public interface CLibrary extends Library {
     int SOCK_STREAM = 1; // Defined in 'sys/socket.h'
 
     // Defined in 'unix.h', see http://man7.org/linux/man-pages/man7/unix.7.html
-    public static class SockAddrUn extends Structure {
+    class SockAddrUn extends Structure {
         public static final int UNIX_PATH_MAX = 108;
 
         public short  sun_family;

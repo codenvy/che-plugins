@@ -22,6 +22,8 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.ChangeDescriptor;
 import org.eclipse.ltk.core.refactoring.ContentStamp;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.ltk.internal.ui.refactoring.CompilationUnitChangeNode;
+import org.eclipse.ltk.ui.refactoring.TextEditChangeNode;
 import org.eclipse.text.edits.UndoEdit;
 
 /**
@@ -117,9 +119,14 @@ public class CompilationUnitChange extends TextFileChange {
 	 * {@inheritDoc}
 	 */
 	public Object getAdapter(Class adapter) {
-		if (ICompilationUnit.class.equals(adapter))
-			return fCUnit;
-		return super.getAdapter(adapter);
+		if (ICompilationUnit.class.equals(adapter)) {
+            return fCUnit;
+        }
+
+		if(TextEditChangeNode.class.equals(adapter)) {
+            return new CompilationUnitChangeNode(this);
+        }
+        return super.getAdapter(adapter);
 	}
 
 	/**

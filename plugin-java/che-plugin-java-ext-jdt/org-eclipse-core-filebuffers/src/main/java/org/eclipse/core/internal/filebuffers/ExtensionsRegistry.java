@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.core.internal.filebuffers;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;

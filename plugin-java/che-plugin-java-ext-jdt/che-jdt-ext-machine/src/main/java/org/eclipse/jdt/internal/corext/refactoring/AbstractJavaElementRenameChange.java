@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.jdt.internal.corext.refactoring;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;

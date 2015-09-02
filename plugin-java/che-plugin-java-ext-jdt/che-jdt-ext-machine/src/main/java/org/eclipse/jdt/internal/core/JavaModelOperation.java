@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -352,34 +353,34 @@ public abstract class JavaModelOperation implements IWorkspaceRunnable, IProgres
 //			throw new JavaModelException(e);
 //		}
 //	}
-//	/**
-//	 * Convenience method to delete a resource
-//	 */
-//	protected void deleteResource(IResource resource,int flags) throws JavaModelException {
-//		try {
-//			resource.delete(flags, getSubProgressMonitor(1));
-//			setAttribute(HAS_MODIFIED_RESOURCE_ATTR, TRUE);
-//		} catch (CoreException e) {
-//			throw new JavaModelException(e);
-//		}
-//	}
-//	/**
-//	 * Convenience method to delete resources
-//	 */
-//	protected void deleteResources(IResource[] resources, boolean forceFlag) throws JavaModelException {
-//		if (resources == null || resources.length == 0) return;
-//		IProgressMonitor subProgressMonitor = getSubProgressMonitor(resources.length);
-//		IWorkspace workspace = resources[0].getWorkspace();
-//		try {
-//			workspace.delete(
-//				resources,
-//				forceFlag ? IResource.FORCE | IResource.KEEP_HISTORY : IResource.KEEP_HISTORY,
-//				subProgressMonitor);
-//				setAttribute(HAS_MODIFIED_RESOURCE_ATTR, TRUE);
-//		} catch (CoreException e) {
-//			throw new JavaModelException(e);
-//		}
-//	}
+	/**
+	 * Convenience method to delete a resource
+	 */
+	protected void deleteResource(IResource resource,int flags) throws JavaModelException {
+		try {
+			resource.delete(flags, getSubProgressMonitor(1));
+			setAttribute(HAS_MODIFIED_RESOURCE_ATTR, TRUE);
+		} catch (CoreException e) {
+			throw new JavaModelException(e);
+		}
+	}
+	/**
+	 * Convenience method to delete resources
+	 */
+	protected void deleteResources(IResource[] resources, boolean forceFlag) throws JavaModelException {
+		if (resources == null || resources.length == 0) return;
+		IProgressMonitor subProgressMonitor = getSubProgressMonitor(resources.length);
+		IWorkspace workspace = resources[0].getWorkspace();
+		try {
+			workspace.delete(
+				resources,
+				forceFlag ? IResource.FORCE | IResource.KEEP_HISTORY : IResource.KEEP_HISTORY,
+				subProgressMonitor);
+				setAttribute(HAS_MODIFIED_RESOURCE_ATTR, TRUE);
+		} catch (CoreException e) {
+			throw new JavaModelException(e);
+		}
+	}
 
     /**
      * Checks with the progress monitor to see whether this operation

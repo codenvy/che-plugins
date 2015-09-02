@@ -37,11 +37,11 @@
             <artifactId>org.eclipse.core.jobs</artifactId>
             <version>${org.eclipse.core.jobs.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.birt.runtime</groupId>
-            <artifactId>org.eclipse.core.resources</artifactId>
-            <version>${org.eclipse.core.resources.version}</version>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.eclipse.che.plugin</groupId>-->
+        <!--<artifactId>org.eclipse.core.resources</artifactId>-->
+        <!--<version>${che.plugins.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.eclipse.birt.runtime</groupId>
             <artifactId>org.eclipse.core.runtime</artifactId>

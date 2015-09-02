@@ -78,7 +78,7 @@ public class DestroyMachineActionTest {
 
 //    @Test
 //    public void devMachineShouldNotBeDestroyed() {
-//        when(machine.isWorkspaceBound()).thenReturn(true);
+//        when(machine.isDev()).thenReturn(true);
 //        MessageDialog dialog = mock(MessageDialog.class);
 //        when(dialogFactory.createMessageDialog(anyString(), anyString(), any(ConfirmCallback.class))).thenReturn(dialog);
 //

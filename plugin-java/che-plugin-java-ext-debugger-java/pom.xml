@@ -23,6 +23,7 @@
     <name>Che Plugin :: Java :: Extension Debugger Java</name>
     <properties>
         <dto-generator-out-directory>${project.build.directory}/generated-sources/dto/</dto-generator-out-directory>
+        <findbugs.excludeFilterFiler>${project.build.testSourceDirectory}/../resources/findbugs-exclude.xml</findbugs.excludeFilterFiler>
     </properties>
     <dependencies>
         <dependency>
@@ -37,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
-            <artifactId>antlr</artifactId>
+            <artifactId>antlr-runtime</artifactId>
             <version>${org.antlr.version}</version>
         </dependency>
         <dependency>

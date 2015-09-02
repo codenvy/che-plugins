@@ -47,6 +47,16 @@ import org.eclipse.che.vfs.impl.fs.WorkspaceToDirectoryMappingService;
 import org.everrest.core.impl.async.AsynchronousJobPool;
 import org.everrest.core.impl.async.AsynchronousJobService;
 import org.everrest.guice.PathKey;
+import org.eclipse.che.api.git.GitConnectionFactory;
+import org.eclipse.che.git.impl.nativegit.NativeGitConnectionFactory;
+import org.eclipse.che.git.impl.nativegit.ssh.SshKeyProvider;
+import org.eclipse.che.git.impl.nativegit.ssh.SshKeyProviderImpl;
+import org.eclipse.che.ide.ext.ssh.server.SshKeyStore;
+import org.eclipse.che.ide.ext.ssh.server.UserProfileSshKeyStore;
+import org.eclipse.che.api.auth.oauth.OAuthTokenProvider;
+import org.eclipse.che.security.oauth.OAuthAuthenticatorTokenProvider;
+import org.eclipse.che.security.oauth.OAuthAuthenticatorProvider;
+import org.eclipse.che.security.oauth.OAuthAuthenticatorProviderImpl;
 
 /** @author andrew00x */
 @DynaModule
@@ -86,5 +96,11 @@ public class ApiModule extends AbstractModule {
         install(new RunnerModule());
         install(new VirtualFileSystemModule());
         install(new VirtualFileSystemFSModule());
+
+        bind(GitConnectionFactory.class).to(NativeGitConnectionFactory.class);
+        bind(SshKeyProvider.class).to(SshKeyProviderImpl.class);
+        bind(SshKeyStore.class).to(UserProfileSshKeyStore.class);
+        bind(OAuthTokenProvider.class).to(OAuthAuthenticatorTokenProvider.class);
+        bind(OAuthAuthenticatorProvider.class).to(OAuthAuthenticatorProviderImpl.class);
     }
 }

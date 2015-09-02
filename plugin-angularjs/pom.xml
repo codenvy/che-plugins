@@ -28,7 +28,6 @@
         <module>completion</module>
         <module>core</module>
         <module>templates</module>
-        <module>itests</module>
     </modules>
 
     <properties>

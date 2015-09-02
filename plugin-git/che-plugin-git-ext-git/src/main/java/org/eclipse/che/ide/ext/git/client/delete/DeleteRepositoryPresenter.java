@@ -10,18 +10,17 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.delete;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.commons.exception.ExceptionThrownEvent;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * Delete repository command handler, performs deleting Git repository.
@@ -73,7 +72,6 @@ public class DeleteRepositoryPresenter {
 
             @Override
             protected void onFailure(Throwable exception) {
-                eventBus.fireEvent(new ExceptionThrownEvent(exception));
                 notificationManager.showError(exception.getMessage());
             }
         });

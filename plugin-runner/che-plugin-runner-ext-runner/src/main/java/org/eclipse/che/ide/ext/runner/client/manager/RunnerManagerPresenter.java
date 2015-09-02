@@ -67,7 +67,6 @@ import org.eclipse.che.ide.ext.runner.client.util.TimerFactory;
 import org.eclipse.che.ide.ext.runner.client.util.annotations.LeftPanel;
 import org.eclipse.che.ide.ext.runner.client.util.annotations.LeftPropertiesPanel;
 import org.eclipse.che.ide.ext.runner.client.util.annotations.RightPropertiesPanel;
-import org.eclipse.che.ide.util.Config;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -370,9 +369,7 @@ public class RunnerManagerPresenter extends BasePresenter implements RunnerManag
                                         .scope(EnumSet.of(RUNNERS))
                                         .tabType(RIGHT)
                                         .build();
-        if (!Config.isSdkProject()) {
-            rightPropertiesContainer.addTab(terminalTab);
-        }
+        rightPropertiesContainer.addTab(terminalTab);
 
         rightPropertiesContainer.addTab(propertiesTab);
 

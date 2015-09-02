@@ -12,7 +12,10 @@ package org.eclipse.che.plugin.docker.client;
 
 import org.apache.commons.codec.binary.Base64;
 import org.eclipse.che.commons.json.JsonHelper;
+import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.inject.ConfigurationProperties;
+import org.eclipse.che.plugin.docker.client.dto.AuthConfig;
+import org.eclipse.che.plugin.docker.client.dto.AuthConfigs;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -66,7 +69,10 @@ public class InitialAuthConfig {
             }
         }
         if (!isNullOrEmpty(serverAddress) && !isNullOrEmpty(username) && !isNullOrEmpty(password) && !isNullOrEmpty(email)) {
-            predefinedConfig = new AuthConfig(serverAddress, username, password, email);
+            predefinedConfig = DtoFactory.newDto(AuthConfig.class).withServeraddress(serverAddress)
+                                         .withUsername(username)
+                                         .withPassword(password)
+                                         .withEmail(email);
         }
     }
 
@@ -88,9 +94,9 @@ public class InitialAuthConfig {
     }
 
     public AuthConfigs getAuthConfigs() {
-        AuthConfigs authConfigs = new AuthConfigs();
+        AuthConfigs authConfigs = DtoFactory.newDto(AuthConfigs.class);
         if (predefinedConfig != null) {
-            authConfigs.addConfig(predefinedConfig);
+            authConfigs.getConfigs().put(predefinedConfig.getServeraddress(), predefinedConfig);
         }
         return authConfigs;
     }

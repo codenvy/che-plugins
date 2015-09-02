@@ -10,25 +10,22 @@
  *******************************************************************************/
 package org.eclipse.ltk.core.refactoring.participants;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
+import org.eclipse.che.ltk.core.refactoring.participants.CheRefactoringParticipantsRegistry;
 import org.eclipse.core.expressions.EvaluationContext;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
-
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.internal.core.refactoring.Messages;
 import org.eclipse.ltk.internal.core.refactoring.ParticipantDescriptor;
 import org.eclipse.ltk.internal.core.refactoring.RefactoringCoreMessages;
 import org.eclipse.ltk.internal.core.refactoring.RefactoringCorePlugin;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A {@link ParticipantExtensionPoint} is used to manage contributions of participants.
@@ -138,12 +135,13 @@ public class ParticipantExtensionPoint {
 	}
 
 	private void init() {
-		IExtensionRegistry registry= Platform.getExtensionRegistry();
-		IConfigurationElement[] ces= registry.getConfigurationElementsFor(fPluginId, fParticipantID);
-		fParticipants= new ArrayList(ces.length);
-		for (int i= 0; i < ces.length; i++) {
-			ParticipantDescriptor descriptor= new ParticipantDescriptor(ces[i]);
-			IStatus status= descriptor.checkSyntax();
+//		IExtensionRegistry registry= Platform.getExtensionRegistry();
+//		IConfigurationElement[] ces= new IConfigurationElement[0];//registry.getConfigurationElementsFor(fPluginId, fParticipantID);
+		Set<Class<? extends RefactoringParticipant>> ces = CheRefactoringParticipantsRegistry.getParticipantsFor(fParticipantID);
+		fParticipants = new ArrayList(ces.size());
+		for (Class<? extends  RefactoringParticipant> clazz : ces) {
+			ParticipantDescriptor descriptor = new ParticipantDescriptor(clazz);
+			IStatus status = descriptor.checkSyntax();
 			switch (status.getSeverity()) {
 				case IStatus.ERROR:
 					RefactoringCorePlugin.log(status);

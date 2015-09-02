@@ -76,7 +76,7 @@ public class DestroyMachineAction extends AbstractPerspectiveAction {
             return;
         }
 
-//        if (selectedMachine.isWorkspaceBound()) {
+//        if (selectedMachine.isDev()) {
 //            dialogFactory.createMessageDialog(locale.devMachineCanNotBeDestroyedTitle(), locale.devMachineCanNotBeDestroyed(), null).show();
 //            return;
 //        }

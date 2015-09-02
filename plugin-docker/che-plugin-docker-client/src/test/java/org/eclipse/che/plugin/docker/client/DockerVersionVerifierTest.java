@@ -37,16 +37,16 @@ public class DockerVersionVerifierTest {
         version.setVersion("x.x.x");
         when(dockerConnector.getVersion()).thenReturn(version);
         //prepare verifies
-        DockerVersionVerifier verifier = new DockerVersionVerifier(/*dockerConnector,*/ new String[]{"1.6.0"});
+        DockerVersionVerifier verifier = new DockerVersionVerifier(dockerConnector, new String[]{"1.6.0"});
 
-        verifier.checkCompatibility(dockerConnector);
+        verifier.checkCompatibility();
     }
 
     @Test(expectedExceptions = ServerException.class, expectedExceptionsMessageRegExp = "Impossible to get docker version")
     public void shouldThrowIOExceptionWhenVersionJsonParsing() throws Exception {
         when(dockerConnector.getVersion()).thenThrow(new IOException());
-        DockerVersionVerifier verifier = new DockerVersionVerifier(/*dockerConnector,*/ new String[]{"1.6.0"});
-        verifier.checkCompatibility(dockerConnector);
+        DockerVersionVerifier verifier = new DockerVersionVerifier(dockerConnector, new String[]{"1.6.0"});
+        verifier.checkCompatibility();
     }
 
     @Test
@@ -54,7 +54,7 @@ public class DockerVersionVerifierTest {
         Version version = new Version();
         version.setVersion("1.6.0");
         when(dockerConnector.getVersion()).thenReturn(version);
-        DockerVersionVerifier verifier = new DockerVersionVerifier(/*dockerConnector,*/ new String[]{"1.6.0"});
-        verifier.checkCompatibility(dockerConnector);
+        DockerVersionVerifier verifier = new DockerVersionVerifier(dockerConnector, new String[]{"1.6.0"});
+        verifier.checkCompatibility();
     }
 }

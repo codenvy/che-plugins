@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.checkout;
 
-import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
 import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -30,6 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -46,6 +47,8 @@ public class CheckoutReferenceTest extends BaseTest {
 
     @Mock
     private CheckoutReferenceView      view;
+    @Mock
+    private BranchCheckoutRequest      branchCheckoutRequest;
     @InjectMocks
     private CheckoutReferencePresenter presenter;
 
@@ -95,35 +98,44 @@ public class CheckoutReferenceTest extends BaseTest {
         presenter.onEnterClicked();
 
         verify(view, never()).close();
-        verify(service, never()).branchCheckout((ProjectDescriptor)anyObject(), anyString(), anyString(), anyBoolean(),
-                                                (AsyncRequestCallback<String>)anyObject());
+        verify(service, never()).branchCheckout(anyObject(), anyObject(), anyObject());
     }
 
     @Test
     public void onEnterClickedWhenValueIsCorrect() throws Exception {
+        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+        when(branchCheckoutRequest.withName(anyString())).thenReturn(branchCheckoutRequest);
+        when(branchCheckoutRequest.withCreateNew(anyBoolean())).thenReturn(branchCheckoutRequest);
         reset(service);
         when(view.getReference()).thenReturn(CORRECT_REFERENCE);
 
         presenter.onEnterClicked();
 
         verify(view).close();
-        verify(service).branchCheckout((ProjectDescriptor)anyObject(), anyString(), anyString(), anyBoolean(),
-                                       (AsyncRequestCallback<String>)anyObject());
+        verify(service).branchCheckout(anyObject(), anyObject(), anyObject());
+        verify(branchCheckoutRequest).withName(CORRECT_REFERENCE);
+        verify(branchCheckoutRequest).withCreateNew(false);
+        verifyNoMoreInteractions(branchCheckoutRequest);
     }
 
     @Test
     public void testOnCheckoutClickedWhenCheckoutIsSuccessful() throws Exception {
+        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+        when(branchCheckoutRequest.withName(anyString())).thenReturn(branchCheckoutRequest);
+        when(branchCheckoutRequest.withCreateNew(anyBoolean())).thenReturn(branchCheckoutRequest);
         reset(service);
         when(view.getReference()).thenReturn(CORRECT_REFERENCE);
         when(rootProjectDescriptor.getPath()).thenReturn(PROJECT_PATH);
 
         presenter.onEnterClicked();
 
-        verify(service).branchCheckout((ProjectDescriptor)anyObject(), anyString(), anyString(), anyBoolean(),
-                                       asyncCallbackCaptor.capture());
+        verify(service).branchCheckout(anyObject(), anyObject(), asyncCallbackCaptor.capture());
         AsyncRequestCallback<String> callback = asyncCallbackCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(callback, "");
 
+        verify(branchCheckoutRequest).withName(CORRECT_REFERENCE);
+        verify(branchCheckoutRequest).withCreateNew(false);
+        verifyNoMoreInteractions(branchCheckoutRequest);
         verify(view).close();
         verify(rootProjectDescriptor).getPath();
         verify(eventBus).fireEvent(Matchers.<OpenProjectEvent>anyObject());
@@ -131,17 +143,23 @@ public class CheckoutReferenceTest extends BaseTest {
 
     @Test
     public void testOnCheckoutClickedWhenCheckoutIsFailed() throws Exception {
+        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+        when(branchCheckoutRequest.withName(anyString())).thenReturn(branchCheckoutRequest);
+        when(branchCheckoutRequest.withCreateNew(anyBoolean())).thenReturn(branchCheckoutRequest);
+
         reset(service);
         when(view.getReference()).thenReturn(CORRECT_REFERENCE);
         when(rootProjectDescriptor.getPath()).thenReturn(PROJECT_PATH);
 
         presenter.onEnterClicked();
 
-        verify(service).branchCheckout((ProjectDescriptor)anyObject(), anyString(), anyString(), anyBoolean(),
-                                       asyncCallbackCaptor.capture());
+        verify(service).branchCheckout(anyObject(), anyObject(), asyncCallbackCaptor.capture());
         AsyncRequestCallback<String> callback = asyncCallbackCaptor.getValue();
         GwtReflectionUtils.callOnFailure(callback, mock(Throwable.class));
 
+        verify(branchCheckoutRequest).withName(CORRECT_REFERENCE);
+        verify(branchCheckoutRequest).withCreateNew(false);
+        verifyNoMoreInteractions(branchCheckoutRequest);
         verify(view).close();
         verify(eventBus, never()).fireEvent(Matchers.<OpenProjectEvent>anyObject());
         verify(notificationManager).showError(anyString());

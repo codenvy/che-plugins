@@ -27,12 +27,14 @@ import org.eclipse.che.ide.ext.java.client.action.NewJavaSourceFileAction;
 import org.eclipse.che.ide.ext.java.client.action.NewPackageAction;
 import org.eclipse.che.ide.ext.java.client.action.OpenDeclarationAction;
 import org.eclipse.che.ide.ext.java.client.action.QuickDocumentationAction;
+import org.eclipse.che.ide.ext.java.client.refactoring.move.MoveAction;
 import org.eclipse.che.ide.ext.java.shared.Constants;
 import org.eclipse.che.ide.util.browser.UserAgent;
 import org.eclipse.che.ide.util.input.KeyCodeMap;
 
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_CODE;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_FILE_NEW;
+import static org.eclipse.che.ide.api.action.IdeActions.GROUP_REFACTORING;
 
 /** @author Evgen Vidolob */
 @Extension(title = "Java", version = "3.0.0")
@@ -62,6 +64,7 @@ public class JavaExtension {
                                 KeyBindingAgent keyBinding,
                                 NewJavaSourceFileAction newJavaSourceFileAction,
                                 ActionManager actionManager,
+                                MoveAction moveAction,
                                 QuickDocumentationAction quickDocumentationAction,
                                 OpenDeclarationAction openDeclarationAction) {
         // add actions in File -> New group
@@ -72,13 +75,17 @@ public class JavaExtension {
         newGroup.add(newJavaSourceFileAction);
         newGroup.add(newPackageAction);
 
+        DefaultActionGroup refactorGroup = (DefaultActionGroup)actionManager.getAction(GROUP_REFACTORING);
+        refactorGroup.addSeparator();
+        refactorGroup.add(moveAction);
+
         actionManager.registerAction("showQuickDoc", quickDocumentationAction);
         actionManager.registerAction("openJavaDeclaration", openDeclarationAction);
 
         DefaultActionGroup codeGroup = (DefaultActionGroup)actionManager.getAction(GROUP_CODE);
         codeGroup.add(quickDocumentationAction, Constraints.LAST);
         codeGroup.add(openDeclarationAction, Constraints.LAST);
-        if(UserAgent.isMac()) {
+        if (UserAgent.isMac()) {
             keyBinding.getGlobal().addKey(new KeyBuilder().control().charCode('j').build(), "showQuickDoc");
         } else {
             keyBinding.getGlobal().addKey(new KeyBuilder().action().charCode('q').build(), "showQuickDoc");

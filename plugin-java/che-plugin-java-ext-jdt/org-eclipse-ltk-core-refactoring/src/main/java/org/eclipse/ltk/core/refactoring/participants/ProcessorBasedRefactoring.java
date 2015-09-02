@@ -12,13 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ltk.core.refactoring.participants;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,10 +22,6 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
-
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.IRefactoringCoreStatusCodes;
@@ -42,6 +33,13 @@ import org.eclipse.ltk.internal.core.refactoring.Messages;
 import org.eclipse.ltk.internal.core.refactoring.ParticipantDescriptor;
 import org.eclipse.ltk.internal.core.refactoring.RefactoringCoreMessages;
 import org.eclipse.ltk.internal.core.refactoring.RefactoringCorePlugin;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An base implementation for refactorings that are split into
@@ -102,7 +100,7 @@ public class ProcessorBasedRefactoring extends Refactoring {
 						IRefactoringCoreStatusCodes.REFACTORING_EXCEPTION_DISABLED_PARTICIPANTS,
 						RefactoringCoreMessages.ProcessorBasedRefactoring_prechange_participants_removed,
 						e);
-				ResourcesPlugin.getPlugin().getLog().log(status);
+				ResourcesPlugin.log(status);
 				Iterator it= fPreChangeParticipants.iterator();
 				while (it.hasNext()) {
 					participant= (RefactoringParticipant) it.next();

@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.core.filesystem;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
-import org.eclipse.che.core.internal.resources.Workspace;
 import org.eclipse.core.internal.filesystem.LocalFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -416,6 +414,7 @@ public class EFS {
 	 * Severity: error. Category: internal.
 	 */
 	public static final int ERROR_INTERNAL = 566;
+	private static String WS_PATH;
 
 //	/**
 //	 * Creates an empty file information object.  The resulting information
@@ -483,8 +482,7 @@ public class EFS {
 //		return InternalFileSystemCore.getInstance().getStore(uri);
 //		throw new UnsupportedOperationException("getStore");
 		String pathname = uri.getSchemeSpecificPart();
-		String workspace = ResourcesPlugin.getPathToWorkspace();
-		return new LocalFile(new File(workspace + pathname));
+		return new LocalFile(new File(WS_PATH + pathname));
 
 	}
 
@@ -497,5 +495,9 @@ public class EFS {
 
 	public static IFileSystem getLocalFileSystem() {
 		throw new UnsupportedOperationException("getLocalFileSystem is not supported");
+	}
+
+	public static void setWsPath(String wsPath) {
+		EFS.WS_PATH = wsPath;
 	}
 }

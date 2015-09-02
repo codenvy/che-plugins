@@ -100,9 +100,9 @@ public class MachineManager {
             public void apply(Void arg) throws OperationException {
                 final String recipeUrl = recipeProvider.getRecipeUrl();
                 final String displayName = machine.getDisplayName();
-                final boolean isWSBound = machine.isWorkspaceBound();
+                final boolean isDev = machine.isDev();
 
-                startMachine(recipeUrl, displayName, isWSBound, RESTART);
+                startMachine(recipeUrl, displayName, isDev, RESTART);
             }
         });
     }

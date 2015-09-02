@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.jdt.internal.core;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -61,7 +61,7 @@ public class JavaModel extends Openable implements IJavaModel {
                                      IResource underlyingResource)	/*throws JavaModelException*/ {
 
         // determine my children
-        IProject[] projects = new IProject[0];//ResourcesPlugin.getWorkspace().getRoot().getProjects();
+        IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
         int length = projects.length;
         IJavaElement[] children = new IJavaElement[length];
         int index = 0;
@@ -128,12 +128,13 @@ protected Object createElementInfo() {
  * @see org.eclipse.jdt.core.IJavaModel
  */
 public void delete(IJavaElement[] elements, boolean force, IProgressMonitor monitor) throws JavaModelException {
-//	if (elements != null && elements.length > 0 && elements[0] != null && elements[0].getElementType() < IJavaElement.TYPE) {
-//		new DeleteResourceElementsOperation(elements, force).runOperation(monitor);
-//	} else {
-//		new DeleteElementsOperation(elements, force).runOperation(monitor);
-//	}
-	throw new UnsupportedOperationException();}
+	if (elements != null && elements.length > 0 && elements[0] != null && elements[0].getElementType() < IJavaElement.TYPE) {
+		new DeleteResourceElementsOperation(elements, force).runOperation(monitor);
+	} else {
+		new DeleteElementsOperation(elements, force).runOperation(monitor);
+	}
+//	throw new UnsupportedOperationException();
+}
 public boolean equals(Object o) {
 	if (!(o instanceof JavaModel)) return false;
 	return super.equals(o);

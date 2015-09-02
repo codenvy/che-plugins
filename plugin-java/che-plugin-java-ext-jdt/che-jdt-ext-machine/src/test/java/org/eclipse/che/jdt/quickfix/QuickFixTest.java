@@ -10,12 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.jdt.quickfix;
 
-import org.eclipse.che.core.internal.resources.ResourcesPlugin;
+import org.eclipse.che.ide.ext.java.BaseTest;
 import org.eclipse.che.jdt.testplugin.JavaProjectHelper;
 import org.eclipse.che.jdt.testplugin.ProjectTestSetup;
 import org.eclipse.che.jdt.testplugin.StringAsserts;
 import org.eclipse.che.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.core.internal.filebuffers.FileBuffersPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IBuffer;
@@ -32,7 +31,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.internal.core.BufferManager;
 import org.eclipse.jdt.internal.core.DefaultWorkingCopyOwner;
-import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.text.correction.ASTResolving;
 import org.eclipse.jdt.internal.ui.text.correction.AssistContext;
 import org.eclipse.jdt.internal.ui.text.correction.JavaCorrectionProcessor;
@@ -60,16 +58,9 @@ import static org.junit.Assert.assertTrue;
 
 /**
  */
-public class QuickFixTest  {
-	protected static final String wsPath = QuickFixTest.class.getResource("/projects").getFile();
-	protected static ResourcesPlugin plugin = new ResourcesPlugin(wsPath + "/index", QuickFixTest.class.getResource("/projects").getFile());
-	protected static JavaPlugin javaPlugin = new JavaPlugin(wsPath + "/set");
-	protected static FileBuffersPlugin fileBuffersPlugin = new FileBuffersPlugin();
+public class QuickFixTest  extends BaseTest {
 
 	static {
-		plugin.start();
-		javaPlugin.start();
-
 		DefaultWorkingCopyOwner.setPrimaryBufferProvider(new WorkingCopyOwner() {
 			@Override
 			public IBuffer createBuffer(ICompilationUnit workingCopy) {

@@ -43,7 +43,6 @@ import java.util.Map;
 /**
  * Utility methods for the Java Model.
  *
- * @see JDTUIHelperClasses
  */
 public class JavaModelUtil {
     /**
@@ -596,6 +595,37 @@ public class JavaModelUtil {
                 IJavaElement cu= javaElement.getAncestor(IJavaElement.COMPILATION_UNIT);
                 if (cu != null)
                     collector.add((ICompilationUnit) cu);
+        }
+    }
+
+    /**
+     * Returns the element of the given compilation unit which is "equal" to the
+     * given element. Note that the given element usually has a parent different
+     * from the given compilation unit.
+     *
+     * @param cu the cu to search in
+     * @param element the element to look for
+     * @return an element of the given cu "equal" to the given element
+     */
+    public static IJavaElement findInCompilationUnit(ICompilationUnit cu, IJavaElement element) {
+        IJavaElement[] elements= cu.findElements(element);
+        if (elements != null && elements.length > 0) {
+            return elements[0];
+        }
+        return null;
+    }
+
+    /**
+     * Returns the fully qualified name of a type's container. (package name or enclosing type name)
+     * @param type the type
+     * @return the type container name
+     */
+    public static String getTypeContainerName(IType type) {
+        IType outerType= type.getDeclaringType();
+        if (outerType != null) {
+            return outerType.getFullyQualifiedName('.');
+        } else {
+            return type.getPackageFragment().getElementName();
         }
     }
 

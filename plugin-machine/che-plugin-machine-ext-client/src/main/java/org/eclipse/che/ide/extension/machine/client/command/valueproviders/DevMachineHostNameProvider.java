@@ -67,7 +67,7 @@ public class DevMachineHostNameProvider implements CommandPropertyValueProvider,
     @Override
     public void onMachineRunning(MachineStateEvent event) {
         final Machine machine = event.getMachine();
-        if (machine.isWorkspaceBound()) {
+        if (machine.isDev()) {
             final String hostName = machine.getMetadata().get("config.hostname");
             if (hostName != null) {
                 value = hostName;
@@ -78,7 +78,7 @@ public class DevMachineHostNameProvider implements CommandPropertyValueProvider,
     @Override
     public void onMachineDestroyed(MachineStateEvent event) {
         final Machine machine = event.getMachine();
-        if (machine.isWorkspaceBound()) {
+        if (machine.isDev()) {
             value = "";
         }
     }

@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.jdt.internal.corext.fix;
 
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -97,7 +96,8 @@ public class PotentialProgrammingProblemsFix extends CompilationUnitRewriteOpera
 				if (types.length == 0)
 					return new RefactoringStatus();
 
-				fProject.getProject().build(IncrementalProjectBuilder.INCREMENTAL_BUILD, new SubProgressMonitor(monitor, 60));
+				//TODO disable build
+//				fProject.getProject().build(IncrementalProjectBuilder.INCREMENTAL_BUILD, new SubProgressMonitor(monitor, 60));
 				if (monitor.isCanceled())
 					throw new OperationCanceledException();
 

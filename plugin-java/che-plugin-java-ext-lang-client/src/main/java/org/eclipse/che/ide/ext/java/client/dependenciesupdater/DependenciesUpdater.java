@@ -74,7 +74,7 @@ public class DependenciesUpdater {
         updating = true;
 
         classpathServiceClient.updateDependencies(
-                project.getPath(), force, new AsyncRequestCallback<Boolean>() {
+                project.getPath(), new AsyncRequestCallback<Boolean>() {
                     @Override
                     protected void onSuccess(Boolean descriptor) {
                         onUpdated();

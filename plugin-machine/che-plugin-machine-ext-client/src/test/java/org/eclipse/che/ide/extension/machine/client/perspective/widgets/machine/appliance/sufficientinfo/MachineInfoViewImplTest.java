@@ -48,7 +48,7 @@ public class MachineInfoViewImplTest {
         when(machine.getId()).thenReturn(SOME_TEXT);
         when(machine.getStatus()).thenReturn(CREATING);
         when(machine.getType()).thenReturn(SOME_TEXT);
-        when(machine.isWorkspaceBound()).thenReturn(true);
+        when(machine.isDev()).thenReturn(true);
 
         view.updateInfo(machine);
 
@@ -56,13 +56,13 @@ public class MachineInfoViewImplTest {
         verify(machine).getId();
         verify(machine).getStatus();
         verify(machine).getType();
-        verify(machine).isWorkspaceBound();
+        verify(machine).isDev();
 
         verify(view.name).setText(SOME_TEXT);
         verify(view.machineId).setText(SOME_TEXT);
         verify(view.status).setText("CREATING");
         verify(view.type).setText(SOME_TEXT);
-        verify(view.workspaceBound).setText("true");
+        verify(view.dev).setText("true");
     }
 
     @Test

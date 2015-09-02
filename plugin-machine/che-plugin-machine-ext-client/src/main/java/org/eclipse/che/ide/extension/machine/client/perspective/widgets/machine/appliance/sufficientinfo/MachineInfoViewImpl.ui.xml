@@ -73,8 +73,8 @@
             </g:FlowPanel>
 
             <g:FlowPanel addStyleNames="{style.block}">
-                <g:Label text="{locale.infoWsBound}" addStyleNames="{style.label}"/>
-                <g:Label ui:field="workspaceBound" addStyleNames="{style.value}"/>
+                <g:Label text="{locale.infoDev}" addStyleNames="{style.label}"/>
+                <g:Label ui:field="dev" addStyleNames="{style.value}"/>
             </g:FlowPanel>
 
             <g:FlowPanel addStyleNames="{style.block}">
