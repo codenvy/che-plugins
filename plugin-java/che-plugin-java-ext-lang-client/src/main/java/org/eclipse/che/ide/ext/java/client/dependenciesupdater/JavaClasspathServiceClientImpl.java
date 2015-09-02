@@ -17,8 +17,6 @@ import com.google.inject.name.Named;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
 
-import java.util.List;
-
 import static org.eclipse.che.ide.MimeType.APPLICATION_JSON;
 import static org.eclipse.che.ide.rest.HTTPHeader.ACCEPT;
 
@@ -31,29 +29,19 @@ import static org.eclipse.che.ide.rest.HTTPHeader.ACCEPT;
 public class JavaClasspathServiceClientImpl implements JavaClasspathServiceClient {
 
     private final AsyncRequestFactory asyncRequestFactory;
-    private final String              extPath;
-    private final String              workspaceId;
+    private final String              baseHttpUrl;
 
     @Inject
     protected JavaClasspathServiceClientImpl(AsyncRequestFactory asyncRequestFactory,
                                              @Named("cheExtensionPath") String extPath,
                                              @Named("workspaceId") String workspaceId) {
         this.asyncRequestFactory = asyncRequestFactory;
-        this.extPath = extPath;
-        this.workspaceId = workspaceId;
+        this.baseHttpUrl = extPath + "/jdt/" + workspaceId;
     }
 
     @Override
-    public void updateDependencies(String projectPath, boolean force, AsyncRequestCallback<Boolean> callback) {
-        final String requestUrl = extPath + "/jdt/" + workspaceId + "/classpath/update?projectpath=" + projectPath;
-        asyncRequestFactory.createGetRequest(requestUrl)
-                           .header(ACCEPT, APPLICATION_JSON)
-                           .send(callback);
-    }
-
-    @Override
-    public void getClasspath(String projectPath, AsyncRequestCallback<List<String>> callback) {
-        final String requestUrl = extPath + "/jdt/" + workspaceId + "/classpath?projectpath=" + projectPath;
+    public void updateDependencies(String projectPath, AsyncRequestCallback<Boolean> callback) {
+        final String requestUrl = baseHttpUrl + "/classpath/update?projectpath=" + projectPath;
         asyncRequestFactory.createGetRequest(requestUrl)
                            .header(ACCEPT, APPLICATION_JSON)
                            .send(callback);

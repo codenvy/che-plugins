@@ -12,8 +12,6 @@ package org.eclipse.che.ide.ext.java.client.dependenciesupdater;
 
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
-import java.util.List;
-
 /**
  * Client for Java classpath service.
  *
@@ -26,12 +24,8 @@ public interface JavaClasspathServiceClient {
      *
      * @param projectPath
      *         path to the project to update its dependencies
-     * @param force
-     *         force update
      * @param callback
      *         the callback to use for the response
      */
-    void updateDependencies(String projectPath, boolean force, AsyncRequestCallback<Boolean> callback);
-
-    void getClasspath(String projectPath, AsyncRequestCallback<List<String>> callback);
+    void updateDependencies(String projectPath, AsyncRequestCallback<Boolean> callback);
 }
