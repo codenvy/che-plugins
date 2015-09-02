@@ -15,16 +15,11 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.eclipse.che.ide.util.Pair;
 import org.eclipse.che.ide.util.loging.Log;
-
-import java.util.LinkedList;
-import java.util.Queue;
 
 import static org.eclipse.che.ide.api.notification.Notification.Status.FINISHED;
 import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
@@ -39,33 +34,30 @@ import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 @Singleton
 public class DependenciesUpdater {
     private final NotificationManager        notificationManager;
-    private final AppContext                 context;
+    private final AppContext                 appContext;
     private final JavaClasspathServiceClient classpathServiceClient;
     private final JavaLocalizationConstant   javaLocalizationConstant;
 
-    private Queue<Pair<ProjectDescriptor, Boolean>> projects = new LinkedList<>();
-    private boolean                                 updating = false;
+    private boolean      updating;
     private Notification notification;
 
     @Inject
     public DependenciesUpdater(JavaLocalizationConstant javaLocalizationConstant,
                                NotificationManager notificationManager,
-                               AppContext context,
+                               AppContext appContext,
                                JavaClasspathServiceClient classpathServiceClient) {
         this.javaLocalizationConstant = javaLocalizationConstant;
         this.notificationManager = notificationManager;
-        this.context = context;
+        this.appContext = appContext;
         this.classpathServiceClient = classpathServiceClient;
     }
 
-    public void updateDependencies(final ProjectDescriptor project, final boolean force) {
+    public void updateDependencies(final ProjectDescriptor project) {
         if (updating) {
-            projects.add(new Pair<>(project, force));
             return;
         }
 
-        final CurrentProject currentProject = context.getCurrentProject();
-        if (currentProject == null) {
+        if (appContext.getCurrentProject() == null) {
             return;
         }
 

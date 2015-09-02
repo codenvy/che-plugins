@@ -24,11 +24,13 @@ import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.parts.base.BasePresenter;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
+import org.eclipse.che.ide.extension.machine.client.MachineResources;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFactory;
 import org.eclipse.che.ide.extension.machine.client.machine.Machine;
 import org.eclipse.che.ide.extension.machine.client.machine.events.MachineStateEvent;
 import org.eclipse.che.ide.extension.machine.client.machine.events.MachineStateHandler;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance.MachineAppliancePresenter;
+import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,6 +51,7 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
     private final EntityFactory               entityFactory;
     private final MachineLocalizationConstant locale;
     private final MachineAppliancePresenter   appliance;
+    private final MachineResources            resources;
 
     private Machine selectedMachine;
     private boolean isFirstNode;
@@ -59,7 +62,8 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
                                  EntityFactory entityFactory,
                                  MachineLocalizationConstant locale,
                                  MachineAppliancePresenter appliance,
-                                 EventBus eventBus) {
+                                 EventBus eventBus,
+                                 MachineResources resources) {
         this.view = view;
         this.view.setDelegate(this);
 
@@ -67,6 +71,7 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
         this.entityFactory = entityFactory;
         this.locale = locale;
         this.appliance = appliance;
+        this.resources = resources;
 
         eventBus.addHandler(MachineStateEvent.TYPE, this);
     }
@@ -151,6 +156,12 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
     @Override
     public ImageResource getTitleImage() {
         return null;
+    }
+
+    @Nullable
+    @Override
+    public SVGResource getTitleSVGImage() {
+        return resources.machinesPartIcon();
     }
 
     /** {@inheritDoc} */

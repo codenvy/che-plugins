@@ -81,7 +81,7 @@ public class MavenExtension {
             @Override
             public void onBeforeModuleOpen(BeforeModuleOpenEvent event) {
                 if (isValidForResolveDependencies(event.getModule().getProject().getData())) {
-                    dependenciesUpdater.updateDependencies(event.getModule().getData(), false);
+                    dependenciesUpdater.updateDependencies(event.getModule().getData());
                 }
             }
         });
@@ -109,7 +109,7 @@ public class MavenExtension {
                         new Timer() {
                             @Override
                             public void run() {
-                                dependenciesUpdater.updateDependencies(project, false);
+                                dependenciesUpdater.updateDependencies(project);
                             }
                         }.schedule(5000);
                     }

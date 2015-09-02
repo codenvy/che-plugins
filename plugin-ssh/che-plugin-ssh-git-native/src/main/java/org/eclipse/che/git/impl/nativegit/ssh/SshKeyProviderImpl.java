@@ -45,7 +45,7 @@ public class SshKeyProviderImpl implements SshKeyProvider {
     }
 
     /**
-     * Get private ssh key and upload public ssh key to epository hosting service.
+     * Get private ssh key and upload public ssh key to repository hosting service.
      *
      * @param url
      *         url to git repository

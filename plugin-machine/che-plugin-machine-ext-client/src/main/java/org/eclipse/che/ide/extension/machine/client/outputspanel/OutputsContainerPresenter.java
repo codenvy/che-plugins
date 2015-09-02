@@ -17,6 +17,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.event.ProjectActionHandler;
 import org.eclipse.che.ide.api.mvp.View;
@@ -26,8 +27,10 @@ import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.OutputConsole;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
+import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +45,7 @@ public class OutputsContainerPresenter extends BasePresenter implements OutputsC
     private final MachineLocalizationConstant localizationConstant;
     private final DialogFactory               dialogFactory;
     private final OutputsContainerView        view;
+    private final Resources                   resources;
 
     private final List<OutputConsole> consoles;
 
@@ -49,10 +53,12 @@ public class OutputsContainerPresenter extends BasePresenter implements OutputsC
     public OutputsContainerPresenter(OutputsContainerView view,
                                      MachineLocalizationConstant localizationConstant,
                                      EventBus eventBus,
-                                     DialogFactory dialogFactory) {
+                                     DialogFactory dialogFactory,
+                                     Resources resources) {
         this.view = view;
         this.localizationConstant = localizationConstant;
         this.dialogFactory = dialogFactory;
+        this.resources = resources;
 
         this.view.setTitle(localizationConstant.outputsConsoleViewTitle());
         this.view.setDelegate(this);
@@ -121,6 +127,12 @@ public class OutputsContainerPresenter extends BasePresenter implements OutputsC
     @Override
     public ImageResource getTitleImage() {
         return null;
+    }
+
+    @Nullable
+    @Override
+    public SVGResource getTitleSVGImage() {
+        return resources.outputPartIcon();
     }
 
     @Override
