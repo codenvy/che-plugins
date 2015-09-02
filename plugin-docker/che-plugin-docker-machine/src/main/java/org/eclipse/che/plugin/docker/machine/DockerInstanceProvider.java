@@ -22,7 +22,13 @@ import org.eclipse.che.api.machine.server.spi.InstanceKey;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.api.machine.shared.Recipe;
 import org.eclipse.che.commons.lang.IoUtil;
-import org.eclipse.che.plugin.docker.client.*;
+import org.eclipse.che.plugin.docker.client.DockerConnector;
+import org.eclipse.che.plugin.docker.client.DockerFileException;
+import org.eclipse.che.plugin.docker.client.DockerVersionVerifier;
+import org.eclipse.che.plugin.docker.client.Dockerfile;
+import org.eclipse.che.plugin.docker.client.DockerfileParser;
+import org.eclipse.che.plugin.docker.client.ProgressLineFormatterImpl;
+import org.eclipse.che.plugin.docker.client.ProgressMonitor;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.eclipse.che.plugin.docker.client.json.HostConfig;
 import org.eclipse.che.plugin.docker.client.json.ProgressStatus;
@@ -60,6 +66,10 @@ public class DockerInstanceProvider implements InstanceProvider {
     private final Map<String, String>              containerLabels;
     private final Map<String, Map<String, String>> portsToExpose;
     private final Set<String>                      systemVolumes;
+
+    @Inject
+    @Named("local.storage.path")
+    private String localStorage;
 
     @Inject
     public DockerInstanceProvider(DockerConnector docker,
@@ -269,7 +279,7 @@ public class DockerInstanceProvider implements InstanceProvider {
 
             final ContainerConfig config = new ContainerConfig().withImage(imageId)
                                                                 .withMemorySwap(-1)
-                                                                .withMemory((long) memorySizeMB * 1024 * 1024)
+                                                                .withMemory((long)memorySizeMB * 1024 * 1024)
                                                                 .withLabels(containerLabels)
                                                                 .withExposedPorts(portsToExpose);
 
@@ -285,9 +295,10 @@ public class DockerInstanceProvider implements InstanceProvider {
             final ArrayList<String> volumes = new ArrayList<>(systemVolumes.size() + 1);
             volumes.addAll(systemVolumes);
             volumes.add(String.format("%s:%s", hostProjectsFolder, "/projects"));
+            volumes.add(String.format("%s:%s", localStorage, "/local-storage"));
 
             HostConfig hostConfig = new HostConfig().withPublishAllPorts(true)
-                    .withBinds(volumes.toArray(new String[volumes.size()]));
+                                                    .withBinds(volumes.toArray(new String[volumes.size()]));
 
             docker.startContainer(containerId, hostConfig,
                                   new LogMessagePrinter(outputConsumer));
