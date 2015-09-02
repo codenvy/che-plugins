@@ -34,7 +34,7 @@ import org.eclipse.che.ide.extension.machine.client.OutputMessageUnmarshaller;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFactory;
 import org.eclipse.che.ide.extension.machine.client.machine.MachineStatusNotifier.RunningListener;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsolePresenter;
-import org.eclipse.che.ide.extension.machine.client.machine.extserver.ExtServerStateController;
+import org.eclipse.che.api.machine.gwt.client.ExtServerStateController;
 import org.eclipse.che.ide.extension.machine.client.util.RecipeProvider;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.util.UUID;
