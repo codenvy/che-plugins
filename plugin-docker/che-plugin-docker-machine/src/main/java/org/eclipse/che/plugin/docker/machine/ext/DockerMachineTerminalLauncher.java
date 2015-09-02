@@ -62,7 +62,6 @@ public class DockerMachineTerminalLauncher {
         eventService.subscribe(new EventSubscriber<MachineStatusEvent>() {
             @Override
             public void onEvent(MachineStatusEvent event) {
-                // TODO launch it on dev machines only???
                 if (event.getEventType() == MachineStatusEvent.EventType.RUNNING) {
                     try {
                         final Instance machine = machineManager.getMachine(event.getMachineId());

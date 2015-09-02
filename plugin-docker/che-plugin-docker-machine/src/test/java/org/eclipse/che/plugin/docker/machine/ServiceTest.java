@@ -142,8 +142,10 @@ public class ServiceTest {
 
         InstanceProvider dockerInstanceProvider = new DockerInstanceProvider(docker,
                                                                              dockerMachineFactory,
-                                                                             new HashSet<ServerConf>(),
-                                                                             new HashSet<String>());
+                                                                             Collections.emptySet(),
+                                                                             Collections.emptySet(),
+                                                                             Collections.emptySet(),
+                                                                             Collections.emptySet());
 
         machineManager = new MachineManager(snapshotDao,
                                             machineRegistry,

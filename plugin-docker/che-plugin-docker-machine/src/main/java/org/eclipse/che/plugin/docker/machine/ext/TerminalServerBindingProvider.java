@@ -15,7 +15,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 /**
- * Provides set of commands that should be added to machine recipe to add terminal to it
+ * Provides volumes configuration of machine for terminal
  *
  * @author Alexander Garagatyi
  */
@@ -27,6 +27,8 @@ public class TerminalServerBindingProvider implements Provider<String> {
         this.terminalArchivePath = terminalArchivePath;
     }
 
+    // :ro removed because of bug in a docker 1.6:L
+    //TODO add :ro when bug is fixed or rework terminal binding mechanism to provide copy of the terminal files to each machine
     @Override
     public String get() {
         return terminalArchivePath + ":/mnt/che/terminal";

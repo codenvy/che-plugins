@@ -32,13 +32,13 @@ public class DockerTerminalModule extends AbstractModule {
                           "&& cp /mnt/che/terminal -nR ~/che" +
                           "&& ~/che/terminal/terminal -addr :4411 -cmd /bin/sh -static ~/che/terminal/");
 
-        Multibinder<ServerConf> machineServers = Multibinder.newSetBinder(binder(), ServerConf.class);
+        Multibinder<ServerConf> machineServers = Multibinder.newSetBinder(binder(),
+                                                                          ServerConf.class,
+                                                                          Names.named("machine.docker.machine_servers"));
         machineServers.addBinding().toInstance(new ServerConf("terminal", "4411", "http"));
 
-        // :ro removed because of bug in a docker 1.6:L
-        //TODO add :ro when bug is fixed or rework ext server binding mechanism to provide copy of the ext server zip to each machine
         Multibinder<String> volumesMultibinder =
-                Multibinder.newSetBinder(binder(), String.class, Names.named("machine.docker.system_volumes"));
+                Multibinder.newSetBinder(binder(), String.class, Names.named("machine.docker.machine_volumes"));
         volumesMultibinder.addBinding().toProvider(TerminalServerBindingProvider.class);
     }
 }

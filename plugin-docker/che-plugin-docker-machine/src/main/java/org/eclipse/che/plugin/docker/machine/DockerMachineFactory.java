@@ -34,7 +34,7 @@ public interface DockerMachineFactory {
 
     Instance createInstance(@Assisted("machineId") String machineId,
                             @Assisted("workspaceId") String workspaceId,
-                            @Assisted boolean workspaceIsBound,
+                            @Assisted boolean isDev,
                             @Assisted("creator") String creator,
                             @Assisted("displayName") String displayName,
                             @Assisted("container") String container,

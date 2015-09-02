@@ -27,6 +27,8 @@ public class DockerExtServerBindingProvider implements Provider<String> {
         this.extServerArchivePath = extServerArchivePath;
     }
 
+    // :ro removed because of bug in a docker 1.6:L
+    //TODO add :ro when bug is fixed or rework ext server binding mechanism to provide copy of the ext server zip to each machine
     @Override
     public String get() {
         return extServerArchivePath + ":/mnt/che/ext-server.zip";

@@ -66,15 +66,19 @@ public class DockerMachineExtServerLauncher {
                 if (event.getEventType() == MachineStatusEvent.EventType.RUNNING) {
                     try {
                         final Instance machine = machineManager.getMachine(event.getMachineId());
-                        final String containerId = machine.getMetadata().getProperties().get("id");
 
-                        final Exec exec = docker.createExec(containerId, true, "/bin/sh", "-c", extServerStartCommand);
-                        docker.startExec(exec.getId(), new LogMessageProcessor() {
-                            @Override
-                            public void process(LogMessage logMessage) {
-                                // TODO check that ext server starts successfully
-                            }
-                        });
+                        // ext server doesn't exist in non-dev machines
+                        if (machine.isDev()) {
+                            final String containerId = machine.getMetadata().getProperties().get("id");
+
+                            final Exec exec = docker.createExec(containerId, true, "/bin/sh", "-c", extServerStartCommand);
+                            docker.startExec(exec.getId(), new LogMessageProcessor() {
+                                @Override
+                                public void process(LogMessage logMessage) {
+                                    // TODO check that ext server starts successfully
+                                }
+                            });
+                        }
                     } catch (IOException | MachineException | NotFoundException e) {
                         LOG.error(e.getLocalizedMessage(), e);
                         // TODO send event that ext server is unavailable

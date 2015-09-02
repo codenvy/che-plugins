@@ -45,7 +45,7 @@ public class TestDockerMachineFactory implements DockerMachineFactory {
     @Override
     public Instance createInstance(@Assisted("machineId") String machineId,
                                    @Assisted("workspaceId") String workspaceId,
-                                   @Assisted boolean workspaceIsBound,
+                                   @Assisted boolean isDev,
                                    @Assisted("creator") String creator,
                                    @Assisted("displayName") String displayName,
                                    @Assisted("container") String container,
@@ -58,7 +58,7 @@ public class TestDockerMachineFactory implements DockerMachineFactory {
                                   this,
                                   machineId,
                                   workspaceId,
-                                  workspaceIsBound,
+                                  isDev,
                                   creator,
                                   displayName,
                                   container,
