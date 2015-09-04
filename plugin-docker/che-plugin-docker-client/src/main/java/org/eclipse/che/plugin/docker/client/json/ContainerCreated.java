@@ -17,6 +17,14 @@ public class ContainerCreated {
     private String id;
     private String[] warnings;
 
+    public ContainerCreated() {
+    }
+
+    public ContainerCreated(String id, String[] warnings) {
+        this.id = id;
+        this.warnings = warnings;
+    }
+
     public String getId() {
         return id;
     }

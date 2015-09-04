@@ -131,8 +131,6 @@ public class ServiceTest {
 
     @BeforeMethod
     public void setUp() throws Exception {
-//        MemberDao memberDao = mock(MemberDao.class);
-
         snapshotDao = mock(SnapshotDao.class);
 
         DockerNode dockerNode = mock(DockerNode.class);
@@ -146,7 +144,7 @@ public class ServiceTest {
                                                                              Collections.emptySet(),
                                                                              Collections.emptySet(),
                                                                              Collections.emptySet(),
-                                                                             "/tmp");
+                                                                             "fake");
 
         machineManager = new MachineManager(snapshotDao,
                                             machineRegistry,
