@@ -86,7 +86,7 @@ public class CheAccessTokenCredentialProvider implements CredentialsProvider {
 
     @Override
     public String getId() {
-        return "codenvy";
+        return "che";
     }
 
     @Override
