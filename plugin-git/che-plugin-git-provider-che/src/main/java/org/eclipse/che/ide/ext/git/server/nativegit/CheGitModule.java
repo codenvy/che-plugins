@@ -21,12 +21,12 @@ import com.google.inject.multibindings.Multibinder;
  * @author Alexander Garagatyi
  */
 @DynaModule
-public class CodenvyGitModule extends AbstractModule {
+public class CheGitModule extends AbstractModule {
 
     /** {@inheritDoc} */
     @Override
     protected void configure() {
-        Multibinder.newSetBinder(binder(), CredentialsProvider.class).addBinding().to(CodenvyAccessTokenCredentialProvider.class);
+        Multibinder.newSetBinder(binder(), CredentialsProvider.class).addBinding().to(CheAccessTokenCredentialProvider.class);
     }
 }
 
