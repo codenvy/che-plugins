@@ -60,8 +60,7 @@ public class CheAccessTokenCredentialProvider implements CredentialsProvider {
 
     @Override
     public GitUser getUser() throws GitException {
-        User user = EnvironmentContext.getCurrent()
-                                      .getUser();
+        User user = EnvironmentContext.getCurrent().getUser();
         GitUser gitUser = newDto(GitUser.class);
         if (user.isTemporary()) {
             gitUser.setEmail("anonymous@noemail.com");
@@ -70,9 +69,7 @@ public class CheAccessTokenCredentialProvider implements CredentialsProvider {
             String name = null;
             String email = null;
             try {
-                Map<String, String> preferences = preferenceDao.getPreferences(EnvironmentContext.getCurrent()
-                                                                                                 .getUser()
-                                                                                                 .getId(),
+                Map<String, String> preferences = preferenceDao.getPreferences(EnvironmentContext.getCurrent().getUser().getId(),
                                                                                "git.committer.\\w+");
                 name = preferences.get("git.committer.name");
                 email = preferences.get("git.committer.email");
