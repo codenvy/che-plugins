@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import org.eclipse.che.ide.api.editor.EditorWithErrors;
+import org.eclipse.che.ide.api.event.DependencyUpdatedEvent;
+import org.eclipse.che.ide.api.event.DependencyUpdatedEventHandler;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.text.Region;
 import org.eclipse.che.ide.api.texteditor.outline.OutlineModel;
@@ -55,7 +58,8 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
                                   @Assisted final AnnotationModel annotationModel,
                                   final JavaReconcileClient client,
                                   final EditorResources editorResources,
-                                  final SemanticHighlightRenderer highlighter) {
+                                  final SemanticHighlightRenderer highlighter,
+                                  EventBus eventBus) {
         this.editor = editor;
         this.client = client;
         this.outlineModel = outlineModel;
@@ -64,6 +68,12 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
         this.highlighter = highlighter;
         this.editorCss = editorResources.editorCss();
 
+        eventBus.addHandler(DependencyUpdatedEvent.TYPE, new DependencyUpdatedEventHandler() {
+            @Override
+            public void onDependencyUpdated(DependencyUpdatedEvent event) {
+                parse();
+            }
+        });
     }
 
     @Override

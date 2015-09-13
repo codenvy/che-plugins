@@ -10,11 +10,13 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.dependenciesupdater;
 
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.event.DependencyUpdatedEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
@@ -40,16 +42,19 @@ public class DependenciesUpdater {
 
     private boolean      updating;
     private Notification notification;
+    private EventBus     eventBus;
 
     @Inject
     public DependenciesUpdater(JavaLocalizationConstant javaLocalizationConstant,
                                NotificationManager notificationManager,
                                AppContext appContext,
-                               JavaClasspathServiceClient classpathServiceClient) {
+                               JavaClasspathServiceClient classpathServiceClient,
+                               EventBus eventBus) {
         this.javaLocalizationConstant = javaLocalizationConstant;
         this.notificationManager = notificationManager;
         this.appContext = appContext;
         this.classpathServiceClient = classpathServiceClient;
+        this.eventBus = eventBus;
     }
 
     public void updateDependencies(final ProjectDescriptor project) {
@@ -85,6 +90,7 @@ public class DependenciesUpdater {
         updating = false;
         notification.setMessage(javaLocalizationConstant.dependenciesSuccessfullyUpdated());
         notification.setStatus(FINISHED);
+        eventBus.fireEvent(new DependencyUpdatedEvent());
     }
 
     private void updateFinishedWithError(Throwable exception, Notification notification) {

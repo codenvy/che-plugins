@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.extension.maven.client;
 
 import com.google.gwt.user.client.Timer;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -90,6 +89,9 @@ public class MavenExtension {
             @Override
             public void onProjectOpened(ProjectActionEvent event) {
                 project = event.getProject();
+                if (isValidForResolveDependencies(project)) {
+                    dependenciesUpdater.updateDependencies(project);
+                }
             }
 
             @Override
