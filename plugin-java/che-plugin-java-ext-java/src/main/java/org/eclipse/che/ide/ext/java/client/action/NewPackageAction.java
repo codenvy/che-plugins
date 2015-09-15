@@ -14,11 +14,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.project.shared.dto.ItemReference;
-import org.eclipse.che.api.promises.client.Operation;
-import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.project.node.HasDataObject;
-import org.eclipse.che.ide.api.project.node.Node;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
@@ -27,14 +25,11 @@ import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 import org.eclipse.che.ide.json.JsonHelper;
 import org.eclipse.che.ide.newresource.AbstractNewResourceAction;
 import org.eclipse.che.ide.project.node.FolderReferenceNode;
-import org.eclipse.che.ide.project.node.ResourceBasedNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.InputCallback;
 import org.eclipse.che.ide.ui.dialogs.input.InputDialog;
 import org.eclipse.che.ide.ui.dialogs.input.InputValidator;
 
-import javax.validation.constraints.NotNull;
-import org.eclipse.che.commons.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -75,40 +70,14 @@ public class NewPackageAction extends AbstractNewResourceAction {
 
         final String path = parent.getStorablePath() + '/' + value.replace('.', '/');
 
-        projectServiceClient.createFolder(path, createCallback(parent));
+        projectServiceClient.createFolder(path, createCallback());
     }
 
-    @Override
-    protected AsyncRequestCallback<ItemReference> createCallback(final ResourceBasedNode<?> parent) {
+    protected AsyncRequestCallback<ItemReference> createCallback() {
         return new AsyncRequestCallback<ItemReference>(dtoUnmarshallerFactory.newUnmarshaller(ItemReference.class)) {
             @Override
             protected void onSuccess(final ItemReference itemReference) {
-                parent.getChildren(false).then(new Operation<List<Node>>() {
-                    @Override
-                    public void apply(List<Node> cachedChildren) throws OperationException {
-                        HasDataObject dataObject = new HasDataObject() {
-                            @NotNull
-                            @Override
-                            public Object getData() {
-                                return itemReference;
-                            }
-
-                            @Override
-                            public void setData(@NotNull Object data) {
-
-                            }
-                        };
-
-
-                        if (cachedChildren.size() == 1 && cachedChildren.get(0) instanceof PackageNode) {
-                            projectExplorer.reloadChildren(parent.getParent(), dataObject, false, false);
-                        } else {
-                            projectExplorer.reloadChildren(parent, dataObject, false, false);
-                        }
-                    }
-                });
-
-
+                projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(itemReference.getPath())).then(selectNode());
             }
 
             @Override

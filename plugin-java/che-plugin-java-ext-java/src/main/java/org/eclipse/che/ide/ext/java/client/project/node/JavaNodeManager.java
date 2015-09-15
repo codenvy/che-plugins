@@ -24,6 +24,7 @@ import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper.RequestCall;
+import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.api.project.node.HasProjectDescriptor;
 import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.api.project.node.settings.NodeSettings;
@@ -61,7 +62,7 @@ public class JavaNodeManager extends NodeManager {
     private JavaNodeSettingsProvider settingsProvider;
 
     public static final String JAVA_MIME_TYPE = "text/x-java-source";
-    public static final String JAVA_EXT = ".java";
+    public static final String JAVA_EXT       = ".java";
 
     @Inject
     public JavaNodeManager(NodeFactory nodeFactory,
@@ -89,7 +90,7 @@ public class JavaNodeManager extends NodeManager {
         this.settingsProvider = (JavaNodeSettingsProvider)settingsProviderMap.get("java");
     }
 
-    /** **************** External Libraries operations ********************* */
+    /** *************** External Libraries operations ********************* */
 
     @NotNull
     public Promise<List<Node>> getExternalLibraries(@NotNull ProjectDescriptor descriptor) {
@@ -109,7 +110,7 @@ public class JavaNodeManager extends NodeManager {
 
     @NotNull
     private Function<List<Jar>, List<Node>> createJarNodes(@NotNull final ProjectDescriptor descriptor,
-                                                            @NotNull final NodeSettings nodeSettings) {
+                                                           @NotNull final NodeSettings nodeSettings) {
         return new Function<List<Jar>, List<Node>>() {
             @Override
             public List<Node> apply(List<Jar> jars) throws FunctionException {
@@ -125,7 +126,7 @@ public class JavaNodeManager extends NodeManager {
         };
     }
 
-    /** **************** Jar Library Children operations ********************* */
+    /** *************** Jar Library Children operations ********************* */
 
     @NotNull
     public Promise<List<Node>> getJarLibraryChildren(@NotNull ProjectDescriptor descriptor, int libId, @NotNull NodeSettings nodeSettings) {
@@ -145,7 +146,8 @@ public class JavaNodeManager extends NodeManager {
     }
 
     @NotNull
-    public Promise<List<Node>> getJarChildren(@NotNull ProjectDescriptor descriptor, int libId, @NotNull String path, @NotNull NodeSettings nodeSettings) {
+    public Promise<List<Node>> getJarChildren(@NotNull ProjectDescriptor descriptor, int libId, @NotNull String path,
+                                              @NotNull NodeSettings nodeSettings) {
         return AsyncPromiseHelper.createFromAsyncRequest(getChildrenRC(descriptor.getPath(), libId, path))
                                  .then(createJarEntryNodes(libId, descriptor, nodeSettings));
     }
@@ -163,7 +165,7 @@ public class JavaNodeManager extends NodeManager {
 
     @NotNull
     private Function<List<JarEntry>, List<Node>> createJarEntryNodes(final int libId, @NotNull final ProjectDescriptor descriptor,
-                                                                      @NotNull final NodeSettings nodeSettings) {
+                                                                     @NotNull final NodeSettings nodeSettings) {
         return new Function<List<JarEntry>, List<Node>>() {
             @Override
             public List<Node> apply(List<JarEntry> entries) throws FunctionException {
@@ -193,7 +195,7 @@ public class JavaNodeManager extends NodeManager {
         return null;
     }
 
-    /** **************** Common methods ********************* */
+    /** *************** Common methods ********************* */
 
     public static boolean isJavaProject(Node node) {
         if (!(node instanceof HasProjectDescriptor)) {
@@ -276,5 +278,80 @@ public class JavaNodeManager extends NodeManager {
                 });
             }
         });
+    }
+
+    @Override
+    public Function<List<ItemReference>, Promise<List<ItemReference>>> filterItemReference() {
+        return new Function<List<ItemReference>, Promise<List<ItemReference>>>() {
+            @Override
+            public Promise<List<ItemReference>> apply(List<ItemReference> referenceList) throws FunctionException {
+                if (referenceList.isEmpty() || referenceList.size() > 1) {
+                    //if children in directory more than one
+
+                    final List<ItemReference> files = new ArrayList<>();
+                    List<ItemReference> otherNodes = new ArrayList<>();
+                    //filter folders to proceed deep child
+                    for (ItemReference itemReference : referenceList) {
+                        if ("file".equals(itemReference.getType())) {
+                            files.add(itemReference);
+                        } else {
+                            otherNodes.add(itemReference);
+                        }
+                    }
+
+                    if (!otherNodes.isEmpty()) {
+                        if (otherNodes.size() == 1) {
+                            return foundFirstNonEmpty(otherNodes.get(0))
+                                    .thenPromise(new Function<List<ItemReference>, Promise<List<ItemReference>>>() {
+                                        @Override
+                                        public Promise<List<ItemReference>> apply(List<ItemReference> arg) throws FunctionException {
+                                            arg.addAll(files);
+                                            return Promises.resolve(arg);
+                                        }
+                                    });
+                        }
+                    }
+
+                    return Promises.resolve(referenceList);
+                }
+
+                //else we have one child. check if it file
+
+                if ("file".equals(referenceList.get(0).getType())) {
+                    return Promises.resolve(referenceList);
+                }
+
+                //so start check if we have single folder, just seek all children to find non empty directory
+
+                return foundFirstNonEmpty(referenceList.get(0));
+            }
+        };
+    }
+
+    private Promise<List<ItemReference>> foundFirstNonEmpty(ItemReference parent) {
+        return AsyncPromiseHelper.createFromAsyncRequest(getItemReferenceRC(parent.getPath()))
+                                 .thenPromise(checkForEmptiness(parent));
+    }
+
+    private Function<List<ItemReference>, Promise<List<ItemReference>>> checkForEmptiness(final ItemReference parent) {
+        return new Function<List<ItemReference>, Promise<List<ItemReference>>>() {
+            @Override
+            public Promise<List<ItemReference>> apply(List<ItemReference> children) throws FunctionException {
+                if (children.isEmpty() || children.size() > 1) {
+                    List<ItemReference> list = new ArrayList<>();
+                    list.add(parent);
+                    return Promises.resolve(list);
+                }
+
+                if ("file".equals(children.get(0).getType())) {
+                    List<ItemReference> list = new ArrayList<>();
+                    list.add(parent);
+                    return Promises.resolve(list);
+                } else {
+                    return foundFirstNonEmpty(children.get(0));
+                }
+
+            }
+        };
     }
 }

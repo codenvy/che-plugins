@@ -16,19 +16,23 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
+import org.eclipse.che.api.promises.client.Function;
+import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.project.node.HasDataObject;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
+import org.eclipse.che.ide.api.project.node.HasStorablePath.StorablePath;
+import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 import org.eclipse.che.ide.json.JsonHelper;
 import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
 import org.eclipse.che.ide.project.node.FolderReferenceNode;
 import org.eclipse.che.ide.project.node.ResourceBasedNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
-import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
@@ -237,7 +241,7 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
 
         final String fileName = nameWithoutExtension + ".java";
 
-        projectServiceClient.createFile(parent.getPath(),
+        projectServiceClient.createFile(parent != null ? parent.getPath() : node.getStorablePath(),
                                         fileName,
                                         content,
                                         null,
@@ -248,26 +252,40 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
         return new AsyncRequestCallback<ItemReference>(dtoUnmarshallerFactory.newUnmarshaller(ItemReference.class)) {
             @Override
             protected void onSuccess(final ItemReference itemReference) {
+                HasStorablePath path = new StorablePath(itemReference.getPath());
 
-                HasDataObject dataObject = new HasDataObject() {
-                    @NotNull
-                    @Override
-                    public Object getData() {
-                        return itemReference;
-                    }
-
-                    @Override
-                    public void setData(@NotNull Object data) {
-
-                    }
-                };
-
-                projectExplorer.reloadChildren(parent, dataObject, true, false);
+                projectExplorer.getNodeByPath(path)
+                               .then(selectNode())
+                               .then(openNode());
             }
 
             @Override
             protected void onFailure(Throwable exception) {
                 dialogFactory.createMessageDialog("", JsonHelper.parseJsonMessage(exception.getMessage()), null).show();
+            }
+        };
+    }
+
+    protected Function<Node, Node> selectNode() {
+        return new Function<Node, Node>() {
+            @Override
+            public Node apply(Node node) throws FunctionException {
+                projectExplorer.select(node, false);
+
+                return node;
+            }
+        };
+    }
+
+    protected Function<Node, Node> openNode() {
+        return new Function<Node, Node>() {
+            @Override
+            public Node apply(Node node) throws FunctionException {
+                if (node instanceof FileReferenceNode) {
+                    ((FileReferenceNode)node).actionPerformed();
+                }
+
+                return node;
             }
         };
     }

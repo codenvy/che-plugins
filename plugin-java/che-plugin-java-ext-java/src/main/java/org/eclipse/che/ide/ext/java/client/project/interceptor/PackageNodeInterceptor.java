@@ -13,20 +13,16 @@ package org.eclipse.che.ide.ext.java.client.project.interceptor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.api.project.node.interceptor.NodeInterceptor;
 import org.eclipse.che.ide.ext.java.client.project.node.JavaNodeManager;
 import org.eclipse.che.ide.ext.java.client.project.settings.JavaNodeSettingsProvider;
 import org.eclipse.che.ide.project.node.FolderReferenceNode;
-import org.eclipse.che.ide.project.node.ItemReferenceChainFilter;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,7 +31,7 @@ import java.util.List;
 @Singleton
 public class PackageNodeInterceptor implements NodeInterceptor {
 
-    private       JavaNodeManager nodeManager;
+    private JavaNodeManager nodeManager;
 
     @Inject
     public PackageNodeInterceptor(JavaNodeManager nodeManager) {
@@ -53,8 +49,7 @@ public class PackageNodeInterceptor implements NodeInterceptor {
 
             return nodeManager.getChildren(sourceFolder.getData(),
                                            sourceFolder.getProjectDescriptor(),
-                                           settingsProvider.getSettings(),
-                                           emptyMiddlePackageFilter()).thenPromise(new Function<List<Node>, Promise<List<Node>>>() {
+                                           settingsProvider.getSettings()).thenPromise(new Function<List<Node>, Promise<List<Node>>>() {
                 @Override
                 public Promise<List<Node>> apply(List<Node> arg) throws FunctionException {
 
@@ -81,52 +76,6 @@ public class PackageNodeInterceptor implements NodeInterceptor {
         }
 
         return Promises.resolve(children);
-    }
-
-    private ItemReferenceChainFilter emptyMiddlePackageFilter() {
-        return new ItemReferenceChainFilter() {
-            @Override
-            public Promise<List<ItemReference>> process(List<ItemReference> referenceList) {
-
-                if (referenceList.isEmpty() || referenceList.size() > 1) {
-                    //if children in directory more than one
-                    return Promises.resolve(referenceList);
-                }
-
-                //else we have one child. check if it file
-
-                if ("file".equals(referenceList.get(0).getType())) {
-                    return Promises.resolve(referenceList);
-                }
-
-                //so start check if we have single folder, just seek all children to find non empty directory
-
-                return foundFirstNonEmpty(referenceList.get(0));
-            }
-        };
-    }
-
-    private Promise<List<ItemReference>> foundFirstNonEmpty(ItemReference parent) {
-        return AsyncPromiseHelper.createFromAsyncRequest(nodeManager.getItemReferenceRC(parent.getPath()))
-                                 .thenPromise(checkForEmptiness(parent));
-    }
-
-    private Function<List<ItemReference>, Promise<List<ItemReference>>> checkForEmptiness(final ItemReference parent) {
-        return new Function<List<ItemReference>, Promise<List<ItemReference>>>() {
-            @Override
-            public Promise<List<ItemReference>> apply(List<ItemReference> children) throws FunctionException {
-                if (children.isEmpty() || children.size() > 1) {
-                    return Promises.resolve(Collections.singletonList(parent));
-                }
-
-                if ("file".equals(children.get(0).getType())) {
-                    return Promises.resolve(Collections.singletonList(parent));
-                } else {
-                    return foundFirstNonEmpty(children.get(0));
-                }
-
-            }
-        };
     }
 
     @Override
