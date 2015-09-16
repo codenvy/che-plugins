@@ -18,6 +18,7 @@ import org.eclipse.che.ide.ext.java.client.project.node.jar.JarContainerNode;
 import org.eclipse.che.ide.ext.java.client.project.node.jar.JarFileNode;
 import org.eclipse.che.ide.ext.java.client.project.node.jar.JarFolderNode;
 import org.eclipse.che.ide.ext.java.client.project.settings.JavaNodeSettings;
+import org.eclipse.che.ide.ext.java.shared.ContentRoot;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 
@@ -51,4 +52,9 @@ public interface JavaNodeFactory {
     JavaFileNode newJavaFileNode(@NotNull ItemReference itemReference,
                                  @NotNull ProjectDescriptor projectDescriptor,
                                  @NotNull JavaNodeSettings nodeSettings);
+
+    SourceFolderNode newSourceFolderNode(@NotNull ItemReference itemReference,
+                                         @NotNull ProjectDescriptor projectDescriptor,
+                                         @NotNull JavaNodeSettings nodeSettings,
+                                         @NotNull ContentRoot contentRootType);
 }

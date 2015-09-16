@@ -16,23 +16,15 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.api.promises.client.Function;
-import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
-import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.ext.java.client.project.settings.JavaNodeSettings;
 import org.eclipse.che.ide.project.node.FolderReferenceNode;
-import org.eclipse.che.ide.project.node.ItemReferenceChainFilter;
 import org.eclipse.che.ide.project.node.resource.ItemReferenceProcessor;
 import org.eclipse.che.ide.ui.smartTree.presentation.NodePresentation;
-import org.eclipse.che.ide.util.loging.Log;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,7 +59,12 @@ public class PackageNode extends FolderReferenceNode {
         presentation.setPresentableIcon(nodeManager.getJavaNodesResources().packageFolder());
     }
 
-    private String getDisplayFqn() {
+    @Override
+    public String getName() {
+        return getDisplayFqn();
+    }
+
+    public String getDisplayFqn() {
         Node parent = getParent();
 
         if (parent != null && parent instanceof HasStorablePath) {
@@ -92,7 +89,7 @@ public class PackageNode extends FolderReferenceNode {
         Node parent = getParent();
 
         while (parent != null) {
-            if (parent instanceof FolderReferenceNode && ((FolderReferenceNode)parent).getAttributes().containsKey("javaContentRoot")) {
+            if (parent instanceof SourceFolderNode) {
                 String parentStorablePath = ((FolderReferenceNode)parent).getStorablePath();
                 String currentStorablePath = getStorablePath();
 

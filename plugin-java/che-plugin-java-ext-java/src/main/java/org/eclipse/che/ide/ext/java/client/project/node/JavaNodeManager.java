@@ -47,7 +47,9 @@ import org.eclipse.che.ide.rest.Unmarshallable;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 /**
@@ -90,7 +92,7 @@ public class JavaNodeManager extends NodeManager {
         this.settingsProvider = (JavaNodeSettingsProvider)settingsProviderMap.get("java");
     }
 
-    /** *************** External Libraries operations ********************* */
+    /** ************** External Libraries operations ********************* */
 
     @NotNull
     public Promise<List<Node>> getExternalLibraries(@NotNull ProjectDescriptor descriptor) {
@@ -126,7 +128,7 @@ public class JavaNodeManager extends NodeManager {
         };
     }
 
-    /** *************** Jar Library Children operations ********************* */
+    /** ************** Jar Library Children operations ********************* */
 
     @NotNull
     public Promise<List<Node>> getJarLibraryChildren(@NotNull ProjectDescriptor descriptor, int libId, @NotNull NodeSettings nodeSettings) {
@@ -195,7 +197,7 @@ public class JavaNodeManager extends NodeManager {
         return null;
     }
 
-    /** *************** Common methods ********************* */
+    /** ************** Common methods ********************* */
 
     public static boolean isJavaProject(Node node) {
         if (!(node instanceof HasProjectDescriptor)) {
@@ -285,45 +287,60 @@ public class JavaNodeManager extends NodeManager {
         return new Function<List<ItemReference>, Promise<List<ItemReference>>>() {
             @Override
             public Promise<List<ItemReference>> apply(List<ItemReference> referenceList) throws FunctionException {
-                if (referenceList.isEmpty() || referenceList.size() > 1) {
-                    //if children in directory more than one
 
-                    final List<ItemReference> files = new ArrayList<>();
-                    List<ItemReference> otherNodes = new ArrayList<>();
-                    //filter folders to proceed deep child
-                    for (ItemReference itemReference : referenceList) {
-                        if ("file".equals(itemReference.getType())) {
-                            files.add(itemReference);
-                        } else {
-                            otherNodes.add(itemReference);
-                        }
+                final List<ItemReference> collector = new ArrayList<>();
+
+                Promise<Void> promise = Promises.resolve(null);
+
+                return getNonEmptyChildren(promise, referenceList.listIterator(), collector)
+                        .thenPromise(new Function<Void, Promise<List<ItemReference>>>() {
+                            @Override
+                            public Promise<List<ItemReference>> apply(Void arg) throws FunctionException {
+                                return Promises.resolve(collector);
+                            }
+                        });
+            }
+        };
+    }
+
+    private Promise<Void> getNonEmptyChildren(Promise<Void> promise,
+                                              ListIterator<ItemReference> iterator,
+                                              final List<ItemReference> collector) {
+        if (!iterator.hasNext()) {
+            return promise;
+        }
+
+        final ItemReference itemReference = iterator.next();
+
+        if (itemReference.getType().equals("file")) {
+            collector.add(itemReference);
+            return getNonEmptyChildren(promise, iterator, collector);
+        }
+
+        final Promise<Void> derivedPromise = promise.thenPromise(new Function<Void, Promise<Void>>() {
+            @Override
+            public Promise<Void> apply(Void arg) throws FunctionException {
+                return foundFirstNonEmpty(itemReference).thenPromise(new Function<List<ItemReference>, Promise<Void>>() {
+                    @Override
+                    public Promise<Void> apply(List<ItemReference> arg) throws FunctionException {
+                        collector.addAll(arg);
+
+                        return Promises.resolve(null);
                     }
+                });
+            }
+        });
 
-                    if (!otherNodes.isEmpty()) {
-                        if (otherNodes.size() == 1) {
-                            return foundFirstNonEmpty(otherNodes.get(0))
-                                    .thenPromise(new Function<List<ItemReference>, Promise<List<ItemReference>>>() {
-                                        @Override
-                                        public Promise<List<ItemReference>> apply(List<ItemReference> arg) throws FunctionException {
-                                            arg.addAll(files);
-                                            return Promises.resolve(arg);
-                                        }
-                                    });
-                        }
-                    }
+        return getNonEmptyChildren(derivedPromise, iterator, collector);
+    }
 
-                    return Promises.resolve(referenceList);
-                }
-
-                //else we have one child. check if it file
-
-                if ("file".equals(referenceList.get(0).getType())) {
-                    return Promises.resolve(referenceList);
-                }
-
-                //so start check if we have single folder, just seek all children to find non empty directory
-
-                return foundFirstNonEmpty(referenceList.get(0));
+    @Override
+    protected Function<List<Node>, Promise<List<Node>>> sortNodes() {
+        return new Function<List<Node>, Promise<List<Node>>>() {
+            @Override
+            public Promise<List<Node>> apply(List<Node> nodes) throws FunctionException {
+                Collections.sort(nodes, new FQNComparator());
+                return Promises.resolve(nodes);
             }
         };
     }

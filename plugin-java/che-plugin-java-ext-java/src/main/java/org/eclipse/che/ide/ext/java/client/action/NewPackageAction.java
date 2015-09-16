@@ -22,6 +22,7 @@ import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.JavaUtils;
 import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
+import org.eclipse.che.ide.ext.java.client.project.node.SourceFolderNode;
 import org.eclipse.che.ide.json.JsonHelper;
 import org.eclipse.che.ide.newresource.AbstractNewResourceAction;
 import org.eclipse.che.ide.project.node.FolderReferenceNode;
@@ -31,7 +32,6 @@ import org.eclipse.che.ide.ui.dialogs.input.InputDialog;
 import org.eclipse.che.ide.ui.dialogs.input.InputValidator;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Action to create new Java package.
@@ -77,12 +77,15 @@ public class NewPackageAction extends AbstractNewResourceAction {
         return new AsyncRequestCallback<ItemReference>(dtoUnmarshallerFactory.newUnmarshaller(ItemReference.class)) {
             @Override
             protected void onSuccess(final ItemReference itemReference) {
-                projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(itemReference.getPath())).then(selectNode());
+                projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(itemReference.getPath()), true).then(selectNode());
             }
 
             @Override
             protected void onFailure(Throwable exception) {
-                dialogFactory.createMessageDialog("", JsonHelper.parseJsonMessage(exception.getMessage()), null).show();
+                String message = JsonHelper.parseJsonMessage(exception.getMessage());
+                dialogFactory.createMessageDialog("New package",
+                                                  message.contains("already exists") ? "Package already exists." : message,
+                                                  null).show();
             }
         };
     }
@@ -105,16 +108,7 @@ public class NewPackageAction extends AbstractNewResourceAction {
 
         Object o = elements.get(0);
 
-        e.getPresentation().setEnabledAndVisible(isSourceFolder(o) || o instanceof PackageNode);
-    }
-
-    private boolean isSourceFolder(Object o) {
-        if (!(o instanceof FolderReferenceNode)) {
-            return false;
-        }
-
-        Map<String, List<String>> attributes = ((FolderReferenceNode)o).getAttributes();
-        return attributes.containsKey("javaContentRoot");
+        e.getPresentation().setEnabledAndVisible(o instanceof SourceFolderNode || o instanceof PackageNode);
     }
 
     private class NameValidator implements InputValidator {
