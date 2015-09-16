@@ -24,6 +24,7 @@ import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper.RequestCall;
+import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.api.project.node.HasProjectDescriptor;
 import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.api.project.node.settings.NodeSettings;
@@ -46,7 +47,9 @@ import org.eclipse.che.ide.rest.Unmarshallable;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 /**
@@ -61,7 +64,7 @@ public class JavaNodeManager extends NodeManager {
     private JavaNodeSettingsProvider settingsProvider;
 
     public static final String JAVA_MIME_TYPE = "text/x-java-source";
-    public static final String JAVA_EXT = ".java";
+    public static final String JAVA_EXT       = ".java";
 
     @Inject
     public JavaNodeManager(NodeFactory nodeFactory,
@@ -89,7 +92,7 @@ public class JavaNodeManager extends NodeManager {
         this.settingsProvider = (JavaNodeSettingsProvider)settingsProviderMap.get("java");
     }
 
-    /** **************** External Libraries operations ********************* */
+    /** ************** External Libraries operations ********************* */
 
     @NotNull
     public Promise<List<Node>> getExternalLibraries(@NotNull ProjectDescriptor descriptor) {
@@ -109,7 +112,7 @@ public class JavaNodeManager extends NodeManager {
 
     @NotNull
     private Function<List<Jar>, List<Node>> createJarNodes(@NotNull final ProjectDescriptor descriptor,
-                                                            @NotNull final NodeSettings nodeSettings) {
+                                                           @NotNull final NodeSettings nodeSettings) {
         return new Function<List<Jar>, List<Node>>() {
             @Override
             public List<Node> apply(List<Jar> jars) throws FunctionException {
@@ -125,7 +128,7 @@ public class JavaNodeManager extends NodeManager {
         };
     }
 
-    /** **************** Jar Library Children operations ********************* */
+    /** ************** Jar Library Children operations ********************* */
 
     @NotNull
     public Promise<List<Node>> getJarLibraryChildren(@NotNull ProjectDescriptor descriptor, int libId, @NotNull NodeSettings nodeSettings) {
@@ -145,7 +148,8 @@ public class JavaNodeManager extends NodeManager {
     }
 
     @NotNull
-    public Promise<List<Node>> getJarChildren(@NotNull ProjectDescriptor descriptor, int libId, @NotNull String path, @NotNull NodeSettings nodeSettings) {
+    public Promise<List<Node>> getJarChildren(@NotNull ProjectDescriptor descriptor, int libId, @NotNull String path,
+                                              @NotNull NodeSettings nodeSettings) {
         return AsyncPromiseHelper.createFromAsyncRequest(getChildrenRC(descriptor.getPath(), libId, path))
                                  .then(createJarEntryNodes(libId, descriptor, nodeSettings));
     }
@@ -163,7 +167,7 @@ public class JavaNodeManager extends NodeManager {
 
     @NotNull
     private Function<List<JarEntry>, List<Node>> createJarEntryNodes(final int libId, @NotNull final ProjectDescriptor descriptor,
-                                                                      @NotNull final NodeSettings nodeSettings) {
+                                                                     @NotNull final NodeSettings nodeSettings) {
         return new Function<List<JarEntry>, List<Node>>() {
             @Override
             public List<Node> apply(List<JarEntry> entries) throws FunctionException {
@@ -193,7 +197,7 @@ public class JavaNodeManager extends NodeManager {
         return null;
     }
 
-    /** **************** Common methods ********************* */
+    /** ************** Common methods ********************* */
 
     public static boolean isJavaProject(Node node) {
         if (!(node instanceof HasProjectDescriptor)) {
@@ -276,5 +280,95 @@ public class JavaNodeManager extends NodeManager {
                 });
             }
         });
+    }
+
+    @Override
+    public Function<List<ItemReference>, Promise<List<ItemReference>>> filterItemReference() {
+        return new Function<List<ItemReference>, Promise<List<ItemReference>>>() {
+            @Override
+            public Promise<List<ItemReference>> apply(List<ItemReference> referenceList) throws FunctionException {
+
+                final List<ItemReference> collector = new ArrayList<>();
+
+                Promise<Void> promise = Promises.resolve(null);
+
+                return getNonEmptyChildren(promise, referenceList.listIterator(), collector)
+                        .thenPromise(new Function<Void, Promise<List<ItemReference>>>() {
+                            @Override
+                            public Promise<List<ItemReference>> apply(Void arg) throws FunctionException {
+                                return Promises.resolve(collector);
+                            }
+                        });
+            }
+        };
+    }
+
+    private Promise<Void> getNonEmptyChildren(Promise<Void> promise,
+                                              ListIterator<ItemReference> iterator,
+                                              final List<ItemReference> collector) {
+        if (!iterator.hasNext()) {
+            return promise;
+        }
+
+        final ItemReference itemReference = iterator.next();
+
+        if (itemReference.getType().equals("file")) {
+            collector.add(itemReference);
+            return getNonEmptyChildren(promise, iterator, collector);
+        }
+
+        final Promise<Void> derivedPromise = promise.thenPromise(new Function<Void, Promise<Void>>() {
+            @Override
+            public Promise<Void> apply(Void arg) throws FunctionException {
+                return foundFirstNonEmpty(itemReference).thenPromise(new Function<List<ItemReference>, Promise<Void>>() {
+                    @Override
+                    public Promise<Void> apply(List<ItemReference> arg) throws FunctionException {
+                        collector.addAll(arg);
+
+                        return Promises.resolve(null);
+                    }
+                });
+            }
+        });
+
+        return getNonEmptyChildren(derivedPromise, iterator, collector);
+    }
+
+    @Override
+    protected Function<List<Node>, Promise<List<Node>>> sortNodes() {
+        return new Function<List<Node>, Promise<List<Node>>>() {
+            @Override
+            public Promise<List<Node>> apply(List<Node> nodes) throws FunctionException {
+                Collections.sort(nodes, new FQNComparator());
+                return Promises.resolve(nodes);
+            }
+        };
+    }
+
+    private Promise<List<ItemReference>> foundFirstNonEmpty(ItemReference parent) {
+        return AsyncPromiseHelper.createFromAsyncRequest(getItemReferenceRC(parent.getPath()))
+                                 .thenPromise(checkForEmptiness(parent));
+    }
+
+    private Function<List<ItemReference>, Promise<List<ItemReference>>> checkForEmptiness(final ItemReference parent) {
+        return new Function<List<ItemReference>, Promise<List<ItemReference>>>() {
+            @Override
+            public Promise<List<ItemReference>> apply(List<ItemReference> children) throws FunctionException {
+                if (children.isEmpty() || children.size() > 1) {
+                    List<ItemReference> list = new ArrayList<>();
+                    list.add(parent);
+                    return Promises.resolve(list);
+                }
+
+                if ("file".equals(children.get(0).getType())) {
+                    List<ItemReference> list = new ArrayList<>();
+                    list.add(parent);
+                    return Promises.resolve(list);
+                } else {
+                    return foundFirstNonEmpty(children.get(0));
+                }
+
+            }
+        };
     }
 }

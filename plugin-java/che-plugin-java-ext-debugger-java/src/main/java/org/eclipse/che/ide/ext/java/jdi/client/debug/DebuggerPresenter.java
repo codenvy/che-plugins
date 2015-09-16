@@ -23,7 +23,6 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
-import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.runner.dto.ApplicationProcessDescriptor;
 import org.eclipse.che.api.runner.dto.RunOptions;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -423,23 +422,11 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             return;
         }
 
-        HasStorablePath path = new HasStorablePath() {
-            @NotNull
-            @Override
-            public String getStorablePath() {
-                return filePath;
-            }
-        };
-
-        Promise<Node> fileNode = projectExplorer.navigate(path, true);
-
-
-        fileNode.then(new Operation<Node>() {
+        projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(filePath)).then(new Operation<Node>() {
             public HandlerRegistration handlerRegistration;
 
             @Override
             public void apply(final Node node) throws OperationException {
-
                 if (!(node instanceof FileReferenceNode)) {
                     return;
                 }
@@ -463,7 +450,6 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                     }
                 });
                 eventBus.fireEvent(new FileEvent((VirtualFile)node, OPEN));
-
             }
         });
     }

@@ -13,14 +13,15 @@ package org.eclipse.che.ide.ext.java.client.project.interceptor;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.js.Promises;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.api.project.node.interceptor.NodeInterceptor;
 import org.eclipse.che.ide.ext.java.client.project.node.JavaNodeManager;
+import org.eclipse.che.ide.ext.java.client.project.settings.JavaNodeSettings;
 import org.eclipse.che.ide.ext.java.shared.ContentRoot;
 import org.eclipse.che.ide.project.node.FolderReferenceNode;
 
-import org.eclipse.che.commons.annotation.Nullable;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,26 +29,35 @@ import java.util.List;
  */
 public abstract class AbstractJavaContentRootInterceptor implements NodeInterceptor {
 
-    private JavaNodeManager javaResourceNodeManager;
+    private JavaNodeManager nodeManager;
 
-    public AbstractJavaContentRootInterceptor(JavaNodeManager javaResourceNodeManager) {
-        this.javaResourceNodeManager = javaResourceNodeManager;
+    public AbstractJavaContentRootInterceptor(JavaNodeManager nodeManager) {
+        this.nodeManager = nodeManager;
     }
 
     @Override
     public Promise<List<Node>> intercept(Node parent, List<Node> children) {
+        List<Node> nodes = new ArrayList<>();
+
         for (Node child : children) {
             ContentRoot contentRoot = getSourceType(child);
 
             if (contentRoot == null) {
+                nodes.add(child);
                 continue;
             }
 
-            setupIcon((FolderReferenceNode)child, contentRoot);
-            setupAttribute((FolderReferenceNode)child, "javaContentRoot");
+            FolderReferenceNode oldNode = (FolderReferenceNode)child;
+
+            JavaNodeSettings settings = (JavaNodeSettings)nodeManager.getJavaSettingsProvider().getSettings();
+
+            nodes.add(nodeManager.getJavaNodeFactory().newSourceFolderNode(oldNode.getData(),
+                                                                           oldNode.getProjectDescriptor(),
+                                                                           settings,
+                                                                           contentRoot));
         }
 
-        return Promises.resolve(children);
+        return Promises.resolve(nodes);
     }
 
     @Nullable
@@ -95,25 +105,6 @@ public abstract class AbstractJavaContentRootInterceptor implements NodeIntercep
     public abstract String getTestSrcFolderAttribute();
 
     public abstract String getResourceFolderAttribute();
-
-    private void setupIcon(FolderReferenceNode srcFolder, ContentRoot srcType) {
-        switch (srcType) {
-            case SOURCE:
-                srcFolder.getPresentation(true).setPresentableIcon(javaResourceNodeManager.getJavaNodesResources().srcFolder());
-                break;
-            case TEST_SOURCE:
-                srcFolder.getPresentation(true).setPresentableIcon(javaResourceNodeManager.getJavaNodesResources().testSrcFolder());
-                break;
-//            case RESOURCE:
-//                srcFolder.getPresentation(true).setPresentableIcon(javaResourceNodeManager.getJavaNodesResources().resourceFolder());
-            default:
-                throw new IllegalArgumentException("Wrong source type");
-        }
-    }
-
-    private void setupAttribute(FolderReferenceNode node, String attributeName) {
-        node.getAttributes().put(attributeName, Collections.singletonList("true"));
-    }
 
     @Override
     public Integer weightOrder() {
