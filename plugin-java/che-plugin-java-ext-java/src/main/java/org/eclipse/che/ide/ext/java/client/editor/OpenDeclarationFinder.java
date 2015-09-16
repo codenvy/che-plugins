@@ -13,6 +13,8 @@ package org.eclipse.che.ide.ext.java.client.editor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.api.promises.client.Function;
+import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -29,12 +31,12 @@ import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
 import org.eclipse.che.ide.jseditor.client.text.LinearRange;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.util.loging.Log;
 
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -141,23 +143,34 @@ public class OpenDeclarationFinder {
                                }
                            });
         } else {
-            HasStorablePath path = new HasStorablePath() {
-                @NotNull
-                @Override
-                public String getStorablePath() {
-                    return descriptor.getPath();
-                }
-            };
-
-            projectExplorer.navigate(path, true).then(new Operation<Node>() {
-                @Override
-                public void apply(Node node) throws OperationException {
-                    if (node instanceof VirtualFile) {
-                        openFile((VirtualFile)node, descriptor);
-                    }
-                }
-            });
+            projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(descriptor.getPath()))
+                           .then(selectNode())
+                           .then(openNode(descriptor));
         }
+    }
+
+    protected Function<Node, Node> selectNode() {
+        return new Function<Node, Node>() {
+            @Override
+            public Node apply(Node node) throws FunctionException {
+                projectExplorer.select(node, false);
+
+                return node;
+            }
+        };
+    }
+
+    protected Function<Node, Node> openNode(final OpenDeclarationDescriptor descriptor) {
+        return new Function<Node, Node>() {
+            @Override
+            public Node apply(Node node) throws FunctionException {
+                if (node instanceof FileReferenceNode) {
+                    openFile((VirtualFile)node, descriptor);
+                }
+
+                return node;
+            }
+        };
     }
 
     private void openFile(VirtualFile result, final OpenDeclarationDescriptor descriptor) {
