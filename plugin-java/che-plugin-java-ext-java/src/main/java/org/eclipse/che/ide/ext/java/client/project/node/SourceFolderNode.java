@@ -28,6 +28,9 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
+ * Node that represent a java source folder.
+ * It may be source, test source, resource and test resource folder type.
+ *
  * @author Vlad Zhukovskiy
  */
 public class SourceFolderNode extends FolderReferenceNode {
