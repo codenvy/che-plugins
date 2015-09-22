@@ -56,6 +56,8 @@ import static org.mockito.Mockito.when;
  */
 public class PullPresenterTest extends BaseTest {
     public static final boolean SHOW_ALL_INFORMATION = true;
+    public static final String  FILE_PATH            = "/src/testClass.java";
+
     @Mock
     private FileReferenceNode   file;
     @Mock
@@ -91,6 +93,7 @@ public class PullPresenterTest extends BaseTest {
         when(editorAgent.getOpenedEditors()).thenReturn(partPresenterMap);
         when(partPresenter.getEditorInput()).thenReturn(editorInput);
         when(editorInput.getFile()).thenReturn(file);
+        when(file.getPath()).thenReturn(FILE_PATH);
     }
 
     @Test
@@ -295,6 +298,7 @@ public class PullPresenterTest extends BaseTest {
         verify(appContext).getCurrentProject();
         verify(eventBus, times(1)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
         verify(partPresenter).getEditorInput();
+        verify(file).getPath();
     }
 
     @Test

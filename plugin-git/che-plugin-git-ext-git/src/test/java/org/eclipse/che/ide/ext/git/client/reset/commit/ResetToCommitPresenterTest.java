@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.git.client.reset.commit;
 
 import com.google.web.bindery.event.shared.Event;
+import com.google.web.bindery.event.shared.EventBus;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
 import org.eclipse.che.api.git.shared.LogResponse;
@@ -61,6 +62,8 @@ public class ResetToCommitPresenterTest extends BaseTest {
     @Mock
     private ResetToCommitView      view;
     @Mock
+    private EventBus               eventBus;
+    @Mock
     private FileNode               file;
     @Mock
     private EditorInput            editorInput;
@@ -78,6 +81,7 @@ public class ResetToCommitPresenterTest extends BaseTest {
         super.disarm();
 
         presenter = new ResetToCommitPresenter(view,
+                                               eventBus,
                                                service,
                                                constant,
                                                editorAgent,
@@ -204,6 +208,8 @@ public class ResetToCommitPresenterTest extends BaseTest {
         verify(appContext).getCurrentProject();
         verify(service).reset((ProjectDescriptor)anyObject(), eq(PROJECT_PATH), eq(HARD), (List<String>)anyObject(),
                               (AsyncRequestCallback<Void>)anyObject());
+        verify(partPresenter).getEditorInput();
+        verify(file).getPath();
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 

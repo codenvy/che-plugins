@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.git.client.pull;
 
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
+import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.Branch;
@@ -20,7 +21,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
-import org.eclipse.che.ide.api.event.FileEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.dto.DtoFactory;
@@ -202,7 +202,7 @@ public class PullPresenter implements PullView.ActionDelegate {
         projectExplorer.reloadChildren();
         for (EditorPartPresenter partPresenter : openedEditors) {
             final VirtualFile file = partPresenter.getEditorInput().getFile();
-            eventBus.fireEvent(new FileEvent(file, FileEvent.FileOperation.CLOSE));
+            eventBus.fireEvent(new FileContentUpdateEvent(file.getPath()));
         }
     }
 

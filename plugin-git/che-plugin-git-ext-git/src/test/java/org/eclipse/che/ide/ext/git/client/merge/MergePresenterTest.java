@@ -36,6 +36,7 @@ import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.notification.Notification;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.junit.Test;
@@ -69,6 +70,8 @@ import static org.mockito.Mockito.when;
  */
 public class MergePresenterTest extends BaseTest {
     public static final String DISPLAY_NAME = "displayName";
+    public static final String FILE_PATH    = "/src/testClass.java";
+
     @Mock
     private MergeView           view;
     @Mock
@@ -81,6 +84,8 @@ public class MergePresenterTest extends BaseTest {
     private Reference           selectedReference;
     @Mock
     private EditorPartPresenter partPresenter;
+    @Mock
+    private VirtualFile         file;
     private MergePresenter      presenter;
 
     @Override
@@ -96,6 +101,8 @@ public class MergePresenterTest extends BaseTest {
         when(selectedReference.getDisplayName()).thenReturn(DISPLAY_NAME);
         when(editorAgent.getOpenedEditors()).thenReturn(partPresenterMap);
         when(partPresenter.getEditorInput()).thenReturn(editorInput);
+        when(editorInput.getFile()).thenReturn(file);
+        when(file.getPath()).thenReturn(FILE_PATH);
     }
 
     @Test
@@ -194,6 +201,7 @@ public class MergePresenterTest extends BaseTest {
         verify(service).merge(eq(rootProjectDescriptor), eq(DISPLAY_NAME), (AsyncRequestCallback<MergeResult>)anyObject());
         verify(appContext).getCurrentProject();
         verify(partPresenter).getEditorInput();
+        verify(file).getPath();
         verify(notificationManager).showNotification((Notification)anyObject());
     }
 

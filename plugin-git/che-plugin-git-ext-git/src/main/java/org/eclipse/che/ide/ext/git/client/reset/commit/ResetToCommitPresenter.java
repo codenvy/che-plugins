@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.reset.commit;
 
+import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.LogResponse;
@@ -27,6 +29,7 @@ import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -46,6 +49,7 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
     private       ResetToCommitView           view;
     private final NewProjectExplorerPresenter projectExplorer;
     private       GitServiceClient            service;
+    private       EventBus                    eventBus;
     private       Revision                    selectedRevision;
     private       AppContext                  appContext;
     private       GitLocalizationConstant     constant;
@@ -58,6 +62,7 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
      */
     @Inject
     public ResetToCommitPresenter(ResetToCommitView view,
+                                  EventBus eventBus,
                                   GitServiceClient service,
                                   GitLocalizationConstant constant,
                                   EditorAgent editorAgent,
@@ -69,6 +74,7 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
         this.projectExplorer = projectExplorer;
         this.view.setDelegate(this);
         this.service = service;
+        this.eventBus = eventBus;
         this.constant = constant;
         this.editorAgent = editorAgent;
         this.appContext = appContext;
@@ -152,7 +158,7 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
                                   // must change the workdir
                                   //In this case we can have unconfigured state of the project,
                                   //so we must repeat the logic which is performed when we open a project
-                                  projectExplorer.reloadChildren();
+                                  refreshProject(openedEditors);
                               }
                               Notification notification = new Notification(constant.resetSuccessfully(), INFO);
                               notificationManager.showNotification(notification);
@@ -166,6 +172,20 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
                               notificationManager.showNotification(notification);
                           }
                       });
+    }
+
+    /**
+     * Refresh project.
+     *
+     * @param openedEditors
+     *         editors that corresponds to open files
+     */
+    private void refreshProject(final List<EditorPartPresenter> openedEditors) {
+        projectExplorer.reloadChildren();
+        for (EditorPartPresenter partPresenter : openedEditors) {
+            final VirtualFile file = partPresenter.getEditorInput().getFile();
+            eventBus.fireEvent(new FileContentUpdateEvent(file.getPath()));
+        }
     }
 }
 
