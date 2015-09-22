@@ -65,15 +65,16 @@ public class DockerInstance extends AbstractInstance {
     protected static final Pattern       SERVICE_LABEL_PATTERN =
             Pattern.compile("che:server:(?<port>[0-9]+(/tcp|/udp)?):(?<servprop>ref|protocol)");
 
-    private final DockerMachineFactory dockerMachineFactory;
-    private final String               container;
-    private final DockerConnector      docker;
-    private final LineConsumer         outputConsumer;
-    private final String               registry;
-    private final DockerNode           node;
-    private final String               workspaceId;
-    private final boolean              workspaceIsBound;
-    private final int                  memorySizeMB;
+    private final DockerMachineFactory       dockerMachineFactory;
+    private final String                     container;
+    private final DockerConnector            docker;
+    private final LineConsumer               outputConsumer;
+    private final String                     registry;
+    private final DockerNode                 node;
+    private final String                     workspaceId;
+    private final boolean                    workspaceIsBound;
+    private final int                        memorySizeMB;
+    private final DockerInstanceStopDetector dockerInstanceStopDetector;
 
     private ContainerInfo containerInfo;
 
@@ -90,7 +91,8 @@ public class DockerInstance extends AbstractInstance {
                           @Assisted DockerNode node,
                           @Assisted LineConsumer outputConsumer,
                           @Assisted Recipe recipe,
-                          @Assisted int memorySizeMB) {
+                          @Assisted int memorySizeMB,
+                          DockerInstanceStopDetector dockerInstanceStopDetector) {
         super(machineId, "docker", workspaceId, creator, recipe, workspaceIsBound, displayName);
         this.dockerMachineFactory = dockerMachineFactory;
         this.container = container;
@@ -101,6 +103,7 @@ public class DockerInstance extends AbstractInstance {
         this.workspaceId = workspaceId;
         this.workspaceIsBound = workspaceIsBound;
         this.memorySizeMB = memorySizeMB;
+        this.dockerInstanceStopDetector = dockerInstanceStopDetector;
     }
 
     @Override
@@ -282,6 +285,7 @@ public class DockerInstance extends AbstractInstance {
 
     @Override
     public void destroy() throws MachineException {
+        dockerInstanceStopDetector.stopDetection(container);
         try {
             if (workspaceIsBound) {
                 node.unbindWorkspace(workspaceId, node.getProjectsFolder());

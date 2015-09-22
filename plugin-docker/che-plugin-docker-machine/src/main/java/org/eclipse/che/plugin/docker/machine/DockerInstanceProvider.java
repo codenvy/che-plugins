@@ -69,6 +69,7 @@ public class DockerInstanceProvider implements InstanceProvider {
 
     private final DockerConnector                  docker;
     private final RuntimeWorkspaceRegistry         runtimeWorkspaceRegistry;
+    private final DockerInstanceStopDetector       dockerInstanceStopDetector;
     private final Set<String>                      supportedRecipeTypes;
     private final DockerMachineFactory             dockerMachineFactory;
     private final Map<String, String>              devMachineContainerLabels;
@@ -83,6 +84,7 @@ public class DockerInstanceProvider implements InstanceProvider {
     public DockerInstanceProvider(DockerConnector docker,
                                   DockerMachineFactory dockerMachineFactory,
                                   RuntimeWorkspaceRegistry runtimeWorkspaceRegistry,
+                                  DockerInstanceStopDetector dockerInstanceStopDetector,
                                   @Named("machine.docker.dev_machine.machine_servers") Set<ServerConf> devMachineServers,
                                   @Named("machine.docker.machine_servers") Set<ServerConf> allMachineServers,
                                   @Named("machine.docker.dev_machine.machine_volumes") Set<String> devMachineSystemVolumes,
@@ -93,6 +95,7 @@ public class DockerInstanceProvider implements InstanceProvider {
         this.docker = docker;
         this.dockerMachineFactory = dockerMachineFactory;
         this.runtimeWorkspaceRegistry = runtimeWorkspaceRegistry;
+        this.dockerInstanceStopDetector = dockerInstanceStopDetector;
         this.devMachineSystemVolumes = new HashSet<>(devMachineSystemVolumes);
         this.systemVolumesForMachine = new HashSet<>(allMachinesSystemVolumes);
         this.portsToExposeOnDevMachine = new HashMap<>();
@@ -355,6 +358,8 @@ public class DockerInstanceProvider implements InstanceProvider {
                                                     .withMemorySwap(-1);
 
             docker.startContainer(containerId, hostConfig);
+
+            dockerInstanceStopDetector.startDetection(containerId, machineId);
 
             return dockerMachineFactory.createInstance(machineId,
                                                        workspaceId,
