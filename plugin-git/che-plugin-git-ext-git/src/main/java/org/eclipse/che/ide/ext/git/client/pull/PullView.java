@@ -32,6 +32,9 @@ public interface PullView extends View<PullView.ActionDelegate> {
         
         /** Performs any actions appropriate in response to the remote branch value changed. */
         void onRemoteBranchChanged();
+
+        /** Performs any actions appropriate in response to the repository value changed. */
+        void onRemoteRepositoryChanged();
     }
 
     /**

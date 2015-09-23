@@ -196,13 +196,18 @@ public class FetchViewImpl extends Window implements FetchView {
     }
 
     @UiHandler("fetchAllBranches")
-    public void onValueChanged(ValueChangeEvent<Boolean> event) {
+    public void onFetchAllBranchesValueChanged(ValueChangeEvent<Boolean> event) {
         delegate.onValueChanged();
     }
 
     @UiHandler("remoteBranch")
-    public void onValueChanged(ChangeEvent event) {
+    public void onRemoteBranchValueChanged(ChangeEvent event) {
         delegate.onRemoteBranchChanged();
+    }
+
+    @UiHandler("repository")
+    public void onRemoteRepositoryValueChanged(ChangeEvent event) {
+        delegate.onRemoteRepositoryChanged();
     }
 
     /** {@inheritDoc} */

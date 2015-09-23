@@ -90,21 +90,21 @@ public class PullPresenter implements PullView.ActionDelegate {
     /** Show dialog. */
     public void showDialog() {
         project = appContext.getCurrentProject();
-        getRemotes();
+        setRemotes();
     }
 
     /**
-     * Get the list of remote repositories for local one. If remote repositories are found, then get the list of branches (remote and
+     * Update the list of remote repositories for local one. If remote repositories are found, then update the list of branches (remote and
      * local).
      */
-    private void getRemotes() {
+    private void setRemotes() {
         view.setEnablePullButton(true);
 
         gitServiceClient.remoteList(project.getRootProject(), null, true,
                                     new AsyncRequestCallback<List<Remote>>(dtoUnmarshallerFactory.newListUnmarshaller(Remote.class)) {
                                         @Override
                                         protected void onSuccess(List<Remote> result) {
-                                            getBranches(LIST_REMOTE);
+                                            setBranches(LIST_REMOTE);
                                             view.setRepositories(result);
                                             view.setEnablePullButton(!result.isEmpty());
                                             view.showDialog();
@@ -123,12 +123,11 @@ public class PullPresenter implements PullView.ActionDelegate {
     }
 
     /**
-     * Get the list of branches.
+     * Update the list of branches.
      *
-     * @param remoteMode
-     *         is a remote mode
+     * @param remoteMode is a remote mode
      */
-    private void getBranches(@NotNull final String remoteMode) {
+    private void setBranches(@NotNull final String remoteMode) {
         gitServiceClient.branchList(project.getRootProject(), remoteMode,
                                     new AsyncRequestCallback<List<Branch>>(dtoUnmarshallerFactory.newListUnmarshaller(Branch.class)) {
                                         @Override
@@ -136,7 +135,7 @@ public class PullPresenter implements PullView.ActionDelegate {
                                             if (LIST_REMOTE.equals(remoteMode)) {
                                                 view.setRemoteBranches(branchSearcher.getRemoteBranchesToDisplay(view.getRepositoryName(),
                                                                                                                  result));
-                                                getBranches(LIST_LOCAL);
+                                                setBranches(LIST_LOCAL);
                                             } else {
                                                 view.setLocalBranches(branchSearcher.getLocalBranchesToDisplay(result));
                                                 for (Branch branch : result) {
@@ -252,5 +251,11 @@ public class PullPresenter implements PullView.ActionDelegate {
     @Override
     public void onRemoteBranchChanged() {
         view.selectLocalBranch(view.getRemoteBranch());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onRemoteRepositoryChanged() {
+        setBranches(LIST_REMOTE);
     }
 }

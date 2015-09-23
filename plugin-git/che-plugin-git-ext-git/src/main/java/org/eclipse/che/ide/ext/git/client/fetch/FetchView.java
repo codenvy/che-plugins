@@ -36,6 +36,9 @@ public interface FetchView extends View<FetchView.ActionDelegate> {
         
         /** Performs any actions appropriate in response to the remote branch value changed. */
         void onRemoteBranchChanged();
+
+        /** Performs any actions appropriate in response to the repository value changed. */
+        void onRemoteRepositoryChanged();
     }
 
     /** @return <code>true</code> if need to delete remove refs, and <code>false</code> otherwise */

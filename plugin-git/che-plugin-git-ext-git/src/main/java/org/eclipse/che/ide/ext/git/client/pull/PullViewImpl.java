@@ -177,8 +177,13 @@ public class PullViewImpl extends Window implements PullView {
     }
 
     @UiHandler("remoteBranch")
-    public void onValueChanged(ChangeEvent event) {
+    public void onRemoteBranchValueChanged(ChangeEvent event) {
         delegate.onRemoteBranchChanged();
+    }
+
+    @UiHandler("repository")
+    public void onRemoteRepositoryValueChanged(ChangeEvent event) {
+        delegate.onRemoteRepositoryChanged();
     }
 
     /** {@inheritDoc} */
