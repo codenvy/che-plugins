@@ -177,8 +177,7 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
     /**
      * Refresh project.
      *
-     * @param openedEditors
-     *         editors that corresponds to open files
+     * @param openedEditors editors that corresponds to open files
      */
     private void refreshProject(final List<EditorPartPresenter> openedEditors) {
         projectExplorer.reloadChildren();
