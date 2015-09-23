@@ -16,17 +16,22 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
+import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
+import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.part.explorer.project.NewProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
+import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+import org.eclipse.che.ide.rest.Unmarshallable;
+import org.eclipse.che.ide.util.loging.Log;
 
 /**
  * Presenter for checkout reference(branch, tag) name or commit hash.
@@ -35,15 +40,17 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
  */
 @Singleton
 public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionDelegate {
-    private final NotificationManager         notificationManager;
-    private       GitServiceClient            service;
-    private       AppContext                  appContext;
-    private       GitLocalizationConstant     constant;
-    private       CheckoutReferenceView       view;
-    private final NewProjectExplorerPresenter projectExplorer;
-    private final DtoFactory                  dtoFactory;
-    private final EditorAgent                 editorAgent;
-    private final EventBus                    eventBus;
+    private final NotificationManager               notificationManager;
+    private final GitServiceClient                  service;
+    private final AppContext                        appContext;
+    private final GitLocalizationConstant           constant;
+    private final CheckoutReferenceView             view;
+    private final NewProjectExplorerPresenter       projectExplorer;
+    private final DtoFactory                        dtoFactory;
+    private final EditorAgent                       editorAgent;
+    private final EventBus                          eventBus;
+    private final ProjectServiceClient              projectService;
+    private final DtoUnmarshallerFactory            dtoUnmarshallerFactory;
 
     @Inject
     public CheckoutReferencePresenter(CheckoutReferenceView view,
@@ -54,7 +61,9 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                       NewProjectExplorerPresenter projectExplorer,
                                       DtoFactory dtoFactory,
                                       EditorAgent editorAgent,
-                                      EventBus eventBus) {
+                                      EventBus eventBus,
+                                      ProjectServiceClient projectService,
+                                      DtoUnmarshallerFactory dtoUnmarshallerFactory) {
         this.view = view;
         this.projectExplorer = projectExplorer;
         this.dtoFactory = dtoFactory;
@@ -65,6 +74,8 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
         this.appContext = appContext;
         this.constant = constant;
         this.notificationManager = notificationManager;
+        this.projectService = projectService;
+        this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
     }
 
     /** Show dialog. */
@@ -91,9 +102,26 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                    protected void onSuccess(String result) {
                                        //In this case we can have unconfigured state of the project,
                                        //so we must repeat the logic which is performed when we open a project
-                                       projectExplorer.reloadChildren();
+                                       Unmarshallable<ProjectDescriptor> unmarshaller =
+                                               dtoUnmarshallerFactory.newUnmarshaller(ProjectDescriptor.class);
+                                       projectService.getProject(project.getPath(),
+                                                                 new AsyncRequestCallback<ProjectDescriptor>(unmarshaller) {
+                                                                     @Override
+                                                                     protected void onSuccess(final ProjectDescriptor result) {
+                                                                         if (!result.getProblems().isEmpty()) {
+                                                                             eventBus.fireEvent(new OpenProjectEvent(result.getPath()));
+                                                                         } else {
+                                                                             projectExplorer.reloadChildren();
 
-                                       updateOpenedFiles();
+                                                                             updateOpenedFiles();
+                                                                         }
+                                                                     }
+
+                                                                     @Override
+                                                                     protected void onFailure(Throwable exception) {
+                                                                         Log.error(getClass(), "Can't get project by path");
+                                                                     }
+                                                                 });
                                    }
 
                                    @Override
