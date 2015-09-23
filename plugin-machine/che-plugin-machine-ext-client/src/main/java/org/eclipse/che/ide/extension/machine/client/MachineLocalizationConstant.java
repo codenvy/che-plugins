@@ -43,6 +43,12 @@ public interface MachineLocalizationConstant extends Messages {
     @Key("control.selectCommand.description")
     String selectCommandControlDescription();
 
+    @Key("control.selectCommand.emptyCurrentDevMachine.text")
+    String selectCommandEmptyCurrentDevMachineText();
+
+    @Key("control.selectCommand.emptyCurrentCommand.text")
+    String selectCommandEmptyCurrentCommandText();
+
     @Key("control.runSelectedCommand.text")
     String executeSelectedCommandControlTitle();
 

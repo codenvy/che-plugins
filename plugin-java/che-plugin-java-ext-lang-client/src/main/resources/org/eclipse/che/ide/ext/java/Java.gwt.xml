@@ -20,6 +20,8 @@
     <inherits name='org.eclipse.che.ide.Api'/>
     <inherits name="com.google.gwt.inject.Inject"/>
     <inherits name="org.eclipse.che.api.Project"/>
+    <inherits name="org.eclipse.che.ide.jseditor.JsEditor"/>
+    <inherits name="org.eclipse.che.ide.ui.CodenvyUI"/>
 
     <source path="client"/>
     <source path="shared"/>

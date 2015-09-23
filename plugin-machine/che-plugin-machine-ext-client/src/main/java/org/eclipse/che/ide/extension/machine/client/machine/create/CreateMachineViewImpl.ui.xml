@@ -16,13 +16,11 @@
     <ui:with field='localizationConstant' type='org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant'/>
 
     <ui:style>
-        @eval inputBackgroundColor org.eclipse.che.ide.api.theme.Style.getInputBackground();
         .emptyBorder {
             margin: 6px;
         }
 
         .inputField {
-            background-color: inputBackgroundColor;
             color: #dbdbdb;
             border: 1px solid #191c1e;
             border-radius: 1px;

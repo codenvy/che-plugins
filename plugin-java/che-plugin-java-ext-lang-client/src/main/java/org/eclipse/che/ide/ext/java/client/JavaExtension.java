@@ -28,6 +28,7 @@ import org.eclipse.che.ide.ext.java.client.action.NewPackageAction;
 import org.eclipse.che.ide.ext.java.client.action.OpenDeclarationAction;
 import org.eclipse.che.ide.ext.java.client.action.QuickDocumentationAction;
 import org.eclipse.che.ide.ext.java.client.refactoring.move.MoveAction;
+import org.eclipse.che.ide.ext.java.client.refactoring.rename.RenameRefactoringAction;
 import org.eclipse.che.ide.ext.java.shared.Constants;
 import org.eclipse.che.ide.util.browser.UserAgent;
 import org.eclipse.che.ide.util.input.KeyCodeMap;
@@ -65,6 +66,7 @@ public class JavaExtension {
                                 NewJavaSourceFileAction newJavaSourceFileAction,
                                 ActionManager actionManager,
                                 MoveAction moveAction,
+                                RenameRefactoringAction renameRefactoringAction,
                                 QuickDocumentationAction quickDocumentationAction,
                                 OpenDeclarationAction openDeclarationAction) {
         // add actions in File -> New group
@@ -78,9 +80,11 @@ public class JavaExtension {
         DefaultActionGroup refactorGroup = (DefaultActionGroup)actionManager.getAction(GROUP_REFACTORING);
         refactorGroup.addSeparator();
         refactorGroup.add(moveAction);
+        refactorGroup.add(renameRefactoringAction);
 
         actionManager.registerAction("showQuickDoc", quickDocumentationAction);
         actionManager.registerAction("openJavaDeclaration", openDeclarationAction);
+        actionManager.registerAction("javaRenameRefactoring", renameRefactoringAction);
 
         DefaultActionGroup codeGroup = (DefaultActionGroup)actionManager.getAction(GROUP_CODE);
         codeGroup.add(quickDocumentationAction, Constraints.LAST);
@@ -91,6 +95,7 @@ public class JavaExtension {
             keyBinding.getGlobal().addKey(new KeyBuilder().action().charCode('q').build(), "showQuickDoc");
         }
         keyBinding.getGlobal().addKey(new KeyBuilder().none().charCode(KeyCodeMap.F4).build(), "openJavaDeclaration");
+        keyBinding.getGlobal().addKey(new KeyBuilder().shift().charCode(KeyCodeMap.F6).build(), "javaRenameRefactoring");
     }
 
     @Inject

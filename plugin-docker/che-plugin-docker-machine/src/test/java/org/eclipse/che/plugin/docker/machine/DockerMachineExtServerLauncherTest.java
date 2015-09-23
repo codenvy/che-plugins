@@ -45,17 +45,9 @@ public class DockerMachineExtServerLauncherTest {
     }
 
 
-    @Test(expectedExceptions = RuntimeException.class)
-    public void shouldThrowRuntimeExceptionIfNoExtServerArchivePresent() {
-        launcher = new DockerMachineExtServerLauncher(eventService, docker, machineManager, "", "/no/such/path");
-
-        launcher.start();
-        verifyZeroInteractions(eventService);
-    }
-
     @Test
     public void shouldSkipEventsWithStatusOtherThanRunning() {
-        launcher = new DockerMachineExtServerLauncher(eventService, docker, machineManager, "", "/tmp");
+        launcher = new DockerMachineExtServerLauncher(eventService, docker, machineManager, "");
 
         launcher.start();
 

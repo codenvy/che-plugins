@@ -123,9 +123,7 @@
 .cm-s-codenvy .CodeMirror-dialog {
     background-color: activeTabBackground;
     color: mainFontColor;
-    text-shadow: boxTextShadow;
     font-family: mainFontFamily;
-    font-size: boxFontSize;
 }
 
 .cm-s-codenvy .CodeMirror-dialog-top {
@@ -145,20 +143,14 @@
     /* same as .cm-s-codenvy .CodeMirror-dialog above */
     background-color: activeTabBackground;
     color: mainFontColor;
-    text-shadow: boxTextShadow;
     font-family: mainFontFamily;
-    font-size: boxFontSize;
 }
 .cm-s-codenvy .CodeMirror-dialog input {
     /* duplicated from Core.css gwt-TextBox style */
-    background-color: boxBackgroundColor;
-    color: boxTextColor;
-    border: 1px solid boxBorderColor;
+    color: textFieldColor;
+    border: 1px solid textFieldBorderColor;
     border-radius: 1px;
-    box-shadow: boxInnerShadow, boxOuterShadow;
     font-family: mainFontFamily;
-    font-size: boxFontSize;
-    text-shadow: boxTextShadow;
 }
 /* hacky override for the inline style. */
 .cm-s-codenvy .CodeMirror-dialog input[style] {

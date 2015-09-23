@@ -89,9 +89,7 @@
 .orionCodenvy .textViewFind {
     background-color: activeTabBackground;
     color: mainFontColor;
-    text-shadow: boxTextShadow;
     font-family: mainFontFamily;
-    font-size: boxFontSize;
     border: 1px solid black;
 }
 .orionCodenvy .textViewFind.show {
@@ -106,14 +104,10 @@
 }
 .orionCodenvy input {
 	/* duplicated from Core.css gwt-TextBox style */
-    background-color: boxBackgroundColor;
-    color: boxTextColor;
-    border: 1px solid boxBorderColor;
+    color: textFieldColor;
+    border: 1px solid textFieldBorderColor;
     border-radius: 1px;
-    box-shadow: boxInnerShadow, boxOuterShadow;
     font-family: mainFontFamily;
-    font-size: boxFontSize;
-    text-shadow: boxTextShadow;
 }
 .orionCodenvy .textViewReplaceInput {
 }

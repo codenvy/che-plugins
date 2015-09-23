@@ -72,15 +72,16 @@ public class SelectCommandComboBoxAction extends AbstractPerspectiveAction imple
     public static final  String                           GROUP_COMMANDS     = "CommandsGroup";
     private static final Comparator<CommandConfiguration> commandsComparator = new CommandsComparator();
 
-    private final DropDownHeaderWidget dropDownHeaderWidget;
-    private final HTML                 devMachineLabelWidget;
-    private final DropDownListFactory  dropDownListFactory;
-    private final AppContext           appContext;
-    private final ActionManager        actionManager;
-    private final CommandServiceClient commandServiceClient;
-    private final MachineServiceClient machineServiceClient;
-    private final CommandTypeRegistry  commandTypeRegistry;
-    private final MachineResources     resources;
+    private final MachineLocalizationConstant locale;
+    private final DropDownHeaderWidget        dropDownHeaderWidget;
+    private final HTML                        devMachineLabelWidget;
+    private final DropDownListFactory         dropDownListFactory;
+    private final AppContext                  appContext;
+    private final ActionManager               actionManager;
+    private final CommandServiceClient        commandServiceClient;
+    private final MachineServiceClient        machineServiceClient;
+    private final CommandTypeRegistry         commandTypeRegistry;
+    private final MachineResources            resources;
 
     private List<CommandConfiguration> commands;
     private DefaultActionGroup         commandActions;
@@ -101,6 +102,7 @@ public class SelectCommandComboBoxAction extends AbstractPerspectiveAction imple
               locale.selectCommandControlTitle(),
               locale.selectCommandControlDescription(),
               null, null);
+        this.locale = locale;
         this.resources = resources;
         this.actionManager = actionManager;
         this.commandServiceClient = commandServiceClient;
@@ -110,7 +112,7 @@ public class SelectCommandComboBoxAction extends AbstractPerspectiveAction imple
         this.dropDownListFactory = dropDownListFactory;
         this.appContext = appContext;
         this.dropDownHeaderWidget = dropDownListFactory.createList(GROUP_COMMANDS_LIST);
-        this.devMachineLabelWidget = new HTML();
+        this.devMachineLabelWidget = new HTML(locale.selectCommandEmptyCurrentDevMachineText());
 
         commands = new LinkedList<>();
 
@@ -293,7 +295,7 @@ public class SelectCommandComboBoxAction extends AbstractPerspectiveAction imple
 
     /** Clears the selected element in the 'Select Command' menu. */
     private void setEmptyCommand() {
-        dropDownHeaderWidget.selectElement("");
+        dropDownHeaderWidget.selectElement(this.locale.selectCommandEmptyCurrentCommandText());
     }
 
     @Override

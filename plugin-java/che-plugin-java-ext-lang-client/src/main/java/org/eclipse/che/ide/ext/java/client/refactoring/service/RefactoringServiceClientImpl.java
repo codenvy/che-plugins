@@ -19,10 +19,13 @@ import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.ChangeCreationResult;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.CreateMoveRefactoring;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.CreateRenameRefactoring;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.LinkedRenameRefactoringApply;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.MoveSettings;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.RefactoringPreview;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.RefactoringSession;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.RefactoringStatus;
+import org.eclipse.che.ide.ext.java.shared.dto.refactoring.RenameRefactoringSession;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.ReorgDestination;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -67,6 +70,36 @@ final class RefactoringServiceClientImpl implements RefactoringServiceClient {
                                    .header(ACCEPT, TEXT_PLAIN)
                                    .header(CONTENT_TYPE, APPLICATION_JSON)
                                    .send(newCallback(callback, new StringUnmarshaller()));
+            }
+        });
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Promise<RenameRefactoringSession> createRenameRefactoring(final CreateRenameRefactoring settings) {
+        final String url = pathToService + "rename/create";
+        return newPromise(new AsyncPromiseHelper.RequestCall<RenameRefactoringSession>() {
+            @Override
+            public void makeCall(AsyncCallback<RenameRefactoringSession> callback) {
+                asyncRequestFactory.createPostRequest(url, settings)
+                                   .header(ACCEPT, APPLICATION_JSON)
+                                   .header(CONTENT_TYPE, APPLICATION_JSON)
+                                   .send(newCallback(callback, unmarshallerFactory.newUnmarshaller(RenameRefactoringSession.class)));
+            }
+        });
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Promise<RefactoringStatus> applyLinkedModeRename(final LinkedRenameRefactoringApply refactoringApply) {
+        final String url = pathToService + "rename/linked/apply";
+        return newPromise(new AsyncPromiseHelper.RequestCall<RefactoringStatus>() {
+            @Override
+            public void makeCall(AsyncCallback<RefactoringStatus> callback) {
+                asyncRequestFactory.createPostRequest(url, refactoringApply)
+                                   .header(ACCEPT, APPLICATION_JSON)
+                                   .header(CONTENT_TYPE, APPLICATION_JSON)
+                                   .send(newCallback(callback, unmarshallerFactory.newUnmarshaller(RefactoringStatus.class)));
             }
         });
     }

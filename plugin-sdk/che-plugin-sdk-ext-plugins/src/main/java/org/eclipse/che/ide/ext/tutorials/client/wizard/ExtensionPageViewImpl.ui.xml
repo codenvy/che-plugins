@@ -13,9 +13,7 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
     <ui:style type="org.eclipse.che.ide.ext.tutorials.client.wizard.ExtensionPageViewImpl.Style">
-        @eval InputBackgroundColor org.eclipse.che.ide.api.theme.Style.getInputBackground();
         .field {
-            background-color: InputBackgroundColor;
             color: #dbdbdb;
             border: 1px solid #191c1e;
             border-radius: 1px;

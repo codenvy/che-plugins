@@ -13,10 +13,8 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
     <ui:style src="org/eclipse/che/ide/api/ui/style.css" type="org.eclipse.che.ide.extension.maven.client.wizard.MavenPageViewImpl.Style">
-        @eval InputBackgroundColor org.eclipse.che.ide.api.theme.Style.getInputBackground();
         @eval borderColor org.eclipse.che.ide.api.theme.Style.getTabBorderColor();
         .field {
-            background-color: InputBackgroundColor;
             color: #dbdbdb;
             border: 1px solid #191c1e;
             border-radius: 1px;

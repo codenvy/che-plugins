@@ -18,7 +18,6 @@
     color: notableButtonTopColor;
     background: none repeat scroll 0% 0% notableButtonColor;
     border-color: brColor;
-    font-size: boxFontSize;
     font-weight: bold;
     padding-left: 12px;
     padding-right: 12px;
@@ -30,7 +29,7 @@
 
 .foldingPanel {
   background-color: cellEvenRow;
-  border: 1px solid boxBorderColor;
+  border: 1px solid textFieldBorderColor;
   margin-bottom: 4px;
 }
 

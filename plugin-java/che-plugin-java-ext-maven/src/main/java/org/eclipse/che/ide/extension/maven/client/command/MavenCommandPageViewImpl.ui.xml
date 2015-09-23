@@ -14,9 +14,7 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
     <ui:with field='locale' type='org.eclipse.che.ide.extension.maven.client.MavenLocalizationConstant'/>
     <ui:style>
-        @eval inputBackgroundColor org.eclipse.che.ide.api.theme.Style.getInputBackground();
         .commandLineField {
-            background-color: inputBackgroundColor;
             color: #dbdbdb;
             border: 1px solid #191c1e;
             border-radius: 1px;

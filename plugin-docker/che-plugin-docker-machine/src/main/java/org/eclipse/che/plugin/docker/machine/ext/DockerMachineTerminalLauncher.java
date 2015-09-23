@@ -41,7 +41,6 @@ import static java.nio.file.Files.notExists;
 @Singleton // must be eager
 public class DockerMachineTerminalLauncher {
     public static final String START_TERMINAL_COMMAND    = "machine.server.terminal.run_command";
-    public static final String TERMINAL_ARCHIVE_LOCATION = "machine.server.terminal.archive";
 
     private static final Logger LOG = LoggerFactory.getLogger(DockerMachineTerminalLauncher.class);
 
@@ -49,30 +48,20 @@ public class DockerMachineTerminalLauncher {
     private final DockerConnector docker;
     private final MachineManager  machineManager;
     private final String          terminalStartCommand;
-    private final String          terminalArchiveLocation;
 
     @Inject
     public DockerMachineTerminalLauncher(EventService eventService,
                                          DockerConnector docker,
                                          MachineManager machineManager,
-                                         @Named(START_TERMINAL_COMMAND) String terminalStartCommand,
-                                         @Named(TERMINAL_ARCHIVE_LOCATION) String terminalArchiveLocation) {
+                                         @Named(START_TERMINAL_COMMAND) String terminalStartCommand) {
         this.eventService = eventService;
         this.docker = docker;
         this.machineManager = machineManager;
         this.terminalStartCommand = terminalStartCommand;
-        this.terminalArchiveLocation = terminalArchiveLocation;
     }
 
     @PostConstruct
     public void start() {
-
-        if (notExists(new File(terminalArchiveLocation).toPath())) {
-            String msg = String.format("Terminal archive not found at %s", terminalArchiveLocation);
-            LOG.error(msg);
-            throw new RuntimeException(msg);
-        }
-
         eventService.subscribe(new EventSubscriber<MachineStatusEvent>() {
             @Override
             public void onEvent(MachineStatusEvent event) {

@@ -126,6 +126,15 @@ public interface JavaLocalizationConstant extends Messages {
     @Key("move.action.name")
     String moveActionName();
 
+    @Key("rename.refactoring.action.name")
+    String renameRefactoringActionName();
+
+    @Key("rename.dialog.title")
+    String renameDialogTitle();
+
+    @Key("rename.dialog.label")
+    String renameDialogLabel();
+
     @Key("move.action.description")
     String moveActionDescription();
 
