@@ -78,20 +78,20 @@ public class FetchPresenter implements FetchView.ActionDelegate {
         project = appContext.getCurrentProject();
         view.setRemoveDeleteRefs(false);
         view.setFetchAllBranches(true);
-        setRemotes();
+        updateRemotes();
     }
 
     /**
-     * Set the list of remote repositories for local one. If remote repositories are found, then set the list of branches (remote and
+     * Update the list of remote repositories for local one. If remote repositories are found, then update the list of branches (remote and
      * local).
      */
-    private void setRemotes() {
+    private void updateRemotes() {
         service.remoteList(project.getRootProject(), null, true,
                            new AsyncRequestCallback<List<Remote>>(dtoUnmarshallerFactory.newListUnmarshaller(Remote.class)) {
                                @Override
                                protected void onSuccess(List<Remote> result) {
                                    view.setRepositories(result);
-                                   setBranches(LIST_REMOTE);
+                                   updateBranches(LIST_REMOTE);
                                    view.setEnableFetchButton(!result.isEmpty());
                                    view.showDialog();
                                }
@@ -111,18 +111,18 @@ public class FetchPresenter implements FetchView.ActionDelegate {
     }
 
     /**
-     * Set the list of branches.
+     * Update the list of branches.
      *
      * @param remoteMode is a remote mode
      */
-    private void setBranches(@NotNull final String remoteMode) {
+    private void updateBranches(@NotNull final String remoteMode) {
         service.branchList(project.getRootProject(), remoteMode,
                            new AsyncRequestCallback<List<Branch>>(dtoUnmarshallerFactory.newListUnmarshaller(Branch.class)) {
                                @Override
                                protected void onSuccess(List<Branch> result) {
                                    if (LIST_REMOTE.equals(remoteMode)) {
                                        view.setRemoteBranches(branchSearcher.getRemoteBranchesToDisplay(view.getRepositoryName(), result));
-                                       setBranches(LIST_LOCAL);
+                                       updateBranches(LIST_LOCAL);
                                    } else {
                                        view.setLocalBranches(branchSearcher.getLocalBranchesToDisplay(result));
                                        for (Branch branch : result) {
@@ -234,6 +234,6 @@ public class FetchPresenter implements FetchView.ActionDelegate {
     /** {@inheritDoc} */
     @Override
     public void onRemoteRepositoryChanged() {
-        setBranches(LIST_REMOTE);
+        updateBranches(LIST_REMOTE);
     }
 }
