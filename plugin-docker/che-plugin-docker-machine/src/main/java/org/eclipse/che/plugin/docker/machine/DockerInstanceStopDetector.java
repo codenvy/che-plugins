@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,10 +39,10 @@ import java.util.concurrent.Executors;
 public class DockerInstanceStopDetector {
     private static final Logger LOG = LoggerFactory.getLogger(DockerInstanceStopDetector.class);
 
-    private final EventService                      eventService;
-    private final DockerConnector                   dockerConnector;
-    private final ExecutorService                   executorService;
-    private final ConcurrentHashMap<String, String> instances;
+    private final EventService        eventService;
+    private final DockerConnector     dockerConnector;
+    private final ExecutorService     executorService;
+    private final Map<String, String> instances;
 
     private long lastProcessedEventDate = 0;
 
@@ -56,28 +57,40 @@ public class DockerInstanceStopDetector {
                                           .build());
     }
 
+    /**
+     * Start container stop detection.
+     *
+     * @param containerId
+     *         id of a container to start detection for
+     * @param machineId
+     *         id of a machine which container implements
+     */
     public void startDetection(String containerId, String machineId) {
         instances.put(containerId, machineId);
     }
 
+    /**
+     * Stop container stop detection.
+     *
+     * @param containerId
+     *         id of a container to start detection for
+     */
     public void stopDetection(String containerId) {
         instances.remove(containerId);
     }
 
     @PostConstruct
     private void detectContainersEvents() {
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        dockerConnector.getEvents(lastProcessedEventDate,
-                                                  0,
-                                                  new Filters().withFilter("event", "die", "oom"),
-                                                  new EventsProcessor());
-                    } catch (IOException ignore) {
-                        // usually connection timeout
-                    }
+        executorService.execute(() -> {
+            while (true) {
+                try {
+                    dockerConnector.getEvents(lastProcessedEventDate,
+                                              0,
+                                              new Filters().withFilter("event", "die", "oom"),
+                                              new EventsProcessor());
+                } catch (IOException e) {
+                    // usually connection timeout
+                    LOG.debug(e.getLocalizedMessage(), e);
                 }
             }
         });
