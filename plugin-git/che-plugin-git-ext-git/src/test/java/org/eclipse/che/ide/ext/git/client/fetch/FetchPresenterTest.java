@@ -35,6 +35,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -266,5 +267,32 @@ public class FetchPresenterTest extends BaseTest {
         presenter.onCancelClicked();
 
         verify(view).close();
+    }
+
+    @Test
+    public void shouldRefreshRemoteBranchesWhenRepositoryIsChanged() throws Exception {
+        final List<Remote> remotes = new ArrayList<>();
+        remotes.add(mock(Remote.class));
+        final List<Branch> branches = new ArrayList<>();
+        branches.add(branch);
+        when(branch.isActive()).thenReturn(ACTIVE_BRANCH);
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] arguments = invocation.getArguments();
+                AsyncRequestCallback<List<Branch>> callback = (AsyncRequestCallback<List<Branch>>)arguments[2];
+                Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
+                onSuccess.invoke(callback, branches);
+                return callback;
+            }
+        }).when(service).branchList((ProjectDescriptor)anyObject(), anyString(), (AsyncRequestCallback<List<Branch>>)anyObject());
+
+        presenter.onRemoteRepositoryChanged();
+
+        verify(service, times(2)).branchList(eq(rootProjectDescriptor), anyString(), (AsyncRequestCallback<List<Branch>>)anyObject());
+        verify(view).setRemoteBranches((List<String>)anyObject());
+        verify(view).setLocalBranches((List<String>)anyObject());
+        verify(view).selectRemoteBranch(anyString());
     }
 }

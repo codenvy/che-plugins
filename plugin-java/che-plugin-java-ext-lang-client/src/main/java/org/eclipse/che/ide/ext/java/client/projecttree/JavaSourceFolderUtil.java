@@ -19,81 +19,138 @@ import org.eclipse.che.ide.ext.java.client.projecttree.nodes.JarClassNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
 
+import javax.validation.constraints.Null;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/** @author Vladyslav Zhukovskii */
+/**
+ * @author Vladyslav Zhukovskii
+ * @author Anatoliy Bazko
+ */
 public class JavaSourceFolderUtil {
-    /** Tests if the specified item is a source folder. */
+
+    /** Indicates if the specified item is a source folder. */
     public static boolean isSourceFolder(ItemReference item, ProjectNode projectNode) {
         if ("folder".equals(item.getType())) {
-            ProjectDescriptor projectDescriptor = projectNode.getData();
-            //TODO only maven now
-//            BuildersDescriptor builders = projectDescriptor.getBuilders();
-            Map<String, List<String>> attributes = projectDescriptor.getAttributes();
-//            if (builders != null) {
-                boolean isSrcDir = false;
-                boolean isTestDir = false;
+            String projectBuilder = getProjectBuilder(projectNode);
 
-                if (attributes.containsKey(/*builders.getDefault() +*/ "maven.source.folder")) {
-                    isSrcDir = (projectDescriptor.getPath() + "/" + attributes.get(/*builders.getDefault() + */"maven.source.folder").get(0)).equals(item.getPath());
-                }
+            if (projectBuilder != null) {
+                ProjectDescriptor projectDescriptor = projectNode.getData();
+                Map<String, List<String>> attributes = projectDescriptor.getAttributes();
 
-                if (attributes.containsKey(/*builders.getDefault() + */"maven.test.source.folder")) {
-                    isTestDir = (projectDescriptor.getPath() + "/" + attributes.get(/*builders.getDefault() + */"maven.test.source.folder").get(0)).equals(item.getPath());
-                }
+                final String projectPath = projectDescriptor.getPath();
+                final String itemPath = item.getPath();
+
+                List<String> sourceFolders = attributes.get(projectBuilder + ".source.folder");
+                boolean isSrcDir = isSourceFolder(sourceFolders, projectPath, itemPath);
+
+                List<String> testSourceFolders = attributes.get(projectBuilder + ".test.source.folder");
+                boolean isTestDir = isSourceFolder(testSourceFolders, projectPath, itemPath);
 
                 return isSrcDir || isTestDir;
-//            }
+            }
         }
 
         return false;
     }
+
+    private static boolean isSourceFolder(@Null List<String> sourceFolders, String projectPath, String itemPath) {
+        projectPath = removeEndingPathSeparator(projectPath);
+
+        if (sourceFolders != null) {
+            for (String sourceFolder : sourceFolders) {
+                if ((projectPath + addStartingPathSeparator(sourceFolder)).equals(itemPath)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * Returns source folders list of the project to which the specified node belongs.
      * Every path in the returned list starts and ends with separator char /.
      */
     public static List<String> getSourceFolders(TreeNode<?> node) {
-        final ProjectNode project = node.getProject();
-        Map<String, List<String>> attributes = project.getData().getAttributes();
-        //TODO only maven now
-//        final String builderName = project.getData().getBuilders().getDefault();
-        List<String> mySourceFolders = new LinkedList<>();
+        List<String> allSourceFolders = new LinkedList<>();
 
-        List<String> sourceFolders = attributes.get(/*builderName + */"maven.source.folder");
+        ProjectNode project = node.getProject();
+        String projectBuilder = getProjectBuilder(project);
+        String projectPath = removeEndingPathSeparator(project.getPath());
+
+        Map<String, List<String>> attributes = project.getData().getAttributes();
+
+        List<String> sourceFolders = attributes.get(projectBuilder + ".source.folder");
         if (sourceFolders != null) {
             for (String sourceFolder : sourceFolders) {
-                mySourceFolders.add(project.getPath() + '/' + sourceFolder + '/');
+                allSourceFolders.add(projectPath + addStartingPathSeparator(sourceFolder) + '/');
             }
         }
 
-        List<String> testSourceFolders = attributes.get(/*builderName + */"maven.test.source.folder");
+        List<String> testSourceFolders = attributes.get(projectBuilder + ".test.source.folder");
         if (testSourceFolders != null) {
             for (String testSourceFolder : testSourceFolders) {
-                mySourceFolders.add(project.getPath() + '/' + testSourceFolder + '/');
+                allSourceFolders.add(projectPath + addStartingPathSeparator(testSourceFolder) + '/');
             }
         }
 
-        return mySourceFolders;
+        return allSourceFolders;
     }
 
-    public static String getFQNForFile(VirtualFile file){
+    public static String getFQNForFile(VirtualFile file) {
         String packageName = "";
         if (file instanceof SourceFileNode) {
             if (((SourceFileNode)file).getParent() instanceof PackageNode) {
                 packageName = ((PackageNode)((SourceFileNode)file).getParent()).getQualifiedName();
             }
-            if(!packageName.isEmpty()){
+            if (!packageName.isEmpty()) {
                 packageName = packageName + ".";
             }
-           return packageName + file.getName().substring(0, file.getName().lastIndexOf('.'));
+            return packageName + file.getName().substring(0, file.getName().lastIndexOf('.'));
         }
 
-        if(file instanceof JarClassNode){
+        if (file instanceof JarClassNode) {
             return file.getPath();
         }
         return file.getName().substring(0, file.getName().lastIndexOf('.'));
+    }
+
+    private static String removeEndingPathSeparator(String path) {
+        if (path.endsWith("/")) {
+            return path.substring(0, path.length() - 1);
+        }
+
+        return path;
+    }
+
+    private static String addStartingPathSeparator(String path) {
+        if (!path.startsWith("/")) {
+            return "/" + path;
+        }
+
+        return path;
+    }
+
+    @Null
+    public static String getProjectBuilder(ProjectNode node) {
+        return getProjectBuilder(node.getData().getType());
+    }
+
+    @Null
+    public static String getProjectBuilder(@Null String projectType) {
+        if (projectType == null) {
+            return null;
+        }
+
+        switch (projectType) {
+            case "maven":
+            case "ant":
+                return projectType;
+            default:
+                return null;
+        }
     }
 }

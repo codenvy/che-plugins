@@ -18,6 +18,7 @@ import org.eclipse.che.ide.api.icon.Icon;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeSettings;
+import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -60,6 +61,7 @@ public abstract class BaseNodeTest {
         attributes.put("maven.source.folder", Collections.singletonList("src/main/java"));
         when(projectDescriptor.getAttributes()).thenReturn(attributes);
         when(projectDescriptor.getPath()).thenReturn(PROJECT_PATH);
+        when(projectDescriptor.getType()).thenReturn(MavenAttributes.MAVEN_ID);
 
         when(projectNode.getData()).thenReturn(projectDescriptor);
 
