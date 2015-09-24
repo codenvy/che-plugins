@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
  *
  * @author Alexander Garagatyi
  */
-@Singleton // should be eager
+@Singleton
 public class DockerInstanceStopDetector {
     private static final Logger LOG = LoggerFactory.getLogger(DockerInstanceStopDetector.class);
 
