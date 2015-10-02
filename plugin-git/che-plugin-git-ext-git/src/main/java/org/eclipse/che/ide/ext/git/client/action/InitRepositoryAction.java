@@ -14,21 +14,18 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitResources;
 import org.eclipse.che.ide.ext.git.client.init.InitRepositoryPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * @author Andrey Plotnikov
- * @author Dmitry Shnurenko
- */
+/** @author Andrey Plotnikov */
 @Singleton
 public class InitRepositoryAction extends GitAction {
     private final InitRepositoryPresenter presenter;
@@ -42,9 +39,9 @@ public class InitRepositoryAction extends GitAction {
                                 GitLocalizationConstant constant,
                                 AppContext appContext,
                                 AnalyticsEventLogger eventLogger,
-                                SelectionAgent selectionAgent,
+                                ProjectExplorerPresenter projectExplorer,
                                 DialogFactory dialogFactory) {
-        super(constant.initControlTitle(), constant.initControlPrompt(), resources.initRepo(), appContext, selectionAgent);
+        super(constant.initControlTitle(), constant.initControlPrompt(), resources.initRepo(), appContext, projectExplorer);
         this.presenter = presenter;
         this.eventLogger = eventLogger;
         this.constant = constant;

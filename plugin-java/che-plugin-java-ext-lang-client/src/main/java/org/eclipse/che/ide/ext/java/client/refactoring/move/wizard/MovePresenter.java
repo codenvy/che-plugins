@@ -20,13 +20,13 @@ import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaSourceFolderUtil;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
 import org.eclipse.che.ide.ext.java.client.refactoring.RefactorInfo;
 import org.eclipse.che.ide.ext.java.client.refactoring.RefactoringUpdater;
 import org.eclipse.che.ide.ext.java.client.refactoring.preview.PreviewPresenter;
@@ -117,16 +117,16 @@ public class MovePresenter implements MoveView.ActionDelegate {
         List<JavaElement> elements = new ArrayList<>();
 
         for (Object node : refactorInfo.getSelectedItems()) {
-            StorableNode<?> storableNode = (StorableNode)node;
+            HasStorablePath storableNode = (HasStorablePath)node;
 
             JavaElement element = dtoFactory.createDto(JavaElement.class);
 
             if (storableNode instanceof PackageNode) {
-                element.setPath(storableNode.getPath());
+                element.setPath(storableNode.getStorablePath());
                 element.setPack(true);
             }
 
-            if (storableNode instanceof SourceFileNode) {
+            if (storableNode instanceof JavaFileNode) {
                 element.setPath(JavaSourceFolderUtil.getFQNForFile((VirtualFile)storableNode));
                 element.setPack(false);
             }

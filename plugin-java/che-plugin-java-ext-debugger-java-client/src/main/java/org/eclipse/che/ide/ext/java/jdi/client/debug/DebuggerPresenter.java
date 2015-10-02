@@ -21,6 +21,8 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -37,9 +39,9 @@ import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.parts.base.BasePresenter;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
+import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.debug.Breakpoint;
 import org.eclipse.che.ide.debug.BreakpointManager;
 import org.eclipse.che.ide.debug.Debugger;
@@ -61,6 +63,8 @@ import org.eclipse.che.ide.ext.java.jdi.shared.StackFrameDump;
 import org.eclipse.che.ide.ext.java.jdi.shared.StepEvent;
 import org.eclipse.che.ide.ext.java.jdi.shared.Value;
 import org.eclipse.che.ide.ext.java.jdi.shared.Variable;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.HTTPStatus;
@@ -99,6 +103,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
     private final DtoFactory                             dtoFactory;
     private final DtoUnmarshallerFactory                 dtoUnmarshallerFactory;
     private final AppContext                             appContext;
+    private final ProjectExplorerPresenter               projectExplorer;
     /** Channel identifier to receive events from debugger over WebSocket. */
     private       String                                 debuggerEventsChannel;
     /** Channel identifier to receive event when debugger will disconnected. */
@@ -142,12 +147,14 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                              final NotificationManager notificationManager,
                              final DtoFactory dtoFactory,
                              DtoUnmarshallerFactory dtoUnmarshallerFactory,
-                             final AppContext appContext) {
+                             final AppContext appContext,
+                             ProjectExplorerPresenter projectExplorer) {
         this.view = view;
         this.eventBus = eventBus;
         this.dtoFactory = dtoFactory;
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
         this.appContext = appContext;
+        this.projectExplorer = projectExplorer;
         this.view.setDelegate(this);
         this.view.setTitle(TITLE);
         this.service = service;
@@ -218,7 +225,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectReady(ProjectActionEvent event) {
                 CurrentProject currentProject = appContext.getCurrentProject();
 
                 if (currentProject == null) {
@@ -233,6 +240,10 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
 
                 List<String> sources = attributes.get(key);
                 srcFolder = sources == null ? "src/main/java" : sources.get(0);
+            }
+
+            @Override
+            public void onProjectOpened(ProjectActionEvent event) {
             }
 
             @Override
@@ -325,9 +336,9 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             final String filePath = resolveFilePathByLocation(location, activeFile);
             if (activeFile == null || !filePath.equalsIgnoreCase(activeFile.getPath())) {
                 final Location finalLocation = location;
-                openFile(location, activeFile, new AsyncCallback<FileNode>() {
+                openFile(location, activeFile, new AsyncCallback<VirtualFile>() {
                     @Override
-                    public void onSuccess(FileNode result) {
+                    public void onSuccess(VirtualFile result) {
                         if (result != null && filePath != null && filePath.equalsIgnoreCase(result.getPath())) {
                             breakpointManager.markCurrentBreakpoint(finalLocation.getLineNumber() - 1);
                         }
@@ -361,10 +372,11 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             return "";
         }
 
-        return activeFile.getProject().getPath() + "/" + srcFolder + "/" + location.getClassName().replace(".", "/") + ".java";
+        return activeFile.getProject().getProjectDescriptor().getPath() + "/" + srcFolder + "/" +
+               location.getClassName().replace(".", "/") + ".java";
     }
 
-    private void openFile(@NotNull Location location, @Nullable VirtualFile activeFile, final AsyncCallback<FileNode> callback) {
+    private void openFile(@NotNull Location location, @Nullable VirtualFile activeFile, final AsyncCallback<VirtualFile> callback) {
         final String filePath = resolveFilePathByLocation(location, activeFile);
         CurrentProject currentProject = appContext.getCurrentProject();
 
@@ -372,38 +384,34 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             return;
         }
 
-        currentProject.getCurrentTree().getNodeByPath(filePath, new AsyncCallback<TreeNode<?>>() {
+        projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(filePath)).then(new Operation<Node>() {
             public HandlerRegistration handlerRegistration;
 
             @Override
-            public void onSuccess(final TreeNode<?> result) {
-                if (result instanceof FileNode) {
-                    final FileNode fileToOpen = (FileNode)result;
-                    handlerRegistration = eventBus.addHandler(ActivePartChangedEvent.TYPE, new ActivePartChangedHandler() {
-                        @Override
-                        public void onActivePartChanged(ActivePartChangedEvent event) {
-                            if (event.getActivePart() instanceof EditorPartPresenter) {
-                                final VirtualFile openedFile = ((EditorPartPresenter)event.getActivePart()).getEditorInput().getFile();
-                                if (fileToOpen.getPath().equals(openedFile.getPath())) {
-                                    handlerRegistration.removeHandler();
-                                    // give the editor some time to fully render it's view
-                                    new Timer() {
-                                        @Override
-                                        public void run() {
-                                            callback.onSuccess(fileToOpen);
-                                        }
-                                    }.schedule(300);
-                                }
+            public void apply(final Node node) throws OperationException {
+                if (!(node instanceof FileReferenceNode)) {
+                    return;
+                }
+
+                handlerRegistration = eventBus.addHandler(ActivePartChangedEvent.TYPE, new ActivePartChangedHandler() {
+                    @Override
+                    public void onActivePartChanged(ActivePartChangedEvent event) {
+                        if (event.getActivePart() instanceof EditorPartPresenter) {
+                            final VirtualFile openedFile = ((EditorPartPresenter)event.getActivePart()).getEditorInput().getFile();
+                            if (((FileReferenceNode)node).getStorablePath().equals(openedFile.getPath())) {
+                                handlerRegistration.removeHandler();
+                                // give the editor some time to fully render it's view
+                                new Timer() {
+                                    @Override
+                                    public void run() {
+                                        callback.onSuccess((VirtualFile)node);
+                                    }
+                                }.schedule(300);
                             }
                         }
-                    });
-                    eventBus.fireEvent(new FileEvent(fileToOpen, OPEN));
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                callback.onFailure(caught);
+                    }
+                });
+                eventBus.fireEvent(new FileEvent((VirtualFile)node, OPEN));
             }
         });
     }

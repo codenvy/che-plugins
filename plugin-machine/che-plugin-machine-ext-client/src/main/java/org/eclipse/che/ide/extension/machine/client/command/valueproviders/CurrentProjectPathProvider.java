@@ -87,8 +87,12 @@ public class CurrentProjectPathProvider implements CommandPropertyValueProvider,
     }
 
     @Override
-    public void onProjectOpened(ProjectActionEvent event) {
+    public void onProjectReady(ProjectActionEvent event) {
         updateValue();
+    }
+
+    @Override
+    public void onProjectOpened(ProjectActionEvent event) {
     }
 
     @Override

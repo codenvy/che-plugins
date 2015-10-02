@@ -17,16 +17,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.RestContext;
 
 import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
@@ -39,19 +39,19 @@ import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
 @Singleton
 public class ExportPresenter extends SubversionActionPresenter implements ExportView.ActionDelegate {
 
-    private ExportView              view;
-    private NotificationManager     notificationManager;
-    private SubversionExtensionLocalizationConstants constants;
-    private final String              baseHttpUrl;
+    private       ExportView                               view;
+    private       NotificationManager                      notificationManager;
+    private       SubversionExtensionLocalizationConstants constants;
+    private final String                                   baseHttpUrl;
 
-    private TreeNode<?> selectedNode;
+    private HasStorablePath selectedNode;
 
     @Inject
     public ExportPresenter(AppContext appContext,
                            EventBus eventBus,
                            RawOutputPresenter console,
                            WorkspaceAgent workspaceAgent,
-                           ProjectExplorerPart projectExplorerPart,
+                           ProjectExplorerPresenter projectExplorerPart,
                            ExportView view,
                            NotificationManager notificationManager,
                            SubversionExtensionLocalizationConstants constants,
@@ -66,7 +66,7 @@ public class ExportPresenter extends SubversionActionPresenter implements Export
         this.baseHttpUrl = restContext + "/svn/" + workspaceId;
     }
 
-    public void showExport(TreeNode<?> selectedNode) {
+    public void showExport(HasStorablePath selectedNode) {
         this.selectedNode = selectedNode;
 
         view.onShow();
@@ -88,7 +88,7 @@ public class ExportPresenter extends SubversionActionPresenter implements Export
         }
 
         final String exportPath =
-                MoreObjects.firstNonNull(Strings.emptyToNull(relPath(projectPath, ((StorableNode)selectedNode).getPath())), ".");
+                MoreObjects.firstNonNull(Strings.emptyToNull(relPath(projectPath, selectedNode.getStorablePath())), ".");
         final String revision = view.isRevisionSpecified() ? view.getRevision() : null;
 
         final Notification notification = new Notification(constants.exportStarted(exportPath), PROGRESS);

@@ -12,8 +12,8 @@ package org.eclipse.che.ide.ext.java.jdi.client.fqn;
 
 import com.google.inject.Singleton;
 
+import org.eclipse.che.ide.api.project.node.HasProjectDescriptor;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -34,10 +34,10 @@ public class JavaFqnResolver implements FqnResolver {
     @NotNull
     @Override
     public String resolveFqn(@NotNull final VirtualFile file) {
-        final ProjectNode projectNode = file.getProject();
+        final HasProjectDescriptor projectNode = file.getProject();
         final List<String> sourceFolders = detectSourceFolders(projectNode);
 
-        final String projectPath = projectNode.getPath();
+        final String projectPath = projectNode.getProjectDescriptor().getPath();
         String filePath = file.getPath();
         int i = 1;
         int j = filePath.lastIndexOf('.');
@@ -68,11 +68,11 @@ public class JavaFqnResolver implements FqnResolver {
         return filePath.substring(i, j).replaceAll("/", ".");
     }
 
-    private List<String> detectSourceFolders(ProjectNode projectNode) {
+    private List<String> detectSourceFolders(HasProjectDescriptor projectNode) {
         List<String> sourceFolders = new ArrayList<>();
 
         String projectBuilder = getProjectBuilder(projectNode);
-        Map<String, List<String>> attributes = projectNode.getData().getAttributes();
+        Map<String, List<String>> attributes = projectNode.getProjectDescriptor().getAttributes();
 
         sourceFolders.addAll(attributes.containsKey(projectBuilder + ".source.folder") ? attributes.get(projectBuilder + ".source.folder")
                                                                                        : Collections.<String>emptyList());

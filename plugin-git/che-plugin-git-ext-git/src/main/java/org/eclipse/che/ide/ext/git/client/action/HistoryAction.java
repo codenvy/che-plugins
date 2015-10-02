@@ -10,19 +10,19 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.action;
 
-import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.client.history.HistoryPresenter;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
-/** @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a> */
+import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
+import org.eclipse.che.ide.api.action.ActionEvent;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.ext.git.client.GitResources;
+import org.eclipse.che.ide.ext.git.client.history.HistoryPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+
+/** @author Andrey Plotnikov */
 @Singleton
 public class HistoryAction extends GitAction {
     private final Provider<HistoryPresenter> presenterProvider;
@@ -34,8 +34,8 @@ public class HistoryAction extends GitAction {
                          GitResources resources,
                          GitLocalizationConstant constant,
                          AnalyticsEventLogger eventLogger,
-                         SelectionAgent selectionAgent) {
-        super(constant.historyControlTitle(), constant.historyControlPrompt(), resources.showHistory(), appContext, selectionAgent);
+                         ProjectExplorerPresenter projectExplorer) {
+        super(constant.historyControlTitle(), constant.historyControlPrompt(), resources.showHistory(), appContext, projectExplorer);
         this.presenterProvider = presenterProvider;
         this.eventLogger = eventLogger;
     }

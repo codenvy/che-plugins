@@ -22,6 +22,7 @@
     <inherits name='org.eclipse.che.api.Machine'/>
     <inherits name="org.eclipse.che.ide.Core"/>
     <inherits name="org.eclipse.che.ide.Commons"/>
+    <inherits name="org.eclipse.che.ide.editor.orion.OrionEditor"/>
 
     <source path="client"/>
     <source path=""/>

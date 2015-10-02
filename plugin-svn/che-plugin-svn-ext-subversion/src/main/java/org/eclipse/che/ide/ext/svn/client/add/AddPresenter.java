@@ -10,25 +10,24 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.add;
 
-import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.notification.Notification;
-import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
-import org.eclipse.che.ide.api.parts.WorkspaceAgent;
-import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.notification.Notification;
+import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.rest.AsyncRequestCallback;
+import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+
+import java.util.List;
 
 import static org.eclipse.che.ide.api.notification.Notification.Status.FINISHED;
 import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
@@ -61,7 +60,7 @@ public class AddPresenter extends SubversionActionPresenter {
                            final SubversionExtensionLocalizationConstants constants,
                            final SubversionClientService service,
                            final WorkspaceAgent workspaceAgent,
-                           final ProjectExplorerPart projectExplorerPart) {
+                           final ProjectExplorerPresenter projectExplorerPart) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
 
         this.service = service;

@@ -26,10 +26,11 @@ import org.eclipse.che.commons.xml.XMLTreeException;
 import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
 import org.eclipse.che.ide.maven.tools.Build;
 import org.eclipse.che.ide.maven.tools.Model;
+import org.eclipse.che.ide.maven.tools.Resource;
 
 import org.eclipse.che.commons.annotation.Nullable;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -115,6 +116,19 @@ public class MavenValueProviderFactory implements ValueProviderFactory {
                         value = build.getTestSourceDirectory();
                     } else {
                         value = "src/test/java";
+                    }
+                }
+                if (attributeName.equals(MavenAttributes.RESOURCE_FOLDER)) {
+                    Build build = model.getBuild();
+                    if (build != null && build.getResources() != null) {
+                        List<Resource> resources = build.getResources();
+                        List<String> resourcesDirectory = new ArrayList<>();
+                        for (Resource resource : resources) {
+                            resourcesDirectory.add(resource.getDirectory());
+                        }
+                        return resourcesDirectory;
+                    } else {
+                        return Arrays.asList("src/main/resources", "src/test/resources");
                     }
                 }
 

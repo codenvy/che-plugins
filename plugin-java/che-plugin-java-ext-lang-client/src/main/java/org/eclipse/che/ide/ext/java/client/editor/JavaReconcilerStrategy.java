@@ -20,8 +20,8 @@ import org.eclipse.che.ide.ext.java.client.event.DependencyUpdatedEventHandler;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.text.Region;
 import org.eclipse.che.ide.api.texteditor.outline.OutlineModel;
+import org.eclipse.che.ide.ext.java.client.project.node.jar.JarFileNode;
 import org.eclipse.che.ide.ext.java.client.projecttree.JavaSourceFolderUtil;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.JarClassNode;
 import org.eclipse.che.ide.ext.java.shared.dto.Problem;
 import org.eclipse.che.ide.ext.java.shared.dto.ReconcileResult;
 import org.eclipse.che.ide.jseditor.client.annotation.AnnotationModel;
@@ -80,7 +80,7 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
     public void setDocument(final EmbeddedDocument document) {
         this.document = document;
         file = editor.getEditorInput().getFile();
-        sourceFromClass = file instanceof JarClassNode;
+        sourceFromClass = file instanceof JarFileNode || (file.getName().endsWith(".class") || file.getName().endsWith(".java"));
         highlighter.init(editor.getHasTextMarkers(), document);
 //        new OutlineUpdater(file.getPath(), outlineModel, worker);
     }
@@ -101,7 +101,7 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
 
 
         String fqn = JavaSourceFolderUtil.getFQNForFile(file);
-        client.reconcile(file.getProject().getPath(), fqn, new JavaReconcileClient.ReconcileCallback() {
+        client.reconcile(file.getProject().getProjectDescriptor().getPath(), fqn, new JavaReconcileClient.ReconcileCallback() {
             @Override
             public void onReconcile(ReconcileResult result) {
                 if (result == null) {

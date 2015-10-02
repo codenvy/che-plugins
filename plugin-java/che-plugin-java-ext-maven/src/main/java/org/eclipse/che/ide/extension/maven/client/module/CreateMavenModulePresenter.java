@@ -12,17 +12,16 @@ package org.eclipse.che.ide.extension.maven.client.module;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.GeneratorDescription;
 import org.eclipse.che.api.project.shared.dto.NewProject;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.extension.maven.client.MavenArchetype;
 import org.eclipse.che.ide.extension.maven.client.MavenExtension;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.util.NameUtils;
@@ -54,11 +53,11 @@ import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.VERSION
 @Singleton
 public class CreateMavenModulePresenter implements CreateMavenModuleView.ActionDelegate {
 
-    private CreateMavenModuleView view;
-    private ProjectServiceClient  projectService;
-    private DtoFactory            dtoFactory;
-    private EventBus              eventBus;
-    private DialogFactory         dialogFactory;
+    private       CreateMavenModuleView    view;
+    private       ProjectServiceClient     projectService;
+    private       DtoFactory               dtoFactory;
+    private       DialogFactory            dialogFactory;
+    private final ProjectExplorerPresenter projectExplorer;
 
     private String moduleName;
 
@@ -67,12 +66,12 @@ public class CreateMavenModulePresenter implements CreateMavenModuleView.ActionD
 
     @Inject
     public CreateMavenModulePresenter(CreateMavenModuleView view, ProjectServiceClient projectService, DtoFactory dtoFactory,
-                                      EventBus eventBus, DialogFactory dialogFactory) {
+                                      DialogFactory dialogFactory, ProjectExplorerPresenter projectExplorer) {
         this.view = view;
         this.projectService = projectService;
         this.dtoFactory = dtoFactory;
-        this.eventBus = eventBus;
         this.dialogFactory = dialogFactory;
+        this.projectExplorer = projectExplorer;
         view.setDelegate(this);
     }
 
@@ -126,7 +125,8 @@ public class CreateMavenModulePresenter implements CreateMavenModuleView.ActionD
                                         protected void onSuccess(ProjectDescriptor result) {
                                             view.close();
                                             view.showButtonLoader(false);
-                                            eventBus.fireEvent(new RefreshProjectTreeEvent());
+
+                                            projectExplorer.reloadChildren();
                                         }
 
                                         @Override

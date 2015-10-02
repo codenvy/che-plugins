@@ -138,7 +138,7 @@ public class JavaQuickAssistProcessor implements QuickAssistProcessor {
                                 final int offset,
                                 final List<Problem> annotations) {
         final VirtualFile file = textEditor.getEditorInput().getFile();
-        final String projectPath = file.getProject().getPath();
+        final String projectPath = file.getProject().getProjectDescriptor().getPath();
         String fqn = JavaSourceFolderUtil.getFQNForFile(file);
         Unmarshallable<Proposals> unmarshaller = unmarshallerFactory.newUnmarshaller(Proposals.class);
         client.computeAssistProposals(projectPath, fqn, offset, annotations, new AsyncRequestCallback<Proposals>(unmarshaller) {

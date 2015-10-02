@@ -10,18 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.init;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
-import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
-import org.eclipse.che.ide.ext.git.client.GitRepositoryInitializer;
-import org.eclipse.che.ide.util.loging.Log;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
+
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
+import org.eclipse.che.ide.ext.git.client.GitRepositoryInitializer;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.util.loging.Log;
 
 import javax.validation.constraints.NotNull;
 
@@ -34,7 +34,7 @@ import javax.validation.constraints.NotNull;
 @Singleton
 public class InitRepositoryPresenter {
     private final GitRepositoryInitializer gitRepositoryInitializer;
-    private final EventBus                 eventBus;
+    private final ProjectExplorerPresenter projectExplorer;
     private final AppContext               appContext;
     private final GitLocalizationConstant  constant;
     private final GitOutputPartPresenter   console;
@@ -42,17 +42,17 @@ public class InitRepositoryPresenter {
 
     @Inject
     public InitRepositoryPresenter(AppContext appContext,
-                                   EventBus eventBus,
                                    GitLocalizationConstant constant,
                                    GitOutputPartPresenter console,
                                    NotificationManager notificationManager,
-                                   GitRepositoryInitializer gitRepositoryInitializer) {
+                                   GitRepositoryInitializer gitRepositoryInitializer,
+                                   ProjectExplorerPresenter projectExplorer) {
         this.appContext = appContext;
-        this.eventBus = eventBus;
         this.constant = constant;
         this.console = console;
         this.notificationManager = notificationManager;
         this.gitRepositoryInitializer = gitRepositoryInitializer;
+        this.projectExplorer = projectExplorer;
     }
 
     public void initRepository() {
@@ -74,7 +74,7 @@ public class InitRepositoryPresenter {
                 console.printInfo(constant.initSuccess());
                 notificationManager.showInfo(constant.initSuccess());
                 //it's need for show .git in project tree
-                eventBus.fireEvent(new RefreshProjectTreeEvent());
+                projectExplorer.reloadChildren();
             }
         });
     }

@@ -12,12 +12,11 @@ package org.eclipse.che.ide.ext.java.client.projecttree;
 
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.ide.api.project.node.HasProjectDescriptor;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.JarClassNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 
 import javax.validation.constraints.Null;
 import java.util.LinkedList;
@@ -31,12 +30,12 @@ import java.util.Map;
 public class JavaSourceFolderUtil {
 
     /** Indicates if the specified item is a source folder. */
-    public static boolean isSourceFolder(ItemReference item, ProjectNode projectNode) {
+    public static boolean isSourceFolder(ItemReference item, HasProjectDescriptor projectNode) {
         if ("folder".equals(item.getType())) {
             String projectBuilder = getProjectBuilder(projectNode);
 
             if (projectBuilder != null) {
-                ProjectDescriptor projectDescriptor = projectNode.getData();
+                ProjectDescriptor projectDescriptor = projectNode.getProjectDescriptor();
                 Map<String, List<String>> attributes = projectDescriptor.getAttributes();
 
                 final String projectPath = projectDescriptor.getPath();
@@ -77,11 +76,11 @@ public class JavaSourceFolderUtil {
     public static List<String> getSourceFolders(TreeNode<?> node) {
         List<String> allSourceFolders = new LinkedList<>();
 
-        ProjectNode project = node.getProject();
+        HasProjectDescriptor project = node.getProject();
         String projectBuilder = getProjectBuilder(project);
-        String projectPath = removeEndingPathSeparator(project.getPath());
+        String projectPath = removeEndingPathSeparator(project.getProjectDescriptor().getPath());
 
-        Map<String, List<String>> attributes = project.getData().getAttributes();
+        Map<String, List<String>> attributes = project.getProjectDescriptor().getAttributes();
 
         List<String> sourceFolders = attributes.get(projectBuilder + ".source.folder");
         if (sourceFolders != null) {
@@ -102,9 +101,9 @@ public class JavaSourceFolderUtil {
 
     public static String getFQNForFile(VirtualFile file) {
         String packageName = "";
-        if (file instanceof SourceFileNode) {
-            if (((SourceFileNode)file).getParent() instanceof PackageNode) {
-                packageName = ((PackageNode)((SourceFileNode)file).getParent()).getQualifiedName();
+        if (file instanceof JavaFileNode) {
+            if (((JavaFileNode)file).getParent() instanceof PackageNode) {
+                packageName = ((PackageNode)((JavaFileNode)file).getParent()).getQualifiedName();
             }
             if (!packageName.isEmpty()) {
                 packageName = packageName + ".";
@@ -112,9 +111,9 @@ public class JavaSourceFolderUtil {
             return packageName + file.getName().substring(0, file.getName().lastIndexOf('.'));
         }
 
-        if (file instanceof JarClassNode) {
-            return file.getPath();
-        }
+//        if (file instanceof JavaFileNode) {
+//            return file.getPath();
+//        }
         return file.getName().substring(0, file.getName().lastIndexOf('.'));
     }
 
@@ -135,8 +134,8 @@ public class JavaSourceFolderUtil {
     }
 
     @Null
-    public static String getProjectBuilder(ProjectNode node) {
-        return getProjectBuilder(node.getData().getType());
+    public static String getProjectBuilder(HasProjectDescriptor node) {
+        return getProjectBuilder(node.getProjectDescriptor().getType());
     }
 
     @Null

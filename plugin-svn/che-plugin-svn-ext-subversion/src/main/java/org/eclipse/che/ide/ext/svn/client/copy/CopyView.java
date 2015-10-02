@@ -12,7 +12,7 @@ package org.eclipse.che.ide.ext.svn.client.copy;
 
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.api.parts.base.BaseActionDelegate;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
+import org.eclipse.che.ide.project.node.ResourceBasedNode;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -33,10 +33,10 @@ public interface CopyView extends View<CopyView.ActionDelegate> {
         void onCancelClicked();
 
         /** Perform actions when node selected in project explorer. */
-        void onNodeSelected(TreeNode<?> destinationNode);
+        void onNodeSelected(ResourceBasedNode<?> destinationNode);
 
         /** Perform actions when node expanded in project explorer. */
-        void onNodeExpanded(TreeNode<?> node);
+        void onNodeExpanded(ResourceBasedNode<?> node);
 
         /** Perform actions when new item name field changed. */
         void onNewNameChanged(String newName);
@@ -58,10 +58,10 @@ public interface CopyView extends View<CopyView.ActionDelegate> {
     void setDialogTitle(String title);
 
     /** Set project tree nodes. */
-    void setProjectNodes(List<TreeNode<?>> rootNodes);
+    void setProjectNodes(List<ResourceBasedNode<?>> rootNodes);
 
     /** Update project tree node. */
-    void updateProjectNode(@NotNull TreeNode<?> oldNode, @NotNull TreeNode<?> newNode);
+    void updateProjectNode(@NotNull ResourceBasedNode<?> oldNode, @NotNull ResourceBasedNode<?> newNode);
 
     /** Show error marker with specified message. */
     void showErrorMarker(String message);

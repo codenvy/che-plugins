@@ -17,7 +17,7 @@ public interface MavenAttributes {
     String MAVEN_ID   = "maven";
     String MAVEN_NAME = "Maven Project";
 
-    String GENERATION_STRATEGY_OPTION   = "type";
+    String GENERATION_STRATEGY_OPTION = "type";
 
     String SIMPLE_GENERATION_STRATEGY    = "simple";
     String ARCHETYPE_GENERATION_STRATEGY = "archetype";
@@ -37,6 +37,8 @@ public interface MavenAttributes {
 
     String SOURCE_FOLDER      = "maven.source.folder";
     String TEST_SOURCE_FOLDER = "maven.test.source.folder";
+
+    final String RESOURCE_FOLDER = "maven.resource.folder";
 
     String DEFAULT_SOURCE_FOLDER      = "src/main/java";
     String DEFAULT_TEST_SOURCE_FOLDER = "src/test/java";

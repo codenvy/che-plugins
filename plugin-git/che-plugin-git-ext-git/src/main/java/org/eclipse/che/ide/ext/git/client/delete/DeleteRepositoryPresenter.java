@@ -12,14 +12,13 @@ package org.eclipse.che.ide.ext.git.client.delete;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
@@ -30,36 +29,34 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
  */
 @Singleton
 public class DeleteRepositoryPresenter {
+    private       GitServiceClient         service;
+    private       GitLocalizationConstant  constant;
+    private       AppContext               appContext;
+    private       NotificationManager      notificationManager;
+    private final ProjectExplorerPresenter projectExplorer;
     private final GitOutputPartPresenter  console;
-
-    private GitServiceClient        service;
-    private EventBus                eventBus;
-    private GitLocalizationConstant constant;
-    private AppContext              appContext;
-    private NotificationManager     notificationManager;
 
     /**
      * Create presenter.
      *
      * @param service
-     * @param eventBus
      * @param constant
      * @param appContext
      * @param notificationManager
      */
     @Inject
     public DeleteRepositoryPresenter(GitServiceClient service,
-                                     EventBus eventBus,
                                      GitLocalizationConstant constant,
                                      GitOutputPartPresenter console,
                                      AppContext appContext,
-                                     NotificationManager notificationManager) {
+                                     NotificationManager notificationManager,
+                                     ProjectExplorerPresenter projectExplorer) {
         this.service = service;
-        this.eventBus = eventBus;
         this.constant = constant;
         this.console = console;
         this.appContext = appContext;
         this.notificationManager = notificationManager;
+        this.projectExplorer = projectExplorer;
     }
 
     /** Delete Git repository. */
@@ -73,7 +70,7 @@ public class DeleteRepositoryPresenter {
                 console.printInfo(constant.deleteGitRepositorySuccess());
                 notificationManager.showInfo(constant.deleteGitRepositorySuccess());
                 //it's need for hide .git in project tree
-                eventBus.fireEvent(new RefreshProjectTreeEvent());
+                projectExplorer.reloadChildren();
             }
 
             @Override

@@ -15,10 +15,10 @@ import com.google.inject.Singleton;
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
 import org.eclipse.che.ide.ext.svn.client.diff.DiffPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 
 /**
  * Extension of {@link org.eclipse.che.ide.ext.svn.client.action.SubversionAction} for implementing the "svn diff" command.
@@ -33,12 +33,12 @@ public class DiffAction extends SubversionAction {
     @Inject
     public DiffAction(final AnalyticsEventLogger eventLogger,
                       final AppContext appContext,
-                      final SelectionAgent selectionAgent,
+                      final ProjectExplorerPresenter projectExplorerPresenter,
                       final SubversionExtensionLocalizationConstants constants,
                       final SubversionExtensionResources resources,
                       final DiffPresenter presenter) {
         super(constants.diffTitle(), constants.diffDescription(), resources.diff(), eventLogger,
-              appContext, constants, resources, selectionAgent);
+              appContext, constants, resources, projectExplorerPresenter);
 
         this.presenter = presenter;
     }

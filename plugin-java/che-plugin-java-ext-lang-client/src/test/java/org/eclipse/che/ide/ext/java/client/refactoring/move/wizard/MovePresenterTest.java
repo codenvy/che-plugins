@@ -20,8 +20,8 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.navigation.JavaNavigationService;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 import org.eclipse.che.ide.ext.java.client.refactoring.RefactorInfo;
 import org.eclipse.che.ide.ext.java.client.refactoring.RefactoringUpdater;
 import org.eclipse.che.ide.ext.java.client.refactoring.preview.PreviewPresenter;
@@ -103,7 +103,7 @@ public class MovePresenterTest {
     @Mock
     private ReorgDestination           destination;
     @Mock
-    private SourceFileNode             sourceFileNode;
+    private JavaFileNode               sourceFileNode;
     @Mock
     private ProjectDescriptor          projectDescriptor;
     @Mock
@@ -182,7 +182,7 @@ public class MovePresenterTest {
         verify(moveView).clearErrorLabel();
         verify(moveRefactoring).setProjectPath(PROJECT_PATH);
         verify(refactorService).createMoveRefactoring(moveRefactoring);
-        verify(packageNode).getPath();
+        verify(packageNode).getStorablePath();
 
         verify(sessionPromise).then(sessionOperation.capture());
         sessionOperation.getValue().apply("sessionId");

@@ -10,14 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.importer.page;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.api.project.shared.dto.ImportProject;
-import org.eclipse.che.api.project.shared.dto.NewProject;
-import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
-import org.eclipse.che.ide.util.NameUtils;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
+
+import org.eclipse.che.api.project.shared.dto.ImportProject;
+import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.util.NameUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -126,10 +126,12 @@ public class GitImporterPagePresenter extends AbstractWizardPage<ImportProject> 
 
         if (keepDirectory) {
             projectParameters().put("keepDirectory", view.getDirectoryName());
+            dataObject.getProject().withType("blank");
             view.highlightDirectoryNameField(!NameUtils.checkProjectName(view.getDirectoryName()));
             view.focusDirectoryNameFiend();
         } else {
             projectParameters().remove("keepDirectory");
+            dataObject.getProject().withType(null);
             view.highlightDirectoryNameField(false);
         }
     }
@@ -138,9 +140,13 @@ public class GitImporterPagePresenter extends AbstractWizardPage<ImportProject> 
     public void keepDirectoryNameChanged(@NotNull String directoryName) {
         if (view.keepDirectory()) {
             projectParameters().put("keepDirectory", directoryName);
+            dataObject.getProject().setContentRoot(view.getDirectoryName());
+            dataObject.getProject().withType("blank");
             view.highlightDirectoryNameField(!NameUtils.checkProjectName(view.getDirectoryName()));
         } else {
             projectParameters().remove("keepDirectory");
+            dataObject.getProject().setContentRoot(null);
+            dataObject.getProject().withType(null);
             view.highlightDirectoryNameField(false);
         }
     }

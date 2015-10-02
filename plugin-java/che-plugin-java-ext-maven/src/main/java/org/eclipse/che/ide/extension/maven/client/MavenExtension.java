@@ -26,16 +26,12 @@ import org.eclipse.che.ide.api.event.ProjectActionHandler;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.api.icon.Icon;
 import org.eclipse.che.ide.api.icon.IconRegistry;
-import org.eclipse.che.ide.api.project.tree.TreeStructureProviderRegistry;
 import org.eclipse.che.ide.api.project.type.wizard.PreSelectedProjectTypeManager;
 import org.eclipse.che.ide.ext.java.client.dependenciesupdater.DependenciesUpdater;
 import org.eclipse.che.ide.extension.machine.client.machine.events.MachineStateEvent;
 import org.eclipse.che.ide.extension.machine.client.machine.events.MachineStateHandler;
 import org.eclipse.che.ide.extension.maven.client.actions.CreateMavenModuleAction;
 import org.eclipse.che.ide.extension.maven.client.actions.UpdateDependencyAction;
-import org.eclipse.che.ide.extension.maven.client.event.BeforeModuleOpenEvent;
-import org.eclipse.che.ide.extension.maven.client.event.BeforeModuleOpenHandler;
-import org.eclipse.che.ide.extension.maven.client.projecttree.MavenProjectTreeStructureProvider;
 import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
 
 import java.util.Arrays;
@@ -57,10 +53,7 @@ public class MavenExtension {
     private        ProjectDescriptor     project;
 
     @Inject
-    public MavenExtension(TreeStructureProviderRegistry treeStructureProviderRegistry,
-                          PreSelectedProjectTypeManager preSelectedProjectManager) {
-
-        treeStructureProviderRegistry.associateProjectTypeToTreeProvider(MavenAttributes.MAVEN_ID, MavenProjectTreeStructureProvider.ID);
+    public MavenExtension(PreSelectedProjectTypeManager preSelectedProjectManager) {
 
         preSelectedProjectManager.setProjectTypeIdToPreselect(MavenAttributes.MAVEN_ID, 100);
 
@@ -76,22 +69,18 @@ public class MavenExtension {
 
     @Inject
     private void bindEvents(final EventBus eventBus, final DependenciesUpdater dependenciesUpdater) {
-        eventBus.addHandler(BeforeModuleOpenEvent.TYPE, new BeforeModuleOpenHandler() {
-            @Override
-            public void onBeforeModuleOpen(BeforeModuleOpenEvent event) {
-                if (isValidForResolveDependencies(event.getModule().getProject().getData())) {
-                    dependenciesUpdater.updateDependencies(event.getModule().getData());
-                }
-            }
-        });
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectReady(ProjectActionEvent event) {
                 project = event.getProject();
                 if (isValidForResolveDependencies(project)) {
                     dependenciesUpdater.updateDependencies(project);
                 }
+            }
+
+            @Override
+            public void onProjectOpened(ProjectActionEvent event) {
             }
 
             @Override

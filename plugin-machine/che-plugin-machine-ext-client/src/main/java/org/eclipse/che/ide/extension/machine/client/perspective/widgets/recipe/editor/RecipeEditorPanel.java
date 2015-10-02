@@ -23,7 +23,7 @@ import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PropertyListener;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.api.texteditor.HandlesUndoRedo;
 import org.eclipse.che.ide.api.texteditor.HasReadOnlyProperty;
 import org.eclipse.che.ide.api.texteditor.UndoableEditor;
@@ -144,7 +144,7 @@ public class RecipeEditorPanel implements TabPresenter, RecipeEditorView.ActionD
         view.setEnableCancelButton(isEnable);
     }
 
-    private void initializeEditor(@NotNull final FileNode file) {
+    private void initializeEditor(@NotNull final VirtualFile file) {
         FileType fileType = fileTypeRegistry.getFileTypeByFile(file);
         editor = getEditor();
         editor.activate();
@@ -185,7 +185,7 @@ public class RecipeEditorPanel implements TabPresenter, RecipeEditorView.ActionD
         return editor;
     }
 
-    private void setReadOnlyProperty(FileNode file) {
+    private void setReadOnlyProperty(VirtualFile file) {
         if (editor instanceof HasReadOnlyProperty) {
             ((HasReadOnlyProperty)editor).setReadOnly(file.isReadOnly());
         }

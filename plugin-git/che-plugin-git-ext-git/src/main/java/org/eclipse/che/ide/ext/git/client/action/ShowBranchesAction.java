@@ -10,17 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.action;
 
-import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
-import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.client.branch.BranchPresenter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-/** @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a> */
+import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
+import org.eclipse.che.ide.api.action.ActionEvent;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.ext.git.client.GitResources;
+import org.eclipse.che.ide.ext.git.client.branch.BranchPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+
+/** @author Andrey Plotnikov */
 @Singleton
 public class ShowBranchesAction extends GitAction {
     private final BranchPresenter      presenter;
@@ -32,8 +33,8 @@ public class ShowBranchesAction extends GitAction {
                               GitResources resources,
                               GitLocalizationConstant constant,
                               AnalyticsEventLogger eventLogger,
-                              SelectionAgent selectionAgent) {
-        super(constant.branchesControlTitle(), constant.branchesControlPrompt(), resources.branches(), appContext, selectionAgent);
+                              ProjectExplorerPresenter projectExplorer) {
+        super(constant.branchesControlTitle(), constant.branchesControlPrompt(), resources.branches(), appContext, projectExplorer);
         this.presenter = presenter;
         this.eventLogger = eventLogger;
     }

@@ -22,14 +22,14 @@ import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.event.ProjectActionHandler;
 import org.eclipse.che.ide.api.event.SelectionChangedEvent;
 import org.eclipse.che.ide.api.event.SelectionChangedHandler;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
 import org.eclipse.che.ide.ext.svn.client.resolve.ResolvePresenter;
 import org.eclipse.che.ide.ext.svn.client.update.SubversionProjectUpdatedEvent;
 import org.eclipse.che.ide.ext.svn.client.update.SubversionProjectUpdatedHandler;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 
 import org.eclipse.che.commons.annotation.Nullable;
 import java.util.List;
@@ -40,10 +40,12 @@ import java.util.List;
  * @author vzhukovskii@codenvy.com
  */
 @Singleton
-public class ResolveAction extends SubversionAction implements SelectionChangedHandler, ProjectActionHandler,
+public class ResolveAction extends SubversionAction implements SelectionChangedHandler,
+                                                               ProjectActionHandler,
                                                                SubversionProjectUpdatedHandler {
 
-    private final ResolvePresenter presenter;
+    private       ProjectExplorerPresenter projectExplorerPresenter;
+    private final ResolvePresenter         presenter;
 
     private List<String> conflictsList;
     private boolean enable = false;
@@ -53,11 +55,12 @@ public class ResolveAction extends SubversionAction implements SelectionChangedH
                          final AppContext appContext,
                          final SubversionExtensionLocalizationConstants constants,
                          final SubversionExtensionResources resources,
-                         final SelectionAgent selectionAgent,
+                         final ProjectExplorerPresenter projectExplorerPresenter,
                          final ResolvePresenter presenter,
                          final EventBus eventBus) {
         super(constants.resolvedTitle(), constants.resolvedDescription(), resources.resolved(), eventLogger,
-              appContext, constants, resources, selectionAgent);
+              appContext, constants, resources, projectExplorerPresenter);
+        this.projectExplorerPresenter = projectExplorerPresenter;
         this.presenter = presenter;
 
         eventBus.addHandler(SelectionChangedEvent.TYPE, this);
@@ -84,7 +87,7 @@ public class ResolveAction extends SubversionAction implements SelectionChangedH
     public void onSelectionChanged(SelectionChangedEvent event) {
         enable = false;
 
-        StorableNode selectedNode = getStorableNodeFromSelection(event.getSelection());
+        HasStorablePath selectedNode = getStorableNodeFromSelection(event.getSelection());
 
         if (selectedNode == null || conflictsList == null) {
             return;
@@ -93,7 +96,7 @@ public class ResolveAction extends SubversionAction implements SelectionChangedH
         for (String conflictPath : conflictsList) {
             final String absPath = (appContext.getCurrentProject().getProjectDescription().getPath() + "/" + conflictPath.trim());
 
-            if (absPath.startsWith(selectedNode.getPath())) {
+            if (absPath.startsWith(selectedNode.getStorablePath())) {
                 enable = true;
                 break;
             }
@@ -102,17 +105,17 @@ public class ResolveAction extends SubversionAction implements SelectionChangedH
     }
 
     @Nullable
-    private StorableNode getStorableNodeFromSelection(Selection<?> selection) {
+    private HasStorablePath getStorableNodeFromSelection(Selection<?> selection) {
         if (selection == null) {
             return null;
         }
 
-        return selection.getHeadElement() instanceof StorableNode ? (StorableNode)selection.getHeadElement() : null;
+        return projectExplorerPresenter.getSelection().getHeadElement() instanceof HasStorablePath ? (HasStorablePath)selection.getHeadElement() : null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void onProjectOpened(ProjectActionEvent event) {
+    public void onProjectReady(ProjectActionEvent event) {
         fetchConflicts();
     }
 
@@ -126,6 +129,11 @@ public class ResolveAction extends SubversionAction implements SelectionChangedH
     @Override
     public void onProjectClosed(ProjectActionEvent event) {
         conflictsList = null;
+    }
+
+    @Override
+    public void onProjectOpened(ProjectActionEvent event) {
+
     }
 
     @Override

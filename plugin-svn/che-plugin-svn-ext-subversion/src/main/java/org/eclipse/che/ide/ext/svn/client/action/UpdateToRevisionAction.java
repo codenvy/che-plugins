@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.action;
 
-import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
-import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
-import org.eclipse.che.ide.ext.svn.client.update.UpdateToRevisionPresenter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
+import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
+import org.eclipse.che.ide.ext.svn.client.update.UpdateToRevisionPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 
 /**
  * Extension of {@link SubversionAction} for implementing the "svn update" command (For a specific revision).
@@ -35,12 +35,12 @@ public class UpdateToRevisionAction extends SubversionAction {
     @Inject
     public UpdateToRevisionAction(final AnalyticsEventLogger eventLogger,
                                   final AppContext appContext,
-                                  final SelectionAgent selectionAgent,
+                                  final ProjectExplorerPresenter projectExplorerPresenter,
                                   final SubversionExtensionLocalizationConstants constants,
                                   final SubversionExtensionResources resources,
                                   final UpdateToRevisionPresenter presenter) {
         super(constants.updateToRevisionTitle(), constants.updateToRevisionDescription(), resources.update(),
-              eventLogger, appContext, constants, resources, selectionAgent);
+              eventLogger, appContext, constants, resources, projectExplorerPresenter);
 
         this.presenter = presenter;
     }

@@ -11,7 +11,14 @@
 package org.eclipse.che.ide.ext.git.client.checkout;
 
 import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
+import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.api.project.shared.dto.ProjectProblem;
+import org.eclipse.che.ide.api.editor.EditorAgent;
+import org.eclipse.che.ide.api.editor.EditorInput;
+import org.eclipse.che.ide.api.editor.EditorPartPresenter;
+import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
 import org.eclipse.che.ide.api.event.OpenProjectEvent;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.test.GwtReflectionUtils;
@@ -21,6 +28,11 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;
@@ -44,11 +56,21 @@ public class CheckoutReferenceTest extends BaseTest {
 
     @Captor
     private ArgumentCaptor<AsyncRequestCallback<String>> asyncCallbackCaptor;
+    @Captor
+    private ArgumentCaptor<AsyncRequestCallback<ProjectDescriptor>> projectDescriptorCaptor;
 
     @Mock
     private CheckoutReferenceView      view;
     @Mock
     private BranchCheckoutRequest      branchCheckoutRequest;
+
+    @Mock
+    private EditorPartPresenter    partPresenter;
+    @Mock
+    private EditorInput            editorInput;
+    @Mock
+    private EditorAgent            editorAgent;
+
     @InjectMocks
     private CheckoutReferencePresenter presenter;
 
@@ -120,6 +142,17 @@ public class CheckoutReferenceTest extends BaseTest {
 
     @Test
     public void testOnCheckoutClickedWhenCheckoutIsSuccessful() throws Exception {
+        VirtualFile virtualFile = mock(VirtualFile.class);
+
+        NavigableMap<String, EditorPartPresenter> partPresenterMap = new TreeMap<>();
+        partPresenterMap.put("partPresenter", partPresenter);
+
+        when(editorAgent.getOpenedEditors()).thenReturn(partPresenterMap);
+        when(partPresenter.getEditorInput()).thenReturn(editorInput);
+
+        when(editorInput.getFile()).thenReturn(virtualFile);
+        when(virtualFile.getPath()).thenReturn("/foo");
+
         when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
         when(branchCheckoutRequest.withName(anyString())).thenReturn(branchCheckoutRequest);
         when(branchCheckoutRequest.withCreateNew(anyBoolean())).thenReturn(branchCheckoutRequest);
@@ -137,7 +170,43 @@ public class CheckoutReferenceTest extends BaseTest {
         verify(branchCheckoutRequest).withCreateNew(false);
         verifyNoMoreInteractions(branchCheckoutRequest);
         verify(view).close();
-        verify(rootProjectDescriptor).getPath();
+        verify(projectServiceClient).getProject(eq(PROJECT_PATH), projectDescriptorCaptor.capture());
+        AsyncRequestCallback<ProjectDescriptor> asyncRequestCallback = projectDescriptorCaptor.getValue();
+        GwtReflectionUtils.callOnSuccess(asyncRequestCallback, projectDescriptor);
+        verify(projectDescriptor).getProblems();
+        verify(projectExplorer).reloadChildren();
+        verify(editorAgent).getOpenedEditors();
+        verify(partPresenter).getEditorInput();
+        verify(editorInput).getFile();
+        verify(eventBus).fireEvent(Matchers.<FileContentUpdateEvent>anyObject());
+    }
+
+    @Test
+    public void testOnCheckoutClickedWhenCheckoutIsSuccessfulButProjectIsNotConfigurated() throws Exception {
+        List<ProjectProblem> problemList = Collections.singletonList(mock(ProjectProblem.class));
+        when(projectDescriptor.getProblems()).thenReturn(problemList);
+
+        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+        when(branchCheckoutRequest.withName(anyString())).thenReturn(branchCheckoutRequest);
+        when(branchCheckoutRequest.withCreateNew(anyBoolean())).thenReturn(branchCheckoutRequest);
+        reset(service);
+        when(view.getReference()).thenReturn(CORRECT_REFERENCE);
+        when(rootProjectDescriptor.getPath()).thenReturn(PROJECT_PATH);
+
+        presenter.onEnterClicked();
+
+        verify(service).branchCheckout(anyObject(), anyObject(), asyncCallbackCaptor.capture());
+        AsyncRequestCallback<String> callback = asyncCallbackCaptor.getValue();
+        GwtReflectionUtils.callOnSuccess(callback, "");
+
+        verify(branchCheckoutRequest).withName(CORRECT_REFERENCE);
+        verify(branchCheckoutRequest).withCreateNew(false);
+        verifyNoMoreInteractions(branchCheckoutRequest);
+        verify(view).close();
+        verify(projectServiceClient).getProject(eq(PROJECT_PATH), projectDescriptorCaptor.capture());
+        AsyncRequestCallback<ProjectDescriptor> asyncRequestCallback = projectDescriptorCaptor.getValue();
+        GwtReflectionUtils.callOnSuccess(asyncRequestCallback, projectDescriptor);
+        verify(projectDescriptor).getProblems();
         verify(eventBus).fireEvent(Matchers.<OpenProjectEvent>anyObject());
     }
 

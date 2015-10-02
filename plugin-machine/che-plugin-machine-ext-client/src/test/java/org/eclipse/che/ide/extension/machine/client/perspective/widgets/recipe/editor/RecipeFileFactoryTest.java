@@ -20,7 +20,7 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.project.tree.TreeStructure;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.junit.Before;
@@ -100,13 +100,12 @@ public class RecipeFileFactoryTest {
     public void dockerFileShouldBeCreated() throws Exception {
         when(currentProject.getCurrentTree()).thenReturn(treeStructure);
 
-        FileNode fileNode = factory.newInstance(SOME_TEXT);
+        VirtualFile fileNode = factory.newInstance(SOME_TEXT);
 
         verify(dtoFactory).createDto(ItemReference.class);
         verify(itemReference).withName(NAME);
         verify(itemReference).withPath(PATH);
         verify(itemReference).withMediaType(TYPE);
-        verify(currentProject).getCurrentTree();
 
         assertThat(fileNode, notNullValue());
         assertThat(fileNode, instanceOf(RecipeFile.class));

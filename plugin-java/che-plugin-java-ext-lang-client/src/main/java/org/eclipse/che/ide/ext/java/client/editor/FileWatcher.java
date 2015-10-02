@@ -18,13 +18,13 @@ import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
 import org.eclipse.che.ide.api.event.ActivePartChangedHandler;
-import org.eclipse.che.ide.api.event.ItemEvent;
-import org.eclipse.che.ide.api.event.ItemHandler;
 import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PropertyListener;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
+import org.eclipse.che.ide.project.event.ResourceNodeDeletedEvent;
+import org.eclipse.che.ide.project.node.ResourceBasedNode;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -43,19 +43,17 @@ public class FileWatcher {
 
     @Inject
     private void handleFileOperations(EventBus eventBus) {
-        eventBus.addHandler(ItemEvent.TYPE, new ItemHandler() {
-            @Override
-            public void onItem(ItemEvent event) {
-                if (event.getOperation() == ItemEvent.ItemOperation.DELETED) {
-                    if (event.getItem() instanceof SourceFileNode) {
-                        reparseAllOpenedFiles();
-                    } else if (event.getItem() instanceof PackageNode) {
-                        reparseAllOpenedFiles();
-                    }
 
+        eventBus.addHandler(ResourceNodeDeletedEvent.getType(), new ResourceNodeDeletedEvent.ResourceNodeDeletedHandler() {
+            @Override
+            public void onResourceEvent(ResourceNodeDeletedEvent event) {
+                ResourceBasedNode node = event.getNode();
+                if (node instanceof PackageNode || node instanceof JavaFileNode) {
+                    reparseAllOpenedFiles();
                 }
             }
         });
+
         eventBus.addHandler(ActivePartChangedEvent.TYPE, new ActivePartChangedHandler() {
             @Override
             public void onActivePartChanged(ActivePartChangedEvent event) {
@@ -73,7 +71,6 @@ public class FileWatcher {
         editor2reconcile.remove(editor);
     }
 
-
     public void editorOpened(final EditorPartPresenter editor) {
         final PropertyListener propertyListener = new PropertyListener() {
             @Override
@@ -89,8 +86,6 @@ public class FileWatcher {
         };
         editor.addPropertyListener(propertyListener);
     }
-
-
 
     private void reparseAllOpenedFiles() {
         Map<String, EditorPartPresenter> openedEditors = editorAgent.getOpenedEditors();

@@ -10,14 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.action;
 
-import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
-import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
+import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 
 /**
  * Extension of {@link SubversionAction} for implementing the "svn diff" (create patch) command.
@@ -31,11 +31,11 @@ public class CreatePatchAction extends SubversionAction {
     @Inject
     public CreatePatchAction(final AnalyticsEventLogger eventLogger,
                              final AppContext appContext,
-                             final SelectionAgent selectionAgent,
+                             final ProjectExplorerPresenter projectExplorerPresenter,
                              final SubversionExtensionLocalizationConstants constants,
                              final SubversionExtensionResources resources) {
         super(constants.createPatchTitle(), constants.createPatchDescription(), resources.createPatch(),
-              eventLogger, appContext, constants, resources, selectionAgent);
+              eventLogger, appContext, constants, resources, projectExplorerPresenter);
     }
 
 }

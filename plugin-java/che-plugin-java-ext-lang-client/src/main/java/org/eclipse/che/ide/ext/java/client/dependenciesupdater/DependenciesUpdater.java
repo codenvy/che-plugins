@@ -20,6 +20,8 @@ import org.eclipse.che.ide.ext.java.client.event.DependencyUpdatedEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
+import org.eclipse.che.ide.ext.java.client.project.node.jar.ExternalLibrariesNode;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.util.loging.Log;
 
@@ -40,21 +42,24 @@ public class DependenciesUpdater {
     private final JavaClasspathServiceClient classpathServiceClient;
     private final JavaLocalizationConstant   javaLocalizationConstant;
 
-    private boolean      updating;
-    private Notification notification;
-    private EventBus     eventBus;
+    private       boolean                  updating;
+    private       Notification             notification;
+    private       EventBus                 eventBus;
+    private final ProjectExplorerPresenter projectExplorer;
 
     @Inject
     public DependenciesUpdater(JavaLocalizationConstant javaLocalizationConstant,
                                NotificationManager notificationManager,
                                AppContext appContext,
                                JavaClasspathServiceClient classpathServiceClient,
-                               EventBus eventBus) {
+                               EventBus eventBus,
+                               ProjectExplorerPresenter projectExplorer) {
         this.javaLocalizationConstant = javaLocalizationConstant;
         this.notificationManager = notificationManager;
         this.appContext = appContext;
         this.classpathServiceClient = classpathServiceClient;
         this.eventBus = eventBus;
+        this.projectExplorer = projectExplorer;
     }
 
     public void updateDependencies(final ProjectDescriptor project) {
@@ -90,6 +95,7 @@ public class DependenciesUpdater {
         updating = false;
         notification.setMessage(javaLocalizationConstant.dependenciesSuccessfullyUpdated());
         notification.setStatus(FINISHED);
+        projectExplorer.reloadChildrenByType(ExternalLibrariesNode.class);
         eventBus.fireEvent(new DependencyUpdatedEvent());
     }
 

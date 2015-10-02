@@ -11,17 +11,12 @@
 package org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.dto.DtoFactory;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 
 import javax.validation.constraints.NotNull;
 
@@ -38,25 +33,13 @@ public class RecipeFileFactory {
     public static final String PATH = "machine_recipe";
     public static final String TYPE = "text/x-dockerfile";
 
-    private final EventBus               eventBus;
-    private final ProjectServiceClient   projectServiceClient;
     private final AppContext             appContext;
     private final DtoFactory             dtoFactory;
-    private final DtoUnmarshallerFactory dtoUnmarshallerFactory;
-    private final Provider<EditorAgent>  editorAgentProvider;
 
     @Inject
-    public RecipeFileFactory(EventBus eventBus,
-                             ProjectServiceClient projectServiceClient,
-                             AppContext appContext,
-                             DtoFactory dtoFactory,
-                             Provider<EditorAgent> editorAgentProvider,
-                             DtoUnmarshallerFactory dtoUnmarshallerFactory) {
-        this.eventBus = eventBus;
+    public RecipeFileFactory(AppContext appContext,
+                             DtoFactory dtoFactory) {
         this.appContext = appContext;
-        this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
-        this.editorAgentProvider = editorAgentProvider;
-        this.projectServiceClient = projectServiceClient;
         this.dtoFactory = dtoFactory;
     }
 
@@ -87,13 +70,7 @@ public class RecipeFileFactory {
                                                  .withPath(path)
                                                  .withMediaType(TYPE);
 
-        return new RecipeFile(content,
-                              eventBus,
-                              projectServiceClient,
-                              dtoUnmarshallerFactory,
-                              recipeFileItem,
-                              currentProject.getCurrentTree(),
-                              editorAgentProvider.get());
+        return new RecipeFile(content, recipeFileItem);
     }
 
 }

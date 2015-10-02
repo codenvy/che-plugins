@@ -186,8 +186,12 @@ public class OutputsContainerPresenter extends BasePresenter implements OutputsC
     }
 
     @Override
-    public void onProjectOpened(ProjectActionEvent event) {
+    public void onProjectReady(ProjectActionEvent event) {
         firePropertyChange(TITLE_PROPERTY);
+    }
+
+    @Override
+    public void onProjectOpened(ProjectActionEvent event) {
     }
 
     @Override

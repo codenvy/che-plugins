@@ -20,7 +20,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.api.project.tree.generic.Openable;
@@ -32,6 +31,7 @@ import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.filteredtree.FilteredTreeStructureProvider;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
@@ -54,7 +54,7 @@ import static org.eclipse.che.ide.api.notification.Notification.Type.INFO;
 @Singleton
 public class MovePresenter extends SubversionActionPresenter implements MoveView.ActionDelegate {
 
-    private ProjectExplorerPart                      projectExplorerPart;
+    private ProjectExplorerPresenter                 projectExplorerPart;
     private MoveView                                 view;
     private SubversionExtensionLocalizationConstants locale;
     private FilteredTreeStructureProvider            treeStructureProvider;
@@ -70,7 +70,7 @@ public class MovePresenter extends SubversionActionPresenter implements MoveView
                          EventBus eventBus,
                          RawOutputPresenter console,
                          WorkspaceAgent workspaceAgent,
-                         ProjectExplorerPart projectExplorerPart,
+                         ProjectExplorerPresenter projectExplorerPart,
                          MoveView view,
                          FilteredTreeStructureProvider treeStructureProvider,
                          NotificationManager notificationManager,

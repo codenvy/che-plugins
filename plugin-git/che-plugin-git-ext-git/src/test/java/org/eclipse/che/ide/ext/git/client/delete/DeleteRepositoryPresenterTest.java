@@ -13,12 +13,10 @@ package org.eclipse.che.ide.ext.git.client.delete;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.window.Window;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -38,7 +36,7 @@ import static org.mockito.Mockito.when;
 /**
  * Testing {@link DeleteRepositoryPresenter} functionality.
  *
- * @author <a href="mailto:aplotnikov@codenvy.com">Andrey Plotnikov</a>
+ * @author Andrey Plotnikov
  */
 public class DeleteRepositoryPresenterTest extends BaseTest {
     private DeleteRepositoryPresenter presenter;
@@ -58,11 +56,10 @@ public class DeleteRepositoryPresenterTest extends BaseTest {
         when(css.contentVisible()).thenReturn("sdgsdf");
         when(css.animationDuration()).thenReturn(1);
         presenter = new DeleteRepositoryPresenter(service,
-                                                  eventBus,
                                                   constant,
                                                   console,
                                                   appContext,
-                                                  notificationManager);
+                                                  notificationManager, projectExplorer);
     }
 
     @Test
@@ -91,7 +88,6 @@ public class DeleteRepositoryPresenterTest extends BaseTest {
         verify(rootProjectDescriptor).getAttributes();
         verify(attributes).get(anyString());
         verify(vcsProvider).clear();
-        verify(eventBus).fireEvent(Matchers.<RefreshProjectTreeEvent>anyObject());
     }
 
     @Test

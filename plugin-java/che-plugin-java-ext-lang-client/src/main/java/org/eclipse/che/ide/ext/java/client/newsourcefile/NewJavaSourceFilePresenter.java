@@ -10,32 +10,35 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.newsourcefile;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
-import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.event.FileEvent;
-import org.eclipse.che.ide.api.event.ItemEvent;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
-import org.eclipse.che.ide.api.project.tree.generic.ItemNode;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
+import org.eclipse.che.api.promises.client.Function;
+import org.eclipse.che.api.promises.client.FunctionException;
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.PromiseError;
+import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
+import org.eclipse.che.ide.api.project.node.HasStorablePath.StorablePath;
+import org.eclipse.che.ide.api.project.node.Node;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
+import org.eclipse.che.ide.project.node.FolderReferenceNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.eclipse.che.ide.api.event.FileEvent.FileOperation.OPEN;
-import static org.eclipse.che.ide.api.event.ItemEvent.ItemOperation.CREATED;
 import static org.eclipse.che.ide.ext.java.client.JavaUtils.checkCompilationUnitName;
 import static org.eclipse.che.ide.ext.java.client.JavaUtils.checkPackageName;
 import static org.eclipse.che.ide.ext.java.client.JavaUtils.isValidCompilationUnitName;
@@ -54,27 +57,25 @@ import static org.eclipse.che.ide.ext.java.client.newsourcefile.JavaSourceFileTy
 public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionDelegate {
     private static final String DEFAULT_CONTENT = " {\n}\n";
 
+    private final ProjectExplorerPresenter projectExplorer;
     private final NewJavaSourceFileView    view;
-    private final SelectionAgent           selectionAgent;
     private final ProjectServiceClient     projectServiceClient;
-    private final DtoUnmarshallerFactory   dtoUnmarshallerFactory;
-    private final EventBus                 eventBus;
-    private final DialogFactory            dialogFactory;
+    private final DtoUnmarshallerFactory   dtoUnmarshaller;
     private final List<JavaSourceFileType> sourceFileTypes;
-    private final AppContext               appContext;
+    private final DialogFactory            dialogFactory;
 
     @Inject
-    public NewJavaSourceFilePresenter(NewJavaSourceFileView view, SelectionAgent selectionAgent, ProjectServiceClient projectServiceClient,
-                                      DtoUnmarshallerFactory dtoUnmarshallerFactory, EventBus eventBus, DialogFactory dialogFactory,
-                                      AppContext appContext) {
-        this.appContext = appContext;
+    public NewJavaSourceFilePresenter(NewJavaSourceFileView view,
+                                      ProjectExplorerPresenter projectExplorer,
+                                      ProjectServiceClient projectServiceClient,
+                                      DtoUnmarshallerFactory dtoUnmarshaller,
+                                      DialogFactory dialogFactory) {
+        this.dialogFactory = dialogFactory;
         sourceFileTypes = Arrays.asList(CLASS, INTERFACE, ENUM, ANNOTATION);
         this.view = view;
-        this.selectionAgent = selectionAgent;
+        this.projectExplorer = projectExplorer;
         this.projectServiceClient = projectServiceClient;
-        this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
-        this.eventBus = eventBus;
-        this.dialogFactory = dialogFactory;
+        this.dtoUnmarshaller = dtoUnmarshaller;
         this.view.setDelegate(this);
     }
 
@@ -116,7 +117,8 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
         }
         if (isValidCompilationUnitName(fileNameWithExtension)) {
             view.close();
-            final FolderNode parent = (FolderNode)selectionAgent.getSelection().getFirstElement();
+
+            FolderReferenceNode parent = (FolderReferenceNode)projectExplorer.getSelection().getHeadElement();
             switch (view.getSelectedType()) {
                 case CLASS:
                     createClass(fileNameWithoutExtension, parent, packageFragment);
@@ -154,35 +156,35 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
         return "";
     }
 
-    private void createClass(String name, FolderNode parent, String packageFragment) {
+    private void createClass(String name, FolderReferenceNode parent, String packageFragment) {
         String content = getPackageQualifier(parent, packageFragment) +
                          "public class " + name + DEFAULT_CONTENT;
 
         createSourceFile(name, parent, packageFragment, content);
     }
 
-    private void createInterface(String name, FolderNode parent, String packageFragment) {
+    private void createInterface(String name, FolderReferenceNode parent, String packageFragment) {
         String content = getPackageQualifier(parent, packageFragment) +
                          "public interface " + name + DEFAULT_CONTENT;
 
         createSourceFile(name, parent, packageFragment, content);
     }
 
-    private void createEnum(String name, FolderNode parent, String packageFragment) {
+    private void createEnum(String name, FolderReferenceNode parent, String packageFragment) {
         String content = getPackageQualifier(parent, packageFragment) +
                          "public enum " + name + DEFAULT_CONTENT;
 
         createSourceFile(name, parent, packageFragment, content);
     }
 
-    private void createAnnotation(String name, FolderNode parent, String packageFragment) {
+    private void createAnnotation(String name, FolderReferenceNode parent, String packageFragment) {
         String content = getPackageQualifier(parent, packageFragment) +
                          "public @interface " + name + DEFAULT_CONTENT;
 
         createSourceFile(name, parent, packageFragment, content);
     }
 
-    private String getPackageQualifier(FolderNode parent, String packageFragment) {
+    private String getPackageQualifier(FolderReferenceNode parent, String packageFragment) {
         String packageFQN = "";
         if (parent instanceof PackageNode) {
             packageFQN = ((PackageNode)parent).getQualifiedName();
@@ -196,71 +198,132 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
         return "\n";
     }
 
-    private void createSourceFile(final String nameWithoutExtension, FolderNode parent, String packageFragment, final String content) {
-        final String parentPath = parent.getPath() + (packageFragment.isEmpty() ? "" : '/' + packageFragment.replace('.', '/'));
-        ensureFolderExists(parentPath, new AsyncCallback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                createAndOpenFile(nameWithoutExtension, parentPath, content);
-            }
+    private void createSourceFile(final String nameWithoutExtension, final FolderReferenceNode parent, String packageFragment,
+                                  final String content) {
+        final String path = parent.getStorablePath() + (packageFragment.isEmpty() ? "" : '/' + packageFragment.replace('.', '/'));
 
-            @Override
-            public void onFailure(Throwable caught) {
-                dialogFactory.createMessageDialog("", caught.getMessage(), null).show();
-            }
-        });
+        getOrCreateFolder(path).thenPromise(createFile(nameWithoutExtension, content))
+                               .thenPromise(navigateToNode())
+                               .then(selectNode())
+                               .then(openNode())
+                               .catchError(onFailedFileCreation());
     }
 
-    /** Creates folder by the specified path if it doesn't exists. */
-    private void ensureFolderExists(String path, final AsyncCallback<Void> callback) {
-        projectServiceClient.createFolder(path, new AsyncRequestCallback<ItemReference>() {
+    private Operation<PromiseError> onFailedFileCreation() {
+        return new Operation<PromiseError>() {
             @Override
-            protected void onSuccess(ItemReference result) {
-                callback.onSuccess(null);
+            public void apply(PromiseError arg) throws OperationException {
+                dialogFactory.createMessageDialog("Cannot create java file", arg.getMessage(), null).show();
+            }
+        };
+    }
+
+    private Function<ItemReference, Promise<Node>> navigateToNode() {
+        return new Function<ItemReference, Promise<Node>>() {
+            @Override
+            public Promise<Node> apply(ItemReference createdItem) throws FunctionException {
+                final HasStorablePath path = new StorablePath(createdItem.getPath());
+
+                return projectExplorer.getNodeByPath(path, true);
+            }
+        };
+    }
+
+    private Function<ItemReference, Promise<ItemReference>> createFile(final String nameWithoutExtension, final String content) {
+        return new Function<ItemReference, Promise<ItemReference>>() {
+            @Override
+            public Promise<ItemReference> apply(ItemReference folder) throws FunctionException {
+                return AsyncPromiseHelper.createFromAsyncRequest(createFileRC(folder, nameWithoutExtension, content));
+            }
+        };
+    }
+
+    private AsyncPromiseHelper.RequestCall<ItemReference> createFileRC(final ItemReference folder, final String nameWithoutExtension,
+                                                                       final String content) {
+        return new AsyncPromiseHelper.RequestCall<ItemReference>() {
+            @Override
+            public void makeCall(AsyncCallback<ItemReference> callback) {
+                projectServiceClient.createFile(folder.getPath(),
+                                                nameWithoutExtension + ".java",
+                                                content,
+                                                null,
+                                                _callback(callback, dtoUnmarshaller.newUnmarshaller(ItemReference.class)));
+            }
+        };
+    }
+
+    private Promise<ItemReference> getOrCreateFolder(String path) {
+        return AsyncPromiseHelper.createFromAsyncRequest(getFolderRC(path))
+                                 .catchErrorPromise(catchAndCreateFolder(path));
+    }
+
+    private AsyncPromiseHelper.RequestCall<ItemReference> getFolderRC(final String path) {
+        return new AsyncPromiseHelper.RequestCall<ItemReference>() {
+            @Override
+            public void makeCall(AsyncCallback<ItemReference> callback) {
+                projectServiceClient.getItem(path, _callback(callback, dtoUnmarshaller.newUnmarshaller(ItemReference.class)));
+            }
+        };
+    }
+
+    @NotNull
+    protected <T> AsyncRequestCallback<T> _callback(@NotNull final AsyncCallback<T> callback, @NotNull Unmarshallable<T> u) {
+        return new AsyncRequestCallback<T>(u) {
+            @Override
+            protected void onSuccess(T result) {
+                callback.onSuccess(result);
             }
 
             @Override
-            protected void onFailure(Throwable exception) {
-                if (exception.getMessage().contains("already exists")) {
-                    callback.onSuccess(null);
-                } else {
-                    callback.onFailure(exception);
+            protected void onFailure(Throwable e) {
+                callback.onFailure(e);
+            }
+        };
+    }
+
+    private Function<PromiseError, Promise<ItemReference>> catchAndCreateFolder(final String path) {
+        return new Function<PromiseError, Promise<ItemReference>>() {
+            @Override
+            public Promise<ItemReference> apply(PromiseError arg) throws FunctionException {
+                return createFolder(path);
+            }
+        };
+    }
+
+    private Promise<ItemReference> createFolder(String path) {
+        return AsyncPromiseHelper.createFromAsyncRequest(createFolderRC(path));
+    }
+
+    private AsyncPromiseHelper.RequestCall<ItemReference> createFolderRC(final String path) {
+        return new AsyncPromiseHelper.RequestCall<ItemReference>() {
+            @Override
+            public void makeCall(AsyncCallback<ItemReference> callback) {
+                projectServiceClient.createFolder(path, _callback(callback, dtoUnmarshaller.newUnmarshaller(ItemReference.class)));
+            }
+        };
+    }
+
+    protected Function<Node, Node> selectNode() {
+        return new Function<Node, Node>() {
+            @Override
+            public Node apply(Node node) throws FunctionException {
+                projectExplorer.select(node, false);
+
+                return node;
+            }
+        };
+    }
+
+    protected Function<Node, Node> openNode() {
+        return new Function<Node, Node>() {
+            @Override
+            public Node apply(Node node) throws FunctionException {
+                if (node instanceof FileReferenceNode) {
+                    ((FileReferenceNode)node).actionPerformed();
                 }
+
+                return node;
             }
-        });
-    }
-
-    private void createAndOpenFile(String nameWithoutExtension, String parentPath, String content) {
-        final CurrentProject currentProject = appContext.getCurrentProject();
-        if (currentProject == null) {
-            throw new IllegalStateException("No opened project.");
-        }
-
-        final String fileName = nameWithoutExtension + ".java";
-        final Unmarshallable<ItemReference> unmarshaller = dtoUnmarshallerFactory.newUnmarshaller(ItemReference.class);
-        projectServiceClient.createFile(parentPath, fileName, content, null, new AsyncRequestCallback<ItemReference>(unmarshaller) {
-            @Override
-            protected void onSuccess(ItemReference result) {
-                currentProject.getCurrentTree().getNodeByPath(result.getPath(), new AsyncCallback<TreeNode<?>>() {
-                    @Override
-                    public void onSuccess(TreeNode<?> result) {
-                        if (result != null) {
-                            eventBus.fireEvent(new ItemEvent((ItemNode)result, CREATED));
-                            eventBus.fireEvent(new FileEvent((VirtualFile)result, OPEN));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        dialogFactory.createMessageDialog("", caught.getMessage(), null).show();
-                    }
-                });
-            }
-
-            @Override
-            protected void onFailure(Throwable exception) {
-                dialogFactory.createMessageDialog("", exception.getMessage(), null).show();
-            }
-        });
+        };
     }
 }

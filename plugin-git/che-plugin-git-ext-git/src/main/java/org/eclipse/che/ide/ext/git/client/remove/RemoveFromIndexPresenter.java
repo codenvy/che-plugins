@@ -10,29 +10,32 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.remove;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileEvent;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
+import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
-import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
+import org.eclipse.che.ide.project.node.FolderReferenceNode;
+import org.eclipse.che.ide.project.node.ResourceBasedNode;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-
 import javax.validation.constraints.NotNull;
+import org.eclipse.che.commons.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,18 +49,18 @@ import static org.eclipse.che.ide.api.notification.Notification.Type.INFO;
  * @author Ann Zhuleva
  */
 public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDelegate {
+    private       RemoveFromIndexView       view;
+    private       EventBus                  eventBus;
+    private final ProjectExplorerPresenter  projectExplorer;
+    private       GitServiceClient          service;
+    private       GitLocalizationConstant   constant;
+    private       AppContext                appContext;
+    private       CurrentProject            project;
+    private       SelectionAgent            selectionAgent;
+    private       NotificationManager       notificationManager;
+    private       List<EditorPartPresenter> openedEditors;
+    private       EditorAgent               editorAgent;
     private final GitOutputPartPresenter console;
-
-    private RemoveFromIndexView       view;
-    private EventBus                  eventBus;
-    private GitServiceClient          service;
-    private GitLocalizationConstant   constant;
-    private AppContext                appContext;
-    private CurrentProject            project;
-    private SelectionAgent            selectionAgent;
-    private NotificationManager       notificationManager;
-    private List<EditorPartPresenter> openedEditors;
-    private EditorAgent               editorAgent;
 
     /**
      * Create presenter
@@ -77,9 +80,11 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
                                     AppContext appContext,
                                     SelectionAgent selectionAgent,
                                     NotificationManager notificationManager,
-                                    EditorAgent editorAgent) {
+                                    EditorAgent editorAgent,
+                                    ProjectExplorerPresenter projectExplorer) {
         this.view = view;
         this.eventBus = eventBus;
+        this.projectExplorer = projectExplorer;
         this.console = console;
         this.view.setDelegate(this);
         this.service = service;
@@ -106,13 +111,13 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
      */
     @NotNull
     private String formMessage(@NotNull String workDir) {
-        Selection<StorableNode> selection = (Selection<StorableNode>)selectionAgent.getSelection();
+        Selection<ResourceBasedNode<?>> selection = (Selection<ResourceBasedNode<?>>)selectionAgent.getSelection();
 
         String path;
         if (selection == null || selection.getHeadElement() == null) {
             path = project.getRootProject().getPath();
         } else {
-            path = selection.getHeadElement().getPath();
+            path = ((HasStorablePath)selection.getHeadElement()).getStorablePath();
         }
 
         String pattern = path.replaceFirst(workDir, "");
@@ -128,7 +133,7 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
             pattern = pattern.substring(0, 40) + "...";
         }
 
-        if (selection != null && selection.getHeadElement() instanceof FolderNode) {
+        if (selection != null && selection.getHeadElement() instanceof FolderReferenceNode) {
             return constant.removeFromIndexFolder(pattern).asString();
         } else {
             return constant.removeFromIndexFile(pattern).asString();
@@ -138,7 +143,6 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
     /** {@inheritDoc} */
     @Override
     public void onRemoveClicked() {
-        final Selection<StorableNode> selection = (Selection<StorableNode>)selectionAgent.getSelection();
         openedEditors = new ArrayList<>();
         for (EditorPartPresenter partPresenter : editorAgent.getOpenedEditors().values()) {
             openedEditors.add(partPresenter);
@@ -153,7 +157,18 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
                                notificationManager.showNotification(notification);
 
                                if (!view.isRemoved()) {
-                                   refreshProject(selection);
+                                   projectExplorer.reloadChildren(getResourceBasedNode());
+
+                                   if (projectExplorer.getSelection().getHeadElement() instanceof FileReferenceNode) {
+                                       FileReferenceNode selectFile = ((FileReferenceNode)projectExplorer.getSelection().getHeadElement());
+                                       for (EditorPartPresenter partPresenter : openedEditors) {
+                                           VirtualFile openFile = partPresenter.getEditorInput().getFile();
+                                           //to close selected file if it open
+                                           if (selectFile.getPath().equals(openFile.getPath())) {
+                                               eventBus.fireEvent(new FileEvent(openFile, FileEvent.FileOperation.CLOSE));
+                                           }
+                                       }
+                                   }
                                }
                            }
 
@@ -166,18 +181,31 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
         view.close();
     }
 
-    private void refreshProject(Selection<StorableNode> selection) {
-        if (selection.getHeadElement() instanceof FileNode) {
-            FileNode selectFile = ((FileNode)selection.getHeadElement());
-            for (EditorPartPresenter partPresenter : openedEditors) {
-                VirtualFile openFile = partPresenter.getEditorInput().getFile();
-                //to close selected file if it open
-                if (selectFile.getPath().equals(openFile.getPath())) {
-                    eventBus.fireEvent(new FileEvent(openFile, FileEvent.FileOperation.CLOSE));
-                }
-            }
+    @Nullable
+    protected ResourceBasedNode<?> getResourceBasedNode() {
+        List<?> selection = projectExplorer.getSelection().getAllElements();
+        //we should be sure that user selected single element to work with it
+        if (selection != null && selection.isEmpty() || selection.size() > 1) {
+            return null;
         }
-        eventBus.fireEvent(new RefreshProjectTreeEvent());
+
+        Object o = selection.get(0);
+
+        if (o instanceof ResourceBasedNode<?>) {
+            ResourceBasedNode<?> node = (ResourceBasedNode<?>)o;
+            //it may be file node, so we should take parent node
+            if (node.isLeaf() && isResourceAndStorableNode(node.getParent())) {
+                return (ResourceBasedNode<?>)node.getParent();
+            }
+
+            return isResourceAndStorableNode(node) ? node : null;
+        }
+
+        return null;
+    }
+
+    protected boolean isResourceAndStorableNode(@Nullable Node node) {
+        return node != null && node instanceof ResourceBasedNode<?> && node instanceof HasStorablePath;
     }
 
     /**
@@ -187,12 +215,12 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
      */
     @NotNull
     private List<String> getFilePatterns() {
-        Selection<StorableNode> selection = (Selection<StorableNode>)selectionAgent.getSelection();
+        Selection<ResourceBasedNode<?>> selection = (Selection<ResourceBasedNode<?>>)selectionAgent.getSelection();
         String path;
         if (selection == null || selection.getHeadElement() == null) {
             path = project.getRootProject().getPath();
         } else {
-            path = selection.getHeadElement().getPath();
+            path = ((HasStorablePath)selection.getHeadElement()).getStorablePath();
         }
 
         String pattern = path.replaceFirst(project.getRootProject().getPath(), "");

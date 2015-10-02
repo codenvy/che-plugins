@@ -13,17 +13,6 @@ package org.eclipse.che.ide.ext.svn.client.copy;
 import elemental.events.KeyboardEvent;
 import elemental.events.MouseEvent;
 
-import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeDataAdapter;
-import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeRenderer;
-import org.eclipse.che.ide.ui.Tooltip;
-import org.eclipse.che.ide.ui.menu.PositionController;
-import org.eclipse.che.ide.ui.tree.Tree;
-import org.eclipse.che.ide.ui.tree.TreeNodeElement;
-import org.eclipse.che.ide.ui.window.Window;
-import org.eclipse.che.ide.util.input.SignalEvent;
-
 import com.google.common.base.Strings;
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.core.client.GWT;
@@ -37,12 +26,30 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DeckPanel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
+import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
+import org.eclipse.che.ide.ext.svn.client.common.filteredtree.ProjectTreeNodeDataAdapter;
+import org.eclipse.che.ide.ext.svn.client.merge.ProjectTreeNodeRenderer;
+import org.eclipse.che.ide.project.node.ResourceBasedNode;
+import org.eclipse.che.ide.ui.Tooltip;
+import org.eclipse.che.ide.ui.menu.PositionController;
+import org.eclipse.che.ide.ui.tree.Tree;
+import org.eclipse.che.ide.ui.tree.TreeNodeElement;
+import org.eclipse.che.ide.ui.window.Window;
+import org.eclipse.che.ide.util.input.SignalEvent;
 import org.vectomatic.dom.svg.OMSVGSVGElement;
 
 import javax.validation.constraints.NotNull;
@@ -201,13 +208,13 @@ public class CopyViewImpl extends Window implements CopyView {
             /** {@inheritDoc} */
             @Override
             public void onNodeExpanded(TreeNodeElement<TreeNode<?>> treeNodeElement) {
-                delegate.onNodeExpanded(treeNodeElement.getData());
+                //delegate.onNodeExpanded(treeNodeElement.getData());
             }
 
             /** {@inheritDoc} */
             @Override
             public void onNodeSelected(TreeNodeElement<TreeNode<?>> treeNodeElement, SignalEvent signalEvent) {
-                delegate.onNodeSelected(treeNodeElement.getData());
+                // delegate.onNodeSelected(treeNodeElement.getData());
             }
 
             /** {@inheritDoc} */
@@ -281,7 +288,7 @@ public class CopyViewImpl extends Window implements CopyView {
         delegate.onTargetCheckBoxChanged();
 
         new SlideAnimation().showWidget(commentDeckPanel.getWidget(targetCheckBox.getValue() ? 1 : 0),
-                commentDeckPanel.getWidget(targetCheckBox.getValue() ? 0 : 1));
+                                        commentDeckPanel.getWidget(targetCheckBox.getValue() ? 0 : 1));
 
     }
 
@@ -320,11 +327,11 @@ public class CopyViewImpl extends Window implements CopyView {
 
     /** {@inheritDoc} */
     @Override
-    public void setProjectNodes(List<TreeNode<?>> rootNodes) {
-        rootNode.setChildren(rootNodes);
-        for (TreeNode<?> treeNode : rootNodes) {
-            treeNode.setParent(rootNode);
-        }
+    public void setProjectNodes(List<ResourceBasedNode<?>> rootNodes) {
+//        rootNode.setChildren(rootNodes);
+//        for (TreeNode<?> treeNode : rootNodes) {
+//            treeNode.setParent(rootNode);
+//        }
 
         tree.getSelectionModel().clearSelections();
         tree.getModel().setRoot(rootNode);
@@ -332,17 +339,18 @@ public class CopyViewImpl extends Window implements CopyView {
 
         if (rootNodes.isEmpty()) {
             delegate.onNodeSelected(null);
-        } else {
-            final TreeNode<?> firstNode = rootNodes.get(0);
-            if (!firstNode.isLeaf()) {
-                // expand first node that usually represents project itself
-                tree.autoExpandAndSelectNode(firstNode, false);
-                delegate.onNodeExpanded(firstNode);
-            }
-            // auto-select first node
-            tree.getSelectionModel().selectSingleNode(firstNode);
-            delegate.onNodeSelected(firstNode);
         }
+//        else {
+//            final TreeNode<?> firstNode = rootNodes.get(0);
+//            if (!firstNode.isLeaf()) {
+        // expand first node that usually represents project itself
+//                tree.autoExpandAndSelectNode(firstNode, false);
+        // delegate.onNodeExpanded(firstNode);
+//            }
+        // auto-select first node
+//            tree.getSelectionModel().selectSingleNode(firstNode);
+        // delegate.onNodeSelected(firstNode);
+//        }
     }
 
     /** {@inheritDoc} */
@@ -363,7 +371,7 @@ public class CopyViewImpl extends Window implements CopyView {
 
     /** {@inheritDoc} */
     @Override
-    public void updateProjectNode(@NotNull TreeNode<?> oldNode, @NotNull TreeNode<?> newNode) {
+    public void updateProjectNode(@NotNull ResourceBasedNode<?> oldNode, @NotNull ResourceBasedNode<?> newNode) {
         // get currently selected node
         final List<TreeNode<?>> selectedNodes = tree.getSelectionModel().getSelectedNodes();
         TreeNode<?> selectedNode = null;
@@ -371,8 +379,8 @@ public class CopyViewImpl extends Window implements CopyView {
             selectedNode = selectedNodes.get(0);
         }
 
-        List<List<String>> pathsToExpand = tree.replaceSubtree(oldNode, newNode, false);
-        tree.expandPaths(pathsToExpand, false);
+//        List<List<String>> pathsToExpand = tree.replaceSubtree(oldNode, newNode, false);
+//        tree.expandPaths(pathsToExpand, false);
 
         // restore selected node
         if (selectedNode != null) {

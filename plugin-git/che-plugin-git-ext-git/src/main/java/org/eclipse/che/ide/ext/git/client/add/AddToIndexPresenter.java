@@ -10,28 +10,28 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.add;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.Status;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.project.node.FolderReferenceNode;
+import org.eclipse.che.ide.project.node.ResourceBasedNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.websocket.WebSocketException;
 import org.eclipse.che.ide.websocket.rest.RequestCallback;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import javax.validation.constraints.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * Presenter for add changes to Git index.
  *
- * @author <a href="mailto:zhulevaanna@gmail.com">Ann Zhuleva</a>
+ * @author Ann Zhuleva
  */
 @Singleton
 public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
@@ -49,13 +49,13 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
     private static final String ROOT_FOLDER = ".";
     private final GitOutputPartPresenter console;
 
-    private AddToIndexView          view;
-    private GitServiceClient        service;
-    private GitLocalizationConstant constant;
-    private AppContext              appContext;
-    private CurrentProject          project;
-    private SelectionAgent          selectionAgent;
-    private NotificationManager     notificationManager;
+    private AddToIndexView           view;
+    private GitServiceClient         service;
+    private GitLocalizationConstant  constant;
+    private AppContext               appContext;
+    private CurrentProject           project;
+    private ProjectExplorerPresenter projectExplorer;
+    private NotificationManager      notificationManager;
 
     private final DtoUnmarshallerFactory dtoUnmarshallerFactory;
 
@@ -66,7 +66,6 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
      * @param service
      * @param constant
      * @param appContext
-     * @param selectionAgent
      * @param notificationManager
      */
     @Inject
@@ -77,14 +76,14 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
                                GitOutputPartPresenter console,
                                GitServiceClient service,
                                NotificationManager notificationManager,
-                               SelectionAgent selectionAgent) {
+                               ProjectExplorerPresenter projectExplorer) {
         this.view = view;
         this.console = console;
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;
         this.appContext = appContext;
-        this.selectionAgent = selectionAgent;
+        this.projectExplorer = projectExplorer;
         this.notificationManager = notificationManager;
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
     }
@@ -150,7 +149,7 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
             pattern = pattern.substring(0, 50) + "...";
         }
 
-        if (getExplorerSelection().getHeadElement() instanceof FolderNode) {
+        if (getExplorerSelection().getHeadElement() instanceof FolderReferenceNode) {
             return constant.addToIndexFolder(pattern).asString();
         } else {
             return constant.addToIndexFile(pattern).asString();
@@ -191,7 +190,7 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
     @NotNull
     private List<String> getMultipleFilePatterns() {
 
-        final Selection<StorableNode> selection = getExplorerSelection();
+        final Selection<ResourceBasedNode<?>> selection = getExplorerSelection();
 
         if (selection == null || selection.isEmpty()) {
             return Collections.singletonList(ROOT_FOLDER);
@@ -199,8 +198,8 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
             final Set<String> paths = new HashSet<>();
             final Set<String> directories = new HashSet<>();
 
-            for (final StorableNode node : selection.getAllElements()) {
-                final String normalized = normalizePath(node.getPath());
+            for (final ResourceBasedNode<?> node : selection.getAllElements()) {
+                final String normalized = normalizePath(((HasStorablePath)node).getStorablePath());
                 if (ROOT_FOLDER.equals(normalized)) {
                     return Collections.singletonList(ROOT_FOLDER);
                 }
@@ -231,18 +230,18 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
     }
 
     private boolean isSelectionSingle() {
-        final Selection<StorableNode> selection = getExplorerSelection();
+        final Selection<ResourceBasedNode<?>> selection = getExplorerSelection();
         return (selection != null && selection.isSingleSelection());
     }
 
     private boolean isSelectionEmpty() {
-        final Selection<StorableNode> selection = getExplorerSelection();
+        final Selection<ResourceBasedNode<?>> selection = getExplorerSelection();
         return (selection == null || selection.isEmpty());
     }
 
-    private Selection<StorableNode> getExplorerSelection() {
-        final Selection<StorableNode> selection = (Selection<StorableNode>)selectionAgent.getSelection();
-        if (selection == null || selection.isEmpty() || selection.getHeadElement() instanceof StorableNode) {
+    private Selection<ResourceBasedNode<?>> getExplorerSelection() {
+        final Selection<ResourceBasedNode<?>> selection = (Selection<ResourceBasedNode<?>>)projectExplorer.getSelection();
+        if (selection == null || selection.isEmpty() || selection.getHeadElement() instanceof HasStorablePath) {
             return selection;
         } else {
             return null;
@@ -250,12 +249,12 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
     }
 
     private String getSingleFilePattern() {
-        final Selection<StorableNode> selection = getExplorerSelection();
+        final Selection<ResourceBasedNode<?>> selection = getExplorerSelection();
         final String path;
         if (selection == null || selection.isEmpty()) {
             return ROOT_FOLDER;
         } else {
-            path = selection.getHeadElement().getPath();
+            path = ((HasStorablePath)selection.getHeadElement()).getStorablePath();
         }
 
         return normalizePath(path);

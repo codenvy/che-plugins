@@ -17,11 +17,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.LogResponse;
 import org.eclipse.che.api.git.shared.Revision;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.event.ProjectActionHandler;
@@ -31,25 +31,25 @@ import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.parts.base.BasePresenter;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
+import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
 import org.eclipse.che.ide.ext.git.client.GitResources;
-import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.StringUnmarshaller;
 import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.validation.constraints.NotNull;
-import org.eclipse.che.commons.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 import static org.eclipse.che.api.git.shared.DiffRequest.DiffType.RAW;
+import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 
 /**
  * Presenter for showing git history.
@@ -106,7 +106,7 @@ public class HistoryPresenter extends BasePresenter implements HistoryView.Actio
         this.selectionAgent = selectionAgent;
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectReady(ProjectActionEvent event) {
 
             }
 
@@ -120,6 +120,11 @@ public class HistoryPresenter extends BasePresenter implements HistoryView.Actio
                 isViewClosed = true;
                 workspaceAgent.hidePart(HistoryPresenter.this);
                 view.clear();
+            }
+
+            @Override
+            public void onProjectOpened(ProjectActionEvent event) {
+
             }
         });
     }
@@ -310,12 +315,12 @@ public class HistoryPresenter extends BasePresenter implements HistoryView.Actio
         if (!showChangesInProject && project != null) {
             String path;
 
-            Selection<StorableNode> selection = (Selection<StorableNode>)selectionAgent.getSelection();
+            Selection<HasStorablePath> selection = (Selection<HasStorablePath>)selectionAgent.getSelection();
 
-            if (selection == null || selection.getFirstElement() == null) {
+            if (selection == null || selection.getHeadElement() == null) {
                 path = project.getPath();
             } else {
-                path = selection.getFirstElement().getPath();
+                path = selection.getHeadElement().getStorablePath();
             }
 
             pattern = path.replaceFirst(project.getPath(), "");
@@ -419,18 +424,6 @@ public class HistoryPresenter extends BasePresenter implements HistoryView.Actio
 
     /** {@inheritDoc} */
     @Override
-    public void setVisible(boolean visible) {
-        view.setVisible(visible);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public IsWidget getView() {
-        return view;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ImageResource getTitleImage() {
         return resources.history();
     }
@@ -463,5 +456,15 @@ public class HistoryPresenter extends BasePresenter implements HistoryView.Actio
         DIFF_WITH_INDEX,
         DIFF_WITH_WORK_TREE,
         DIFF_WITH_PREV_VERSION
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        view.setVisible(visible);
+    }
+
+    @Override
+    public IsWidget getView() {
+        return view;
     }
 }

@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.action;
 
-import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
-import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
-import org.eclipse.che.ide.ext.svn.client.commit.CommitPresenter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
+import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
+import org.eclipse.che.ide.ext.svn.client.commit.CommitPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 
 /**
  * Extension of {@link SubversionAction} for implementing the "svn commit" command.
@@ -36,11 +36,11 @@ public class CommitAction extends SubversionAction {
     public CommitAction(final AnalyticsEventLogger eventLogger,
                         final AppContext appContext,
                         final CommitPresenter presenter,
-                        final SelectionAgent selectionAgent,
+                        final ProjectExplorerPresenter projectExplorerPresenter,
                         final SubversionExtensionLocalizationConstants constants,
                         final SubversionExtensionResources resources) {
         super(constants.commitTitle(), constants.commitDescription(), resources.commit(), eventLogger, appContext,
-              constants, resources, selectionAgent);
+              constants, resources, projectExplorerPresenter);
         this.presenter = presenter;
     }
 

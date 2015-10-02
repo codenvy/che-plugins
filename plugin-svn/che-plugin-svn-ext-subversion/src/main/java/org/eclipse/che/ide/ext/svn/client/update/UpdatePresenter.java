@@ -10,22 +10,22 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.update;
 
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
-import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
-import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
-import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
-import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
-import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
+import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
+import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
+import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
+import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import static org.eclipse.che.ide.api.notification.Notification.Status.FINISHED;
 import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
@@ -58,7 +58,7 @@ public class UpdatePresenter extends SubversionActionPresenter {
                            final WorkspaceAgent workspaceAgent,
                            final SubversionExtensionLocalizationConstants constants,
                            final NotificationManager notificationManager,
-                           final ProjectExplorerPart projectExplorerPart) {
+                           final ProjectExplorerPresenter projectExplorerPart) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
 
         this.eventBus = eventBus;

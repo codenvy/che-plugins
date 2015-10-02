@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.watcher;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -19,9 +18,7 @@ import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.api.project.tree.TreeStructure;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.websocket.MessageBus;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
 import org.junit.Test;
@@ -29,13 +26,10 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.eclipse.che.ide.extension.machine.client.watcher.SystemFileWatcher.WATCHER_WS_CHANEL;
 import static org.mockito.Matchers.eq;
@@ -50,7 +44,6 @@ public class SystemFileWatcherTest {
 
     private static final String SOME_TEXT = "someText";
 
-    private static final String PATH_TO_FILE   = "parent/child/changed_file";
     private static final String PATH_TO_PARENT = "parent/child";
 
     //constructor mocks
@@ -69,37 +62,18 @@ public class SystemFileWatcherTest {
     @Mock
     private CurrentProject currentProject;
     @Mock
-    private TreeStructure  treeStructure;
-    @Mock
-    private TreeNode<?>    treeNode;
+    private ProjectExplorerPresenter projectExplorer;
 
     @Captor
     private ArgumentCaptor<Operation<Void>>                   operationCaptor;
     @Captor
     private ArgumentCaptor<SubscriptionHandler<String>>       subscriptionCaptor;
-    @Captor
-    private ArgumentCaptor<AsyncCallback<TreeNode<?>>>        nodeCaptor;
-    @Captor
-    private ArgumentCaptor<AsyncCallback<List<TreeNode<?>>>> rootNodeCaptor;
 
     @InjectMocks
     private SystemFileWatcher systemFileWatcher;
 
-    @Test
-    public void watcherShouldBeRegistered() throws Exception {
-        callRefreshTreeMethod(PATH_TO_FILE);
-
-        verify(appContext).getCurrentProject();
-        verify(currentProject).getCurrentTree();
-        verify(treeStructure).getNodeByPath(eq(PATH_TO_PARENT), nodeCaptor.capture());
-        nodeCaptor.getValue().onSuccess(treeNode);
-
-        verify(eventBus).fireEvent(Matchers.<RefreshProjectTreeEvent>anyObject());
-    }
-
     private void callRefreshTreeMethod(@NotNull String pathToNode) throws Exception {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
-        when(currentProject.getCurrentTree()).thenReturn(treeStructure);
 
         when(watcherService.registerRecursiveWatcher(SOME_TEXT)).thenReturn(registerPromise);
 
@@ -123,14 +97,8 @@ public class SystemFileWatcherTest {
 
     @Test
     public void parentNodeShouldBeRefreshed() throws Exception {
-        List<TreeNode<?>> nodes = new ArrayList<>();
-        nodes.add(treeNode);
-
         callRefreshTreeMethod(PATH_TO_PARENT);
 
-        verify(treeStructure).getRootNodes(rootNodeCaptor.capture());
-        rootNodeCaptor.getValue().onSuccess(nodes);
-
-        verify(eventBus).fireEvent(Matchers.<RefreshProjectTreeEvent>anyObject());
+        verify(projectExplorer).reloadChildren();
     }
 }

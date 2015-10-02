@@ -10,21 +10,21 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.log;
 
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
-import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
-import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
-import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
-import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
+import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
+import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
+import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
+import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
 import org.eclipse.che.ide.ext.svn.shared.InfoResponse;
 import org.eclipse.che.ide.ext.svn.shared.SubversionItem;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * Manages the displaying commit log messages for specified period.
@@ -49,7 +49,7 @@ public class ShowLogPresenter extends SubversionActionPresenter {
                                final RawOutputPresenter console,
                                final SubversionClientService subversionClientService,
                                final NotificationManager notificationManager,
-                               final ProjectExplorerPart projectExplorerPart,
+                               final ProjectExplorerPresenter projectExplorerPart,
                                final ShowLogsView view) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
 
@@ -85,26 +85,26 @@ public class ShowLogPresenter extends SubversionActionPresenter {
         }
 
         subversionClientService.info(appContext.getCurrentProject().getRootProject().getPath(), getSelectedPaths().get(0), "HEAD", false,
-                new AsyncRequestCallback<InfoResponse>(dtoUnmarshallerFactory.newUnmarshaller(InfoResponse.class)) {
-                    @Override
-                    protected void onSuccess(InfoResponse result) {
-                        if (result.getErrorOutput() != null && !result.getErrorOutput().isEmpty()) {
-                            printResponse(null, null, result.getErrorOutput());
-                            notificationManager.showError("Unable to execute subversion command");
-                            return;
-                        }
+                                     new AsyncRequestCallback<InfoResponse>(dtoUnmarshallerFactory.newUnmarshaller(InfoResponse.class)) {
+                                         @Override
+                                         protected void onSuccess(InfoResponse result) {
+                                             if (result.getErrorOutput() != null && !result.getErrorOutput().isEmpty()) {
+                                                 printResponse(null, null, result.getErrorOutput());
+                                                 notificationManager.showError("Unable to execute subversion command");
+                                                 return;
+                                             }
 
-                        SubversionItem subversionItem = result.getItems().get(0);
-                        view.setRevisionCount(subversionItem.getRevision());
-                        view.rangeFiend().setValue("1:" + subversionItem.getRevision());
-                        view.show();
-                    }
+                                             SubversionItem subversionItem = result.getItems().get(0);
+                                             view.setRevisionCount(subversionItem.getRevision());
+                                             view.rangeFiend().setValue("1:" + subversionItem.getRevision());
+                                             view.show();
+                                         }
 
-                    @Override
-                    protected void onFailure(Throwable exception) {
-                        notificationManager.showError(exception.getMessage());
-                    }
-                });
+                                         @Override
+                                         protected void onFailure(Throwable exception) {
+                                             notificationManager.showError(exception.getMessage());
+                                         }
+                                     });
 
     }
 
@@ -115,18 +115,18 @@ public class ShowLogPresenter extends SubversionActionPresenter {
      */
     private void showLogs(String range) {
         subversionClientService.showLog(appContext.getCurrentProject().getRootProject().getPath(), getSelectedPaths(), range,
-                new AsyncRequestCallback<CLIOutputResponse>(dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponse.class)) {
-                    @Override
-                    protected void onSuccess(CLIOutputResponse result) {
-                        printCommand(result.getCommand());
-                        printAndSpace(result.getOutput());
-                    }
+                                        new AsyncRequestCallback<CLIOutputResponse>(dtoUnmarshallerFactory.newUnmarshaller(CLIOutputResponse.class)) {
+                                            @Override
+                                            protected void onSuccess(CLIOutputResponse result) {
+                                                printCommand(result.getCommand());
+                                                printAndSpace(result.getOutput());
+                                            }
 
-                    @Override
-                    protected void onFailure(Throwable exception) {
-                        notificationManager.showError(exception.getMessage());
-                    }
-                });
+                                            @Override
+                                            protected void onFailure(Throwable exception) {
+                                                notificationManager.showError(exception.getMessage());
+                                            }
+                                        });
     }
 
 }

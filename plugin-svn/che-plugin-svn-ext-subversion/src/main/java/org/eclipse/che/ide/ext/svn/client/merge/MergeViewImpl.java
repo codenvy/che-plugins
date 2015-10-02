@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.merge;
 
+import elemental.events.KeyboardEvent;
+import elemental.events.MouseEvent;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style;
@@ -29,17 +32,16 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import elemental.events.KeyboardEvent;
-import elemental.events.MouseEvent;
+
 import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
-import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeDataAdapter;
-import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeRenderer;
+import org.eclipse.che.ide.ext.svn.client.common.filteredtree.ProjectTreeNodeDataAdapter;
 import org.eclipse.che.ide.ui.Tooltip;
 import org.eclipse.che.ide.ui.menu.PositionController;
-import org.eclipse.che.ide.ui.tree.*;
+import org.eclipse.che.ide.ui.tree.Tree;
+import org.eclipse.che.ide.ui.tree.TreeNodeElement;
 import org.eclipse.che.ide.ui.window.Window;
 import org.eclipse.che.ide.util.input.SignalEvent;
 import org.vectomatic.dom.svg.OMSVGSVGElement;
@@ -289,9 +291,9 @@ public class MergeViewImpl extends Window implements MergeView {
             @Override
             public void execute() {
                 Tooltip tooltip = Tooltip.create((elemental.dom.Element) alertMarker.getElement(),
-                        PositionController.VerticalAlign.TOP,
-                        PositionController.HorizontalAlign.MIDDLE,
-                        message);
+                                                 PositionController.VerticalAlign.TOP,
+                                                 PositionController.HorizontalAlign.MIDDLE,
+                                                 message);
             }
         });
     }

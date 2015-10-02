@@ -35,8 +35,8 @@ import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
 import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionResources;
-import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeDataAdapter;
-import org.eclipse.che.ide.part.projectexplorer.ProjectTreeNodeRenderer;
+import org.eclipse.che.ide.ext.svn.client.common.filteredtree.ProjectTreeNodeDataAdapter;
+import org.eclipse.che.ide.ext.svn.client.merge.ProjectTreeNodeRenderer;
 import org.eclipse.che.ide.ui.Tooltip;
 import org.eclipse.che.ide.ui.menu.PositionController;
 import org.eclipse.che.ide.ui.tree.Tree;
@@ -293,9 +293,9 @@ public class MoveViewImpl extends Window implements MoveView {
         alertMarker.getStyle().setVisibility(Style.Visibility.VISIBLE);
 
         Tooltip.create((elemental.dom.Element)alertMarker.getElement(),
-                PositionController.VerticalAlign.TOP,
-                PositionController.HorizontalAlign.MIDDLE,
-                message);
+                       PositionController.VerticalAlign.TOP,
+                       PositionController.HorizontalAlign.MIDDLE,
+                       message);
 
         btnMove.setEnabled(false);
     }

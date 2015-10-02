@@ -10,28 +10,27 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.resolve;
 
-import java.util.HashMap;
-import java.util.List;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.SubversionActionPresenter;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponseList;
-import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
-import org.eclipse.che.ide.api.parts.WorkspaceAgent;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
+import java.util.HashMap;
+import java.util.List;
 
 public class ResolvePresenter extends SubversionActionPresenter implements ResolveView.ActionDelegate {
 
@@ -54,7 +53,7 @@ public class ResolvePresenter extends SubversionActionPresenter implements Resol
                                final DialogFactory dialogFactory,
                                final SubversionClientService subversionClientService,
                                final ResolveView view,
-                               final ProjectExplorerPart projectExplorerPart) {
+                               final ProjectExplorerPresenter projectExplorerPart) {
         super(appContext, eventBus, console, workspaceAgent, projectExplorerPart);
 
         this.subversionClientService = subversionClientService;

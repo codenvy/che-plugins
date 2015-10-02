@@ -15,5 +15,6 @@
     <inherits name="com.google.gwt.user.User"/>
     <inherits name="org.eclipse.che.ide.Api"/>
     <inherits name="org.eclipse.che.ide.Core"/>
+    <inherits name="org.eclipse.che.ide.jseditor.JsEditor"/>
     <source path=""/>
 </module>

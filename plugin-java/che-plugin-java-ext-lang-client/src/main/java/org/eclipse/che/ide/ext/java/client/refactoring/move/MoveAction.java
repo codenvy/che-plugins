@@ -15,12 +15,12 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.SourceFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaFileNode;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 import org.eclipse.che.ide.ext.java.client.refactoring.RefactorInfo;
 import org.eclipse.che.ide.ext.java.client.refactoring.move.wizard.MovePresenter;
 
@@ -70,13 +70,13 @@ public class MoveAction extends Action {
         this.selectedItems = selectedItems;
 
         for (Object selectedItem : selectedItems) {
-            if (!(selectedItem instanceof StorableNode)) {
+            if (!(selectedItem instanceof HasStorablePath)) {
                 return false;
             }
 
-            StorableNode<?> item = (StorableNode)selectedItem;
+            HasStorablePath item = (HasStorablePath)selectedItem;
 
-            boolean isSourceFileNode = item instanceof SourceFileNode;
+            boolean isSourceFileNode = item instanceof JavaFileNode;
             boolean isPackageNode = item instanceof PackageNode;
 
             if (isSourceFileNode) {

@@ -10,17 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.perspective.widgets.recipe.editor;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.web.bindery.event.shared.EventBus;
-
-import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
-import org.eclipse.che.ide.api.editor.EditorAgent;
-import org.eclipse.che.ide.api.project.tree.TreeStructure;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-
-import javax.validation.constraints.NotNull;
+import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.js.Promises;
+import org.eclipse.che.ide.api.project.node.HasProjectDescriptor;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 
 /**
  * The file node that represents recipe file item in the project explorer tree. It needs just for opening recipe for editing (it is a
@@ -28,32 +22,58 @@ import javax.validation.constraints.NotNull;
  *
  * @author Valeriy Svydenko
  */
-public class RecipeFile extends FileNode {
+public class RecipeFile implements VirtualFile {
 
     private final String content;
+    private final ItemReference recipe;
 
-    public RecipeFile(@NotNull String content,
-                      @NotNull EventBus eventBus,
-                      @NotNull ProjectServiceClient projectServiceClient,
-                      @NotNull DtoUnmarshallerFactory dtoUnmarshallerFactory,
-                      @NotNull ItemReference data,
-                      @NotNull TreeStructure treeStructure,
-                      @NotNull EditorAgent editorAgent) {
-        super(null, data, treeStructure, eventBus, projectServiceClient, dtoUnmarshallerFactory, editorAgent);
-
+    public RecipeFile(String content, ItemReference recipe) {
         this.content = content;
+        this.recipe = recipe;
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getPath() {
+        return recipe.getPath();
+    }
+
+    @Override
+    public String getName() {
+        return recipe.getName();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return recipe.getName();
+    }
+
+    @Override
+    public String getMediaType() {
+        return recipe.getMediaType();
+    }
+
     @Override
     public boolean isReadOnly() {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void getContent(AsyncCallback<String> callback) {
-        callback.onSuccess(content);
+    public HasProjectDescriptor getProject() {
+        return null;
     }
 
+    @Override
+    public String getContentUrl() {
+        return null;
+    }
+
+    @Override
+    public Promise<String> getContent() {
+        return Promises.resolve(content);
+    }
+
+    @Override
+    public Promise<Void> updateContent(String content) {
+        return Promises.resolve(null);
+    }
 }

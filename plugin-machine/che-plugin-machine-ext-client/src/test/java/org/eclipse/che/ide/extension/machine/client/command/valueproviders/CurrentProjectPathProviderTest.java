@@ -123,7 +123,7 @@ public class CurrentProjectPathProviderTest {
         when(machineDescriptorMock.getMetadata()).thenReturn(machineMetadataMock);
         when(machinePromise.then(Matchers.any(Operation.class))).thenReturn(machinePromise);
 
-        currentProjectPathProvider.onProjectOpened(mock(ProjectActionEvent.class));
+        currentProjectPathProvider.onProjectReady(mock(ProjectActionEvent.class));
 
         verify(machinePromise).then(machineCaptor.capture());
         machineCaptor.getValue().apply(machineDescriptorMock);

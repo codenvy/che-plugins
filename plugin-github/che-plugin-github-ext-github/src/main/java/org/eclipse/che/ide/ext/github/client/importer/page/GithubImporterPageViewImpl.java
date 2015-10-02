@@ -145,7 +145,7 @@ public class GithubImporterPageViewImpl extends Composite implements GithubImpor
         Column<ProjectData, ImageResource> iconColumn = new Column<ProjectData, ImageResource>(new ImageResourceCell()) {
             @Override
             public ImageResource getValue(ProjectData item) {
-                return resources.project();
+                return null;
             }
         };
 

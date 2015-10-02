@@ -10,19 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.branch;
 
-import com.google.web.bindery.event.shared.Event;
-
 import org.eclipse.che.api.git.shared.Branch;
 import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
+import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
@@ -80,27 +79,27 @@ public class BranchPresenterTest extends BaseTest {
     public static final boolean IS_REMOTE          = true;
     public static final boolean IS_ACTIVE          = true;
     @Mock
-    private BranchView             view;
+    private BranchView               view;
     @Mock
-    private FileNode               file;
+    private EditorInput              editorInput;
     @Mock
-    private EditorInput            editorInput;
+    private EditorAgent              editorAgent;
     @Mock
-    private EditorAgent            editorAgent;
+    private Branch                   selectedBranch;
     @Mock
-    private Branch                 selectedBranch;
+    private EditorPartPresenter      partPresenter;
     @Mock
-    private EditorPartPresenter    partPresenter;
+    private GitOutputPartPresenter   gitConsole;
     @Mock
-    private GitOutputPartPresenter gitConsole;
+    private WorkspaceAgent           workspaceAgent;
     @Mock
-    private WorkspaceAgent         workspaceAgent;
+    private DialogFactory            dialogFactory;
     @Mock
-    private DialogFactory          dialogFactory;
+    private DtoFactory               dtoFactory;
     @Mock
-    private DtoFactory             dtoFactory;
+    private ProjectExplorerPresenter projectExplorer;
     @Mock
-    private BranchCheckoutRequest  branchCheckoutRequest;
+    private BranchCheckoutRequest    branchCheckoutRequest;
 
     private BranchPresenter presenter;
 
@@ -109,7 +108,6 @@ public class BranchPresenterTest extends BaseTest {
         super.disarm();
 
         presenter = new BranchPresenter(view,
-                                        eventBus,
                                         dtoFactory,
                                         editorAgent,
                                         service,
@@ -119,7 +117,9 @@ public class BranchPresenterTest extends BaseTest {
                                         dtoUnmarshallerFactory,
                                         gitConsole,
                                         workspaceAgent,
-                                        dialogFactory);
+                                        dialogFactory,
+                                        projectExplorer,
+                                        eventBus);
 
         NavigableMap<String, EditorPartPresenter> partPresenterMap = new TreeMap<>();
         partPresenterMap.put("partPresenter", partPresenter);
@@ -130,7 +130,6 @@ public class BranchPresenterTest extends BaseTest {
         when(selectedBranch.isActive()).thenReturn(IS_ACTIVE);
         when(editorAgent.getOpenedEditors()).thenReturn(partPresenterMap);
         when(partPresenter.getEditorInput()).thenReturn(editorInput);
-        when(editorInput.getFile()).thenReturn(file);
     }
 
     @Ignore
@@ -344,6 +343,11 @@ public class BranchPresenterTest extends BaseTest {
     public void testOnCheckoutClickedWhenBranchCheckoutRequestAndRefreshProjectIsSuccessful() throws Exception {
         when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
 
+        VirtualFile virtualFile = mock(VirtualFile.class);
+
+        when(editorInput.getFile()).thenReturn(virtualFile);
+        when(virtualFile.getPath()).thenReturn("/foo");
+
         selectBranch();
         presenter.onCheckoutClicked();
 
@@ -366,14 +370,19 @@ public class BranchPresenterTest extends BaseTest {
         verify(appContext).getCurrentProject();
         verify(gitConsole, never()).printError(anyString());
         verify(notificationManager, never()).showError(anyString());
+        verify(eventBus).fireEvent(Matchers.<FileContentUpdateEvent>anyObject());
         verify(constant, never()).branchCheckoutFailed();
-        verify(eventBus).fireEvent(Matchers.<Event<OpenProjectEvent>>anyObject());
     }
 
     @Test
     public void testOnCheckoutClickedWhenBranchCheckoutRequestAndRefreshProjectIsSuccessfulButOpenFileIsNotExistInBranch()
             throws Exception {
         when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+
+        VirtualFile virtualFile = mock(VirtualFile.class);
+
+        when(editorInput.getFile()).thenReturn(virtualFile);
+        when(virtualFile.getPath()).thenReturn("/foo");
 
         selectBranch();
         presenter.onCheckoutClicked();
@@ -390,8 +399,8 @@ public class BranchPresenterTest extends BaseTest {
         verify(selectedBranch, times(2)).getDisplayName();
         verify(selectedBranch).isRemote();
         verify(service, times(2)).branchList(eq(rootProjectDescriptor), eq(LIST_ALL), anyObject());
+        verify(eventBus).fireEvent(Matchers.<FileContentUpdateEvent>anyObject());
         verify(appContext).getCurrentProject();
-        verify(eventBus).fireEvent(Matchers.<Event<OpenProjectEvent>>anyObject());
     }
 
     @Test

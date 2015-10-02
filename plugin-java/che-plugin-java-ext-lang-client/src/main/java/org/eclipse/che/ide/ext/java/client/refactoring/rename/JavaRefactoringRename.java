@@ -28,10 +28,8 @@ import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.editor.EditorWithAutoSave;
 import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.api.text.Position;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
@@ -54,6 +52,8 @@ import org.eclipse.che.ide.jseditor.client.link.LinkedModelData;
 import org.eclipse.che.ide.jseditor.client.link.LinkedModelGroup;
 import org.eclipse.che.ide.jseditor.client.texteditor.TextEditor;
 import org.eclipse.che.ide.json.JsonHelper;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.ui.loaders.requestLoader.IdeLoader;
@@ -72,6 +72,7 @@ import static org.eclipse.che.ide.ext.java.shared.dto.refactoring.RefactoringSta
 
 /**
  * Class for rename refactoring java classes
+ *
  * @author Alexander Andrienko
  */
 @Singleton
@@ -87,6 +88,7 @@ public class JavaRefactoringRename {
     private final DtoUnmarshallerFactory   unmarshallerFactory;
     private final NotificationManager      notificationManager;
     private final IdeLoader                loader;
+    private final ProjectExplorerPresenter projectExplorer;
 
     @Inject
     public JavaRefactoringRename(EditorAgent editorAgent,
@@ -99,7 +101,8 @@ public class JavaRefactoringRename {
                                  EventBus eventBus,
                                  DtoUnmarshallerFactory unmarshallerFactory,
                                  NotificationManager notificationManager,
-                                 IdeLoader loader) {
+                                 IdeLoader loader,
+                                 ProjectExplorerPresenter projectExplorer) {
         this.editorAgent = editorAgent;
         this.locale = locale;
         this.dialogFactory = dialogFactory;
@@ -111,11 +114,14 @@ public class JavaRefactoringRename {
         this.unmarshallerFactory = unmarshallerFactory;
         this.notificationManager = notificationManager;
         this.loader = loader;
+        this.projectExplorer = projectExplorer;
     }
 
     /**
      * Launch java rename refactoring process
-     * @param textEditorPresenter editor where user refactors code
+     *
+     * @param textEditorPresenter
+     *         editor where user refactors code
      */
     public void refactor(final TextEditor textEditorPresenter) {
         final CreateRenameRefactoring createRenameRefactoring = createRenameRefactoringDto(textEditorPresenter, appContext);
@@ -158,8 +164,8 @@ public class JavaRefactoringRename {
             groups.add(group);
         }
         model.setGroups(groups);
-        if(linkedEditor instanceof EditorWithAutoSave){
-           ((EditorWithAutoSave)linkedEditor).disableAutoSave();
+        if (linkedEditor instanceof EditorWithAutoSave) {
+            ((EditorWithAutoSave)linkedEditor).disableAutoSave();
         }
 
         mode.enterLinkedMode(model);
@@ -193,7 +199,7 @@ public class JavaRefactoringRename {
         }).catchError(new Operation<PromiseError>() {
             @Override
             public void apply(PromiseError arg) throws OperationException {
-                if(linkedEditor instanceof EditorWithAutoSave){
+                if (linkedEditor instanceof EditorWithAutoSave) {
                     ((EditorWithAutoSave)linkedEditor).enableAutoSave();
                 }
                 loader.hide();
@@ -203,7 +209,7 @@ public class JavaRefactoringRename {
     }
 
     private void onTargetRenamed(RefactoringStatus status, String newName, HasLinkedMode linkedEditor) {
-        if(linkedEditor instanceof EditorWithAutoSave){
+        if (linkedEditor instanceof EditorWithAutoSave) {
             ((EditorWithAutoSave)linkedEditor).enableAutoSave();
         }
         switch (status.getSeverity()) {
@@ -254,16 +260,16 @@ public class JavaRefactoringRename {
         }).then(new Operation<ItemReference>() {
             @Override
             public void apply(ItemReference reference) throws OperationException {
-                ((FileNode)virtualFile).setData(reference);
+                ((FileReferenceNode)virtualFile).setData(reference);
                 editorAgent.updateEditorNode(oldPath, virtualFile);
                 updateAllEditors();
-                eventBus.fireEvent(new RefreshProjectTreeEvent());
+                projectExplorer.reloadChildren();
             }
         }).catchError(new Operation<PromiseError>() {
             @Override
             public void apply(PromiseError arg) throws OperationException {
                 updateAllEditors();
-                eventBus.fireEvent(new RefreshProjectTreeEvent());
+                projectExplorer.reloadChildren();
             }
         });
     }

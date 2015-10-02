@@ -19,9 +19,8 @@ import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.Notification;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
-import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import com.google.web.bindery.event.shared.Event;
 import com.googlecode.gwt.test.utils.GwtReflectionUtils;
@@ -64,7 +63,7 @@ public class ResetToCommitPresenterTest extends BaseTest {
     @Mock
     private ResetToCommitView      view;
     @Mock
-    private FileNode               file;
+    private FileReferenceNode      file;
     @Mock
     private EditorInput            editorInput;
     @Mock

@@ -15,7 +15,7 @@ import org.eclipse.che.ide.api.action.AbstractPerspectiveAction;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.validation.constraints.NotNull;
@@ -30,14 +30,17 @@ import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspect
  */
 public abstract class GitAction extends AbstractPerspectiveAction {
 
-    protected final AppContext     appContext;
-    protected       SelectionAgent selectionAgent;
+    protected final AppContext               appContext;
+    protected       ProjectExplorerPresenter projectExplorer;
 
-    public GitAction(String text, String description, SVGResource svgIcon, AppContext appContext,
-                     SelectionAgent selectionAgent) {
+    public GitAction(String text,
+                     String description,
+                     SVGResource svgIcon,
+                     AppContext appContext,
+                     ProjectExplorerPresenter projectExplorer) {
         super(Arrays.asList(PROJECT_PERSPECTIVE_ID), text, description, null, svgIcon);
         this.appContext = appContext;
-        this.selectionAgent = selectionAgent;
+        this.projectExplorer = projectExplorer;
     }
 
     protected boolean isGitRepository() {

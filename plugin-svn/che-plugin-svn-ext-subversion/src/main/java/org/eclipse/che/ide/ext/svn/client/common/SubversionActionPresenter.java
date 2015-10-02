@@ -10,21 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.common;
 
-import org.eclipse.che.ide.api.project.tree.TreeNode;
-import static org.eclipse.che.ide.ext.svn.client.common.PathTypeFilter.ALL;
-import static org.eclipse.che.ide.ext.svn.client.common.PathTypeFilter.PROJECT;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
-import org.eclipse.che.ide.api.parts.ProjectExplorerPart;
-import org.eclipse.che.ide.ext.svn.client.action.SubversionAction;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -32,14 +20,21 @@ import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.event.ProjectActionHandler;
 import org.eclipse.che.ide.api.parts.PartStackType;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
-import org.eclipse.che.ide.api.project.tree.generic.FileNode;
-import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
-import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
+import org.eclipse.che.ide.ext.svn.client.action.SubversionAction;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.project.node.FileReferenceNode;
+import org.eclipse.che.ide.project.node.FolderReferenceNode;
+import org.eclipse.che.ide.project.node.ProjectDescriptorNode;
 
-import com.google.web.bindery.event.shared.EventBus;
-import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static org.eclipse.che.ide.ext.svn.client.common.PathTypeFilter.ALL;
 
 /**
  * Presenter to be extended by all {@link SubversionAction} presenters.
@@ -61,13 +56,13 @@ public class SubversionActionPresenter {
             {"G", "chartreuse"}
     };
 
-    protected final AppContext       appContext;
-    protected final EventBus         eventBus;
-    protected final WorkspaceAgent   workspaceAgent;
-    private final RawOutputPresenter console;
-    private boolean                  isViewClosed;
+    protected final AppContext         appContext;
+    protected final EventBus           eventBus;
+    protected final WorkspaceAgent     workspaceAgent;
+    private final   RawOutputPresenter console;
+    private         boolean            isViewClosed;
 
-    private final ProjectExplorerPart projectExplorerPart;
+    private final ProjectExplorerPresenter projectExplorerPart;
 
     /**
      * Constructor.
@@ -76,7 +71,7 @@ public class SubversionActionPresenter {
                                         final EventBus eventBus,
                                         final RawOutputPresenter console,
                                         final WorkspaceAgent workspaceAgent,
-                                        final ProjectExplorerPart projectExplorerPart) {
+                                        final ProjectExplorerPresenter projectExplorerPart) {
         this.appContext = appContext;
         this.workspaceAgent = workspaceAgent;
         this.console = console;
@@ -88,7 +83,7 @@ public class SubversionActionPresenter {
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectOpened(final ProjectActionEvent event) {
+            public void onProjectReady(final ProjectActionEvent event) {
             }
 
             @Override
@@ -100,6 +95,11 @@ public class SubversionActionPresenter {
                 isViewClosed = true;
                 console.clear();
                 workspaceAgent.hidePart(console);
+            }
+
+            @Override
+            public void onProjectOpened(ProjectActionEvent event) {
+
             }
 
         });
@@ -128,9 +128,9 @@ public class SubversionActionPresenter {
      * Returns currently selected project item.
      * @return
      */
-    protected TreeNode<?> getSelectedNode() {
+    protected HasStorablePath getSelectedNode() {
         Object selectedNode = projectExplorerPart.getSelection().getHeadElement();
-        return selectedNode != null && selectedNode instanceof StorableNode ? (StorableNode)selectedNode : null;
+        return selectedNode != null && selectedNode instanceof HasStorablePath ? (HasStorablePath)selectedNode : null;
     }
 
     /**
@@ -138,18 +138,20 @@ public class SubversionActionPresenter {
      */
     @NotNull
     protected List<String> getSelectedPaths(final Collection<PathTypeFilter> filters) {
-        final Selection<?> selection = projectExplorerPart.getSelection();
+        final List<?> selection = projectExplorerPart.getSelection().getAllElements();
         final List<String> paths = new ArrayList<>();
 
-        if (selection != null && !selection.isEmpty()) {
-            for (final Object item : selection.getAllElements()) {
-                if (matchesFilter(item, filters)) {
-                    final String path = relativePath((StorableNode)item);
-                    if (!path.isEmpty()) {
-                        paths.add(path);
-                    } else {
-                        paths.add("."); //it may be root path for our project
-                    }
+        if (selection.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        for (final Object item : selection) {
+            if (matchesFilter(item, filters)) {
+                final String path = relativePath((HasStorablePath)item);
+                if (!path.isEmpty()) {
+                    paths.add(path);
+                } else {
+                    paths.add("."); //it may be root path for our project
                 }
             }
         }
@@ -160,11 +162,10 @@ public class SubversionActionPresenter {
     /**
      * Returns relative node path in the project.
      *
-     * @param node node
      * @return relative node path
      */
-    protected String relativePath(final StorableNode node) {
-        String path = node.getPath().replaceFirst(node.getProject().getPath(), ""); // TODO: Move to method
+    protected String relativePath(final HasStorablePath node) {
+        String path = node.getStorablePath().replaceFirst(appContext.getCurrentProject().getRootProject().getPath(), ""); // TODO: Move to method
 
         if (path.startsWith("/")) {
             path = path.substring(1);
@@ -182,11 +183,10 @@ public class SubversionActionPresenter {
             return true;
         }
         for (final PathTypeFilter filter : filters) {
-            if (filter == ALL && node instanceof StorableNode
-                || filter == PathTypeFilter.FILE && node instanceof FileNode
-                || filter == PathTypeFilter.FOLDER && node instanceof FolderNode
-                || filter == PathTypeFilter.PROJECT && (node instanceof ProjectNode
-                    || node instanceof org.eclipse.che.ide.part.projectexplorer.ProjectListStructure.ProjectNode)) {
+            if (filter == ALL && node instanceof HasStorablePath
+                || filter == PathTypeFilter.FILE && node instanceof FileReferenceNode
+                || filter == PathTypeFilter.FOLDER && node instanceof FolderReferenceNode
+                || filter == PathTypeFilter.PROJECT && (node instanceof ProjectDescriptorNode)) {
                 return true;
             }
         }
@@ -305,18 +305,18 @@ public class SubversionActionPresenter {
 
         final Collection<PathTypeFilter> filters = Collections.singleton(ALL);
 
-        if (selection != null && !selection.isEmpty()) {
-            for (final Object item : selection.getAll()) {
-                if (matchesFilter(item, filters)) {
-                    final StorableNode node = (StorableNode)item;
-                    if (node instanceof FileNode) {
-                        eventBus.fireEvent(new RefreshProjectTreeEvent(node.getParent(), true));
-                    } else {
-                        eventBus.fireEvent(new RefreshProjectTreeEvent(node, true));
-                    }
-                }
-            }
-        }
+//        if (selection != null && !selection.isEmpty()) {
+//            for (final Object item : selection.getAll().asIterable()) {
+//                if (matchesFilter(item, filters)) {
+//                    final StorableNode node = (StorableNode)item;
+//                    if (node instanceof FileNode) {
+//                        eventBus.fireEvent(new RefreshProjectTreeEvent(node.getParent(), true));
+//                    } else {
+//                        eventBus.fireEvent(new RefreshProjectTreeEvent(node, true));
+//                    }
+//                }
+//            }
+//        }
 
     }
 

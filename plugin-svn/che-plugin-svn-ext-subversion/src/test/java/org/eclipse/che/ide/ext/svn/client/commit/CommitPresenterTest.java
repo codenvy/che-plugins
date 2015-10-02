@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.client.commit;
 
-import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.ide.api.project.tree.generic.FolderNode;
-import org.eclipse.che.ide.api.project.tree.generic.ProjectNode;
-import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.ext.svn.client.commit.diff.DiffViewerPresenter;
 import org.eclipse.che.ide.ext.svn.client.common.BaseSubversionPresenterTest;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
@@ -108,40 +104,6 @@ public class CommitPresenterTest extends BaseSubversionPresenterTest {
 
         verify(service).commit(eq("/plugin-svn-test"),
                                eq(Collections.singletonList(".")),
-                               eq("foo"),
-                               eq(false),
-                               eq(false),
-                               asyncRequestCallbackCommitCaptor.capture());
-    }
-
-    @Test
-    public void testCommitSelectionShouldBeFired() throws Exception {
-        when(view.getMessage()).thenReturn("foo");
-        when(view.isKeepLocksStateSelected()).thenReturn(false);
-        when(view.isCommitAllSelected()).thenReturn(false);
-        when(view.isCommitSelectionSelected()).thenReturn(true);
-
-        Selection selection = mock(Selection.class);
-
-        ProjectNode projectNode = mock(ProjectNode.class);
-        FolderNode folderNode = mock(FolderNode.class);
-        List<FolderNode> nodes = Collections.singletonList(folderNode);
-
-        ProjectDescriptor descriptor = mock(ProjectDescriptor.class);
-
-        when(appContext.getCurrentProject()).thenReturn(currentProject);
-        when(currentProject.getProjectDescription()).thenReturn(descriptor);
-        when(descriptor.getPath()).thenReturn("/foo");
-        when(projectExplorerPart.getSelection()).thenReturn(selection);
-        when(selection.getAllElements()).thenReturn(nodes);
-        when(folderNode.getPath()).thenReturn("/foo");
-        when(projectNode.getPath()).thenReturn("/");
-        when(folderNode.getProject()).thenReturn(projectNode);
-
-        presenter.onCommitClicked();
-
-        verify(service).commit(eq("/foo"),
-                               eq(Collections.singletonList("foo")),
                                eq("foo"),
                                eq(false),
                                eq(false),

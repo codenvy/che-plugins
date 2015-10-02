@@ -10,45 +10,34 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.action;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.project.shared.dto.ItemReference;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.app.CurrentProject;
-import org.eclipse.che.ide.api.event.ItemEvent;
-import org.eclipse.che.ide.api.event.RefreshProjectTreeEvent;
-import org.eclipse.che.ide.api.project.tree.AbstractTreeNode;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
-import org.eclipse.che.ide.api.project.tree.TreeStructure;
-import org.eclipse.che.ide.api.project.tree.generic.ItemNode;
-import org.eclipse.che.ide.api.project.tree.generic.StorableNode;
+import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.JavaUtils;
-import org.eclipse.che.ide.ext.java.client.projecttree.JavaTreeStructure;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.AbstractSourceContainerNode;
-import org.eclipse.che.ide.ext.java.client.projecttree.nodes.PackageNode;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
+import org.eclipse.che.ide.ext.java.client.project.node.SourceFolderNode;
+import org.eclipse.che.ide.json.JsonHelper;
 import org.eclipse.che.ide.newresource.AbstractNewResourceAction;
+import org.eclipse.che.ide.project.node.FolderReferenceNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.eclipse.che.ide.rest.Unmarshallable;
 import org.eclipse.che.ide.ui.dialogs.InputCallback;
 import org.eclipse.che.ide.ui.dialogs.input.InputDialog;
 import org.eclipse.che.ide.ui.dialogs.input.InputValidator;
-import org.eclipse.che.ide.util.loging.Log;
 
 import javax.validation.constraints.NotNull;
-import org.eclipse.che.commons.annotation.Nullable;
-
-import static org.eclipse.che.ide.api.event.ItemEvent.ItemOperation.CREATED;
+import java.util.List;
 
 /**
  * Action to create new Java package.
  *
  * @author Artem Zatsarynnyy
- * @author Dmitry Shnurenko
  */
 @Singleton
 public class NewPackageAction extends AbstractNewResourceAction {
@@ -75,84 +64,52 @@ public class NewPackageAction extends AbstractNewResourceAction {
     }
 
     private void onAccepted(String value) {
-        final StorableNode parent = getNewResourceParent();
+        final FolderReferenceNode parent = (FolderReferenceNode)getResourceBasedNode();
         if (parent == null) {
             throw new IllegalStateException("No selected parent.");
         }
 
-        createPackage(parent, value, new AsyncCallback<ItemReference>() {
-            @Override
-            public void onSuccess(ItemReference result) {
-                final AbstractTreeNode nodeToRefresh = getNodeToRefresh((AbstractSourceContainerNode)parent);
-                eventBus.fireEvent(new RefreshProjectTreeEvent(nodeToRefresh));
+        final String path = parent.getStorablePath() + '/' + value.replace('.', '/');
 
-                fireNodeCreated(result.getPath());
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                dialogFactory.createMessageDialog("", caught.getMessage(), null).show();
-            }
-        });
+        projectServiceClient.createFolder(path, createCallback());
     }
 
-    private void fireNodeCreated(String path) {
-        final CurrentProject currentProject = appContext.getCurrentProject();
-        if (currentProject == null) {
-            throw new IllegalStateException("No opened project.");
-        }
-
-        currentProject.getCurrentTree().getNodeByPath(path, new AsyncCallback<TreeNode<?>>() {
+    protected AsyncRequestCallback<ItemReference> createCallback() {
+        return new AsyncRequestCallback<ItemReference>(dtoUnmarshallerFactory.newUnmarshaller(ItemReference.class)) {
             @Override
-            public void onSuccess(TreeNode<?> result) {
-                eventBus.fireEvent(new ItemEvent((ItemNode)result, CREATED));
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                Log.error(NewPackageAction.class, caught);
-            }
-        });
-    }
-
-    private AbstractTreeNode getNodeToRefresh(AbstractSourceContainerNode parent) {
-        final CurrentProject currentProject = appContext.getCurrentProject();
-        if (currentProject == null) {
-            throw new IllegalStateException("No opened project.");
-        }
-
-        final TreeStructure currentTree = currentProject.getCurrentTree();
-        if (currentTree instanceof JavaTreeStructure && ((JavaTreeStructure)currentTree).getSettings().isCompactEmptyPackages()
-            && parent instanceof PackageNode && parent.getChildren().isEmpty()) {
-            return (AbstractTreeNode)parent.getParent();
-        }
-        return parent;
-    }
-
-    @Override
-    public void updateInPerspective(@NotNull ActionEvent event) {
-        boolean enabled = false;
-        Selection<?> selection = selectionAgent.getSelection();
-        if (selection != null) {
-            enabled = selection.getFirstElement() instanceof AbstractSourceContainerNode;
-        }
-        event.getPresentation().setEnabledAndVisible(enabled);
-    }
-
-    private void createPackage(StorableNode parent, String name, final AsyncCallback<ItemReference> callback) {
-        final String path = parent.getPath() + '/' + name.replace('.', '/');
-        final Unmarshallable<ItemReference> unmarshaller = dtoUnmarshallerFactory.newUnmarshaller(ItemReference.class);
-        projectServiceClient.createFolder(path, new AsyncRequestCallback<ItemReference>(unmarshaller) {
-            @Override
-            protected void onSuccess(ItemReference result) {
-                callback.onSuccess(result);
+            protected void onSuccess(final ItemReference itemReference) {
+                projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(itemReference.getPath()), true).then(selectNode());
             }
 
             @Override
             protected void onFailure(Throwable exception) {
-                callback.onFailure(exception);
+                String message = JsonHelper.parseJsonMessage(exception.getMessage());
+                dialogFactory.createMessageDialog("New package",
+                                                  message.contains("already exists") ? "Package already exists." : message,
+                                                  null).show();
             }
-        });
+        };
+    }
+
+    @Override
+    public void updateInPerspective(@NotNull ActionEvent e) {
+        Selection<?> selection = projectExplorer.getSelection();
+
+        if (selection == null) {
+            e.getPresentation().setEnabledAndVisible(false);
+            return;
+        }
+
+        List<?> elements = selection.getAllElements();
+
+        if (elements == null || elements.isEmpty() || elements.size() > 1) {
+            e.getPresentation().setEnabledAndVisible(false);
+            return;
+        }
+
+        Object o = elements.get(0);
+
+        e.getPresentation().setEnabledAndVisible(o instanceof SourceFolderNode || o instanceof PackageNode);
     }
 
     private class NameValidator implements InputValidator {
