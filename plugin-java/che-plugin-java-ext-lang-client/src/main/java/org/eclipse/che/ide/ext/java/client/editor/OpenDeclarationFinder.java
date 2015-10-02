@@ -98,33 +98,6 @@ public class OpenDeclarationFinder {
                                  });
     }
 
-//    private void handle(JavadocHandleComputed result, VirtualFile file) {
-//        if (result.getOffset() != -1 && result.isSource()) {
-//           EditorPartPresenter editorPartPresenter = editorAgent.getActiveEditor();
-//           fileOpened(editorPartPresenter, result.getOffset());
-//        } else {
-//            sendRequest(result.getKey(), file.getProject());
-//        }
-//    }
-
-//    private void sendRequest(String bindingKey, ProjectNode project) {
-//        Unmarshallable<OpenDeclarationDescriptor> unmarshaller =
-//                factory.newUnmarshaller(OpenDeclarationDescriptor.class);
-//        service.findDeclaration(project.getPath(), bindingKey, new AsyncRequestCallback<OpenDeclarationDescriptor>(unmarshaller) {
-//            @Override
-//            protected void onSuccess(OpenDeclarationDescriptor result) {
-//                if (result != null) {
-//                    handleDescriptor(result);
-//                }
-//            }
-//
-//            @Override
-//            protected void onFailure(Throwable exception) {
-//                Log.error(OpenDeclarationFinder.class, exception);
-//            }
-//        });
-//    }
-
     private void handleDescriptor(final OpenDeclarationDescriptor descriptor) {
         Map<String, EditorPartPresenter> openedEditors = editorAgent.getOpenedEditors();
         for (String s : openedEditors.keySet()) {
@@ -152,41 +125,6 @@ public class OpenDeclarationFinder {
                            .then(selectNode())
                            .then(openNode(descriptor));
         }
-
-//        TreeStructure tree = context.getCurrentProject().getCurrentTree();
-//        if (descriptor.isBinary()) {
-//            if (tree instanceof JavaTreeStructure) {
-//                ((JavaTreeStructure)tree)
-//                        .getClassFileByPath(context.getCurrentProject().getProjectDescription().getPath(), descriptor.getLibId(),
-//                                            descriptor.getPath(), new AsyncCallback<TreeNode<?>>() {
-//                            @Override
-//                            public void onFailure(Throwable caught) {
-//                                Log.error(OpenDeclarationFinder.class, caught);
-//                            }
-//
-//                            @Override
-//                            public void onSuccess(TreeNode<?> result) {
-//                                if (result instanceof VirtualFile) {
-//                                    openFile((VirtualFile)result, descriptor);
-//                                }
-//                            }
-//                        });
-//            }
-//        } else {
-//            tree.getNodeByPath(descriptor.getPath(), new AsyncCallback<TreeNode<?>>() {
-//                @Override
-//                public void onFailure(Throwable caught) {
-//                    Log.error(OpenDeclarationFinder.class, caught);
-//                }
-//
-//                @Override
-//                public void onSuccess(TreeNode<?> result) {
-//                    if (result instanceof VirtualFile) {
-//                        openFile((VirtualFile)result, descriptor);
-//                    }
-//                }
-//            });
-//        }
     }
 
     protected Function<Node, Node> selectNode() {
