@@ -75,20 +75,6 @@ public class RefactoringUpdater {
             promise.thenPromise(getContent(file))
                    .thenPromise(updateEditor(editor))
                    .catchErrorPromise(onGetContentFailed(file));
-
-//            String path = file.getPath();
-//            file.getContent(new AsyncCallback<String>() {
-//                @Override
-//                public void onFailure(Throwable caught) {
-//                    reopenMovedFile(file);
-//                }
-//
-//                @Override
-//                public void onSuccess(String result) {
-//                    Document document = ((EmbeddedTextEditorPresenter)editor).getDocument();
-//                    document.replace(0, document.getContents().length(), result);
-//                }
-//            });
         }
     }
 
@@ -143,23 +129,6 @@ public class RefactoringUpdater {
     /** Refreshes project tree. */
     public void refreshProjectTree() {
         projectExplorer.reloadChildren();
-//        List<?> selectionItems = selectionAgent.getSelection().getAllElements();
-//        for (Object selectionItem : selectionItems) {
-//
-//            eventBus.fireEvent(new RefreshProjectTreeEvent(((StorableNode)selectionItem).getParent()));
-//        }
-//
-//        appContext.getCurrentProject().getCurrentTree().getNodeByPath(pathToMove, new AsyncCallback<TreeNode<?>>() {
-//            @Override
-//            public void onFailure(Throwable caught) {
-//                notificationManager.showError("Can not find: " + pathToMove);
-//            }
-//
-//            @Override
-//            public void onSuccess(TreeNode<?> result) {
-//                eventBus.fireEvent(new RefreshProjectTreeEvent(result.getParent()));
-//            }
-//        });
     }
 
     private Promise<Object> reopenMovedFile(final VirtualFile file) {
@@ -168,19 +137,5 @@ public class RefactoringUpdater {
         final String newPathToFile = pathToMove + file.getPath().substring(file.getPath().lastIndexOf('/'));
 
         return projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(newPathToFile)).thenPromise(openFile());
-
-//        appContext.getCurrentProject().getCurrentTree().getNodeByPath(newPathToFile, new AsyncCallback<TreeNode<?>>() {
-//            @Override
-//            public void onFailure(Throwable caught) {
-//                notificationManager.showError("Can not find a file: " + newPathToFile);
-//            }
-//
-//            @Override
-//            public void onSuccess(TreeNode<?> result) {
-//                if (result instanceof FileNode) {
-//                    eventBus.fireEvent(new FileEvent((FileNode)result, FileEvent.FileOperation.OPEN));
-//                }
-//            }
-//        });
     }
 }

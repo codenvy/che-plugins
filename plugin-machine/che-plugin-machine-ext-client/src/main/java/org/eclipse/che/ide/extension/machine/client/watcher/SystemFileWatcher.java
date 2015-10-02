@@ -73,7 +73,6 @@ public class SystemFileWatcher {
                         @Override
                         protected void onMessageReceived(String path) {
                             projectExplorer.reloadChildren();
-//                            refreshTree(path);
                         }
 
                         @Override
@@ -87,61 +86,4 @@ public class SystemFileWatcher {
             }
         });
     }
-
-//    private void refreshTree(@NotNull String path) {
-//        CurrentProject currentProject = appContext.getCurrentProject();
-//
-//        if (currentProject == null) {
-//            return;
-//        }
-//
-//        String pathToNode = getPathToParent(path);
-//
-//        boolean isRootNode = !pathToNode.contains("/");
-//
-//        TreeStructure treeStructure = currentProject.getCurrentTree();
-//
-//        if (isRootNode) {
-//            refreshRootNode(treeStructure);
-//        } else {
-//            refreshChildNode(treeStructure, pathToNode);
-//        }
-//    }
-
-//    @NotNull
-//    private String getPathToParent(@NotNull String path) {
-//        int parentPathEnd = path.lastIndexOf("/");
-//
-//        return parentPathEnd == -1 ? path : path.substring(0, parentPathEnd);
-//    }
-
-//    private void refreshRootNode(@NotNull TreeStructure treeStructure) {
-//        treeStructure.getRootNodes(new AsyncCallback<List<TreeNode<?>>>() {
-//            @Override
-//            public void onSuccess(List<TreeNode<?>> result) {
-//                TreeNode<?> rootNode = result.get(0);
-//
-//                eventBus.fireEvent(new RefreshProjectTreeEvent(rootNode));
-//            }
-//
-//            @Override
-//            public void onFailure(Throwable caught) {
-//                Log.error(getClass(), caught);
-//            }
-//        });
-//    }
-
-//    private void refreshChildNode(@NotNull TreeStructure treeStructure, @NotNull String pathToChild) {
-//        treeStructure.getNodeByPath(pathToChild, new AsyncCallback<TreeNode<?>>() {
-//            @Override
-//            public void onSuccess(TreeNode<?> result) {
-//                eventBus.fireEvent(new RefreshProjectTreeEvent(result));
-//            }
-//
-//            @Override
-//            public void onFailure(Throwable caught) {
-//                Log.error(getClass(), caught);
-//            }
-//        });
-//    }
 }
