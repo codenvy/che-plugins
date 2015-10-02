@@ -15,8 +15,10 @@ import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.api.workspace.shared.dto.UsersWorkspaceDto;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.event.ProjectActionHandler;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.project.tree.generic.FileNode;
@@ -34,6 +36,9 @@ import org.eclipse.che.ide.ext.java.jdi.shared.DebuggerInfo;
 import org.eclipse.che.ide.ext.java.jdi.shared.Location;
 import org.eclipse.che.ide.ext.java.jdi.shared.Variable;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
+import org.eclipse.che.ide.websocket.MessageBusProvider;
+import org.eclipse.che.ide.workspace.start.StartWorkspaceEvent;
+import org.eclipse.che.ide.workspace.start.StartWorkspaceHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -96,6 +101,15 @@ public class DebuggerTest extends BaseTest {
     private AppContext                           appContext;
     @Mock
     private CurrentProject                       currentProject;
+    @Mock
+    private EditorAgent                          editorAgent;
+    @Mock
+    private MessageBusProvider                   messageBusProvider;
+    @Mock
+    private UsersWorkspaceDto                    workspace;
+
+    @Captor
+    private ArgumentCaptor<StartWorkspaceHandler> startWorkspaceCaptor;
 
     @InjectMocks
     private DebuggerPresenter presenter;
@@ -108,6 +122,10 @@ public class DebuggerTest extends BaseTest {
         when(dtoFactory.createDto(Location.class)).thenReturn(mock(Location.class));
         when(dtoFactory.createDto(BreakPoint.class)).thenReturn(mock(BreakPoint.class));
         when(resolverFactory.getResolver(anyString())).thenReturn(mock(FqnResolver.class));
+
+        when(messageBusProvider.getMessageBus()).thenReturn(messageBus);
+        verify(eventBus).addHandler(eq(StartWorkspaceEvent.TYPE), startWorkspaceCaptor.capture());
+        startWorkspaceCaptor.getValue().onWorkspaceStarted(workspace);
     }
 
     @Test

@@ -18,6 +18,7 @@ import org.eclipse.che.api.machine.shared.MachineStatus;
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
 import org.eclipse.che.api.machine.shared.dto.ServerDescriptor;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
+import org.eclipse.che.ide.util.Config;
 
 import javax.validation.constraints.NotNull;
 import java.util.Map;
@@ -112,7 +113,7 @@ public class Machine {
 
         boolean isSecureConnection = Window.Location.getProtocol().equals("https:");
 
-        return (isSecureConnection ? "wss" : "ws") + extUrl + "/che/ext/ws";
+        return (isSecureConnection ? "wss" : "ws") + extUrl + Config.getCheExtensionPath() + "/ws";
     }
 
     /** @return active tab name for current machine */

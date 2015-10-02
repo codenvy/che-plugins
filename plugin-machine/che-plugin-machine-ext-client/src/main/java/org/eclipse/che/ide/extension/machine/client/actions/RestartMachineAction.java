@@ -59,7 +59,7 @@ public class RestartMachineAction extends AbstractPerspectiveAction {
     @Override
     public void updateInPerspective(@NotNull ActionEvent event) {
         selectedMachine = panelPresenter.getSelectedMachine();
-        event.getPresentation().setEnabled(selectedMachine != null);
+        event.getPresentation().setEnabled(selectedMachine != null && !selectedMachine.isDev());
         event.getPresentation().setText(selectedMachine != null ? locale.machineRestartTextByName(selectedMachine.getDisplayName())
                                                                 : locale.controlMachineRestartText());
     }

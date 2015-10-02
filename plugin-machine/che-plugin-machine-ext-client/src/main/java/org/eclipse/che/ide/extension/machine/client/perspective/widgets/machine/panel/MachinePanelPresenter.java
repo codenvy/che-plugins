@@ -18,10 +18,14 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.machine.gwt.client.MachineServiceClient;
+import org.eclipse.che.api.machine.gwt.client.events.ExtServerStateEvent;
+import org.eclipse.che.api.machine.gwt.client.events.ExtServerStateHandler;
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.commons.annotation.Nullable;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.parts.base.BasePresenter;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.eclipse.che.ide.extension.machine.client.MachineResources;
@@ -33,7 +37,6 @@ import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.
 import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.validation.constraints.NotNull;
-import org.eclipse.che.commons.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +47,9 @@ import java.util.List;
  * @author Artem Zatsarynnyy
  */
 @Singleton
-public class MachinePanelPresenter extends BasePresenter implements MachinePanelView.ActionDelegate, MachineStateHandler {
+public class MachinePanelPresenter extends BasePresenter implements MachinePanelView.ActionDelegate,
+                                                                    MachineStateHandler,
+                                                                    ExtServerStateHandler {
 
     private final MachinePanelView            view;
     private final MachineServiceClient        service;
@@ -52,6 +57,7 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
     private final MachineLocalizationConstant locale;
     private final MachineAppliancePresenter   appliance;
     private final MachineResources            resources;
+    private final AppContext                  appContext;
 
     private Machine selectedMachine;
     private boolean isFirstNode;
@@ -63,7 +69,8 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
                                  MachineLocalizationConstant locale,
                                  MachineAppliancePresenter appliance,
                                  EventBus eventBus,
-                                 MachineResources resources) {
+                                 MachineResources resources,
+                                 AppContext appContext) {
         this.view = view;
         this.view.setDelegate(this);
 
@@ -72,13 +79,17 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
         this.locale = locale;
         this.appliance = appliance;
         this.resources = resources;
+        this.appContext = appContext;
 
         eventBus.addHandler(MachineStateEvent.TYPE, this);
+        eventBus.addHandler(ExtServerStateEvent.TYPE, this);
     }
 
     /** Gets all machines and adds them to special place on view. */
     public void showMachines() {
-        Promise<List<MachineDescriptor>> machinesPromise = service.getMachines(null);
+        String workspaceId = appContext.getWorkspace().getId();
+
+        Promise<List<MachineDescriptor>> machinesPromise = service.getWorkspaceMachines(workspaceId);
 
         machinesPromise.then(new Operation<List<MachineDescriptor>>() {
             @Override
@@ -186,5 +197,16 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
     @Override
     public void onMachineDestroyed(MachineStateEvent event) {
         showMachines();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onExtServerStarted(ExtServerStateEvent event) {
+        showMachines();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onExtServerStopped(ExtServerStateEvent event) {
     }
 }

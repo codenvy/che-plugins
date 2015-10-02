@@ -21,6 +21,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
+import org.eclipse.che.api.workspace.shared.dto.UsersWorkspaceDto;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.commons.annotation.Nullable;
@@ -70,9 +71,12 @@ import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.rest.HTTPStatus;
 import org.eclipse.che.ide.util.loging.Log;
 import org.eclipse.che.ide.websocket.MessageBus;
+import org.eclipse.che.ide.websocket.MessageBusProvider;
 import org.eclipse.che.ide.websocket.WebSocketException;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
 import org.eclipse.che.ide.websocket.rest.exceptions.ServerException;
+import org.eclipse.che.ide.workspace.start.StartWorkspaceEvent;
+import org.eclipse.che.ide.workspace.start.StartWorkspaceHandler;
 import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.validation.constraints.Min;
@@ -136,7 +140,6 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
     public DebuggerPresenter(DebuggerView view,
                              final DebuggerServiceClient service,
                              final EventBus eventBus,
-                             final MessageBus messageBus,
                              final JavaRuntimeLocalizationConstant constant,
                              WorkspaceAgent workspaceAgent,
                              final BreakpointManager breakpointManager,
@@ -148,7 +151,8 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                              final DtoFactory dtoFactory,
                              DtoUnmarshallerFactory dtoUnmarshallerFactory,
                              final AppContext appContext,
-                             ProjectExplorerPresenter projectExplorer) {
+                             ProjectExplorerPresenter projectExplorer,
+                             final MessageBusProvider messageBusProvider) {
         this.view = view;
         this.eventBus = eventBus;
         this.dtoFactory = dtoFactory;
@@ -158,7 +162,6 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
         this.view.setDelegate(this);
         this.view.setTitle(TITLE);
         this.service = service;
-        this.messageBus = messageBus;
         this.constant = constant;
         this.workspaceAgent = workspaceAgent;
         this.breakpointManager = breakpointManager;
@@ -222,6 +225,13 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
                 }
             }
         };
+
+        eventBus.addHandler(StartWorkspaceEvent.TYPE, new StartWorkspaceHandler() {
+            @Override
+            public void onWorkspaceStarted(UsersWorkspaceDto workspace) {
+                messageBus = messageBusProvider.getMessageBus();
+            }
+        });
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override

@@ -20,6 +20,8 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.workspace.shared.dto.UsersWorkspaceDto;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFactory;
@@ -75,6 +77,8 @@ public class MachinePanelPresenterTest {
     private MachineAppliancePresenter   appliance;
     @Mock
     private EventBus                    eventBus;
+    @Mock
+    private AppContext                  appContext;
 
     //additional mocks
     @Mock
@@ -99,6 +103,8 @@ public class MachinePanelPresenterTest {
     private MachineTreeNode                  machineNode1;
     @Mock
     private MachineTreeNode                  machineNode2;
+    @Mock
+    private UsersWorkspaceDto                workspaceDto;
 
     @Captor
     private ArgumentCaptor<Operation<List<MachineDescriptor>>> operationCaptor;
@@ -110,6 +116,8 @@ public class MachinePanelPresenterTest {
 
     @Before
     public void setUp() {
+        when(appContext.getWorkspace()).thenReturn(workspaceDto);
+        when(workspaceDto.getId()).thenReturn("id");
         when(entityFactory.createMachine(machineDescriptor1)).thenReturn(machine1);
         when(entityFactory.createMachine(machineDescriptor2)).thenReturn(machine2);
 
@@ -126,14 +134,14 @@ public class MachinePanelPresenterTest {
                                              eq(machine2),
                                              isNull(List.class))).thenReturn(machineNode2);
 
-        when(service.getMachines(null)).thenReturn(machinePromise);
+        when(service.getWorkspaceMachines(anyString())).thenReturn(machinePromise);
     }
 
     @Test
     public void treeShouldBeDisplayedWithMachines() throws Exception {
         presenter.showMachines();
 
-        verify(service).getMachines(null);
+        verify(service).getWorkspaceMachines("id");
 
         verify(machinePromise).then(operationCaptor.capture());
         operationCaptor.getValue().apply(Arrays.asList(machineDescriptor1, machineDescriptor2));
