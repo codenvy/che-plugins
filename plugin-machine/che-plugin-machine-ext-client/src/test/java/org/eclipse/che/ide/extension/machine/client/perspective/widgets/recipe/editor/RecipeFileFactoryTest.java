@@ -98,8 +98,6 @@ public class RecipeFileFactoryTest {
 
     @Test
     public void dockerFileShouldBeCreated() throws Exception {
-        when(currentProject.getCurrentTree()).thenReturn(treeStructure);
-
         VirtualFile fileNode = factory.newInstance(SOME_TEXT);
 
         verify(dtoFactory).createDto(ItemReference.class);

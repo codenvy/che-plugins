@@ -820,7 +820,7 @@ public class CreateJavaClassPresenter implements CreateJavaClassHandler, ViewClo
     * @see org.eclipse.che.ide.client.framework.project.ProjectOpenedHandler#onProjectOpened(org.eclipse.che.ide.client.framework.project.ProjectOpenedEvent)
     */
    @Override
-   public void onProjectOpened(ProjectOpenedEvent event)
+   public void onProjectCreated(ProjectOpenedEvent event)
    {
       currentProject = event.getProject();
    }
@@ -829,7 +829,7 @@ public class CreateJavaClassPresenter implements CreateJavaClassHandler, ViewClo
     * @see org.eclipse.che.ide.client.framework.project.ProjectClosedHandler#onProjectClosed(org.eclipse.che.ide.client.framework.project.ProjectClosedEvent)
     */
    @Override
-   public void onProjectClosed(ProjectClosedEvent event)
+   public void onProjectDeleted(ProjectClosedEvent event)
    {
       currentProject = null;
    }

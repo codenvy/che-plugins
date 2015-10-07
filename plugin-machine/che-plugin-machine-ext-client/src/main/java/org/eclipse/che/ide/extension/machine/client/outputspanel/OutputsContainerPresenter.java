@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.event.ProjectActionHandler;
@@ -29,7 +30,6 @@ import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.validation.constraints.NotNull;
-import org.eclipse.che.commons.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -186,20 +186,12 @@ public class OutputsContainerPresenter extends BasePresenter implements OutputsC
     }
 
     @Override
-    public void onProjectReady(ProjectActionEvent event) {
+    public void onProjectCreated(ProjectActionEvent event) {
         firePropertyChange(TITLE_PROPERTY);
     }
 
     @Override
-    public void onProjectOpened(ProjectActionEvent event) {
-    }
-
-    @Override
-    public void onProjectClosing(ProjectActionEvent event) {
-    }
-
-    @Override
-    public void onProjectClosed(ProjectActionEvent event) {
+    public void onProjectDeleted(ProjectActionEvent event) {
         consoles.clear();
         view.removeAllConsoles();
         firePropertyChange(TITLE_PROPERTY);

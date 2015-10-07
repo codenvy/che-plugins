@@ -81,7 +81,7 @@ public class CurrentProjectPathProviderTest {
 
     @Test
     public void shouldReturnEmptyValueAfterClosingProject() throws Exception {
-        currentProjectPathProvider.onProjectClosed(mock(ProjectActionEvent.class));
+        currentProjectPathProvider.onProjectDeleted(mock(ProjectActionEvent.class));
 
         assertTrue(currentProjectPathProvider.getValue().isEmpty());
     }
@@ -123,7 +123,7 @@ public class CurrentProjectPathProviderTest {
         when(machineDescriptorMock.getMetadata()).thenReturn(machineMetadataMock);
         when(machinePromise.then(Matchers.any(Operation.class))).thenReturn(machinePromise);
 
-        currentProjectPathProvider.onProjectReady(mock(ProjectActionEvent.class));
+        currentProjectPathProvider.onProjectCreated(mock(ProjectActionEvent.class));
 
         verify(machinePromise).then(machineCaptor.capture());
         machineCaptor.getValue().apply(machineDescriptorMock);

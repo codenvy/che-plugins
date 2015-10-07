@@ -21,9 +21,9 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
-import org.eclipse.che.api.workspace.shared.dto.UsersWorkspaceDto;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.api.workspace.shared.dto.UsersWorkspaceDto;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -235,7 +235,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectReady(ProjectActionEvent event) {
+            public void onProjectCreated(ProjectActionEvent event) {
                 CurrentProject currentProject = appContext.getCurrentProject();
 
                 if (currentProject == null) {
@@ -253,15 +253,7 @@ public class DebuggerPresenter extends BasePresenter implements DebuggerView.Act
             }
 
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
+            public void onProjectDeleted(ProjectActionEvent event) {
                 // application will be stopped after closing a project
                 if (debuggerInfo != null) {
                     changeButtonsEnableState(false);

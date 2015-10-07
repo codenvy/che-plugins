@@ -17,7 +17,7 @@ import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
+import org.eclipse.che.ide.api.event.ProjectActionEvent;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
@@ -55,21 +55,21 @@ public class CheckoutReferenceTest extends BaseTest {
     private static final String INCORRECT_REFERENCE = "";
 
     @Captor
-    private ArgumentCaptor<AsyncRequestCallback<String>> asyncCallbackCaptor;
+    private ArgumentCaptor<AsyncRequestCallback<String>>            asyncCallbackCaptor;
     @Captor
     private ArgumentCaptor<AsyncRequestCallback<ProjectDescriptor>> projectDescriptorCaptor;
 
     @Mock
-    private CheckoutReferenceView      view;
+    private CheckoutReferenceView view;
     @Mock
-    private BranchCheckoutRequest      branchCheckoutRequest;
+    private BranchCheckoutRequest branchCheckoutRequest;
 
     @Mock
-    private EditorPartPresenter    partPresenter;
+    private EditorPartPresenter partPresenter;
     @Mock
-    private EditorInput            editorInput;
+    private EditorInput         editorInput;
     @Mock
-    private EditorAgent            editorAgent;
+    private EditorAgent         editorAgent;
 
     @InjectMocks
     private CheckoutReferencePresenter presenter;
@@ -207,7 +207,7 @@ public class CheckoutReferenceTest extends BaseTest {
         AsyncRequestCallback<ProjectDescriptor> asyncRequestCallback = projectDescriptorCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(asyncRequestCallback, projectDescriptor);
         verify(projectDescriptor).getProblems();
-        verify(eventBus).fireEvent(Matchers.<OpenProjectEvent>anyObject());
+        verify(eventBus).fireEvent(Matchers.<ProjectActionEvent>anyObject());
     }
 
     @Test
@@ -230,7 +230,7 @@ public class CheckoutReferenceTest extends BaseTest {
         verify(branchCheckoutRequest).withCreateNew(false);
         verifyNoMoreInteractions(branchCheckoutRequest);
         verify(view).close();
-        verify(eventBus, never()).fireEvent(Matchers.<OpenProjectEvent>anyObject());
+        verify(eventBus, never()).fireEvent(Matchers.<ProjectActionEvent>anyObject());
         verify(console).printError(anyString());
         verify(notificationManager).showError(anyString());
     }

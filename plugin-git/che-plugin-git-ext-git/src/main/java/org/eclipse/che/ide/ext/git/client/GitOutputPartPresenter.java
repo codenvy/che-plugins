@@ -52,18 +52,9 @@ public class GitOutputPartPresenter extends BasePresenter implements GitOutputPa
         this.view.setDelegate(this);
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
-            @Override
-            public void onProjectReady(ProjectActionEvent event) {
-
-            }
 
             @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
+            public void onProjectDeleted(ProjectActionEvent event) {
                 clear();
                 workspaceAgent.hidePart(GitOutputPartPresenter.this);
                 workspaceAgent.removePart(GitOutputPartPresenter.this);
@@ -71,7 +62,7 @@ public class GitOutputPartPresenter extends BasePresenter implements GitOutputPa
             }
 
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
+            public void onProjectCreated(ProjectActionEvent event) {
 
             }
         });

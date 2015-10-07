@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.reset.commit;
 
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.LogResponse;
 import org.eclipse.che.api.git.shared.ResetRequest;
@@ -19,21 +22,18 @@ import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
-import org.eclipse.che.ide.api.event.OpenProjectEvent;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitOutputPartPresenter;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.eclipse.che.ide.api.event.ProjectActionEvent.projectCreatedEvent;
 import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 import static org.eclipse.che.ide.api.notification.Notification.Type.INFO;
 
@@ -154,11 +154,12 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
                           @Override
                           protected void onSuccess(Void result) {
                               if (ResetRequest.ResetType.HARD.equals(finalType) || ResetRequest.ResetType.MERGE.equals(finalType)) {
-                                  // Only in the cases of <code>ResetRequest.ResetType.HARD</code>  or <code>ResetRequest.ResetType.MERGE</code>
+                                  // Only in the cases of <code>ResetRequest.ResetType.HARD</code>  or <code>ResetRequest.ResetType
+                                  // .MERGE</code>
                                   // must change the workdir
                                   //In this case we can have unconfigured state of the project,
                                   //so we must repeat the logic which is performed when we open a project
-                                  eventBus.fireEvent(new OpenProjectEvent(project.getPath()));
+                                  eventBus.fireEvent(projectCreatedEvent(project));
                               }
                               console.printInfo(constant.resetSuccessfully());
                               Notification notification = new Notification(constant.resetSuccessfully(), INFO);

@@ -16,6 +16,7 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.event.ProjectActionEvent;
@@ -31,7 +32,6 @@ import org.eclipse.che.ide.ext.svn.client.update.SubversionProjectUpdatedEvent;
 import org.eclipse.che.ide.ext.svn.client.update.SubversionProjectUpdatedHandler;
 import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 
-import org.eclipse.che.commons.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -110,30 +110,19 @@ public class ResolveAction extends SubversionAction implements SelectionChangedH
             return null;
         }
 
-        return projectExplorerPresenter.getSelection().getHeadElement() instanceof HasStorablePath ? (HasStorablePath)selection.getHeadElement() : null;
+        return projectExplorerPresenter.getSelection().getHeadElement() instanceof HasStorablePath ? (HasStorablePath)selection
+                .getHeadElement() : null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void onProjectReady(ProjectActionEvent event) {
-        fetchConflicts();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onProjectClosing(ProjectActionEvent event) {
-        //stub
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onProjectClosed(ProjectActionEvent event) {
+    public void onProjectDeleted(ProjectActionEvent event) {
         conflictsList = null;
     }
 
     @Override
-    public void onProjectOpened(ProjectActionEvent event) {
-
+    public void onProjectCreated(ProjectActionEvent event) {
+        fetchConflicts();
     }
 
     @Override

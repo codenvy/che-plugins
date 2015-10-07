@@ -12,17 +12,16 @@ package org.eclipse.che.ide.ext.svn.client.copy;
 
 import com.google.common.base.Strings;
 import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.project.node.HasStorablePath;
-import org.eclipse.che.ide.api.project.tree.TreeNode;
 import org.eclipse.che.ide.ext.svn.client.SubversionClientService;
 import org.eclipse.che.ide.ext.svn.client.SubversionExtensionLocalizationConstants;
 import org.eclipse.che.ide.ext.svn.client.common.RawOutputPresenter;
@@ -36,9 +35,6 @@ import org.eclipse.che.ide.project.node.ResourceBasedNode;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.util.RegExpUtils;
-import org.eclipse.che.ide.util.loging.Log;
-
-import org.eclipse.che.commons.annotation.Nullable;
 
 import static org.eclipse.che.ide.api.notification.Notification.Status.FINISHED;
 import static org.eclipse.che.ide.api.notification.Notification.Status.PROGRESS;
@@ -163,8 +159,6 @@ public class CopyPresenter extends SubversionActionPresenter implements CopyView
                              notification.setMessage(constants.copyNotificationSuccessful());
                              notification.setStatus(FINISHED);
                              notification.setType(INFO);
-
-                             refreshNodes(targetHolder.dir);
                          }
 
                          @Override
@@ -176,21 +170,6 @@ public class CopyPresenter extends SubversionActionPresenter implements CopyView
                              notification.setType(ERROR);
                          }
                      });
-    }
-
-    private void refreshNodes(String forPath) {
-        appContext.getCurrentProject().getCurrentTree().getNodeByPath(forPath, new AsyncCallback<TreeNode<?>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Log.error(CopyPresenter.class, caught);
-            }
-
-            @Override
-            public void onSuccess(TreeNode<?> result) {
-//                eventBus.fireEvent(new RefreshProjectTreeEvent(result, true));
-                updateProjectExplorer();
-            }
-        });
     }
 
     /** {@inheritDoc} */

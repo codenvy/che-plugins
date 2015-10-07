@@ -50,7 +50,7 @@ import static org.eclipse.che.ide.api.action.IdeActions.GROUP_FILE_NEW;
 @Extension(title = "Maven", version = "3.0.0")
 public class MavenExtension {
     private static List<MavenArchetype> archetypes;
-    private        ProjectDescriptor     project;
+    private        ProjectDescriptor    project;
 
     @Inject
     public MavenExtension(PreSelectedProjectTypeManager preSelectedProjectManager) {
@@ -72,7 +72,7 @@ public class MavenExtension {
 
         eventBus.addHandler(ProjectActionEvent.TYPE, new ProjectActionHandler() {
             @Override
-            public void onProjectReady(ProjectActionEvent event) {
+            public void onProjectCreated(ProjectActionEvent event) {
                 project = event.getProject();
                 if (isValidForResolveDependencies(project)) {
                     dependenciesUpdater.updateDependencies(project);
@@ -80,15 +80,7 @@ public class MavenExtension {
             }
 
             @Override
-            public void onProjectOpened(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosing(ProjectActionEvent event) {
-            }
-
-            @Override
-            public void onProjectClosed(ProjectActionEvent event) {
+            public void onProjectDeleted(ProjectActionEvent event) {
             }
         });
 
