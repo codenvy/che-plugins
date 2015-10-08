@@ -34,8 +34,6 @@ import org.eclipse.jdt.internal.ui.JavaPlugin;
 @DynaModule
 public class JdtGuiceModule extends AbstractModule {
 
-    private static final String CHE = "/.che";
-
     @Override
     protected void configure() {
         bind(JavadocService.class);
@@ -63,17 +61,16 @@ public class JdtGuiceModule extends AbstractModule {
     @Provides
     @Named("che.jdt.settings.dir")
     @Singleton
-    protected String provideSettings(@Named("che.workspace.path")String wsPath){
-        return wsPath + CHE + "/settings";
+    protected String provideSettings(@Named("che.settings.folder") String pathToCheFolders) {
+        return pathToCheFolders + "/settings";
     }
 
     @Provides
     @Named("che.jdt.workspace.index.dir")
     @Singleton
-    protected String provideIndex(@Named("che.workspace.path")String wsPath){
-        return wsPath + CHE + "/index";
+    protected String provideIndex(@Named("che.settings.folder") String pathToCheFolders) {
+        return pathToCheFolders + "/index";
     }
-
 
 
 }

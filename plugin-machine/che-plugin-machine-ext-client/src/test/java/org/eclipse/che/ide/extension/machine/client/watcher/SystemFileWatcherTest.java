@@ -13,6 +13,7 @@ package org.eclipse.che.ide.extension.machine.client.watcher;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.machine.gwt.client.events.ExtServerStateEvent;
 import org.eclipse.che.api.project.gwt.client.watcher.WatcherServiceClient;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.Promise;
@@ -23,8 +24,6 @@ import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.websocket.MessageBus;
 import org.eclipse.che.ide.websocket.MessageBusProvider;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
-import org.eclipse.che.ide.workspace.start.StartWorkspaceEvent;
-import org.eclipse.che.ide.workspace.start.StartWorkspaceHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +31,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 
-import javax.validation.constraints.NotNull;
 import java.lang.reflect.Method;
 
 import static org.eclipse.che.ide.extension.machine.client.watcher.SystemFileWatcher.WATCHER_WS_CHANEL;
@@ -64,21 +62,23 @@ public class SystemFileWatcherTest {
 
     //additional mocks
     @Mock
-    private Promise<Void>     registerPromise;
+    private Promise<Void>            registerPromise;
     @Mock
-    private CurrentProject    currentProject;
+    private CurrentProject           currentProject;
     @Mock
     private ProjectExplorerPresenter projectExplorer;
     @Mock
-    private UsersWorkspaceDto workspace;
+    private UsersWorkspaceDto        workspace;
+    @Mock
+    private ExtServerStateEvent      extServerStateEvent;
 
     @Captor
-    private ArgumentCaptor<Operation<Void>>                  operationCaptor;
+    private ArgumentCaptor<Operation<Void>>             operationCaptor;
     @Captor
-    private ArgumentCaptor<SubscriptionHandler<String>>       subscriptionCaptor;
+    private ArgumentCaptor<SubscriptionHandler<String>> subscriptionCaptor;
 
     @Captor
-    private ArgumentCaptor<StartWorkspaceHandler>            startWorkspaceCaptor;
+    private ArgumentCaptor<ExtServerStateEvent> extServerStateEventCaptor;
 
 
     private SystemFileWatcher systemFileWatcher;
@@ -86,19 +86,21 @@ public class SystemFileWatcherTest {
     @Before
     public void setUp() {
         when(messageBusProvider.getMessageBus()).thenReturn(messageBus);
+        when(appContext.getWorkspace()).thenReturn(workspace);
+        when(workspace.getId()).thenReturn(SOME_TEXT);
 
         systemFileWatcher = new SystemFileWatcher(watcherService, eventBus, appContext, messageBusProvider, projectExplorer);
 
-        verify(eventBus).addHandler(eq(StartWorkspaceEvent.TYPE), startWorkspaceCaptor.capture());
-        startWorkspaceCaptor.getValue().onWorkspaceStarted(workspace);
+        verify(eventBus).addHandler(eq(ExtServerStateEvent.TYPE), eq(systemFileWatcher));
     }
 
-    private void callRefreshTreeMethod(@NotNull String pathToNode) throws Exception {
+    @Test
+    public void parentNodeShouldBeRefreshed() throws Exception {
         when(appContext.getCurrentProject()).thenReturn(currentProject);
 
         when(watcherService.registerRecursiveWatcher(SOME_TEXT)).thenReturn(registerPromise);
 
-        systemFileWatcher.registerWatcher(SOME_TEXT);
+        systemFileWatcher.onExtServerStarted(extServerStateEvent);
 
         verify(watcherService).registerRecursiveWatcher(SOME_TEXT);
 
@@ -113,12 +115,7 @@ public class SystemFileWatcherTest {
 
         method.setAccessible(true);
 
-        method.invoke(handler, pathToNode);
-    }
-
-    @Test
-    public void parentNodeShouldBeRefreshed() throws Exception {
-        callRefreshTreeMethod(PATH_TO_PARENT);
+        method.invoke(handler, PATH_TO_PARENT);
 
         verify(projectExplorer).reloadChildren();
     }

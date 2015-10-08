@@ -17,6 +17,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -40,6 +41,7 @@ import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFacto
 import org.eclipse.che.ide.extension.machine.client.machine.MachineStatusNotifier.RunningListener;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsolePresenter;
 import org.eclipse.che.ide.extension.machine.client.util.RecipeProvider;
+import org.eclipse.che.ide.extension.machine.client.watcher.SystemFileWatcher;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.eclipse.che.ide.util.UUID;
 import org.eclipse.che.ide.util.loging.Log;
@@ -89,7 +91,8 @@ public class MachineManager {
                           RecipeProvider recipeProvider,
                           EntityFactory entityFactory,
                           EventBus eventBus,
-                          AppContext appContext) {
+                          AppContext appContext,
+                          Provider<SystemFileWatcher> systemFileWatcherProvider) {
         this.extServerStateController = extServerStateController;
         this.machineServiceClient = machineServiceClient;
         this.machineConsolePresenter = machineConsolePresenter;
@@ -101,6 +104,8 @@ public class MachineManager {
         this.appContext = appContext;
 
         this.messageBus = messageBusProvider.getMessageBus();
+
+        systemFileWatcherProvider.get();
 
         eventBus.addHandler(StartWorkspaceEvent.TYPE, new StartWorkspaceHandler() {
             @Override

@@ -13,11 +13,12 @@ package org.eclipse.che.ide.extension.machine.client.watcher;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.machine.gwt.client.events.ExtServerStateEvent;
+import org.eclipse.che.api.machine.gwt.client.events.ExtServerStateHandler;
 import org.eclipse.che.api.project.gwt.client.watcher.WatcherServiceClient;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.api.workspace.shared.dto.UsersWorkspaceDto;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.util.loging.Log;
@@ -26,24 +27,22 @@ import org.eclipse.che.ide.websocket.MessageBusProvider;
 import org.eclipse.che.ide.websocket.WebSocketException;
 import org.eclipse.che.ide.websocket.rest.StringUnmarshallerWS;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
-import org.eclipse.che.ide.workspace.start.StartWorkspaceEvent;
-import org.eclipse.che.ide.workspace.start.StartWorkspaceHandler;
 
 import javax.validation.constraints.NotNull;
 
 /**
- * The class contains business logic which allows describe on spacial socket and do some actions when
+ * The class contains business logic which allows add listener on file system and do some actions when
  * files are changed on file system.
  *
  * @author Dmitry Shnurenko
  */
-public class SystemFileWatcher {
+public class SystemFileWatcher implements ExtServerStateHandler {
 
     static final String WATCHER_WS_CHANEL = "watcher:chanel:1";
 
-    private final WatcherServiceClient watcherService;
-    private final EventBus             eventBus;
-    private final AppContext           appContext;
+    private final WatcherServiceClient     watcherService;
+    private final AppContext               appContext;
+    private final MessageBusProvider       messageBusProvider;
     private final ProjectExplorerPresenter projectExplorer;
 
     private MessageBus messageBus;
@@ -52,29 +51,29 @@ public class SystemFileWatcher {
     public SystemFileWatcher(WatcherServiceClient watcherService,
                              EventBus eventBus,
                              AppContext appContext,
-                             final MessageBusProvider messageBusProvider,
+                             MessageBusProvider messageBusProvider,
                              ProjectExplorerPresenter projectExplorer) {
         this.watcherService = watcherService;
-        this.eventBus = eventBus;
-        this.messageBus = messageBusProvider.getMessageBus();
+        this.messageBusProvider = messageBusProvider;
         this.appContext = appContext;
         this.projectExplorer = projectExplorer;
 
-        eventBus.addHandler(StartWorkspaceEvent.TYPE, new StartWorkspaceHandler() {
-            @Override
-            public void onWorkspaceStarted(UsersWorkspaceDto workspace) {
-                messageBus = messageBusProvider.getMessageBus();
-            }
-        });
+        eventBus.addHandler(ExtServerStateEvent.TYPE, this);
     }
 
-    /**
-     * Registers special watcher which allows track changes on file system.
-     *
-     * @param workspaceId
-     *         workspace id need to add watcher for current workspace
-     */
-    public void registerWatcher(@NotNull String workspaceId) {
+    @Override
+    public void onExtServerStarted(ExtServerStateEvent event) {
+        messageBus = messageBusProvider.getMessageBus();
+
+        registerWatcher(appContext.getWorkspace().getId());
+    }
+
+    @Override
+    public void onExtServerStopped(ExtServerStateEvent event) {
+
+    }
+
+    private void registerWatcher(@NotNull String workspaceId) {
         Promise<Void> watcherPromise = watcherService.registerRecursiveWatcher(workspaceId);
 
         watcherPromise.then(new Operation<Void>() {
