@@ -189,9 +189,11 @@ public class PullPresenter implements PullView.ActionDelegate {
                                   protected void onSuccess(PullResponse result) {
                                       console.printInfo(result.getCommandOutput());
                                       notification.setStatus(FINISHED);
-                                      notification.setMessage(result.getCommandOutput());
-                                      if (!result.getCommandOutput().contains("Already up-to-date")) {
+                                      if (result.getCommandOutput().contains("Already up-to-date")) {
+                                          notification.setMessage(constant.pullUpToDate());
+                                      } else {
                                           refreshProject(openedEditors);
+                                          notification.setMessage(constant.pullSuccess(remoteUrl));
                                       }
                                   }
 
