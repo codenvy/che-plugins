@@ -274,7 +274,7 @@ public class PullPresenterTest extends BaseTest {
     }
 
     @Test
-    public void testOnPullClickedWhenPullRequestIsSuccessful() throws Exception {
+    public void testOnPullClickedWhenPullHasChanges() throws Exception {
         when(pullResponse.getCommandOutput()).thenReturn("Something pulled");
 
         doAnswer(new Answer() {
@@ -297,11 +297,44 @@ public class PullPresenterTest extends BaseTest {
         verify(editorAgent).getOpenedEditors();
         verify(service).pull(eq(rootProjectDescriptor), anyString(), eq(REPOSITORY_NAME), (AsyncRequestCallback)anyObject());
         verify(console).printInfo(anyString());
+        verify(constant).pullSuccess(anyString());
         verify(notificationManager).showNotification((Notification) anyObject());
         verify(appContext).getCurrentProject();
-        verify(eventBus, times(1)).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
+        verify(eventBus).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
         verify(partPresenter).getEditorInput();
         verify(file).getPath();
+    }
+
+    @Test
+    public void testOnPullClickedWhenPullIsUpToDate() throws Exception {
+        when(pullResponse.getCommandOutput()).thenReturn("Already up-to-date");
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] arguments = invocation.getArguments();
+                AsyncRequestCallback<Void> callback = (AsyncRequestCallback<Void>)arguments[3];
+                Method onSuccess = GwtReflectionUtils.getMethod(callback.getClass(), "onSuccess");
+                onSuccess.invoke(callback, pullResponse);
+                return callback;
+            }
+        }).when(service).pull((ProjectDescriptor)anyObject(), anyString(), anyString(), (AsyncRequestCallback<PullResponse>)anyObject());
+
+        presenter.showDialog();
+        presenter.onPullClicked();
+
+        verify(view, times(2)).getRepositoryName();
+        verify(view).getRepositoryUrl();
+        verify(view).close();
+        verify(editorAgent).getOpenedEditors();
+        verify(service).pull(eq(rootProjectDescriptor), anyString(), eq(REPOSITORY_NAME), (AsyncRequestCallback)anyObject());
+        verify(console).printInfo(anyString());
+        verify(constant).pullUpToDate();
+        verify(notificationManager).showNotification((Notification) anyObject());
+        verify(appContext).getCurrentProject();
+        verify(eventBus, never()).fireEvent(Matchers.<Event<GwtEvent>>anyObject());
+        verify(partPresenter, never()).getEditorInput();
+        verify(file, never()).getPath();
     }
 
     @Test

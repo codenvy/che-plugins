@@ -284,7 +284,9 @@ public class PushToRemotePresenterTest extends BaseTest {
     }
 
     @Test
-    public void testOnPushClickedWhenPushWSRequestIsSuccessful() throws Exception {
+    public void testOnPushClickedWhenPusHasChanges() throws Exception {
+        when(pushResponse.getCommandOutput()).thenReturn("Something pushed");
+
         presenter.showDialog();
         presenter.onPushClicked();
 
@@ -298,7 +300,29 @@ public class PushToRemotePresenterTest extends BaseTest {
                 (AsyncRequestCallback<PushResponse>) anyObject());
         verify(view).close();
         verify(console).printInfo(anyString());
-        verify(notificationManager).showNotification((Notification) anyObject());
+        verify(constant).pushSuccess(anyString());
+        verify(notificationManager).showNotification((Notification)anyObject());
+    }
+
+    @Test
+    public void testOnPushClickedWhenPusIsUpToDate() throws Exception {
+        when(pushResponse.getCommandOutput()).thenReturn("Everything up-to-date");
+
+        presenter.showDialog();
+        presenter.onPushClicked();
+
+        verify(service).push((ProjectDescriptor)anyObject(), anyListOf(String.class), anyString(), anyBoolean(),
+                             asyncCallbackVoidCaptor.capture());
+        AsyncRequestCallback<PushResponse> voidCallback = asyncCallbackVoidCaptor.getValue();
+        Method onSuccess = GwtReflectionUtils.getMethod(voidCallback.getClass(), "onSuccess");
+        onSuccess.invoke(voidCallback, pushResponse);
+
+        verify(service).push(eq(rootProjectDescriptor), anyListOf(String.class), eq(REPOSITORY_NAME), eq(DISABLE_CHECK),
+                             (AsyncRequestCallback<PushResponse>) anyObject());
+        verify(view).close();
+        verify(console).printInfo(anyString());
+        verify(constant).pushUpToDate();
+        verify(notificationManager).showNotification((Notification)anyObject());
     }
 
     @Test

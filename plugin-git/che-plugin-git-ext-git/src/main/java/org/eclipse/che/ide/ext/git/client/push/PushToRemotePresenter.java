@@ -283,7 +283,11 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
                          protected void onSuccess(PushResponse result) {
                              console.printInfo(result.getCommandOutput());
                              notification.setStatus(FINISHED);
-                             notification.setMessage(result.getCommandOutput());
+                             if (result.getCommandOutput().contains("Everything up-to-date")) {
+                                 notification.setMessage(constant.pushUpToDate());
+                             } else {
+                                 notification.setMessage(constant.pushSuccess(repository));
+                             }
                          }
 
                          @Override

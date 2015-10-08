@@ -136,6 +136,9 @@ public interface GitLocalizationConstant extends Messages {
     @Key("messages.push_success")
     String pushSuccess(String remote);
 
+    @Key("messages.push_up_to_date")
+    String pushUpToDate();
+
     @Key("messages.push_fail")
     String pushFail();
 
@@ -144,6 +147,9 @@ public interface GitLocalizationConstant extends Messages {
 
     @Key("messages.pull_success")
     String pullSuccess(String remoteUrl);
+
+    @Key("messages.pull_up_to_date")
+    String pullUpToDate();
 
     @Key("messages.pull_fail")
     String pullFail(String remoteUrl);
