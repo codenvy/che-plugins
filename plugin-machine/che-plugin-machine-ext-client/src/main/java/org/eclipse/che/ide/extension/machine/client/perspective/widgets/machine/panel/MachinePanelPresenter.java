@@ -21,6 +21,7 @@ import org.eclipse.che.api.machine.gwt.client.MachineServiceClient;
 import org.eclipse.che.api.machine.gwt.client.events.ExtServerStateEvent;
 import org.eclipse.che.api.machine.gwt.client.events.ExtServerStateHandler;
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
+import org.eclipse.che.api.machine.shared.dto.MachineStateDescriptor;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
@@ -38,7 +39,9 @@ import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The class contains business logic to control displaying of machines on special view.
@@ -93,38 +96,67 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
 
         machinesPromise.then(new Operation<List<MachineDescriptor>>() {
             @Override
-            public void apply(List<MachineDescriptor> machines) throws OperationException {
-                if (machines.isEmpty()) {
-                    appliance.showStub();
-                    selectedMachine = null;
-                }
+            public void apply(final List<MachineDescriptor> machines) throws OperationException {
+                Promise<List<MachineStateDescriptor>> statePromise = service.getMachinesStates("");
+                statePromise.then(new Operation<List<MachineStateDescriptor>>() {
+                    @Override
+                    public void apply(List<MachineStateDescriptor> machineStates) throws OperationException {
+                        List<Machine> result = createListMachine(machines, machineStates);
 
-                isFirstNode = true;
+                        if (result.isEmpty()) {
+                            appliance.showStub();
+                            selectedMachine = null;
+                        }
 
-                List<MachineTreeNode> rootChildren = new ArrayList<>();
+                        isFirstNode = true;
 
-                MachineTreeNode rootNode = entityFactory.createMachineNode(null, "root", rootChildren);
+                        List<MachineTreeNode> rootChildren = new ArrayList<>();
 
-                MachineTreeNode selectedNode = null;
+                        MachineTreeNode rootNode = entityFactory.createMachineNode(null, "root", rootChildren);
 
-                for (MachineDescriptor descriptor : machines) {
-                    Machine machine = entityFactory.createMachine(descriptor);
-                    MachineTreeNode machineNode = entityFactory.createMachineNode(rootNode, machine, null);
+                        MachineTreeNode selectedNode = null;
 
-                    rootChildren.add(machineNode);
+                        for (Machine machine : result) {
+                            MachineTreeNode machineNode = entityFactory.createMachineNode(rootNode, machine, null);
 
-                    if (isFirstNode) {
-                        selectedNode = machineNode;
+                            rootChildren.add(machineNode);
 
-                        isFirstNode = false;
+                            if (isFirstNode) {
+                                selectedNode = machineNode;
+
+                                isFirstNode = false;
+                            }
+                        }
+
+                        view.setData(rootNode);
+
+                        view.selectNode(selectedNode);
                     }
-                }
-
-                view.setData(rootNode);
-
-                view.selectNode(selectedNode);
+                });
             }
         });
+    }
+
+    private List<Machine> createListMachine(List<MachineDescriptor> machines, List<MachineStateDescriptor> machineStates) {
+        List<Machine> result = new ArrayList<>();
+
+        Map<String, MachineDescriptor> machineDescMap = new HashMap<>();
+        for (MachineDescriptor machineDescriptor: machines) {
+            Machine machine = entityFactory.createMachine(machineDescriptor);
+            result.add(machine);
+
+            machineDescMap.put(machine.getId(), machineDescriptor);
+        }
+
+        for (MachineStateDescriptor machineStateDescriptor: machineStates) {
+            String id = machineStateDescriptor.getId();
+            if (!machineDescMap.containsKey(id)) {
+                Machine machine = entityFactory.createMachine(machineStateDescriptor);
+                result.add(machine);
+            }
+        }
+
+        return result;
     }
 
     public Machine getSelectedMachine() {

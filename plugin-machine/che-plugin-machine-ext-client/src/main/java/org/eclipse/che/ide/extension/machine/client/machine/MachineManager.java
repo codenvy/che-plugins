@@ -40,6 +40,7 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFactory;
 import org.eclipse.che.ide.extension.machine.client.machine.MachineStatusNotifier.RunningListener;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsolePresenter;
+import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel.MachinePanelPresenter;
 import org.eclipse.che.ide.extension.machine.client.util.RecipeProvider;
 import org.eclipse.che.ide.extension.machine.client.watcher.SystemFileWatcher;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
@@ -76,6 +77,7 @@ public class MachineManager {
     private final RecipeProvider           recipeProvider;
     private final EntityFactory            entityFactory;
     private final AppContext               appContext;
+    private final MachinePanelPresenter    machinePanelPresenter;
 
     private MessageBus messageBus;
     private Machine    devMachine;
@@ -92,7 +94,8 @@ public class MachineManager {
                           EntityFactory entityFactory,
                           EventBus eventBus,
                           AppContext appContext,
-                          Provider<SystemFileWatcher> systemFileWatcherProvider) {
+                          Provider<SystemFileWatcher> systemFileWatcherProvider,
+                          MachinePanelPresenter machinePanelPresenter) {
         this.extServerStateController = extServerStateController;
         this.machineServiceClient = machineServiceClient;
         this.machineConsolePresenter = machineConsolePresenter;
@@ -102,6 +105,7 @@ public class MachineManager {
         this.recipeProvider = recipeProvider;
         this.entityFactory = entityFactory;
         this.appContext = appContext;
+        this.machinePanelPresenter = machinePanelPresenter;
 
         this.messageBus = messageBusProvider.getMessageBus();
 
@@ -170,6 +174,8 @@ public class MachineManager {
         }).then(new Operation<MachineDescriptor>() {
             @Override
             public void apply(final MachineDescriptor machineDescriptor) throws OperationException {
+                machinePanelPresenter.showMachines();
+
                 RunningListener runningListener = null;
 
                 if (bindWorkspace) {

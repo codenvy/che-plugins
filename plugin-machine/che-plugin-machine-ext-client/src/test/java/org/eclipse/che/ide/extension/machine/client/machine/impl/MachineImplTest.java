@@ -8,13 +8,14 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.ide.extension.machine.client.machine;
+package org.eclipse.che.ide.extension.machine.client.machine.impl;
 
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
 import org.eclipse.che.api.machine.shared.dto.ServerDescriptor;
 import org.eclipse.che.api.machine.shared.dto.recipe.MachineRecipe;
 import org.eclipse.che.api.workspace.shared.dto.MachineMetadataDto;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
+import org.eclipse.che.ide.extension.machine.client.machine.Machine;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +25,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.eclipse.che.ide.extension.machine.client.machine.Machine.TERMINAL_REF_KEY;
+import static org.eclipse.che.ide.extension.machine.client.machine.impl.MachineImpl.TERMINAL_REF_KEY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.when;
  * @author Dmitry Shnurenko
  */
 @RunWith(MockitoJUnitRunner.class)
-public class MachineTest {
+public class MachineImplTest {
 
     private final static String SOME_TEXT = "someText";
 
@@ -54,7 +55,7 @@ public class MachineTest {
         Map<String, ServerDescriptor> servers = new HashMap<>();
         servers.put(SOME_TEXT, serverDescriptor);
 
-        machine = new Machine(locale, descriptor);
+        machine = new MachineImpl(locale, descriptor);
 
         when(serverDescriptor.getAddress()).thenReturn(SOME_TEXT);
         when(descriptor.getServers()).thenReturn(servers);
@@ -68,7 +69,7 @@ public class MachineTest {
     @Test
     public void defaultActiveTabShouldBeReturned() {
         when(locale.tabInfo()).thenReturn(SOME_TEXT);
-        machine = new Machine(locale, descriptor);
+        machine = new MachineImpl(locale, descriptor);
 
         String tabName = machine.getActiveTabName();
 

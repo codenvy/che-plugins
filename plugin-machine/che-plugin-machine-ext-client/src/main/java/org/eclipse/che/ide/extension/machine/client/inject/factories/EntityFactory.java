@@ -16,6 +16,8 @@ import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
 import org.eclipse.che.api.machine.shared.dto.MachineStateDescriptor;
 import org.eclipse.che.api.machine.shared.dto.ServerDescriptor;
 import org.eclipse.che.api.machine.shared.dto.recipe.RecipeDescriptor;
+import org.eclipse.che.ide.extension.machine.client.inject.annotations.MachineBlank;
+import org.eclipse.che.ide.extension.machine.client.inject.annotations.CreatedMachine;
 import org.eclipse.che.ide.extension.machine.client.machine.Machine;
 import org.eclipse.che.ide.extension.machine.client.machine.MachineState;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.appliance.server.Server;
@@ -39,11 +41,23 @@ import java.util.Collection;
 public interface EntityFactory {
 
     /**
-     * Creates machine object.
+     * Creates machine object for representation completely created Machine in the server side.
      *
+     * @param descriptor machine descriptor
      * @return an instance of {@link Machine}
      */
+    @CreatedMachine
     Machine createMachine(@NotNull MachineDescriptor descriptor);
+
+
+    /**
+     * Creates machine object for representation Machine which isn't completely created in the server side
+     *
+     * @param descriptor machine state descriptor
+     * @return
+     */
+    @MachineBlank
+    Machine createMachine(@NotNull MachineStateDescriptor descriptor);
 
     /**
      * Creates machine state object.

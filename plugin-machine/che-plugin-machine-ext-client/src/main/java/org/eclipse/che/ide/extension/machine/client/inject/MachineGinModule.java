@@ -29,14 +29,19 @@ import org.eclipse.che.ide.extension.machine.client.command.valueproviders.Comma
 import org.eclipse.che.ide.extension.machine.client.command.valueproviders.CommandPropertyValueProviderRegistryImpl;
 import org.eclipse.che.ide.extension.machine.client.command.valueproviders.CurrentProjectPathProvider;
 import org.eclipse.che.ide.extension.machine.client.command.valueproviders.DevMachineHostNameProvider;
+import org.eclipse.che.ide.extension.machine.client.inject.annotations.CreatedMachine;
+import org.eclipse.che.ide.extension.machine.client.inject.annotations.MachineBlank;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFactory;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.TerminalFactory;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.WidgetsFactory;
+import org.eclipse.che.ide.extension.machine.client.machine.Machine;
+import org.eclipse.che.ide.extension.machine.client.machine.impl.MachineBlankImpl;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsoleToolbar;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsoleView;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsoleViewImpl;
 import org.eclipse.che.ide.extension.machine.client.machine.create.CreateMachineView;
 import org.eclipse.che.ide.extension.machine.client.machine.create.CreateMachineViewImpl;
+import org.eclipse.che.ide.extension.machine.client.machine.impl.MachineImpl;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.OutputsContainerView;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.OutputsContainerViewImpl;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.CommandConsoleFactory;
@@ -61,6 +66,7 @@ import static org.eclipse.che.ide.extension.machine.client.perspective.MachinePe
  * @author Artem Zatsarynnyy
  * @author Dmitry Shnurenko
  * @author Valeriy Svydenko
+ * @author Alexander Andrienko
  */
 @ExtensionGinModule
 public class MachineGinModule extends AbstractGinModule {
@@ -97,7 +103,10 @@ public class MachineGinModule extends AbstractGinModule {
         install(new GinFactoryModuleBuilder().implement(TabHeader.class, TabHeaderImpl.class)
                                              .implement(EditorButtonWidget.class, EditorButtonWidgetImpl.class)
                                              .build(WidgetsFactory.class));
-        install(new GinFactoryModuleBuilder().implement(Tab.class, TabImpl.class).build(EntityFactory.class));
+        install(new GinFactoryModuleBuilder().implement(Tab.class, TabImpl.class)
+                .implement(Machine.class, CreatedMachine.class, MachineImpl.class)
+                .implement(Machine.class, MachineBlank.class, MachineBlankImpl.class)
+                .build(EntityFactory.class));
         install(new GinFactoryModuleBuilder().build(TerminalFactory.class));
     }
 }

@@ -16,6 +16,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.machine.gwt.client.MachineServiceClient;
 import org.eclipse.che.api.machine.shared.dto.MachineDescriptor;
+import org.eclipse.che.api.machine.shared.dto.MachineStateDescriptor;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
@@ -62,6 +63,11 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class MachinePanelPresenterTest {
 
+    private static final String ID1 = "id1";
+    private static final String ID2 = "id2";
+    private static final String ID3 = "id3";
+    private static final String ID4 = "id4";
+
     //constructor mocks
     @Mock
     private MachinePanelView            view;
@@ -82,32 +88,49 @@ public class MachinePanelPresenterTest {
 
     //additional mocks
     @Mock
-    private Promise<List<MachineDescriptor>> machinePromise;
+    private Promise<List<MachineDescriptor>>      machinePromise;
     @Mock
-    private CurrentProject                   currentProject;
+    private Promise<List<MachineStateDescriptor>> machineStatePromise;
+
     @Mock
-    private ProjectDescriptor                projectDescriptor;
+    private CurrentProject         currentProject;
     @Mock
-    private MachineDescriptor                machineDescriptor1;
+    private ProjectDescriptor      projectDescriptor;
     @Mock
-    private MachineDescriptor                machineDescriptor2;
+    private MachineDescriptor      machineDescriptor1;
     @Mock
-    private Machine                          machine1;
+    private MachineDescriptor      machineDescriptor2;
     @Mock
-    private Machine                          machine2;
+    private MachineStateDescriptor machineStateDescriptor1;
     @Mock
-    private AcceptsOneWidget                 container;
+    private MachineStateDescriptor machineStateDescriptor2;
     @Mock
-    private MachineTreeNode                  rootNode;
+    private Machine                machine1;
     @Mock
-    private MachineTreeNode                  machineNode1;
+    private Machine                machine2;
     @Mock
-    private MachineTreeNode                  machineNode2;
+    private Machine                machine3;
     @Mock
-    private UsersWorkspaceDto                workspaceDto;
+    private Machine                machine4;
+    @Mock
+    private AcceptsOneWidget       container;
+    @Mock
+    private MachineTreeNode        rootNode;
+    @Mock
+    private MachineTreeNode        machineNode1;
+    @Mock
+    private MachineTreeNode        machineNode2;
+    @Mock
+    private MachineTreeNode        machineNode3;
+    @Mock
+    private MachineTreeNode        machineNode4;
+    @Mock
+    private UsersWorkspaceDto      workspaceDto;
 
     @Captor
     private ArgumentCaptor<Operation<List<MachineDescriptor>>> operationCaptor;
+    @Captor
+    private ArgumentCaptor<Operation<List<MachineStateDescriptor>>> stateDecriptorCaptor;
     @Captor
     private ArgumentCaptor<InputCallback>                      inputCallbackCaptor;
 
@@ -120,6 +143,8 @@ public class MachinePanelPresenterTest {
         when(workspaceDto.getId()).thenReturn("id");
         when(entityFactory.createMachine(machineDescriptor1)).thenReturn(machine1);
         when(entityFactory.createMachine(machineDescriptor2)).thenReturn(machine2);
+        when(entityFactory.createMachine(machineStateDescriptor1)).thenReturn(machine3);
+        when(entityFactory.createMachine(machineStateDescriptor2)).thenReturn(machine4);
 
         when(entityFactory.createMachineNode(isNull(MachineTreeNode.class),
                                              anyString(),
@@ -133,12 +158,30 @@ public class MachinePanelPresenterTest {
         when(entityFactory.createMachineNode(eq(rootNode),
                                              eq(machine2),
                                              isNull(List.class))).thenReturn(machineNode2);
+        //noinspection unchecked
+        when(entityFactory.createMachineNode(eq(rootNode),
+                                             eq(machine3),
+                                             isNull(List.class))).thenReturn(machineNode3);
+        //noinspection unchecked
+        when(entityFactory.createMachineNode(eq(rootNode),
+                                             eq(machine4),
+                                             isNull(List.class))).thenReturn(machineNode4);
 
         when(service.getWorkspaceMachines(anyString())).thenReturn(machinePromise);
+        when(service.getMachinesStates("")).thenReturn(machineStatePromise);
     }
 
     @Test
     public void treeShouldBeDisplayedWithMachines() throws Exception {
+        when(machineDescriptor1.getId()).thenReturn(ID1);
+        when(machineDescriptor2.getId()).thenReturn(ID2);
+        when(machineStateDescriptor1.getId()).thenReturn(ID3);
+        when(machineStateDescriptor2.getId()).thenReturn(ID4);
+        when(machine1.getId()).thenReturn(ID1);
+        when(machine2.getId()).thenReturn(ID2);
+        when(machine3.getId()).thenReturn(ID3);
+        when(machine4.getId()).thenReturn(ID4);
+
         presenter.showMachines();
 
         verify(service).getWorkspaceMachines("id");
@@ -146,17 +189,86 @@ public class MachinePanelPresenterTest {
         verify(machinePromise).then(operationCaptor.capture());
         operationCaptor.getValue().apply(Arrays.asList(machineDescriptor1, machineDescriptor2));
 
+        verify(service).getMachinesStates("");
+        verify(machineStatePromise).then(stateDecriptorCaptor.capture());
+        stateDecriptorCaptor.getValue().apply(Arrays.asList(machineStateDescriptor1, machineStateDescriptor2));
+
         verify(entityFactory).createMachineNode(isNull(MachineTreeNode.class), eq("root"), Matchers.<List<MachineTreeNode>>anyObject());
 
         //noinspection unchecked
         verify(entityFactory).createMachineNode(eq(rootNode), eq(machine1), isNull(List.class));
         //noinspection unchecked
         verify(entityFactory).createMachineNode(eq(rootNode), eq(machine2), isNull(List.class));
+        //noinspection unchecked
+        verify(entityFactory).createMachineNode(eq(rootNode), eq(machine3), isNull(List.class));
+        //noinspection unchecked
+        verify(entityFactory).createMachineNode(eq(rootNode), eq(machine4), isNull(List.class));
+    }
 
-        verify(view).setData(rootNode);
-        verify(view).selectNode(machineNode1);
+    @Test
+    public void treeShouldBeDisplayedWithMachines2() throws Exception {
+        when(machineDescriptor1.getId()).thenReturn(ID1);
+        when(machineDescriptor2.getId()).thenReturn(ID2);
+        when(machineStateDescriptor1.getId()).thenReturn(ID1);
+        when(machineStateDescriptor2.getId()).thenReturn(ID4);
+        when(machine1.getId()).thenReturn(ID1);
+        when(machine2.getId()).thenReturn(ID2);
+        when(machine3.getId()).thenReturn(ID1);
+        when(machine4.getId()).thenReturn(ID4);
+        presenter.showMachines();
 
-        verify(view, never()).selectNode(machineNode2);
+        verify(service).getWorkspaceMachines("id");
+
+        verify(machinePromise).then(operationCaptor.capture());
+        operationCaptor.getValue().apply(Arrays.asList(machineDescriptor1, machineDescriptor2));
+
+        verify(service).getMachinesStates("");
+        verify(machineStatePromise).then(stateDecriptorCaptor.capture());
+        stateDecriptorCaptor.getValue().apply(Arrays.asList(machineStateDescriptor1, machineStateDescriptor2));
+
+        verify(entityFactory).createMachineNode(isNull(MachineTreeNode.class), eq("root"), Matchers.<List<MachineTreeNode>>anyObject());
+
+        //noinspection unchecked
+        verify(entityFactory).createMachineNode(eq(rootNode), eq(machine1), isNull(List.class));
+        //noinspection unchecked
+        verify(entityFactory).createMachineNode(eq(rootNode), eq(machine2), isNull(List.class));
+        //noinspection unchecked
+        verify(entityFactory, never()).createMachineNode(eq(rootNode), eq(machine3), isNull(List.class));
+        //noinspection unchecked
+        verify(entityFactory).createMachineNode(eq(rootNode), eq(machine4), isNull(List.class));
+    }
+
+    @Test
+    public void treeShouldBeDisplayedWithMachines3() throws Exception {
+        when(machineDescriptor1.getId()).thenReturn(ID1);
+        when(machineDescriptor2.getId()).thenReturn(ID2);
+        when(machineStateDescriptor1.getId()).thenReturn(ID1);
+        when(machineStateDescriptor2.getId()).thenReturn(ID2);
+        when(machine1.getId()).thenReturn(ID1);
+        when(machine2.getId()).thenReturn(ID2);
+        when(machine3.getId()).thenReturn(ID1);
+        when(machine4.getId()).thenReturn(ID2);
+        presenter.showMachines();
+
+        verify(service).getWorkspaceMachines("id");
+
+        verify(machinePromise).then(operationCaptor.capture());
+        operationCaptor.getValue().apply(Arrays.asList(machineDescriptor1, machineDescriptor2));
+
+        verify(service).getMachinesStates("");
+        verify(machineStatePromise).then(stateDecriptorCaptor.capture());
+        stateDecriptorCaptor.getValue().apply(Arrays.asList(machineStateDescriptor1, machineStateDescriptor2));
+
+        verify(entityFactory).createMachineNode(isNull(MachineTreeNode.class), eq("root"), Matchers.<List<MachineTreeNode>>anyObject());
+
+        //noinspection unchecked
+        verify(entityFactory).createMachineNode(eq(rootNode), eq(machine1), isNull(List.class));
+        //noinspection unchecked
+        verify(entityFactory).createMachineNode(eq(rootNode), eq(machine2), isNull(List.class));
+        //noinspection unchecked
+        verify(entityFactory, never()).createMachineNode(eq(rootNode), eq(machine3), isNull(List.class));
+        //noinspection unchecked
+        verify(entityFactory, never()).createMachineNode(eq(rootNode), eq(machine4), isNull(List.class));
     }
 
     @Test
@@ -164,7 +276,13 @@ public class MachinePanelPresenterTest {
         presenter.showMachines();
 
         verify(machinePromise).then(operationCaptor.capture());
+
+        verify(service).getWorkspaceMachines("id");
         operationCaptor.getValue().apply(Collections.<MachineDescriptor>emptyList());
+
+        verify(service).getMachinesStates("");
+        verify(machineStatePromise).then(stateDecriptorCaptor.capture());
+        stateDecriptorCaptor.getValue().apply(Collections.<MachineStateDescriptor>emptyList());
 
         verify(appliance).showStub();
         Collection<MachineTreeNode> children = rootNode.getChildren();
