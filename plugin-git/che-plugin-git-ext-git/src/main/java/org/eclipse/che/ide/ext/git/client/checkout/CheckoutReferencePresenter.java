@@ -15,7 +15,7 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
-import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
+import org.eclipse.che.api.git.shared.CheckoutRequest;
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ProjectDescriptor;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -97,8 +97,8 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
     public void onCheckoutClicked(final String reference) {
         view.close();
         final ProjectDescriptor project = appContext.getCurrentProject().getRootProject();
-        service.branchCheckout(project,
-                               dtoFactory.createDto(BranchCheckoutRequest.class)
+        service.checkout(project,
+                               dtoFactory.createDto(CheckoutRequest.class)
                                          .withName(reference)
                                          .withCreateNew(false),
                                new AsyncRequestCallback<String>() {

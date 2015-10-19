@@ -11,7 +11,7 @@
 package org.eclipse.che.ide.ext.git.client.branch;
 
 import org.eclipse.che.api.git.shared.Branch;
-import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
+import org.eclipse.che.api.git.shared.CheckoutRequest;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
@@ -99,7 +99,7 @@ public class BranchPresenterTest extends BaseTest {
     @Mock
     private ProjectExplorerPresenter projectExplorer;
     @Mock
-    private BranchCheckoutRequest    branchCheckoutRequest;
+    private CheckoutRequest    checkoutRequest;
 
     private BranchPresenter presenter;
 
@@ -314,35 +314,35 @@ public class BranchPresenterTest extends BaseTest {
     @Test
     public void testOnCheckoutClickedWhenSelectedNotRemoteBranch() throws Exception {
         when(selectedBranch.isRemote()).thenReturn(false);
-        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+        when(dtoFactory.createDto(CheckoutRequest.class)).thenReturn(checkoutRequest);
 
         selectBranch();
         presenter.onCheckoutClicked();
 
-        verify(branchCheckoutRequest).setName(eq(BRANCH_NAME));
-        verifyNoMoreInteractions(branchCheckoutRequest);
-        verify(service).branchCheckout(eq(rootProjectDescriptor),
-                                       eq(branchCheckoutRequest),
+        verify(checkoutRequest).setName(eq(BRANCH_NAME));
+        verifyNoMoreInteractions(checkoutRequest);
+        verify(service).checkout(eq(rootProjectDescriptor),
+                                       eq(checkoutRequest),
                                        asyncRequestCallbackCaptor.capture());
     }
 
     @Test
     public void testOnCheckoutClickedWhenSelectedRemoteBranch() throws Exception {
-        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+        when(dtoFactory.createDto(CheckoutRequest.class)).thenReturn(checkoutRequest);
 
         selectBranch();
         presenter.onCheckoutClicked();
 
-        verify(branchCheckoutRequest).setTrackBranch(eq(BRANCH_NAME));
-        verifyNoMoreInteractions(branchCheckoutRequest);
-        verify(service).branchCheckout(eq(rootProjectDescriptor),
-                                       eq(branchCheckoutRequest),
+        verify(checkoutRequest).setTrackBranch(eq(BRANCH_NAME));
+        verifyNoMoreInteractions(checkoutRequest);
+        verify(service).checkout(eq(rootProjectDescriptor),
+                                       eq(checkoutRequest),
                                        asyncRequestCallbackCaptor.capture());
     }
 
     @Test
-    public void testOnCheckoutClickedWhenBranchCheckoutRequestAndRefreshProjectIsSuccessful() throws Exception {
-        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+    public void testOnCheckoutClickedWhenCheckoutRequestAndRefreshProjectIsSuccessful() throws Exception {
+        when(dtoFactory.createDto(CheckoutRequest.class)).thenReturn(checkoutRequest);
 
         VirtualFile virtualFile = mock(VirtualFile.class);
 
@@ -352,10 +352,10 @@ public class BranchPresenterTest extends BaseTest {
         selectBranch();
         presenter.onCheckoutClicked();
 
-        verify(branchCheckoutRequest).setTrackBranch(eq(BRANCH_NAME));
-        verifyNoMoreInteractions(branchCheckoutRequest);
-        verify(service).branchCheckout(eq(rootProjectDescriptor),
-                                       eq(branchCheckoutRequest),
+        verify(checkoutRequest).setTrackBranch(eq(BRANCH_NAME));
+        verifyNoMoreInteractions(checkoutRequest);
+        verify(service).checkout(eq(rootProjectDescriptor),
+                                       eq(checkoutRequest),
                                        asyncRequestCallbackCaptor.capture());
 
         AsyncRequestCallback<String> checkoutBranchCallback = asyncRequestCallbackCaptor.getValue();
@@ -364,9 +364,9 @@ public class BranchPresenterTest extends BaseTest {
         verify(editorAgent).getOpenedEditors();
         verify(selectedBranch, times(2)).getDisplayName();
         verify(selectedBranch).isRemote();
-        verify(service).branchCheckout(eq(rootProjectDescriptor),
-                                       eq(branchCheckoutRequest),
-                                       anyObject());
+        verify(service).checkout(eq(rootProjectDescriptor),
+                                 eq(checkoutRequest),
+                                 anyObject());
         verify(service, times(2)).branchList(eq(rootProjectDescriptor), eq(LIST_ALL), anyObject());
         verify(appContext).getCurrentProject();
         verify(console, never()).printError(anyString());
@@ -376,9 +376,9 @@ public class BranchPresenterTest extends BaseTest {
     }
 
     @Test
-    public void testOnCheckoutClickedWhenBranchCheckoutRequestAndRefreshProjectIsSuccessfulButOpenFileIsNotExistInBranch()
+    public void testOnCheckoutClickedWhenCheckoutRequestAndRefreshProjectIsSuccessfulButOpenFileIsNotExistInBranch()
             throws Exception {
-        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+        when(dtoFactory.createDto(CheckoutRequest.class)).thenReturn(checkoutRequest);
 
         VirtualFile virtualFile = mock(VirtualFile.class);
 
@@ -388,11 +388,11 @@ public class BranchPresenterTest extends BaseTest {
         selectBranch();
         presenter.onCheckoutClicked();
 
-        verify(branchCheckoutRequest).setTrackBranch(eq(BRANCH_NAME));
-        verifyNoMoreInteractions(branchCheckoutRequest);
-        verify(service).branchCheckout(eq(rootProjectDescriptor),
-                                       eq(branchCheckoutRequest),
-                                       asyncRequestCallbackCaptor.capture());
+        verify(checkoutRequest).setTrackBranch(eq(BRANCH_NAME));
+        verifyNoMoreInteractions(checkoutRequest);
+        verify(service).checkout(eq(rootProjectDescriptor),
+                                 eq(checkoutRequest),
+                                 asyncRequestCallbackCaptor.capture());
         AsyncRequestCallback<String> checkoutBranchCallback = asyncRequestCallbackCaptor.getValue();
         GwtReflectionUtils.callOnSuccess(checkoutBranchCallback, PROJECT_PATH);
 
@@ -405,16 +405,16 @@ public class BranchPresenterTest extends BaseTest {
     }
 
     @Test
-    public void testOnCheckoutClickedWhenBranchCheckoutRequestIsFailed() throws Exception {
-        when(dtoFactory.createDto(BranchCheckoutRequest.class)).thenReturn(branchCheckoutRequest);
+    public void testOnCheckoutClickedWhenCheckoutRequestIsFailed() throws Exception {
+        when(dtoFactory.createDto(CheckoutRequest.class)).thenReturn(checkoutRequest);
         selectBranch();
         presenter.onCheckoutClicked();
 
-        verify(branchCheckoutRequest).setTrackBranch(eq(BRANCH_NAME));
-        verifyNoMoreInteractions(branchCheckoutRequest);
-        verify(service).branchCheckout(eq(rootProjectDescriptor),
-                                       eq(branchCheckoutRequest),
-                                       asyncRequestCallbackCaptor.capture());
+        verify(checkoutRequest).setTrackBranch(eq(BRANCH_NAME));
+        verifyNoMoreInteractions(checkoutRequest);
+        verify(service).checkout(eq(rootProjectDescriptor),
+                                 eq(checkoutRequest),
+                                 asyncRequestCallbackCaptor.capture());
         AsyncRequestCallback<String> checkoutBranchCallback = asyncRequestCallbackCaptor.getValue();
         GwtReflectionUtils.callOnFailure(checkoutBranchCallback, mock(Throwable.class));
 

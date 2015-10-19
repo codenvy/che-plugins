@@ -19,7 +19,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.core.rest.shared.dto.ServiceError;
 import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.Branch;
-import org.eclipse.che.api.git.shared.BranchCheckoutRequest;
+import org.eclipse.che.api.git.shared.CheckoutRequest;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorAgent;
@@ -204,14 +204,14 @@ public class BranchPresenter implements BranchView.ActionDelegate {
             return;
         }
 
-        final BranchCheckoutRequest branchCheckoutRequest = dtoFactory.createDto(BranchCheckoutRequest.class);
+        final CheckoutRequest checkoutRequest = dtoFactory.createDto(CheckoutRequest.class);
         if (selectedBranch.isRemote()) {
-            branchCheckoutRequest.setTrackBranch(selectedBranch.getDisplayName());
+        	checkoutRequest.setTrackBranch(selectedBranch.getDisplayName());
         } else {
-            branchCheckoutRequest.setName(selectedBranch.getDisplayName());
+        	checkoutRequest.setName(selectedBranch.getDisplayName());
         }
 
-        service.branchCheckout(project.getRootProject(), branchCheckoutRequest, new AsyncRequestCallback<String>() {
+        service.checkout(project.getRootProject(), checkoutRequest, new AsyncRequestCallback<String>() {
             @Override
             protected void onSuccess(String result) {
                 getBranches();
