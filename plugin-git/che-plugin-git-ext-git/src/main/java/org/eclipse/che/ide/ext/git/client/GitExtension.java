@@ -15,6 +15,7 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.ext.git.client.action.AddToIndexAction;
@@ -72,7 +73,8 @@ public class GitExtension {
                         FetchAction fetchAction,
                         PullAction pullAction,
                         GitLocalizationConstant constant,
-                        HistoryAction historyAction) {
+                        HistoryAction historyAction,
+                        AppContext appContext) {
 
         resources.gitCSS().ensureInjected();
 
@@ -127,8 +129,11 @@ public class GitExtension {
         historyGroup.add(historyAction);
         actionManager.registerAction("gitStatus", showStatusAction);
         historyGroup.add(showStatusAction);
-        actionManager.registerAction("gitUrl", showGitUrlAction);
-        historyGroup.add(showGitUrlAction);
+
+        if (!appContext.getWorkspace().isTemporary()) {
+            actionManager.registerAction("gitUrl", showGitUrlAction);
+            historyGroup.add(showGitUrlAction);
+        }
 
         actionManager.registerAction("gitPush", pushAction);
         remoteGroup.add(pushAction);
