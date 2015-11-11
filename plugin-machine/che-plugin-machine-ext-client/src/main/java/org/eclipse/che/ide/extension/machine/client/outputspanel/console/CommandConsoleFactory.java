@@ -10,11 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.outputspanel.console;
 
+import com.google.inject.name.Named;
+
 import org.eclipse.che.ide.extension.machine.client.command.CommandConfiguration;
 
 /** @author Artem Zatsarynnyy */
 public interface CommandConsoleFactory {
 
-    /** Create {@link OutputConsole} for the given {@code commandConfiguration}. */
+    /** Create the instance of {@link CommandOutputConsole} for the given {@code commandConfiguration}. */
+    @Named("command")
     OutputConsole create(CommandConfiguration commandConfiguration, String machineId);
+
+    /** Create the instance of {@link DefaultOutputConsole} for the given title. */
+    @Named("default")
+    OutputConsole create(String title);
 }

@@ -15,6 +15,7 @@ import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
 import com.google.gwt.inject.client.multibindings.GinMapBinder;
 import com.google.gwt.inject.client.multibindings.GinMultibinder;
 import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 
 import org.eclipse.che.ide.api.extension.ExtensionGinModule;
 import org.eclipse.che.ide.api.parts.Perspective;
@@ -42,6 +43,7 @@ import org.eclipse.che.ide.extension.machine.client.outputspanel.OutputsContaine
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.CommandConsoleFactory;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.CommandOutputConsole;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.CommandOutputConsoleView;
+import org.eclipse.che.ide.extension.machine.client.outputspanel.console.DefaultOutputConsole;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.OutputConsole;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.console.OutputConsoleView;
 import org.eclipse.che.ide.extension.machine.client.perspective.MachinePerspective;
@@ -79,7 +81,8 @@ public class MachineGinModule extends AbstractGinModule {
 
         bind(CreateMachineView.class).to(CreateMachineViewImpl.class);
         bind(OutputConsoleView.class).to(CommandOutputConsoleView.class);
-        install(new GinFactoryModuleBuilder().implement(OutputConsole.class, CommandOutputConsole.class)
+        install(new GinFactoryModuleBuilder().implement(OutputConsole.class, Names.named("command"), CommandOutputConsole.class)
+                                             .implement(OutputConsole.class, Names.named("default"), DefaultOutputConsole.class)
                                              .build(CommandConsoleFactory.class));
 
         bind(OutputsContainerView.class).to(OutputsContainerViewImpl.class).in(Singleton.class);

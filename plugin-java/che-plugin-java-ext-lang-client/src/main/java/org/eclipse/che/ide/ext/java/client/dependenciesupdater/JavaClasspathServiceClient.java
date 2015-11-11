@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.dependenciesupdater;
 
+import org.eclipse.che.ide.ext.java.shared.dto.MavenOperationResult;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 /**
@@ -27,5 +28,5 @@ public interface JavaClasspathServiceClient {
      * @param callback
      *         the callback to use for the response
      */
-    void updateDependencies(String projectPath, AsyncRequestCallback<Boolean> callback);
+    void updateDependencies(String projectPath, AsyncRequestCallback<MavenOperationResult> callback);
 }

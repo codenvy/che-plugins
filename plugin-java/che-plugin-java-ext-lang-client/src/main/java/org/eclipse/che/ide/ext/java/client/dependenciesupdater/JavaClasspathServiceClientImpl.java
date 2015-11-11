@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import org.eclipse.che.ide.ext.java.shared.dto.MavenOperationResult;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
 
@@ -39,8 +40,9 @@ public class JavaClasspathServiceClientImpl implements JavaClasspathServiceClien
         this.baseHttpUrl = extPath + "/jdt/" + workspaceId;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void updateDependencies(String projectPath, AsyncRequestCallback<Boolean> callback) {
+    public void updateDependencies(String projectPath, AsyncRequestCallback<MavenOperationResult> callback) {
         final String requestUrl = baseHttpUrl + "/classpath/update?projectpath=" + projectPath;
         asyncRequestFactory.createGetRequest(requestUrl)
                            .header(ACCEPT, APPLICATION_JSON)

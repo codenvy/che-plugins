@@ -54,6 +54,12 @@ public interface JavaLocalizationConstant extends Messages {
     @Key("messages.dependencies.updating.dependencies")
     String updatingDependencies();
 
+    @Key("messages.dependencies.fail.updated")
+    String updateDependenciesFailed();
+
+    @Key("dependencies.output.tab.title")
+    String updateDependenciesTabTitle();
+
     @Key("action.quickdoc.title")
     String actionQuickdocTitle();
 
