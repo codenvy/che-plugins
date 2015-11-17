@@ -15,7 +15,7 @@
     <ui:with field='locale' type='org.eclipse.che.ide.ext.git.client.GitLocalizationConstant'/>
     <ui:with field="style" type="org.eclipse.che.ide.ext.git.client.importer.page.GitImporterPageViewImpl.Style"/>
     <g:DockLayoutPanel unit="PX" addStyleNames="{style.mainPanel}">
-        <g:north size="450">
+        <g:north size="460">
             <g:FlowPanel ui:field="importerPanel">
                 <g:FlowPanel height="65px" addStyleNames="{style.namePanel}">
                     <g:Label text="{locale.gitImporterPageProjectUrl}"
@@ -23,6 +23,10 @@
                     <g:TextBox ui:field="projectUrl" addStyleNames="{style.inputField} {style.alignRight}" tabIndex="3"
                                debugId="file-importProject-projectUrl"/>
                     <g:Label ui:field="labelUrlError" width="100%" wordWrap="true" addStyleNames="{style.labelErrorPosition}"/>
+                </g:FlowPanel>
+                <g:FlowPanel height="20px" addStyleNames="{style.namePanel}">
+                    <g:CheckBox ui:field="recursive" text="{locale.gitImporterPageRecursive}"
+                                debugId="file-importProject-recursive" addStyleNames="{style.alignLeft}" />
                 </g:FlowPanel>
                 <g:FlowPanel height="0" addStyleNames="{style.horizontalLine}"/>
                 <g:FlowPanel height="35px" addStyleNames="{style.namePanel}">
