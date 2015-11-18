@@ -58,6 +58,9 @@ public class GitImporterPageViewImpl extends Composite implements GitImporterPag
     TextBox     projectUrl;
 
     @UiField
+    CheckBox    recursive;
+
+    @UiField
     FlowPanel   importerPanel;
 
     @UiField
@@ -104,6 +107,11 @@ public class GitImporterPageViewImpl extends Composite implements GitImporterPag
     @UiHandler("projectUrl")
     void onProjectUrlChanged(KeyUpEvent event) {
         delegate.projectUrlChanged(projectUrl.getValue());
+    }
+
+    @UiHandler({"recursive"})
+    void recursiveHandler(ValueChangeEvent<Boolean> event) {
+        delegate.recursiveSelected(event.getValue());
     }
 
     @UiHandler("projectDescription")
