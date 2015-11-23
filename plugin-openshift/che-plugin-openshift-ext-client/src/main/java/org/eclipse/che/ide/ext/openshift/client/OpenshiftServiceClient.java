@@ -16,6 +16,7 @@ import org.eclipse.che.ide.ext.openshift.shared.dto.BuildConfig;
 import org.eclipse.che.ide.ext.openshift.shared.dto.DeploymentConfig;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ImageStream;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ImageStreamTag;
+import org.eclipse.che.ide.ext.openshift.shared.dto.OpenshiftServerInfo;
 import org.eclipse.che.ide.ext.openshift.shared.dto.Project;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ProjectRequest;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ReplicationController;
@@ -30,6 +31,8 @@ import java.util.List;
  * @author Sergii Leschenko
  */
 public interface OpenshiftServiceClient {
+    Promise<OpenshiftServerInfo> getServerInfo();
+
     Promise<List<Template>> getTemplates(String namespace);
 
     Promise<Template> processTemplate(String namespace, Template template);

@@ -20,6 +20,7 @@ import org.eclipse.che.ide.ext.openshift.server.rest.BuildService;
 import org.eclipse.che.ide.ext.openshift.server.rest.DeploymentConfigService;
 import org.eclipse.che.ide.ext.openshift.server.rest.ImageStreamService;
 import org.eclipse.che.ide.ext.openshift.server.rest.OpenshiftExceptionMapper;
+import org.eclipse.che.ide.ext.openshift.server.rest.OpenshiftApiInfoService;
 import org.eclipse.che.ide.ext.openshift.server.rest.ProjectService;
 import org.eclipse.che.ide.ext.openshift.server.rest.ReplicationControllerService;
 import org.eclipse.che.ide.ext.openshift.server.rest.RouteService;
@@ -40,6 +41,7 @@ public class OpenshiftModule extends AbstractModule {
         bind(TemplateService.class);
         bind(ProjectService.class);
         bind(BuildService.class);
+        bind(OpenshiftApiInfoService.class);
         bind(ReplicationControllerService.class);
         bind(OpenshiftExceptionMapper.class);
 
