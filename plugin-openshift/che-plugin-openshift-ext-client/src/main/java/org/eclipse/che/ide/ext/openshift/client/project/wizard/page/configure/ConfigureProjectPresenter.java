@@ -66,7 +66,6 @@ public class ConfigureProjectPresenter extends AbstractWizardPage<NewApplication
         view.setDelegate(this);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void init(NewApplicationRequest dataObject) {
         super.init(dataObject);
@@ -87,7 +86,7 @@ public class ConfigureProjectPresenter extends AbstractWizardPage<NewApplication
         projectServiceClient.getProjects(false).then(new Operation<List<ProjectDescriptor>>() {
             @Override
             public void apply(List<ProjectDescriptor> projects) throws OperationException {
-                openShiftProjects.clear();
+                cheProjects.clear();
                 for (ProjectDescriptor project : projects) {
                     cheProjects.add(project.getName());
                 }
@@ -96,24 +95,36 @@ public class ConfigureProjectPresenter extends AbstractWizardPage<NewApplication
     }
 
 
-    /** {@inheritDoc} */
     @Override
     public boolean isCompleted() {
         if (view.isNewOpenShiftProjectSelected()) {
+            setUpNewProjectRequest();
+            setUpCheProjectRequest();
             return isOpenShiftProjectNameValid(view.getOpenShiftNewProjectName()) & isCheProjectNameValid(view.getCheNewProjectName());
         } else {
+            setUpExistProjectRequest();
+            setUpCheProjectRequest();
             return view.getExistedSelectedProject() != null && isCheProjectNameValid(view.getCheNewProjectName());
         }
     }
 
-    private boolean isOpenShiftProjectNameValid(String name) {
-        if (openShiftProjects.contains(name)) {
+    /**
+     * Checks whether project name matches OpenShift's naming requirements.
+     * If is not valid, display error message on the view, depending on case.
+     *
+     * @param projectName
+     *         project name
+     * @return true if project is valid, false otherwise
+     */
+    private boolean isOpenShiftProjectNameValid(String projectName) {
+        if (openShiftProjects.contains(projectName)) {
             view.showOsProjectNameError(locale.existingProjectNameError());
             return false;
         }
-        if (name.length() > 63
-            || name.isEmpty()
-            || !name.matches("[a-z0-9]([-a-z0-9]*[a-z0-9])?")) {
+        if (projectName.length() > 63
+            || projectName.length() < 2
+            || projectName.isEmpty()
+            || !projectName.matches("[a-z]([-a-z0-9]*[a-z0-9])?")) {
             view.showOsProjectNameError(locale.invalidOpenShiftProjectNameError());
             return false;
         }
@@ -122,6 +133,15 @@ public class ConfigureProjectPresenter extends AbstractWizardPage<NewApplication
         return true;
     }
 
+    /**
+     * Checks whether project name matches OpenShift's and Che's project naming
+     * requirements.
+     * If is not valid, display error message on the view, depending on case.
+     *
+     * @param projectName
+     *         project name
+     * @return true if project is valid, false otherwise
+     */
     private boolean isCheProjectNameValid(String projectName) {
         if (cheProjects.contains(projectName)) {
             view.showCheProjectNameError(locale.existingProjectNameError());
@@ -131,50 +151,47 @@ public class ConfigureProjectPresenter extends AbstractWizardPage<NewApplication
             view.showCheProjectNameError(locale.invalidCheProjectNameError());
             return false;
         }
+        if (projectName.length() > 63
+            || projectName.length() < 2
+            || projectName.isEmpty()
+            || !projectName.matches("[a-z]([-a-z0-9]*[a-z0-9])?")) {
+            view.showCheProjectNameError(locale.invalidOpenShiftProjectNameError());
+            return false;
+        }
         view.hideCheProjectNameError();
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void go(AcceptsOneWidget container) {
         container.setWidget(view);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void onOpenShiftNewProjectNameChanged() {
-        setUpNewProjectRequest();
         updateDelegate.updateControls();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void onCheNewProjectNameChanged() {
-        setUpCheProjectRequest();
         updateDelegate.updateControls();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void onExistProjectSelected() {
-        setUpExistProjectRequest();
         updateDelegate.updateControls();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void onOpenShiftDescriptionChanged() {
         setUpNewProjectRequest();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void onCheDescriptionChanged() {
         setUpCheProjectRequest();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void onOpenShiftDisplayNameChanged() {
         setUpNewProjectRequest();
