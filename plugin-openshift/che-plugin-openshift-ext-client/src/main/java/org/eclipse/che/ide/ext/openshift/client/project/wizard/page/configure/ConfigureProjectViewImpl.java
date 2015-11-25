@@ -131,19 +131,16 @@ public class ConfigureProjectViewImpl implements ConfigureProjectView {
         rewriteCheProjectName = true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void setDelegate(ActionDelegate delegate) {
         this.delegate = delegate;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Widget asWidget() {
         return widget;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean isNewOpenShiftProjectSelected() {
         return osNewProjectButton.getValue();
@@ -200,13 +197,11 @@ public class ConfigureProjectViewImpl implements ConfigureProjectView {
         delegate.onOpenShiftDisplayNameChanged();
     }
 
-    /** {@inheritDoc} */
     @Override
     public Project getExistedSelectedProject() {
         return projectsList.getSelectionModel().getSelectedItem();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void resetControls() {
         osProjectNameInput.setValue("", true);
@@ -220,37 +215,31 @@ public class ConfigureProjectViewImpl implements ConfigureProjectView {
         projectsList.render(Collections.<Project>emptyList());
     }
 
-    /** {@inheritDoc} */
     @Override
     public void setExistOpenShiftProjects(List<Project> projects) {
         projectsList.render(projects);
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getOpenShiftNewProjectName() {
         return osProjectNameInput.getValue();
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getCheNewProjectName() {
         return cheProjectNameInput.getValue();
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getOpenShiftProjectDescription() {
         return osProjectDescriptionInput.getValue();
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getCheProjectDescription() {
         return cheProjectDescriptionInput.getValue();
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getOpenShiftProjectDisplayName() {
         return osProjectDisplayNameInput.getValue();
