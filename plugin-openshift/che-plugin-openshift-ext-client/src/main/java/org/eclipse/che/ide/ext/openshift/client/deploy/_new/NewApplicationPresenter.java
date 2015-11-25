@@ -246,29 +246,6 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
 
                 view.setImages(imageNames);
                 view.setLabels(Collections.<Pair<String, String>>emptyList());
-
-                osService.getImageStreamTag("openshift", streams.get(0).getMetadata().getName(), "latest")
-                         .then(new Operation<ImageStreamTag>() {
-                             @Override
-                             public void apply(ImageStreamTag streamTag) throws OperationException {
-                                 if (streamTag == null) {
-                                     return;
-                                 }
-
-                                 osActiveStreamTag = streamTag;
-
-                                 List<Pair<String, String>> variables = new ArrayList<>();
-                                 for (String env : streamTag.getDockerImageMetadata().getContainerConfig().getEnv()) {
-                                     String[] keyValuePair = env.split("=");
-                                     if (keyValuePair.length != 2) {
-                                         continue;
-                                     }
-                                     variables.add(new Pair<>(keyValuePair[0], keyValuePair[1]));
-                                 }
-
-                                 view.setEnvironmentVariables(variables);
-                             }
-                         });
             }
         }));
     }
@@ -315,16 +292,27 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
                     labels.put(label.getFirst(), label.getSecond());
                 }
 
-                Object exposedPorts = osActiveStreamTag.getDockerImageMetadata().getContainerConfig().getExposedPorts();
+                Object exposedPorts =
+                        (osActiveStreamTag.getDockerImageMetadata().getConfig() != null) ? osActiveStreamTag.getDockerImageMetadata()
+                                                                                                            .getConfig().getExposedPorts()
+                                                                                         : osActiveStreamTag.getDockerImageMetadata()
+                                                                                                            .getContainerConfig()
+                                                                                                            .getExposedPorts();
                 List<ContainerPort> ports = parsePorts(exposedPorts);
 
                 String namespace = project.getMetadata().getName();
 
-                Promises.all(osService.createImageStream(generateImageStream(namespace, labels)),
-                             osService.createBuildConfig(generateBuildConfig(namespace, labels)),
-                             osService.createDeploymentConfig(generateDeploymentConfig(namespace, labels)),
-                             osService.createRoute(generateRoute(namespace, labels)),
-                             osService.createService(generateService(namespace, getFirstPort(ports), labels)))
+                List<Promise<?>> promises = new ArrayList();
+                promises.add(osService.createImageStream(generateImageStream(namespace, labels)));
+                promises.add(osService.createBuildConfig(generateBuildConfig(namespace, labels)));
+                promises.add(osService.createDeploymentConfig(generateDeploymentConfig(namespace, labels)));
+                promises.add(osService.createRoute(generateRoute(namespace, labels)));
+
+                if (!ports.isEmpty()) {
+                    promises.add(osService.createService(generateService(namespace, getFirstPort(ports), labels)));
+                }
+
+                Promises.all(promises.toArray(new Promise[promises.size()]))
                         .then(new Operation<JsArrayMixed>() {
                             @Override
                             public void apply(JsArrayMixed arg) throws OperationException {
@@ -403,8 +391,11 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
                     @Override
                     public Promise<ImageStreamTag> apply(ImageStreamTag streamTag) throws FunctionException {
                         osActiveStreamTag = streamTag;
-
-                        List<String> envs = streamTag.getDockerImageMetadata().getContainerConfig().getEnv();
+                        List<String> envs =
+                                (streamTag.getDockerImageMetadata().getConfig() != null) ? streamTag.getDockerImageMetadata().getConfig()
+                                                                                                    .getEnv()
+                                                                                         : streamTag.getDockerImageMetadata()
+                                                                                                    .getContainerConfig().getEnv();
                         List<Pair<String, String>> variables = new ArrayList<>();
                         for (String env : envs) {
                             String[] keyValuePair = env.split("=");
