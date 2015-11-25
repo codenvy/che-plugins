@@ -21,6 +21,7 @@ import org.eclipse.che.ide.ext.openshift.shared.dto.BuildConfig;
 import org.eclipse.che.ide.ext.openshift.shared.dto.DeploymentConfig;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ImageStream;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ImageStreamTag;
+import org.eclipse.che.ide.ext.openshift.shared.dto.OpenshiftServerInfo;
 import org.eclipse.che.ide.ext.openshift.shared.dto.Project;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ProjectRequest;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ReplicationController;
@@ -62,6 +63,18 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
         this.loader = loader;
         this.dtoUnmarshaller = dtoUnmarshaller;
         openshiftPath = extPath + "/openshift/" + appContext.getWorkspace().getId();
+    }
+
+    @Override
+    public Promise<OpenshiftServerInfo> getServerInfo() {
+        return newPromise(new AsyncPromiseHelper.RequestCall<OpenshiftServerInfo>() {
+            @Override
+            public void makeCall(AsyncCallback<OpenshiftServerInfo> callback) {
+                asyncRequestFactory.createGetRequest(openshiftPath)
+                                   .header(ACCEPT, MimeType.APPLICATION_JSON)
+                                   .send(newCallback(callback, dtoUnmarshaller.newUnmarshaller(OpenshiftServerInfo.class)));
+            }
+        });
     }
 
     public Promise<List<Template>> getTemplates(final String namespace) {

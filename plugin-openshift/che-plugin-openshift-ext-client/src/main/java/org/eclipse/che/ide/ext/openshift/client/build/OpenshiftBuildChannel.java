@@ -23,12 +23,10 @@ import org.eclipse.che.ide.websocket.events.MessageReceivedHandler;
  * @author Sergii Leschenko
  */
 public class OpenshiftBuildChannel {
-    private static final String OPENSHIFT_API_ENDPOINT = "wss://api.codenvy.openshift.com/osapi/v1beta3";
-    private final String         wsConnectionUrl;
     private       WebSocket      ws;
 
-    private OpenshiftBuildChannel(String token, String namespace) {
-        this.wsConnectionUrl = OPENSHIFT_API_ENDPOINT + "/watch/namespaces/" + namespace + "/builds?access_token=" + token;
+    private OpenshiftBuildChannel(String openshiftWebSocketPath, String token, String namespace) {
+        String wsConnectionUrl = openshiftWebSocketPath + "/watch/namespaces/" + namespace + "/builds?access_token=" + token;
 
         if (WebSocket.isSupported()) {
             ws = WebSocket.create(wsConnectionUrl);
@@ -46,10 +44,12 @@ public class OpenshiftBuildChannel {
         private       ConnectionClosedHandler closedHandler;
         private       ConnectionErrorHandler  errorHandler;
         private       MessageReceivedHandler  messageHandler;
+        private final String                  webSocketPath;
         private final String                  namespace;
         private final String                  token;
 
-        Builder(String namespace, String token) {
+        Builder(String webSocketPath, String namespace, String token) {
+            this.webSocketPath = webSocketPath;
             this.namespace = namespace;
             this.token = token;
         }
@@ -75,7 +75,7 @@ public class OpenshiftBuildChannel {
         }
 
         public OpenshiftBuildChannel build() {
-            OpenshiftBuildChannel openshiftBuildChannel = new OpenshiftBuildChannel(token, namespace);
+            OpenshiftBuildChannel openshiftBuildChannel = new OpenshiftBuildChannel(webSocketPath, token, namespace);
             if (messageHandler != null) {
                 openshiftBuildChannel.ws.setOnMessageHandler(messageHandler);
             }

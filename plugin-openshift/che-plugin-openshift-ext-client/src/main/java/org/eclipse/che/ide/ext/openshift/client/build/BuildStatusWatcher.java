@@ -10,12 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.openshift.client.build;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.openshift.client.OpenshiftLocalizationConstant;
+import org.eclipse.che.ide.ext.openshift.client.OpenshiftWebSocketPathProvider;
 import org.eclipse.che.ide.ext.openshift.client.dto.BuildChangeEvent;
 import org.eclipse.che.ide.ext.openshift.client.oauth.OAuthTokenChangedEvent;
 import org.eclipse.che.ide.ext.openshift.client.oauth.OAuthTokenChangedEventHandler;
@@ -46,9 +48,10 @@ import static org.eclipse.che.ide.ext.openshift.shared.dto.BuildStatus.Phase.Fai
  */
 @Singleton
 public class BuildStatusWatcher {
-    private final NotificationManager           notificationManager;
-    private final OpenshiftAuthorizationHandler authorizationHandler;
-    private final DtoFactory                    dtoFactory;
+    private final NotificationManager            notificationManager;
+    private final OpenshiftAuthorizationHandler  authorizationHandler;
+    private final DtoFactory                     dtoFactory;
+    private final OpenshiftWebSocketPathProvider wsPathProvider;
 
     private final Map<BuildId, Notification>         buildsToNotifications = new HashMap<>();
     private final Map<String, OpenshiftBuildChannel> namespacesToChannels  = new HashMap<>();
@@ -60,11 +63,13 @@ public class BuildStatusWatcher {
                               OpenshiftAuthorizationHandler authorizationHandler,
                               EventBus eventBus,
                               DtoFactory dtoFactory,
-                              final OpenshiftLocalizationConstant locale) {
+                              final OpenshiftLocalizationConstant locale,
+                              OpenshiftWebSocketPathProvider wsPathProvider) {
         this.notificationManager = notificationManager;
         this.authorizationHandler = authorizationHandler;
         this.dtoFactory = dtoFactory;
         this.locale = locale;
+        this.wsPathProvider = wsPathProvider;
 
         eventBus.addHandler(OAuthTokenChangedEvent.TYPE, new OAuthTokenChangedEventHandler() {
             @Override
@@ -99,11 +104,24 @@ public class BuildStatusWatcher {
         final String namespace = build.getMetadata().getNamespace();
         if (!namespacesToChannels.containsKey(namespace)) {
             final WebSocketWatcher webSocketWatcher = new WebSocketWatcher(namespace);
-            OpenshiftBuildChannel buildChannel = new OpenshiftBuildChannel.Builder(namespace, authorizationHandler.getToken())
-                    .withMessageHandler(webSocketWatcher)
-                    .withClosedHandler(webSocketWatcher)
-                    .build();
-            namespacesToChannels.put(namespace, buildChannel);
+            wsPathProvider.get(new AsyncCallback<String>() {
+                @Override
+                public void onSuccess(String openshiftWebSocketEndpoint) {
+                    OpenshiftBuildChannel buildChannel =
+                            new OpenshiftBuildChannel.Builder(openshiftWebSocketEndpoint, namespace, authorizationHandler.getToken())
+                                    .withMessageHandler(webSocketWatcher)
+                                    .withClosedHandler(webSocketWatcher)
+                                    .build();
+                    namespacesToChannels.put(namespace, buildChannel);
+                }
+
+                @Override
+                public void onFailure(Throwable caught) {
+                    stopWatching(buildId);
+                    notification.setType(Type.ERROR);
+                    notification.setMessage(locale.failedToWatchBuildByWebSocket(buildId.toString()) + " " + caught.getLocalizedMessage());
+                }
+            });
         }
     }
 
@@ -113,7 +131,7 @@ public class BuildStatusWatcher {
 
         final OpenshiftBuildChannel openshiftBuildChannel = namespacesToChannels.get(build.getNamespace());
 
-        if (!buildsToNamespaces.containsValue(build.getNamespace())) {
+        if (openshiftBuildChannel != null && !buildsToNamespaces.containsValue(build.getNamespace())) {
             openshiftBuildChannel.close();
             namespacesToChannels.remove(build.getNamespace());
         }

@@ -13,6 +13,7 @@ package org.eclipse.che.ide.ext.openshift.server;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.openshift.internal.restclient.OpenShiftAPIVersion;
 import com.openshift.internal.restclient.http.UrlConnectionHttpClientBuilder;
 import com.openshift.restclient.IClient;
 import com.openshift.restclient.NoopSSLCertificateCallback;
@@ -23,6 +24,7 @@ import org.eclipse.che.api.auth.shared.dto.OAuthToken;
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.UnauthorizedException;
 import org.eclipse.che.commons.env.EnvironmentContext;
+import org.eclipse.che.ide.ext.openshift.shared.dto.OpenshiftServerInfo;
 import org.eclipse.che.security.oauth.RemoteOAuthTokenProvider;
 
 import javax.inject.Inject;
@@ -33,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.api.client.repackaged.com.google.common.base.Strings.isNullOrEmpty;
+import static org.eclipse.che.dto.server.DtoFactory.newDto;
 
 /**
  * @author Sergii Leschenko
@@ -42,6 +45,8 @@ public class ClientFactory {
     private final LoadingCache<String, IClient> token2clientCache;
     private final String                        openshiftApiEndpoint;
     private final RemoteOAuthTokenProvider      provider;
+    /** Client instance without specified token for providing information about openshift server*/
+    private final IClient                       infoClient;
 
     @Inject
     public ClientFactory(@Named("openshift.api.endpoint") String openshiftApiEndpoint,
@@ -57,6 +62,14 @@ public class ClientFactory {
                                                      return createClient(token);
                                                  }
                                              });
+        this.infoClient = new com.openshift.restclient.ClientFactory().create(openshiftApiEndpoint, new NoopSSLCertificateCallback());
+    }
+
+    public OpenshiftServerInfo getClientInfo() {
+        final String openShiftAPIVersion = infoClient.getOpenShiftAPIVersion();
+        final String openshiftEndpoint = (OpenShiftAPIVersion.v1beta3.toString().equals(openShiftAPIVersion) ? "osapi" : "oapi") +
+                                         "/" + openShiftAPIVersion;
+        return newDto(OpenshiftServerInfo.class).withOpenshiftEndpoint(infoClient.getBaseURL().toString() + openshiftEndpoint);
     }
 
     /**
