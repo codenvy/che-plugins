@@ -54,7 +54,7 @@ public class DeleteProjectAction extends AbstractPerspectiveAction {
         CurrentProject currentProject = appContext.getCurrentProject();
         event.getPresentation().setVisible(currentProject != null);
         event.getPresentation().setEnabled(currentProject != null
-                                           && currentProject.getProjectDescription().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
+                                           && currentProject.getRootProject().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
     }
 
     @Override

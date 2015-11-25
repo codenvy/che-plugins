@@ -68,7 +68,7 @@ public class StartBuildAction extends AbstractPerspectiveAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        final ProjectDescriptor projectDescriptor = appContext.getCurrentProject().getProjectDescription();
+        final ProjectDescriptor projectDescriptor = appContext.getCurrentProject().getRootProject();
         final String namespace = getAttributeValue(projectDescriptor, OPENSHIFT_NAMESPACE_VARIABLE_NAME);
         final String application = getAttributeValue(projectDescriptor, OPENSHIFT_APPLICATION_VARIABLE_NAME);
 
@@ -109,7 +109,7 @@ public class StartBuildAction extends AbstractPerspectiveAction {
         event.getPresentation().setVisible(currentProject != null);
         event.getPresentation().setEnabled(authorizationHandler.isLoggedIn()
                                            && currentProject != null
-                                           && currentProject.getProjectDescription().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
+                                           && currentProject.getRootProject().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
     }
 
     /** Returns first value of attribute of null if it is absent in project descriptor */

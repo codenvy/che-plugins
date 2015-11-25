@@ -17,6 +17,7 @@ import org.eclipse.che.api.analytics.client.logger.AnalyticsEventLogger;
 import org.eclipse.che.ide.api.action.AbstractPerspectiveAction;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.ext.openshift.client.OpenshiftLocalizationConstant;
 
 import javax.validation.constraints.NotNull;
@@ -51,10 +52,10 @@ public class LinkProjectWithExistingApplicationAction extends AbstractPerspectiv
 
     @Override
     public void updateInPerspective(@NotNull ActionEvent event) {
-        event.getPresentation().setVisible(appContext.getCurrentProject() != null);
-        event.getPresentation().setEnabled(appContext.getCurrentProject() != null
-                                           && !appContext.getCurrentProject().getProjectDescription().getMixins()
-                                                         .contains(OPENSHIFT_PROJECT_TYPE_ID));
+        CurrentProject currentProject = appContext.getCurrentProject();
+        event.getPresentation().setVisible(currentProject != null);
+        event.getPresentation().setEnabled(currentProject != null
+                                           && !currentProject.getRootProject().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
     }
 
     @Override
