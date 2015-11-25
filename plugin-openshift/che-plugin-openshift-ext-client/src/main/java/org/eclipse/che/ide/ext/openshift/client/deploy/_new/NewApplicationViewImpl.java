@@ -347,6 +347,7 @@ public class NewApplicationViewImpl extends Window implements NewApplicationView
         for (String image : images) {
             this.images.addItem(image, image);
         }
+        this.images.setSelectedIndex(0);
         delegate.onImageStreamChanged(images.get(0));
     }
 
@@ -392,7 +393,7 @@ public class NewApplicationViewImpl extends Window implements NewApplicationView
 
     @Override
     public String getActiveImage() {
-        return images.getValue(images.getSelectedIndex());
+        return (images.getSelectedIndex() < 0) ? null : images.getValue(images.getSelectedIndex());
     }
 
     @Override

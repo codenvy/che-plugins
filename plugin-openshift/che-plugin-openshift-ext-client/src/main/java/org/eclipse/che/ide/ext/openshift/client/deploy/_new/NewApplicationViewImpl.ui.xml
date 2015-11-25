@@ -63,7 +63,7 @@
                 <g:FlowPanel height="24px" addStyleNames="{style.spacing20}">
                     <g:RadioButton name="createMode" text="{locale.deployProjectWindowChooseExistingProject}" ui:field="choseExistProject"/>
                 </g:FlowPanel>
-                <g:ScrollPanel ui:field="osProjectListPanel" height="100%" visible="false"/>
+                <g:ScrollPanel ui:field="osProjectListPanel" visible="false" height="103px"/>
             </g:FlowPanel>
         </g:center>
         <g:east size="400">
