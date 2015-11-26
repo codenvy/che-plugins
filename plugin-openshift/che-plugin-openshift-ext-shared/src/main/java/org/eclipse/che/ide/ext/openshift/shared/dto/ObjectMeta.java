@@ -22,6 +22,12 @@ public interface ObjectMeta {
 
     ObjectMeta withGeneration(Integer generation);
 
+    Integer getDeletionGracePeriodSeconds();
+
+    void setDeletionGracePeriodSeconds(Integer deletionGracePeriodSeconds);
+
+    ObjectMeta withDeletionGracePeriodSeconds(Integer deletionGracePeriodSeconds);
+
     String getUid();
 
     void setUid(String uid);

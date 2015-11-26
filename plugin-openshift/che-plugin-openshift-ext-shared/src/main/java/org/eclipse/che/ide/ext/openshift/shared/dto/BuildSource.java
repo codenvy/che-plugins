@@ -26,6 +26,18 @@ public interface BuildSource {
 
     BuildSource withGit(GitBuildSource git);
 
+    BinaryBuildSource getBinary();
+
+    void setBinary(BinaryBuildSource binary);
+
+    BuildSource withBinary(BinaryBuildSource binary);
+
+    String getDockerfile();
+
+    void setDockerfile(String dockerfile);
+
+    BuildSource withDockerfile(String dockerfile);
+
     String getType();
 
     void setType(String type);

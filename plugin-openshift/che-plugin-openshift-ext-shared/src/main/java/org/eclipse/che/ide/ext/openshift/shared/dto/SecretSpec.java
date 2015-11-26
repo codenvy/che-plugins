@@ -13,17 +13,17 @@ package org.eclipse.che.ide.ext.openshift.shared.dto;
 import org.eclipse.che.dto.shared.DTO;
 
 @DTO
-public interface ImageChangeTrigger {
-    String getLastTriggeredImageID();
+public interface SecretSpec {
+    String getMountPath();
 
-    void setLastTriggeredImageID(String lastTriggeredImageID);
+    void setMountPath(String mountPath);
 
-    ImageChangeTrigger withLastTriggeredImageID(String lastTriggeredImageID);
+    SecretSpec withMountPath(String mountPath);
 
-    ObjectReference getFrom();
+    LocalObjectReference getSecretSource();
 
-    void setFrom(ObjectReference from);
+    void setSecretSource(LocalObjectReference secretSource);
 
-    ImageChangeTrigger withFrom(ObjectReference from);
+    SecretSpec withSecretSource(LocalObjectReference secretSource);
 
 }

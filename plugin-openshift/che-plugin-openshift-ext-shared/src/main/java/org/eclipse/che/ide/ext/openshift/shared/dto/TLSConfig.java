@@ -20,6 +20,12 @@ public interface TLSConfig {
 
     TLSConfig withTermination(String termination);
 
+    String getInsecureEdgeTerminationPolicy();
+
+    void setInsecureEdgeTerminationPolicy(String insecureEdgeTerminationPolicy);
+
+    TLSConfig withInsecureEdgeTerminationPolicy(String insecureEdgeTerminationPolicy);
+
     String getCertificate();
 
     void setCertificate(String certificate);

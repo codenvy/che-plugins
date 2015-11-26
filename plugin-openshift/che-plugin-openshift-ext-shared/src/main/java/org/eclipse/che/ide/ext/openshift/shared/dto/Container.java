@@ -34,11 +34,11 @@ public interface Container {
 
     Container withImagePullPolicy(String imagePullPolicy);
 
-    Capabilities getCapabilities();
+    boolean getStdin();
 
-    void setCapabilities(Capabilities capabilities);
+    void setStdin(boolean stdin);
 
-    Container withCapabilities(Capabilities capabilities);
+    Container withStdin(boolean stdin);
 
     String getTerminationMessagePath();
 
@@ -100,22 +100,28 @@ public interface Container {
 
     Container withLifecycle(Lifecycle lifecycle);
 
-    boolean getPrivileged();
-
-    void setPrivileged(boolean privileged);
-
-    Container withPrivileged(boolean privileged);
-
     String getName();
 
     void setName(String name);
 
     Container withName(String name);
 
+    boolean getTty();
+
+    void setTty(boolean tty);
+
+    Container withTty(boolean tty);
+
     Probe getReadinessProbe();
 
     void setReadinessProbe(Probe readinessProbe);
 
     Container withReadinessProbe(Probe readinessProbe);
+
+    boolean getStdinOnce();
+
+    void setStdinOnce(boolean stdinOnce);
+
+    Container withStdinOnce(boolean stdinOnce);
 
 }

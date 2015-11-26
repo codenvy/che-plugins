@@ -13,17 +13,11 @@ package org.eclipse.che.ide.ext.openshift.shared.dto;
 import org.eclipse.che.dto.shared.DTO;
 
 @DTO
-public interface ImageChangeTrigger {
-    String getLastTriggeredImageID();
+public interface BinaryBuildSource {
+    String getAsFile();
 
-    void setLastTriggeredImageID(String lastTriggeredImageID);
+    void setAsFile(String asFile);
 
-    ImageChangeTrigger withLastTriggeredImageID(String lastTriggeredImageID);
-
-    ObjectReference getFrom();
-
-    void setFrom(ObjectReference from);
-
-    ImageChangeTrigger withFrom(ObjectReference from);
+    BinaryBuildSource withAsFile(String asFile);
 
 }

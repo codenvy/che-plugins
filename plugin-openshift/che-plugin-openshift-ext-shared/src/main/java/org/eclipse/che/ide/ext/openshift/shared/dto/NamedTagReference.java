@@ -16,6 +16,12 @@ import java.util.Map;
 
 @DTO
 public interface NamedTagReference {
+    boolean getReference();
+
+    void setReference(boolean reference);
+
+    NamedTagReference withReference(boolean reference);
+
     String getName();
 
     void setName(String name);

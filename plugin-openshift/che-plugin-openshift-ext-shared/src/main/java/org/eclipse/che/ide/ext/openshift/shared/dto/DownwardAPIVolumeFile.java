@@ -13,17 +13,17 @@ package org.eclipse.che.ide.ext.openshift.shared.dto;
 import org.eclipse.che.dto.shared.DTO;
 
 @DTO
-public interface ImageChangeTrigger {
-    String getLastTriggeredImageID();
+public interface DownwardAPIVolumeFile {
+    String getPath();
 
-    void setLastTriggeredImageID(String lastTriggeredImageID);
+    void setPath(String path);
 
-    ImageChangeTrigger withLastTriggeredImageID(String lastTriggeredImageID);
+    DownwardAPIVolumeFile withPath(String path);
 
-    ObjectReference getFrom();
+    ObjectFieldSelector getFieldRef();
 
-    void setFrom(ObjectReference from);
+    void setFieldRef(ObjectFieldSelector fieldRef);
 
-    ImageChangeTrigger withFrom(ObjectReference from);
+    DownwardAPIVolumeFile withFieldRef(ObjectFieldSelector fieldRef);
 
 }

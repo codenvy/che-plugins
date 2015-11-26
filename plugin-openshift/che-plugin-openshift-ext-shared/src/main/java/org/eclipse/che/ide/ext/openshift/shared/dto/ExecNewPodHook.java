@@ -22,6 +22,12 @@ public interface ExecNewPodHook {
 
     ExecNewPodHook withContainerName(String containerName);
 
+    List<String> getVolumes();
+
+    void setVolumes(List<String> volumes);
+
+    ExecNewPodHook withVolumes(List<String> volumes);
+
     List<EnvVar> getEnv();
 
     void setEnv(List<EnvVar> env);

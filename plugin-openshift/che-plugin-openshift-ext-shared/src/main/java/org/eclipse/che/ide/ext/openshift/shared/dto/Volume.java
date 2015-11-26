@@ -26,6 +26,18 @@ public interface Volume {
 
     Volume withMetadata(MetadataVolumeSource metadata);
 
+    CinderVolumeSource getCinder();
+
+    void setCinder(CinderVolumeSource cinder);
+
+    Volume withCinder(CinderVolumeSource cinder);
+
+    DownwardAPIVolumeSource getDownwardAPI();
+
+    void setDownwardAPI(DownwardAPIVolumeSource downwardAPI);
+
+    Volume withDownwardAPI(DownwardAPIVolumeSource downwardAPI);
+
     AWSElasticBlockStoreVolumeSource getAwsElasticBlockStore();
 
     void setAwsElasticBlockStore(AWSElasticBlockStoreVolumeSource awsElasticBlockStore);
@@ -37,6 +49,12 @@ public interface Volume {
     void setSecret(SecretVolumeSource secret);
 
     Volume withSecret(SecretVolumeSource secret);
+
+    FlockerVolumeSource getFlocker();
+
+    void setFlocker(FlockerVolumeSource flocker);
+
+    Volume withFlocker(FlockerVolumeSource flocker);
 
     ISCSIVolumeSource getIscsi();
 
@@ -91,6 +109,12 @@ public interface Volume {
     void setGitRepo(GitRepoVolumeSource gitRepo);
 
     Volume withGitRepo(GitRepoVolumeSource gitRepo);
+
+    FCVolumeSource getFc();
+
+    void setFc(FCVolumeSource fc);
+
+    Volume withFc(FCVolumeSource fc);
 
     HostPathVolumeSource getHostPath();
 

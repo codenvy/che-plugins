@@ -14,17 +14,17 @@ import org.eclipse.che.dto.shared.DTO;
 
 @DTO
 public interface ImageStreamTag {
+    Image getImage();
+
+    void setImage(Image image);
+
+    ImageStreamTag withImage(Image image);
+
     ObjectMeta getMetadata();
 
     void setMetadata(ObjectMeta metadata);
 
     ImageStreamTag withMetadata(ObjectMeta metadata);
-
-    DockerImageMetadata getDockerImageMetadata();
-
-    void setDockerImageMetadata(DockerImageMetadata dockerImageMetadata);
-
-    ImageStreamTag withDockerImageMetadata(DockerImageMetadata dockerImageMetadata);
 
     String getApiVersion();
 
@@ -32,34 +32,10 @@ public interface ImageStreamTag {
 
     ImageStreamTag withApiVersion(String apiVersion);
 
-    String getImageName();
-
-    void setImageName(String imageName);
-
-    ImageStreamTag withImageName(String imageName);
-
     String getKind();
 
     void setKind(String kind);
 
     ImageStreamTag withKind(String kind);
-
-    String getDockerImageReference();
-
-    void setDockerImageReference(String dockerImageReference);
-
-    ImageStreamTag withDockerImageReference(String dockerImageReference);
-
-    String getDockerImageMetadataVersion();
-
-    void setDockerImageMetadataVersion(String dockerImageMetadataVersion);
-
-    ImageStreamTag withDockerImageMetadataVersion(String dockerImageMetadataVersion);
-
-    String getDockerImageManifest();
-
-    void setDockerImageManifest(String dockerImageManifest);
-
-    ImageStreamTag withDockerImageManifest(String dockerImageManifest);
 
 }

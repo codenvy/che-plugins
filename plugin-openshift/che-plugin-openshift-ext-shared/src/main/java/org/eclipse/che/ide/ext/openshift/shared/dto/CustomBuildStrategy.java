@@ -16,6 +16,12 @@ import java.util.List;
 
 @DTO
 public interface CustomBuildStrategy {
+    boolean getForcePull();
+
+    void setForcePull(boolean forcePull);
+
+    CustomBuildStrategy withForcePull(boolean forcePull);
+
     ObjectReference getFrom();
 
     void setFrom(ObjectReference from);
@@ -39,5 +45,11 @@ public interface CustomBuildStrategy {
     void setExposeDockerSocket(boolean exposeDockerSocket);
 
     CustomBuildStrategy withExposeDockerSocket(boolean exposeDockerSocket);
+
+    List<SecretSpec> getSecrets();
+
+    void setSecrets(List<SecretSpec> secrets);
+
+    CustomBuildStrategy withSecrets(List<SecretSpec> secrets);
 
 }

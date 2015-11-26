@@ -20,6 +20,12 @@ public interface BuildSpec {
 
     BuildSpec withOutput(BuildOutput output);
 
+    Integer getCompletionDeadlineSeconds();
+
+    void setCompletionDeadlineSeconds(Integer completionDeadlineSeconds);
+
+    BuildSpec withCompletionDeadlineSeconds(Integer completionDeadlineSeconds);
+
     ResourceRequirements getResources();
 
     void setResources(ResourceRequirements resources);

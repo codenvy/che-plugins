@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.openshift.server.rest;
 
-
 import com.google.common.collect.ImmutableMap;
 import com.openshift.restclient.IClient;
 import com.openshift.restclient.ResourceKind;
@@ -58,9 +57,9 @@ public class ImageStreamService {
     private final String        getTagUrlTemplate;
 
     @Inject
-    public ImageStreamService(@Named("openshift.api.endpoint") String openshiftApiEndpoint,
-                              ClientFactory clientFactory) {
-        this.getTagUrlTemplate = openshiftApiEndpoint + "osapi/v1beta3/namespaces/{namespace}/imagestreamtags/{imageStream}:{tag}";
+    public ImageStreamService(ClientFactory clientFactory) {
+        this.getTagUrlTemplate = clientFactory.getClientInfo().getOpenshiftEndpoint()
+                                 + "/namespaces/{namespace}/imagestreamtags/{imageStream}:{tag}";
         this.clientFactory = clientFactory;
     }
 
@@ -129,8 +128,8 @@ public class ImageStreamService {
         URL url;
         try {
             url = UriBuilder.fromPath(getTagUrlTemplate).buildFromMap(ImmutableMap.of("namespace", namespace,
-                                                                                     "imageStream", imageStream,
-                                                                                     "tag", imageStreamTag))
+                                                                                      "imageStream", imageStream,
+                                                                                      "tag", imageStreamTag))
                             .toURL();
         } catch (MalformedURLException e) {
             throw new ServerException("Unable to get image stream tag. " + e.getMessage(), e);

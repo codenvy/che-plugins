@@ -13,17 +13,23 @@ package org.eclipse.che.ide.ext.openshift.shared.dto;
 import org.eclipse.che.dto.shared.DTO;
 
 @DTO
-public interface ImageChangeTrigger {
-    String getLastTriggeredImageID();
+public interface CinderVolumeSource {
+    String getVolumeID();
 
-    void setLastTriggeredImageID(String lastTriggeredImageID);
+    void setVolumeID(String volumeID);
 
-    ImageChangeTrigger withLastTriggeredImageID(String lastTriggeredImageID);
+    CinderVolumeSource withVolumeID(String volumeID);
 
-    ObjectReference getFrom();
+    boolean getReadOnly();
 
-    void setFrom(ObjectReference from);
+    void setReadOnly(boolean readOnly);
 
-    ImageChangeTrigger withFrom(ObjectReference from);
+    CinderVolumeSource withReadOnly(boolean readOnly);
+
+    String getFsType();
+
+    void setFsType(String fsType);
+
+    CinderVolumeSource withFsType(String fsType);
 
 }

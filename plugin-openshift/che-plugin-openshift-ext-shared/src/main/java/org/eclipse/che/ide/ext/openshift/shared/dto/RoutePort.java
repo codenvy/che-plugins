@@ -13,17 +13,11 @@ package org.eclipse.che.ide.ext.openshift.shared.dto;
 import org.eclipse.che.dto.shared.DTO;
 
 @DTO
-public interface ImageChangeTrigger {
-    String getLastTriggeredImageID();
+public interface RoutePort {
+    Integer getTargetPort();
 
-    void setLastTriggeredImageID(String lastTriggeredImageID);
+    void setTargetPort(Integer targetPort);
 
-    ImageChangeTrigger withLastTriggeredImageID(String lastTriggeredImageID);
-
-    ObjectReference getFrom();
-
-    void setFrom(ObjectReference from);
-
-    ImageChangeTrigger withFrom(ObjectReference from);
+    RoutePort withTargetPort(Integer targetPort);
 
 }

@@ -20,6 +20,12 @@ public interface RouteSpec {
 
     RouteSpec withPath(String path);
 
+    RoutePort getPort();
+
+    void setPort(RoutePort port);
+
+    RouteSpec withPort(RoutePort port);
+
     String getHost();
 
     void setHost(String host);

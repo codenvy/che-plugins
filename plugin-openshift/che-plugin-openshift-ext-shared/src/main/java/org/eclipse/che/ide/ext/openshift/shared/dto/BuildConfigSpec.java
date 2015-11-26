@@ -22,6 +22,12 @@ public interface BuildConfigSpec {
 
     BuildConfigSpec withOutput(BuildOutput output);
 
+    Integer getCompletionDeadlineSeconds();
+
+    void setCompletionDeadlineSeconds(Integer completionDeadlineSeconds);
+
+    BuildConfigSpec withCompletionDeadlineSeconds(Integer completionDeadlineSeconds);
+
     ResourceRequirements getResources();
 
     void setResources(ResourceRequirements resources);

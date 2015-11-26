@@ -14,6 +14,12 @@ import org.eclipse.che.dto.shared.DTO;
 
 @DTO
 public interface RollingDeploymentStrategyParams {
+    String getMaxSurge();
+
+    void setMaxSurge(String maxSurge);
+
+    RollingDeploymentStrategyParams withMaxSurge(String maxSurge);
+
     Integer getUpdatePeriodSeconds();
 
     void setUpdatePeriodSeconds(Integer updatePeriodSeconds);
@@ -37,6 +43,12 @@ public interface RollingDeploymentStrategyParams {
     void setPost(LifecycleHook post);
 
     RollingDeploymentStrategyParams withPost(LifecycleHook post);
+
+    String getMaxUnavailable();
+
+    void setMaxUnavailable(String maxUnavailable);
+
+    RollingDeploymentStrategyParams withMaxUnavailable(String maxUnavailable);
 
     Integer getTimeoutSeconds();
 

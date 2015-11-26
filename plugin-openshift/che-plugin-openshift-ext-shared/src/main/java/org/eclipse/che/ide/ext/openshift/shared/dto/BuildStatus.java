@@ -28,6 +28,12 @@ public interface BuildStatus {
 
     BuildStatus withPhase(Phase phase);
 
+    String getReason();
+
+    void setReason(String reason);
+
+    BuildStatus withReason(String reason);
+
     String getCompletionTimestamp();
 
     void setCompletionTimestamp(String completionTimestamp);
@@ -57,5 +63,11 @@ public interface BuildStatus {
     void setStartTimestamp(String startTimestamp);
 
     BuildStatus withStartTimestamp(String startTimestamp);
+
+    String getOutputDockerImageReference();
+
+    void setOutputDockerImageReference(String outputDockerImageReference);
+
+    BuildStatus withOutputDockerImageReference(String outputDockerImageReference);
 
 }

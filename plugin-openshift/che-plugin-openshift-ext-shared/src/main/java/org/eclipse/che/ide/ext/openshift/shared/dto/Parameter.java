@@ -14,6 +14,12 @@ import org.eclipse.che.dto.shared.DTO;
 
 @DTO
 public interface Parameter {
+    String getDisplayName();
+
+    void setDisplayName(String displayName);
+
+    Parameter withDisplayName(String displayName);
+
     String getName();
 
     void setName(String name);
@@ -43,5 +49,11 @@ public interface Parameter {
     void setGenerate(String generate);
 
     Parameter withGenerate(String generate);
+
+    boolean getRequired();
+
+    void setRequired(boolean required);
+
+    Parameter withRequired(boolean required);
 
 }

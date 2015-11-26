@@ -293,11 +293,14 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
                 }
 
                 Object exposedPorts =
-                        (osActiveStreamTag.getDockerImageMetadata().getConfig() != null) ? osActiveStreamTag.getDockerImageMetadata()
-                                                                                                            .getConfig().getExposedPorts()
-                                                                                         : osActiveStreamTag.getDockerImageMetadata()
-                                                                                                            .getContainerConfig()
-                                                                                                            .getExposedPorts();
+                        (osActiveStreamTag.getImage().getDockerImageMetadata().getConfig() != null) ? osActiveStreamTag.getImage()
+                                                                                                                       .getDockerImageMetadata()
+                                                                                                                       .getConfig()
+                                                                                                                       .getExposedPorts()
+                                                                                                    : osActiveStreamTag.getImage()
+                                                                                                                       .getDockerImageMetadata()
+                                                                                                                       .getContainerConfig()
+                                                                                                                       .getExposedPorts();
                 List<ContainerPort> ports = parsePorts(exposedPorts);
 
                 String namespace = project.getMetadata().getName();
@@ -391,10 +394,14 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
                     public Promise<ImageStreamTag> apply(ImageStreamTag streamTag) throws FunctionException {
                         osActiveStreamTag = streamTag;
                         List<String> envs =
-                                (streamTag.getDockerImageMetadata().getConfig() != null) ? streamTag.getDockerImageMetadata().getConfig()
-                                                                                                    .getEnv()
-                                                                                         : streamTag.getDockerImageMetadata()
-                                                                                                    .getContainerConfig().getEnv();
+                                (streamTag.getImage().getDockerImageMetadata().getConfig() != null) ? streamTag.getImage()
+                                                                                                               .getDockerImageMetadata()
+                                                                                                               .getConfig()
+                                                                                                               .getEnv()
+                                                                                                    : streamTag.getImage()
+                                                                                                               .getDockerImageMetadata()
+                                                                                                               .getContainerConfig()
+                                                                                                               .getEnv();
                         List<Pair<String, String>> variables = new ArrayList<>();
                         for (String env : envs) {
                             String[] keyValuePair = env.split("=");
@@ -517,7 +524,7 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
         checkNotNull(osActiveStreamTag);
         checkNotNull(namespace);
 
-        Object exposedPorts = osActiveStreamTag.getDockerImageMetadata().getContainerConfig().getExposedPorts();
+        Object exposedPorts = osActiveStreamTag.getImage().getDockerImageMetadata().getContainerConfig().getExposedPorts();
         List<ContainerPort> ports = parsePorts(exposedPorts);
 
         Map<String, String> templateLabels = new HashMap<>(labels);

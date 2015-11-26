@@ -12,18 +12,32 @@ package org.eclipse.che.ide.ext.openshift.shared.dto;
 
 import org.eclipse.che.dto.shared.DTO;
 
+import java.util.List;
+
 @DTO
-public interface ImageChangeTrigger {
-    String getLastTriggeredImageID();
+public interface FCVolumeSource {
+    List<String> getTargetWWNs();
 
-    void setLastTriggeredImageID(String lastTriggeredImageID);
+    void setTargetWWNs(List<String> targetWWNs);
 
-    ImageChangeTrigger withLastTriggeredImageID(String lastTriggeredImageID);
+    FCVolumeSource withTargetWWNs(List<String> targetWWNs);
 
-    ObjectReference getFrom();
+    Integer getLun();
 
-    void setFrom(ObjectReference from);
+    void setLun(Integer lun);
 
-    ImageChangeTrigger withFrom(ObjectReference from);
+    FCVolumeSource withLun(Integer lun);
+
+    boolean getReadOnly();
+
+    void setReadOnly(boolean readOnly);
+
+    FCVolumeSource withReadOnly(boolean readOnly);
+
+    String getFsType();
+
+    void setFsType(String fsType);
+
+    FCVolumeSource withFsType(String fsType);
 
 }
