@@ -41,6 +41,7 @@
         <g:center>
              <g:AbsolutePanel ui:field="categoriesPanel" addStyleNames="{resources.css.projectApplicationBox} {style.marginV}">
                  <g:Label ui:field="loadingCategoriesLabel" addStyleNames="{resources.css.loadingCategoriesLabel} {resources.css.flashingLabel}" visible="false"></g:Label>
+                 <g:Label ui:field="nothingToShowLabel" addStyleNames="{resources.css.loadingCategoriesLabel}" visible="false" text="{locale.importApplicationNoProjects}"></g:Label>
              </g:AbsolutePanel>
         </g:center>
         <g:east size="300">

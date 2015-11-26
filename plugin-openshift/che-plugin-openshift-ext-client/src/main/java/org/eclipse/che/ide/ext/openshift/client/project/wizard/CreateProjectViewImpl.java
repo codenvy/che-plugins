@@ -59,7 +59,8 @@ public class CreateProjectViewImpl extends Window implements CreateProjectView {
     private ActionDelegate delegate;
 
     @Inject
-    public CreateProjectViewImpl(org.eclipse.che.ide.Resources resources, CoreLocalizationConstant constants,
+    public CreateProjectViewImpl(org.eclipse.che.ide.Resources resources,
+                                 CoreLocalizationConstant constants,
                                  OpenshiftLocalizationConstant openshiftConstant) {
         ensureDebugId("openshift-create-from-template");
 
@@ -76,7 +77,7 @@ public class CreateProjectViewImpl extends Window implements CreateProjectView {
             }
         });
         addButtonToFooter(createBtn);
-
+        createBtn.addStyleName(resources.Css().buttonLoader());
 
         nextBtn = createButton(constants.next(), "openshift-create-from-template-next-button", new ClickHandler() {
             @Override
@@ -139,4 +140,22 @@ public class CreateProjectViewImpl extends Window implements CreateProjectView {
     public void setCreateButtonEnabled(boolean enabled) {
         createBtn.setEnabled(enabled);
     }
+
+    @Override
+    public void animateCreateButton(boolean animate) {
+        if (animate && !createBtn.getElement().hasAttribute("animated")) {
+            // save state and start animation
+            createBtn.getElement().setAttribute("originText", createBtn.getText());
+            createBtn.getElement().getStyle().setProperty("minWidth", createBtn.getOffsetWidth() + "px");
+            createBtn.setHTML("<i></i>");
+            createBtn.getElement().setAttribute("animated", "true");
+        } else if (!animate && createBtn.getElement().hasAttribute("animated")) {
+            // stop animation and restore state
+            createBtn.setText(createBtn.getElement().getAttribute("originText"));
+            createBtn.getElement().removeAttribute("originText");
+            createBtn.getElement().getStyle().clearProperty("minWidth");
+            createBtn.getElement().removeAttribute("animated");
+        }
+    }
+
 }

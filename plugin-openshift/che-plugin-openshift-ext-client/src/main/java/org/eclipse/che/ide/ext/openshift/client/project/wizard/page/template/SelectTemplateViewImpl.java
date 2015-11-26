@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.openshift.client.project.wizard.page.template;
 
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.ui.Label;
 import elemental.dom.Element;
 import elemental.html.DivElement;
 import elemental.html.SpanElement;
@@ -28,18 +32,23 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.dto.DtoFactory;
+import org.eclipse.che.ide.ext.openshift.client.OpenshiftLocalizationConstant;
 import org.eclipse.che.ide.ext.openshift.client.OpenshiftResources;
+import org.eclipse.che.ide.ext.openshift.shared.dto.BuildConfig;
+import org.eclipse.che.ide.ext.openshift.shared.dto.Parameter;
 import org.eclipse.che.ide.ext.openshift.shared.dto.Template;
 import org.eclipse.che.ide.ui.list.SimpleList;
 import org.eclipse.che.ide.util.dom.Elements;
+import org.eclipse.che.ide.util.loging.Log;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Implementation of view {@link SelectTemplateView}
  *
  * @author Vlad Zhukovskiy
+ * @author Sergii Leschenko
+ * @author Vitaliy Guliy
  */
 @Singleton
 public class SelectTemplateViewImpl implements SelectTemplateView {
@@ -50,16 +59,29 @@ public class SelectTemplateViewImpl implements SelectTemplateView {
     }
 
     @UiField
+    Label templatesLabel;
+
+    @UiField
+    Label loadingCategoriesLabel;
+
+    @UiField
     ScrollPanel templatePanel;
 
-    private SimpleList<Template> templateList;
-
-    private ActionDelegate delegate;
-    private DockPanel      widget;
+    private SimpleList<Template>            templateList;
+    private ActionDelegate                  delegate;
+    private DockPanel                       widget;
+    private DtoFactory                      dtoFactory;
+    private OpenshiftLocalizationConstant   localizationConstant;
 
     @Inject
-    public SelectTemplateViewImpl(Resources resources, final OpenshiftResources openshiftResources) {
+    public SelectTemplateViewImpl(Resources resources,
+                                  final OpenshiftResources openshiftResources,
+                                  final OpenshiftLocalizationConstant localizationConstant,
+                                  DtoFactory dtoFactory) {
         widget = uiBinder.createAndBindUi(this);
+
+        this.dtoFactory = dtoFactory;
+        this.localizationConstant = localizationConstant;
 
         TableElement breakPointsElement = Elements.createTableElement();
         breakPointsElement.setAttribute("style", "width: 100%");
@@ -67,38 +89,38 @@ public class SelectTemplateViewImpl implements SelectTemplateView {
         templateList = SimpleList.create((SimpleList.View)breakPointsElement, resources.defaultSimpleListCss(),
                                          new SimpleList.ListItemRenderer<Template>() {
                                              @Override
-                                             public void render(Element listItemBase, Template itemData) {
-                                                 String tags = itemData.getMetadata().getAnnotations().get("tags");
+                                             public void render(Element element, Template template) {
+                                                 String tags = template.getMetadata().getAnnotations().get("tags");
                                                  tags = (tags != null) ? tags.replace(",", " ") : "";
 
-                                                 DivElement
-                                                         title = Elements.createDivElement(openshiftResources.css().templateSectionTitle());
-                                                 title.setTextContent(itemData.getMetadata().getName());
-                                                 listItemBase.appendChild(title);
+                                                 DivElement title = Elements.createDivElement(openshiftResources.css().templateSectionTitle());
+                                                 title.setTextContent(template.getMetadata().getName());
+                                                 element.appendChild(title);
 
-                                                 DivElement description = Elements.createDivElement(
-                                                         openshiftResources.css().templateSectionDescription());
-                                                 description.setTextContent(itemData.getMetadata().getAnnotations().get("description"));
-                                                 listItemBase.appendChild(description);
+                                                 if (!hasValidBuildConfig(template)) {
+                                                     title.getStyle().setColor(org.eclipse.che.ide.api.theme.Style.theme.getErrorColor());
+                                                 }
+
+                                                 DivElement description = Elements.createDivElement(openshiftResources.css().templateSectionDescription());
+                                                 description.setTextContent(template.getMetadata().getAnnotations().get("description"));
+                                                 element.appendChild(description);
 
                                                  DivElement namespace = Elements.createDivElement();
-                                                 SpanElement namespaceTitle = Elements.createSpanElement(openshiftResources.css()
-                                                                                                                           .templateSectionSecondary());
+                                                 SpanElement namespaceTitle = Elements.createSpanElement(openshiftResources.css().templateSectionSecondary());
                                                  namespaceTitle.setTextContent("Namespace:");
                                                  namespaceTitle.getStyle().setMarginRight(10, "px");
                                                  namespace.appendChild(namespaceTitle);
                                                  SpanElement namespaceContent = Elements.createSpanElement();
-                                                 namespaceContent.setTextContent(itemData.getMetadata().getNamespace());
+                                                 namespaceContent.setTextContent(template.getMetadata().getNamespace());
                                                  namespace.appendChild(namespaceContent);
-                                                 listItemBase.appendChild(namespace);
+                                                 element.appendChild(namespace);
 
                                                  DivElement tag = Elements.createDivElement(openshiftResources.css().templateSectionTags(),
-                                                                                            openshiftResources.css()
-                                                                                                              .templateSectionSecondary());
+                                                                                            openshiftResources.css().templateSectionSecondary());
                                                  tag.setTextContent(tags);
-                                                 listItemBase.appendChild(tag);
+                                                 element.appendChild(tag);
 
-                                                 listItemBase.getClassList().add(openshiftResources.css().templateSection());
+                                                 element.getClassList().add(openshiftResources.css().templateSection());
                                              }
                                          },
                                          new SimpleList.ListEventDelegate<Template>() {
@@ -117,6 +139,42 @@ public class SelectTemplateViewImpl implements SelectTemplateView {
         templatePanel.add(templateList);
     }
 
+    /**
+     * Determines whether template has properly set build configuration and contains Git URL to sources.
+     *
+     * @param template
+     *         template to check
+     * @return
+     *         {@code true} if template has build configuration and points to sources, otherwise returns {@code false}
+     */
+    private boolean hasValidBuildConfig(Template template) {
+        try {
+            for (Object o : template.getObjects()) {
+                final JSONObject object = (JSONObject)o;
+                final String kind = ((JSONString)object.get("kind")).stringValue();
+                if (kind.equals("BuildConfig")) {
+                    BuildConfig buildConfig = dtoFactory.createDtoFromJson(object.toString(), BuildConfig.class);
+                    String uri = buildConfig.getSpec().getSource().getGit().getUri();
+                    if (uri.startsWith("${") && uri.endsWith("}")) {
+                        String uriVariableName = uri.substring(2, uri.length() - 1);
+                        for (Parameter parameter : template.getParameters()) {
+                            if (uriVariableName.equals(parameter.getName())) {
+                                return !Strings.isNullOrEmpty(parameter.getValue());
+                            }
+                        }
+                        return false;
+                    } else {
+                        return !uri.isEmpty();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.error(getClass(), e.getMessage());
+        }
+
+        return false;
+    }
+
     /** {@inheritDoc} */
     @Override
     public void setDelegate(ActionDelegate delegate) {
@@ -129,9 +187,25 @@ public class SelectTemplateViewImpl implements SelectTemplateView {
         return widget;
     }
 
+    @Override
+    public void showLoadingTemplates() {
+        // hide templates list
+        templateList.asWidget().setVisible(false);
+        templatesLabel.setVisible(false);
+
+        // show loading label
+        loadingCategoriesLabel.setVisible(true);
+    }
+
     /** {@inheritDoc} */
     @Override
     public void setTemplates(List<Template> templates, boolean keepExisting) {
+        // hide loading label
+        loadingCategoriesLabel.setVisible(false);
+
+        // show templates list
+        templatesLabel.setVisible(true);
+        templateList.asWidget().setVisible(true);
         templateList.render(templates);
     }
 }

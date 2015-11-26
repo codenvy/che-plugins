@@ -143,6 +143,11 @@ public class ImportApplicationPresenter extends ValidateAuthenticationPresenter 
         openShiftClient.getProjects().then(new Operation<List<Project>>() {
             @Override
             public void apply(List<Project> result) throws OperationException {
+                if (result.isEmpty()) {
+                    view.setBuildConfigs(buildConfigMap);
+                    return;
+                }
+
                 projectList.addAll(result);
                 for (Project project : result) {
                     getBuildConfigs(project.getMetadata().getName());

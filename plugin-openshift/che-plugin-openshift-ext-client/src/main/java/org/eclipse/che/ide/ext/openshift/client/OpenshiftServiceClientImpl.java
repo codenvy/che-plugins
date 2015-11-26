@@ -83,7 +83,6 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
             public void makeCall(AsyncCallback<List<Template>> callback) {
                 asyncRequestFactory.createGetRequest(openshiftPath + "/namespace/" + namespace + "/template")
                                    .header(ACCEPT, MimeType.APPLICATION_JSON)
-                                   .loader(loader, "Getting templates...")
                                    .send(newCallback(callback, dtoUnmarshaller.newListUnmarshaller(Template.class)));
             }
         });
@@ -96,7 +95,6 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
                 asyncRequestFactory.createPostRequest(openshiftPath + "/namespace/" + namespace + "/template/process", template)
                                    .header(ACCEPT, MimeType.APPLICATION_JSON)
                                    .header(CONTENT_TYPE, MimeType.APPLICATION_JSON)
-                                   .loader(loader, "Processing template...")
                                    .send(newCallback(callback, dtoUnmarshaller.newUnmarshaller(Template.class)));
             }
         });
@@ -121,7 +119,6 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
             public void makeCall(AsyncCallback<Project> callback) {
                 asyncRequestFactory.createPostRequest(openshiftPath + "/project", request)
                                    .header(ACCEPT, MimeType.APPLICATION_JSON)
-                                   .loader(loader, "Creating project...")
                                    .send(newCallback(callback, dtoUnmarshaller.newUnmarshaller(Project.class)));
             }
         });
@@ -149,7 +146,6 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
                         .createPostRequest(openshiftPath + "/namespace/" + config.getMetadata().getNamespace() + "/buildconfig", config)
                         .header(CONTENT_TYPE, MimeType.APPLICATION_JSON)
                         .header(ACCEPT, MimeType.APPLICATION_JSON)
-                        .loader(loader, "Creating build configs...")
                         .send(newCallback(callback, dtoUnmarshaller.newUnmarshaller(BuildConfig.class)));
             }
         });
@@ -214,7 +210,6 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
                         .createPostRequest(openshiftPath + "/namespace/" + stream.getMetadata().getNamespace() + "/imagestream", stream)
                         .header(CONTENT_TYPE, MimeType.APPLICATION_JSON)
                         .header(ACCEPT, MimeType.APPLICATION_JSON)
-                        .loader(loader, "Creating image streams...")
                         .send(newCallback(callback, dtoUnmarshaller.newUnmarshaller(ImageStream.class)));
             }
         });
@@ -263,7 +258,6 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
                                            config)
                         .header(CONTENT_TYPE, MimeType.APPLICATION_JSON)
                         .header(ACCEPT, MimeType.APPLICATION_JSON)
-                        .loader(loader, "Creating deployment config...")
                         .send(newCallback(callback, dtoUnmarshaller.newUnmarshaller(DeploymentConfig.class)));
             }
         });
@@ -277,7 +271,6 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
                 asyncRequestFactory.createPostRequest(openshiftPath + "/namespace/" + route.getMetadata().getNamespace() + "/route", route)
                                    .header(CONTENT_TYPE, MimeType.APPLICATION_JSON)
                                    .header(ACCEPT, MimeType.APPLICATION_JSON)
-                                   .loader(loader, "Creating route...")
                                    .send(newCallback(callback, dtoUnmarshaller.newUnmarshaller(Route.class)));
             }
         });
@@ -292,7 +285,6 @@ public class OpenshiftServiceClientImpl implements OpenshiftServiceClient {
                         .createPostRequest(openshiftPath + "/namespace/" + service.getMetadata().getNamespace() + "/service", service)
                         .header(CONTENT_TYPE, MimeType.APPLICATION_JSON)
                         .header(ACCEPT, MimeType.APPLICATION_JSON)
-                        .loader(loader, "Creating service...")
                         .send(newCallback(callback, dtoUnmarshaller.newUnmarshaller(Service.class)));
             }
         });

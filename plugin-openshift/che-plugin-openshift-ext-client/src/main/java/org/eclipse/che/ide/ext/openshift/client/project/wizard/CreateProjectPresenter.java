@@ -58,6 +58,7 @@ public class CreateProjectPresenter implements Wizard.UpdateDelegate, CreateProj
         this.dtoFactory = dtoFactory;
         this.notificationManager = notificationManager;
         this.locale = locale;
+
         view.setDelegate(this);
     }
 
@@ -82,15 +83,32 @@ public class CreateProjectPresenter implements Wizard.UpdateDelegate, CreateProj
     /** {@inheritDoc} */
     @Override
     public void onCreateClicked() {
+        configProjectPage.setEnabled(false);
+        view.setPreviousButtonEnabled(false);
+        view.setNextButtonEnabled(false);
+        view.setCreateButtonEnabled(false);
+        view.animateCreateButton(true);
+        view.setBlocked(true);
+
         wizard.complete(new Wizard.CompleteCallback() {
             @Override
             public void onCompleted() {
+                configProjectPage.setEnabled(true);
+                updateControls();
+                view.animateCreateButton(false);
+                view.setBlocked(false);
+
                 notificationManager.showInfo(locale.createFromTemplateSuccess());
                 view.closeWizard();
             }
 
             @Override
             public void onFailure(Throwable e) {
+                configProjectPage.setEnabled(true);
+                updateControls();
+                view.animateCreateButton(false);
+                view.setBlocked(false);
+
                 String message = e.getMessage() != null ? e.getMessage() : locale.createFromTemplateFailed();
                 notificationManager.showError(message);
             }
@@ -111,8 +129,19 @@ public class CreateProjectPresenter implements Wizard.UpdateDelegate, CreateProj
         view.showPage(currentPage);
     }
 
+    /**
+     * Displays the wizard.
+     */
     public void createWizardAndShow() {
-        wizard = createDefaultWizard();
+        view.showWizard();
+
+        wizard = wizardFactory.newWizard(dtoFactory.createDto(NewApplicationRequest.class)
+                              .withProjectConfigDto(dtoFactory.createDto(ProjectConfigDto.class)));
+
+        wizard.setUpdateDelegate(this);
+        wizard.addPage(selectTemplatePage);
+        wizard.addPage(configProjectPage);
+
         final WizardPage<NewApplicationRequest> firstPage = wizard.navigateToFirst();
         if (firstPage != null) {
             showWizardPage(firstPage);
@@ -120,15 +149,4 @@ public class CreateProjectPresenter implements Wizard.UpdateDelegate, CreateProj
         }
     }
 
-    private CreateProjectWizard createDefaultWizard() {
-        NewApplicationRequest newApplicationRequest = dtoFactory.createDto(NewApplicationRequest.class);
-
-        newApplicationRequest.setProjectConfigDto(dtoFactory.createDto(ProjectConfigDto.class));
-
-        CreateProjectWizard createProjectWizard = wizardFactory.newWizard(newApplicationRequest);
-        createProjectWizard.setUpdateDelegate(this);
-        createProjectWizard.addPage(configProjectPage);
-        createProjectWizard.addPage(selectTemplatePage);
-        return createProjectWizard;
-    }
 }

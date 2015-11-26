@@ -84,6 +84,12 @@ public class ConfigureProjectViewImpl implements ConfigureProjectView {
     @UiField
     ScrollPanel osExistProjectListPanel;
 
+    @UiField
+    RadioButton chePublicProject;
+
+    @UiField
+    RadioButton chePrivateProject;
+
     OpenshiftResources openshiftResources;
 
     private SimpleList<Project> projectsList;
@@ -128,7 +134,6 @@ public class ConfigureProjectViewImpl implements ConfigureProjectView {
                                              }
                                          });
         osExistProjectListPanel.add(projectsList);
-        rewriteCheProjectName = true;
     }
 
     @Override
@@ -204,6 +209,7 @@ public class ConfigureProjectViewImpl implements ConfigureProjectView {
 
     @Override
     public void resetControls() {
+        rewriteCheProjectName = true;
         osProjectNameInput.setValue("", true);
         osProjectDisplayNameInput.setValue("", true);
         osProjectDescriptionInput.setValue("", true);
@@ -275,5 +281,21 @@ public class ConfigureProjectViewImpl implements ConfigureProjectView {
 
     private void setRewriteCheProjectName(boolean rewriteCheProjectName) {
         this.rewriteCheProjectName = rewriteCheProjectName;
+    }
+
+    @Override
+    public void setElementsEnabled(boolean enabled) {
+        osNewProjectButton.setEnabled(enabled);
+        osProjectNameInput.setEnabled(enabled);
+        osProjectDisplayNameInput.setEnabled(enabled);
+        osProjectDescriptionInput.setEnabled(enabled);
+
+        osExistProjectButton.setEnabled(enabled);
+
+        cheProjectNameInput.setEnabled(enabled);
+        cheProjectDescriptionInput.setEnabled(enabled);
+
+        chePublicProject.setEnabled(enabled);
+        chePrivateProject.setEnabled(enabled);
     }
 }

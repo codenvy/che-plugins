@@ -11,7 +11,7 @@
 package org.eclipse.che.ide.ext.openshift.client.project.wizard;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArrayMixed;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -27,12 +27,15 @@ import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.api.promises.client.js.JsPromiseError;
 import org.eclipse.che.api.promises.client.js.Promises;
+import org.eclipse.che.api.workspace.shared.dto.SourceStorageDto;
 import org.eclipse.che.ide.api.wizard.AbstractWizard;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.openshift.client.OpenshiftServiceClient;
 import org.eclipse.che.ide.ext.openshift.client.dto.NewApplicationRequest;
 import org.eclipse.che.ide.ext.openshift.shared.dto.BuildConfig;
+import org.eclipse.che.ide.ext.openshift.shared.dto.BuildSource;
 import org.eclipse.che.ide.ext.openshift.shared.dto.DeploymentConfig;
+import org.eclipse.che.ide.ext.openshift.shared.dto.GitBuildSource;
 import org.eclipse.che.ide.ext.openshift.shared.dto.ImageStream;
 import org.eclipse.che.ide.ext.openshift.shared.dto.Parameter;
 import org.eclipse.che.ide.ext.openshift.shared.dto.Project;
@@ -46,7 +49,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import static java.util.Collections.singletonList;
 import static org.eclipse.che.ide.ext.openshift.shared.OpenshiftProjectTypeConstants.OPENSHIFT_APPLICATION_VARIABLE_NAME;
@@ -57,19 +59,16 @@ import static org.eclipse.che.ide.ext.openshift.shared.OpenshiftProjectTypeConst
  * Complete wizard handler. Handle create operation and tries to create configs on openshift.
  *
  * @author Vlad Zhukovskiy
+ * @author Sergii Leschenko
+ * @author Vitaliy Guliy
  */
 public class CreateProjectWizard extends AbstractWizard<NewApplicationRequest> {
+
+    public static final String APPLICATION_NAME = "APPLICATION_NAME";
 
     private final OpenshiftServiceClient openshiftClient;
     private final DtoFactory             dtoFactory;
     private final ImportWizardFactory    importWizardFactory;
-
-    private Predicate<Parameter> APP_NAME_PARAM = new Predicate<Parameter>() {
-        @Override
-        public boolean apply(Parameter parameter) {
-            return "APPLICATION_NAME".equals(parameter.getName());
-        }
-    };
 
     @Inject
     public CreateProjectWizard(@Assisted NewApplicationRequest newApplicationRequest,
@@ -84,13 +83,18 @@ public class CreateProjectWizard extends AbstractWizard<NewApplicationRequest> {
 
     @Override
     public void complete(@NotNull final CompleteCallback callback) {
-        Parameter appNameParam;
+        Parameter appNameParam = null;
 
-        try {
-            appNameParam = Iterables.find(dataObject.getTemplate().getParameters(), APP_NAME_PARAM);
-        } catch (NoSuchElementException e) {
-            callback.onFailure(e);
-            return;
+        for (Parameter parameter : dataObject.getTemplate().getParameters()) {
+            if (APPLICATION_NAME.equals(parameter.getName())) {
+                appNameParam = parameter;
+                break;
+            }
+        }
+
+        if (appNameParam == null) {
+            appNameParam = dtoFactory.createDto(Parameter.class).withName(APPLICATION_NAME);
+            dataObject.getTemplate().getParameters().add(appNameParam);
         }
 
         appNameParam.setValue(dataObject.getProjectConfigDto().getName());
@@ -101,7 +105,6 @@ public class CreateProjectWizard extends AbstractWizard<NewApplicationRequest> {
                     .then(onSuccess(callback))
                     .catchError(onFailed(callback));
     }
-
 
     private Operation<JsArrayMixed> onSuccess(final CompleteCallback callback) {
         return new Operation<JsArrayMixed>() {
@@ -160,17 +163,14 @@ public class CreateProjectWizard extends AbstractWizard<NewApplicationRequest> {
         return new Function<Template, Promise<JsArrayMixed>>() {
             @Override
             public Promise<JsArrayMixed> apply(final Template template) throws FunctionException {
-//                Promise<Void> queue = Promises.resolve(null);
-
                 List<Promise<?>> promises = new ArrayList<>();
 
                 for (Object o : template.getObjects()) {
-                    final JSONObject object = (JSONObject)o;
+                    final JSONObject object = (JSONObject) o;
                     final JSONValue metadata = object.get("metadata");
-                    final String namespace =
-                            dataObject.getProjectConfigDto().getAttributes().get(OPENSHIFT_NAMESPACE_VARIABLE_NAME).get(0);
-                    ((JSONObject)metadata).put("namespace", new JSONString(namespace));
-                    final String kind = ((JSONString)object.get("kind")).stringValue();
+                    final String namespace = dataObject.getProjectConfigDto().getAttributes().get(OPENSHIFT_NAMESPACE_VARIABLE_NAME).get(0);
+                    ((JSONObject) metadata).put("namespace", new JSONString(namespace));
+                    final String kind = ((JSONString) object.get("kind")).stringValue();
 
                     switch (kind) {
                         case "DeploymentConfig":
@@ -179,6 +179,26 @@ public class CreateProjectWizard extends AbstractWizard<NewApplicationRequest> {
                             break;
                         case "BuildConfig":
                             BuildConfig bConfig = dtoFactory.createDtoFromJson(object.toString(), BuildConfig.class);
+
+                            HashMap<String, String> importOptions = new HashMap<>();
+                            BuildSource source = bConfig.getSpec().getSource();
+
+                            GitBuildSource gitSource = source.getGit();
+                            String branch = gitSource.getRef();
+                            if (!Strings.isNullOrEmpty(branch)) {
+                                importOptions.put("branch", branch);
+                            }
+
+                            String contextDir = source.getContextDir();
+                            if (!Strings.isNullOrEmpty(contextDir)) {
+                                importOptions.put("keepDirectory", contextDir);
+                            }
+
+                            dataObject.getProjectConfigDto()
+                                    .withSource(dtoFactory.createDto(SourceStorageDto.class).withType("git")
+                                            .withLocation(gitSource.getUri())
+                                            .withParameters(importOptions));
+
                             promises.add(openshiftClient.createBuildConfig(bConfig));
                             break;
                         case "ImageStream":

@@ -64,6 +64,14 @@ public interface ConfigureProjectView extends View<ConfigureProjectView.ActionDe
     /** @return selected existed OpenShift project or null. */
     Project getExistedSelectedProject();
 
+    /**
+     * Enables or disables all elements on the view.
+     *
+     * @param enabled
+     *         true or false to enable or disable
+     */
+    void setElementsEnabled(boolean enabled);
+
     /** Handles operations from the view. */
     interface ActionDelegate {
         /** Process operations when openshift project name changed. */

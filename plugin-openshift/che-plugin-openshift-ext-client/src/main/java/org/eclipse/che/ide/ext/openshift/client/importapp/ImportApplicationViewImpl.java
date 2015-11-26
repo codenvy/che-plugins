@@ -89,6 +89,9 @@ public class ImportApplicationViewImpl extends Window implements ImportApplicati
     Label loadingCategoriesLabel;
 
     @UiField
+    Label nothingToShowLabel;
+
+    @UiField
     FlowPanel branchPanel;
 
     @UiField
@@ -176,8 +179,15 @@ public class ImportApplicationViewImpl extends Window implements ImportApplicati
 
     @Override
     public void showLoadingBuildConfigs(String message) {
-        buildConfigList.setVisible(false);
+        nothingToShowLabel.setVisible(false);
 
+        if (message == null || message.isEmpty()) {
+            loadingCategoriesLabel.setVisible(false);
+            buildConfigList.setVisible(true);
+            return;
+        }
+
+        buildConfigList.setVisible(false);
         loadingCategoriesLabel.setText(message);
         loadingCategoriesLabel.setVisible(true);
     }
@@ -185,7 +195,6 @@ public class ImportApplicationViewImpl extends Window implements ImportApplicati
     @Override
     public void setBuildConfigs(Map<String, List<BuildConfig>> buildConfigs) {
         loadingCategoriesLabel.setVisible(false);
-        buildConfigList.setVisible(true);
 
         buildConfigList.clear();
         List<Category<?>> categoriesList = new ArrayList<>();
@@ -197,6 +206,9 @@ public class ImportApplicationViewImpl extends Window implements ImportApplicati
             categoriesList.add(category);
         }
         buildConfigList.render(categoriesList);
+
+        buildConfigList.setVisible(!buildConfigs.isEmpty());
+        nothingToShowLabel.setVisible(buildConfigs.isEmpty());
     }
 
     @Override

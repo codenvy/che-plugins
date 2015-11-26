@@ -27,10 +27,14 @@ import java.util.Map;
 @ImplementedBy(ImportApplicationViewImpl.class)
 public interface ImportApplicationView extends View<ImportApplicationView.ActionDelegate> {
 
-    /** Show view. */
+    /**
+     * Show view.
+     */
     void showView();
 
-    /** Close view. */
+    /**
+     * Close view.
+     */
     void closeView();
 
     /**

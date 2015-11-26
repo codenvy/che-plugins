@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.openshift.client.project.wizard.page.configure;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -64,6 +65,7 @@ public class ConfigureProjectPresenter extends AbstractWizardPage<NewApplication
         openShiftProjects = new ArrayList<>();
         cheProjects = new ArrayList<>();
         view.setDelegate(this);
+        view.setElementsEnabled(true);
     }
 
     @Override
@@ -106,6 +108,16 @@ public class ConfigureProjectPresenter extends AbstractWizardPage<NewApplication
             setUpCheProjectRequest();
             return view.getExistedSelectedProject() != null && isCheProjectNameValid(view.getCheNewProjectName());
         }
+    }
+
+    /**
+     * Enables or disables wizard page.
+     *
+     * @param enabled
+     *         new enabled state
+     */
+    public void setEnabled(boolean enabled) {
+        view.setElementsEnabled(enabled);
     }
 
     /**

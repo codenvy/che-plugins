@@ -25,13 +25,24 @@ import java.util.List;
 @ImplementedBy(SelectTemplateViewImpl.class)
 public interface SelectTemplateView extends View<SelectTemplateView.ActionDelegate> {
 
-    /** Sets available template list. */
+    /**
+     * Hides template list and shows template loader.
+     */
+    void showLoadingTemplates();
+
+    /**
+     * Sets available template list.
+     */
     void setTemplates(List<Template> templates, boolean keepExisting);
 
-    /** Handles operations from the view. */
+    /**
+     * Handles operations from the view.
+     */
     interface ActionDelegate {
 
-        /** Process operations when user selects template. */
+        /**
+         * Process operations when user selects template.
+         */
         void onTemplateSelected(Template template);
     }
 }

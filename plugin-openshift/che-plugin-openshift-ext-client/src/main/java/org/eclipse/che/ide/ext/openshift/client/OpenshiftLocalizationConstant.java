@@ -40,7 +40,6 @@ public interface OpenshiftLocalizationConstant extends Messages {
     @Key("openshift.logout.failed")
     String logoutFailed();
 
-
     @Key("create.from.template.view.title")
     String createFromTemplateViewTitle();
 
@@ -49,6 +48,9 @@ public interface OpenshiftLocalizationConstant extends Messages {
 
     @Key("create.from.template.failed")
     String createFromTemplateFailed();
+
+    @Key("create.from.template.loading")
+    String createFromTemplateLoading();
 
     @Key("link.with.existing.action")
     String linkProjectWithExistingApplicationAction();
@@ -97,6 +99,9 @@ public interface OpenshiftLocalizationConstant extends Messages {
 
     @Key("import.application.context.dir")
     String importApplicationContextDir();
+
+    @Key("import.application.no.projects")
+    String importApplicationNoProjects();
 
     @Key("not.git.repository.warning")
     String notGitRepositoryWarning(String project);

@@ -23,33 +23,69 @@ import org.eclipse.che.ide.api.mvp.View;
 @ImplementedBy(CreateProjectViewImpl.class)
 public interface CreateProjectView extends View<CreateProjectView.ActionDelegate> {
 
-    /** Shows specified wizard page. */
+    /**
+     * Shows specified wizard page.
+     */
     void showPage(Presenter presenter);
 
-    /** Shows wizard. */
+    /**
+     * Shows wizard.
+     */
     void showWizard();
 
-    /** Hides wizard. */
+    /**
+     * Hides wizard.
+     */
     void closeWizard();
 
-    /** Enables next wizard page button. */
+    /**
+     * Enables next wizard page button.
+     */
     void setNextButtonEnabled(boolean enabled);
 
-    /** Enables previous wizard page button. */
+    /**
+     * Enables previous wizard page button.
+     */
     void setPreviousButtonEnabled(boolean enabled);
 
-    /** Enables create wizard page button. */
+    /**
+     * Enables create wizard page button.
+     */
     void setCreateButtonEnabled(boolean enabled);
 
-    /** Handles operations from the view. */
+    /**
+     * Animates create button.
+     *
+     * @param animate
+     *         is button animated
+     */
+    void animateCreateButton(boolean animate);
+
+    /**
+     * Blocks the view and does not allow it to be closed.
+     *
+     * @param blocked
+     *         blocked or not
+     */
+    void setBlocked(boolean blocked);
+
+    /**
+     * Handles operations from the view.
+     */
     interface ActionDelegate {
-        /** Perform operations when next button clicked. */
+        /**
+         * Perform operations when next button clicked.
+         */
         void onNextClicked();
 
-        /** Perform operations when previous button clicked. */
+        /**
+         * Perform operations when previous button clicked.
+         */
         void onPreviousClicked();
 
-        /** Perform operations when create button clicked. */
+        /**
+         * Perform operations when create button clicked.
+         */
         void onCreateClicked();
     }
 }

@@ -11,15 +11,12 @@
 package org.eclipse.che.ide.ext.openshift.client.project.wizard.page.template;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
-import org.eclipse.che.api.workspace.shared.dto.SourceStorageDto;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.openshift.client.OpenshiftServiceClient;
@@ -27,10 +24,7 @@ import org.eclipse.che.ide.ext.openshift.client.dto.NewApplicationRequest;
 import org.eclipse.che.ide.ext.openshift.shared.dto.Parameter;
 import org.eclipse.che.ide.ext.openshift.shared.dto.Template;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Presenter for select template wizard page.
@@ -71,7 +65,15 @@ public class SelectTemplatePresenter extends AbstractWizardPage<NewApplicationRe
     public void init(NewApplicationRequest dataObject) {
         super.init(dataObject);
 
-        openshiftClient.getTemplates(DEF_NAMESPACE).then(showTemplates(false));
+        view.showLoadingTemplates();
+
+        openshiftClient.getTemplates(DEF_NAMESPACE)
+                .then(new Operation<List<Template>>() {
+                    @Override
+                    public void apply(final List<Template> templates) throws OperationException {
+                        view.setTemplates(templates, false);
+                    }
+                });
     }
 
     /** {@inheritDoc} */
@@ -86,56 +88,11 @@ public class SelectTemplatePresenter extends AbstractWizardPage<NewApplicationRe
         container.setWidget(view);
     }
 
-    private Operation<List<Template>> showTemplates(final boolean keepExisting) {
-        return new Operation<List<Template>>() {
-            @Override
-            public void apply(final List<Template> templates) throws OperationException {
-                List<Template> filtered = new ArrayList<>();
-                for (Template t : templates) {
-                    Parameter parameter = Iterables.find(t.getParameters(), GIT_URI, null);
-                    if (parameter == null || Strings.isNullOrEmpty(parameter.getValue())) {
-                        continue;
-                    }
-
-                    filtered.add(t);
-                }
-                view.setTemplates(filtered, keepExisting);
-            }
-        };
-    }
-
     /** {@inheritDoc} */
     @Override
     public void onTemplateSelected(Template template) {
         this.template = template;
         dataObject.setTemplate(template);
-
-        Map<String, String> importOptions = new HashMap<>(2);
-
-        for (Parameter parameter : template.getParameters()) {
-            if ("GIT_URI".equals(parameter.getName())) {
-                String value = parameter.getValue();
-                dataObject.getProjectConfigDto()
-                          .withSource(dtoFactory.createDto(SourceStorageDto.class).withType("git")
-                                                .withLocation(value)
-                                                .withParameters(importOptions));
-            } else if ("GIT_REF".equals(parameter.getName())) {
-//                String value = parameter.getValue();
-                String value = "7.0.x-develop";
-                if (Strings.isNullOrEmpty(value)) {
-                    break;
-                }
-                importOptions.put("branch", value);
-            } else if ("GIT_CONTEXT_DIR".equals(parameter.getName())) {
-                String value = parameter.getValue();
-                if (Strings.isNullOrEmpty(value)) {
-                    break;
-                }
-
-                importOptions.put("keepDirectory", value);
-            }
-        }
-
         updateDelegate.updateControls();
     }
 }
