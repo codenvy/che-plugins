@@ -178,19 +178,21 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
 
         if (appContext.getCurrentProject() != null) {
             //Check is Git repository:
-            List<String> listVcsProvider = appContext.getCurrentProject().getRootProject().getAttributes().get("vcs.provider.name");
+            ProjectDescriptor projectDescriptor = appContext.getCurrentProject().getRootProject();
+            List<String> listVcsProvider = projectDescriptor.getAttributes().get("vcs.provider.name");
             if (listVcsProvider != null && !listVcsProvider.isEmpty() && listVcsProvider.contains("git")) {
-                getGitRemoteRepositories();
+                getGitRemoteRepositories(projectDescriptor);
             } else {
-                dialogFactory.createMessageDialog(locale.notGitRepositoryWarningTitle(), locale.notGitRepositoryWarning(
-                        appContext.getCurrentProject().getProjectDescription().getName()), null).show();
+                dialogFactory.createMessageDialog(locale.notGitRepositoryWarningTitle(), 
+                                                  locale.notGitRepositoryWarning(projectDescriptor.getName()), 
+                                                  null).show();
             }
         }
 
     }
 
-    private void getGitRemoteRepositories() {
-        gitService.remoteList(appContext.getCurrentProject().getProjectDescription(), null, true,
+    private void getGitRemoteRepositories(final ProjectDescriptor projectDescriptor) {
+        gitService.remoteList(projectDescriptor, null, true,
                               new AsyncRequestCallback<List<Remote>>(dtoUnmarshaller.newListUnmarshaller(Remote.class)) {
                                   @Override
                                   protected void onSuccess(List<Remote> result) {
@@ -199,22 +201,20 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
                                           loadOpenShiftData();
                                       } else {
                                           dialogFactory.createMessageDialog(locale.noGitRemoteRepositoryWarningTitle(),
-                                                                            locale.noGitRemoteRepositoryWarning(
-                                                                                    appContext.getCurrentProject().getProjectDescription()
-                                                                                              .getName()), null).show();
+                                                                            locale.noGitRemoteRepositoryWarning(projectDescriptor.getName()), 
+                                                                            null).show();
                                       }
                                   }
 
                                   @Override
                                   protected void onFailure(Throwable exception) {
-                                      notificationManager.showError(locale.getGitRemoteRepositoryError(
-                                              appContext.getCurrentProject().getProjectDescription().getName()));
+                                      notificationManager.showError(locale.getGitRemoteRepositoryError(projectDescriptor.getName()));
                                   }
                               });
     }
 
     private void loadOpenShiftData() {
-        final ProjectDescriptor descriptor = checkNotNull(appContext.getCurrentProject()).getProjectDescription();
+        final ProjectDescriptor descriptor = checkNotNull(appContext.getCurrentProject()).getRootProject();
         view.show();
         view.setApplicationName(descriptor.getName());
 
@@ -356,9 +356,8 @@ public class NewApplicationPresenter extends ValidateAuthenticationPresenter imp
         }).then(new Operation<ProjectDescriptor>() {
             @Override
             public void apply(ProjectDescriptor project) throws OperationException {
-                eventBus.fireEvent(new ProjectUpdatedEvent(appContext.getCurrentProject().getRootProject().getPath(), project));
-                notificationManager.showInfo(
-                        locale.linkProjectWithExistingSuccess(appContext.getCurrentProject().getRootProject().getName(), osAppName));
+                eventBus.fireEvent(new ProjectUpdatedEvent(projectDescriptor.getPath(), project));
+                notificationManager.showInfo(locale.linkProjectWithExistingSuccess(projectDescriptor.getName(), osAppName));
             }
         }).catchError(new Operation<PromiseError>() {
             @Override

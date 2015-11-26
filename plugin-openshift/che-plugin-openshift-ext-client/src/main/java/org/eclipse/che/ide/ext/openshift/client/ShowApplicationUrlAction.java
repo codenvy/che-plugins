@@ -63,6 +63,6 @@ public class ShowApplicationUrlAction extends AbstractPerspectiveAction {
         event.getPresentation().setVisible(currentProject != null);
         event.getPresentation().setEnabled(authorizationHandler.isLoggedIn()
                                            && currentProject != null
-                                           && currentProject.getProjectDescription().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
+                                           && currentProject.getRootProject().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
     }
 }

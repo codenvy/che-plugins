@@ -239,6 +239,9 @@ public interface OpenshiftLocalizationConstant extends Messages {
     @Key("invalid.che.project.name.error")
     String invalidCheProjectNameError();
 
+    @Key("retrieving.projects.data")
+    String retrievingProjectsData();
+
     @Key("delete.project.action.description")
     String deleteProjectActionDescription();
 

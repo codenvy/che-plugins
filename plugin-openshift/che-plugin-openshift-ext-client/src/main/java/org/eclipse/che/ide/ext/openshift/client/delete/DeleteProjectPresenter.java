@@ -33,6 +33,7 @@ import org.eclipse.che.ide.ext.openshift.shared.dto.BuildConfig;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.ui.dialogs.DialogFactory;
+import org.eclipse.che.ide.ui.loaders.requestLoader.IdeLoader;
 
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class DeleteProjectPresenter extends ValidateAuthenticationPresenter {
     private final NotificationManager           notificationManager;
     private final ProjectServiceClient          projectService;
     private final DtoUnmarshallerFactory        dtoUnmarshaller;
+    private final IdeLoader                     loader;
 
     @Inject
     protected DeleteProjectPresenter(OpenshiftAuthenticator openshiftAuthenticator,
@@ -65,7 +67,8 @@ public class DeleteProjectPresenter extends ValidateAuthenticationPresenter {
                                      OpenshiftServiceClient service,
                                      ProjectServiceClient projectService,
                                      NotificationManager notificationManager,
-                                     DtoUnmarshallerFactory dtoUnmarshaller) {
+                                     DtoUnmarshallerFactory dtoUnmarshaller,
+                                     IdeLoader loader) {
         super(openshiftAuthenticator, openshiftAuthorizationHandler, locale, notificationManager);
 
         this.appContext = appContext;
@@ -75,22 +78,29 @@ public class DeleteProjectPresenter extends ValidateAuthenticationPresenter {
         this.notificationManager = notificationManager;
         this.projectService = projectService;
         this.dtoUnmarshaller = dtoUnmarshaller;
+        this.loader = loader;
     }
 
     @Override
     protected void onSuccessAuthentication() {
-        ProjectDescriptor descriptor = appContext.getCurrentProject().getProjectDescription();
+        ProjectDescriptor descriptor = appContext.getCurrentProject().getRootProject();
         final String namespace = getAttributeValue(descriptor, OPENSHIFT_NAMESPACE_VARIABLE_NAME);
         
         if (!Strings.isNullOrEmpty(namespace)) {
+            loader.show(locale.retrievingProjectsData());
             Promise<List<BuildConfig>> buildConfigs = service.getBuildConfigs(namespace);
             buildConfigs.then(showConfirmDialog(descriptor, namespace))
+                        .catchError(new Operation<PromiseError>() {
+                            @Override
+                            public void apply(PromiseError arg) throws OperationException {
+                                loader.hide();
+                            }
+                        })
                         .catchError(handleError(namespace));
         } else {
             notificationManager.showError(locale.projectIsNotLinkedToOpenShiftError(descriptor.getName()));
         }
     }
-
 
     private String getAttributeValue(ProjectDescriptor projectDescriptor, String value) {
         List<String> attributes = projectDescriptor.getAttributes().get(value);
@@ -113,6 +123,7 @@ public class DeleteProjectPresenter extends ValidateAuthenticationPresenter {
                     String applications = getBuildConfigNames(configs);
                     dialogLabel = locale.deleteMultipleAppProjectLabel(nameSpace, applications);
                 }
+                loader.hide();
                 dialogFactory.createConfirmDialog(locale.deleteProjectDialogTitle(),
                                                   dialogLabel,
                                                   new ConfirmCallback() {
@@ -161,7 +172,7 @@ public class DeleteProjectPresenter extends ValidateAuthenticationPresenter {
         }).then(new Operation<ProjectDescriptor>() {
             @Override
             public void apply(ProjectDescriptor projectDescriptor) throws OperationException {
-                appContext.getCurrentProject().setProjectDescription(projectDescriptor);
+                appContext.getCurrentProject().setRootProject(projectDescriptor);
                 notificationManager.showInfo(locale.projectSuccessfullyReset(projectDescriptor.getName()));
             }
         }).catchError(handleError(nameSpace));

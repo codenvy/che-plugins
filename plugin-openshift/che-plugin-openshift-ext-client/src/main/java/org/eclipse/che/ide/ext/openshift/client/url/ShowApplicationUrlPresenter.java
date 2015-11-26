@@ -68,7 +68,7 @@ public class ShowApplicationUrlPresenter implements ShowApplicationUrlView.Actio
         if (currentProject == null) {
             return;
         }
-        final ProjectDescriptor projectDescription = currentProject.getProjectDescription();
+        final ProjectDescriptor projectDescription = currentProject.getRootProject();
 
         service.getRoutes(getAttributeValue(projectDescription, OPENSHIFT_NAMESPACE_VARIABLE_NAME),
                           getAttributeValue(projectDescription, OPENSHIFT_APPLICATION_VARIABLE_NAME))

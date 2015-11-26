@@ -95,12 +95,14 @@ public class LinkProjectWithExistingApplicationPresenter extends ValidateAuthent
     protected void onSuccessAuthentication() {
         if (appContext.getCurrentProject() != null) {
             //Check is Git repository:
-            List<String> listVcsProvider = appContext.getCurrentProject().getProjectDescription().getAttributes().get("vcs.provider.name");
+            ProjectDescriptor projectDescription = appContext.getCurrentProject().getRootProject();
+            List<String> listVcsProvider = projectDescription.getAttributes().get("vcs.provider.name");
             if (listVcsProvider != null && !listVcsProvider.isEmpty() && listVcsProvider.contains("git")) {
-                getGitRemoteRepositories();
+                getGitRemoteRepositories(projectDescription);
             } else {
-                dialogFactory.createMessageDialog(locale.notGitRepositoryWarningTitle(), locale.notGitRepositoryWarning(
-                        appContext.getCurrentProject().getProjectDescription().getName()), null).show();
+                dialogFactory.createMessageDialog(locale.notGitRepositoryWarningTitle(),
+                                                  locale.notGitRepositoryWarning(projectDescription.getName()),
+                                                  null).show();
             }
         }
     }
@@ -108,8 +110,8 @@ public class LinkProjectWithExistingApplicationPresenter extends ValidateAuthent
     /**
      * Retrieve Git remote repositories of the current project.
      */
-    private void getGitRemoteRepositories() {
-        gitService.remoteList(appContext.getCurrentProject().getProjectDescription(), null, true,
+    private void getGitRemoteRepositories(final ProjectDescriptor project) {
+        gitService.remoteList(project, null, true,
                               new AsyncRequestCallback<List<Remote>>(dtoUnmarshaller.newListUnmarshaller(Remote.class)) {
                                   @Override
                                   protected void onSuccess(List<Remote> result) {
@@ -119,16 +121,14 @@ public class LinkProjectWithExistingApplicationPresenter extends ValidateAuthent
                                           loadOpenShiftData();
                                       } else {
                                           dialogFactory.createMessageDialog(locale.noGitRemoteRepositoryWarningTitle(),
-                                                                            locale.noGitRemoteRepositoryWarning(
-                                                                                    appContext.getCurrentProject().getProjectDescription()
-                                                                                              .getName()), null).show();
+                                                                            locale.noGitRemoteRepositoryWarning(project.getName()),
+                                                                            null).show();
                                       }
                                   }
 
                                   @Override
                                   protected void onFailure(Throwable exception) {
-                                      notificationManager.showError(locale.getGitRemoteRepositoryError(
-                                              appContext.getCurrentProject().getProjectDescription().getName()));
+                                      notificationManager.showError(locale.getGitRemoteRepositoryError(project.getName()));
                                   }
                               });
     }
@@ -149,7 +149,7 @@ public class LinkProjectWithExistingApplicationPresenter extends ValidateAuthent
         //Change location in existing
         selectedBuildConfig.getSpec().getSource().getGit().setUri(remoteUrl);
         selectedBuildConfig.getSpec().getSource().getGit().setRef(null);
-        selectedBuildConfig.getSpec().getSource().setContextDir(appContext.getCurrentProject().getProjectDescription().getContentRoot());
+        selectedBuildConfig.getSpec().getSource().setContextDir(appContext.getCurrentProject().getRootProject().getContentRoot());
 
         updateBuildConfig(selectedBuildConfig);
     }
@@ -179,29 +179,29 @@ public class LinkProjectWithExistingApplicationPresenter extends ValidateAuthent
      *         OpenShift application info
      */
     private void markAsOpenshiftProject(final BuildConfig buildConfig) {
-        List<String> mixins = appContext.getCurrentProject().getProjectDescription().getMixins();
+        final ProjectDescriptor projectDescription = appContext.getCurrentProject().getRootProject();
+        List<String> mixins = projectDescription.getMixins();
         if (!mixins.contains(OpenshiftProjectTypeConstants.OPENSHIFT_PROJECT_TYPE_ID)) {
             mixins.add(OpenshiftProjectTypeConstants.OPENSHIFT_PROJECT_TYPE_ID);
         }
 
-        Map<String, List<String>> attributes = appContext.getCurrentProject().getProjectDescription().getAttributes();
+        Map<String, List<String>> attributes = projectDescription.getAttributes();
         attributes.put(OpenshiftProjectTypeConstants.OPENSHIFT_APPLICATION_VARIABLE_NAME, Arrays.asList(
                 buildConfig.getMetadata().getName()));
 
         attributes.put(OpenshiftProjectTypeConstants.OPENSHIFT_NAMESPACE_VARIABLE_NAME, Arrays.asList(
                 buildConfig.getMetadata().getNamespace()));
 
-        final ProjectDescriptor projectDescription = appContext.getCurrentProject().getProjectDescription();
         projectDescription.withMixins(mixins)
-                          .withType(appContext.getCurrentProject().getProjectDescription().getType())
+                          .withType(projectDescription.getType())
                           .withAttributes(attributes);
 
-        projectServiceClient.updateProject(appContext.getCurrentProject().getProjectDescription().getPath(), projectDescription,
+        projectServiceClient.updateProject(projectDescription.getPath(), projectDescription,
                                            new AsyncRequestCallback<ProjectDescriptor>(
                                                    dtoUnmarshaller.newUnmarshaller(ProjectDescriptor.class)) {
                                                @Override
                                                protected void onSuccess(ProjectDescriptor result) {
-                                                   appContext.getCurrentProject().setProjectDescription(result);
+                                                   appContext.getCurrentProject().setRootProject(result);
                                                    notificationManager.showInfo(locale.linkProjectWithExistingSuccess(result.getName(),
                                                                                                                       buildConfig
                                                                                                                               .getMetadata()
@@ -226,7 +226,7 @@ public class LinkProjectWithExistingApplicationPresenter extends ValidateAuthent
 
         if (buildConfig != null) {
             view.setBuildConfigGitUrl(buildConfig.getSpec().getSource().getGit().getUri());
-            String project = appContext.getCurrentProject().getProjectDescription().getName();
+            String project = appContext.getCurrentProject().getRootProject().getName();
             view.setReplaceWarningMessage(locale.linkProjectWithExistingReplaceWarning(buildConfig.getMetadata().getName(), project));
         }
 

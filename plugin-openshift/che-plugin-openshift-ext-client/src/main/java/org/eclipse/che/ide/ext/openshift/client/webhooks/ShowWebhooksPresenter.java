@@ -77,7 +77,7 @@ public class ShowWebhooksPresenter implements ShowWebhooksView.ActionDelegate {
         if (currentProject == null) {
             return;
         }
-        final ProjectDescriptor projectDescription = currentProject.getProjectDescription();
+        final ProjectDescriptor projectDescription = currentProject.getRootProject();
 
         service.getBuildConfigs(getAttributeValue(projectDescription, OPENSHIFT_NAMESPACE_VARIABLE_NAME),
                                 getAttributeValue(projectDescription, OPENSHIFT_APPLICATION_VARIABLE_NAME))

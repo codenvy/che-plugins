@@ -70,13 +70,13 @@ public class UnlinkProjectAction extends AbstractPerspectiveAction {
         final CurrentProject currentProject = appContext.getCurrentProject();
         event.getPresentation().setVisible(currentProject != null);
         event.getPresentation().setEnabled(currentProject != null
-                                           && currentProject.getProjectDescription().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
+                                           && currentProject.getRootProject().getMixins().contains(OPENSHIFT_PROJECT_TYPE_ID));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         eventLogger.log(this);
-        final ProjectDescriptor projectDescription = appContext.getCurrentProject().getProjectDescription();
+        final ProjectDescriptor projectDescription = appContext.getCurrentProject().getRootProject();
         List<String> mixins = projectDescription.getMixins();
         if (mixins.contains(OpenshiftProjectTypeConstants.OPENSHIFT_PROJECT_TYPE_ID)) {
             mixins.remove(OpenshiftProjectTypeConstants.OPENSHIFT_PROJECT_TYPE_ID);
@@ -90,7 +90,7 @@ public class UnlinkProjectAction extends AbstractPerspectiveAction {
                                                        unmarshallerFactory.newUnmarshaller(ProjectDescriptor.class)) {
                                                    @Override
                                                    protected void onSuccess(ProjectDescriptor result) {
-                                                       appContext.getCurrentProject().setProjectDescription(result);
+                                                       appContext.getCurrentProject().setRootProject(result);
                                                        notificationManager.showInfo(locale.unlinkProjectSuccessful(result.getName()));
                                                    }
 
