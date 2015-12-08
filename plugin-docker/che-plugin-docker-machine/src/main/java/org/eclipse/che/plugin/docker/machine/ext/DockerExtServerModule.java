@@ -17,6 +17,8 @@ import com.google.inject.name.Names;
 import org.eclipse.che.api.core.util.SystemInfo;
 import org.eclipse.che.plugin.docker.machine.ServerConf;
 
+import javax.inject.Singleton;
+
 /**
  * Guice module for extension servers feature in docker machines
  *
@@ -33,13 +35,16 @@ public class DockerExtServerModule extends AbstractModule {
                                                                           Names.named("machine.docker.dev_machine.machine_servers"));
         machineServers.addBinding().toInstance(new ServerConf("extensions", "4401", "http"));
 
-        Multibinder<String> volumesMultibinder =
-                Multibinder.newSetBinder(binder(), String.class, Names.named("machine.docker.dev_machine.machine_volumes"));
+        Multibinder<String> volumesMultibinder = Multibinder.newSetBinder(binder(),
+                                                                          String.class,
+                                                                          Names.named("machine.docker.dev_machine.machine_volumes"));
 
         if (SystemInfo.isWindows()) {
             volumesMultibinder.addBinding().toProvider(DockerExtServerBindingProviderWinOS.class);
         } else {
             volumesMultibinder.addBinding().toProvider(DockerExtServerBindingProviderUnix.class);
         }
+
+        volumesMultibinder.addBinding().toProvider(DockerExtConfBindingProvider.class).in(Singleton.class);
     }
 }
