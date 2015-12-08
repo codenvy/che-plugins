@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
@@ -31,6 +32,7 @@ import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.lang.IoUtil;
 import org.eclipse.che.commons.lang.NameGenerator;
+import org.eclipse.che.inject.CheBootstrap;
 import org.eclipse.che.plugin.docker.client.DockerConnector;
 import org.eclipse.che.plugin.docker.client.DockerFileException;
 import org.eclipse.che.plugin.docker.client.Dockerfile;
@@ -39,6 +41,7 @@ import org.eclipse.che.plugin.docker.client.ProgressLineFormatterImpl;
 import org.eclipse.che.plugin.docker.client.ProgressMonitor;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.eclipse.che.plugin.docker.client.json.HostConfig;
+import org.eclipse.che.plugin.docker.machine.ext.DockerExtConfBindingProvider;
 import org.eclipse.che.plugin.docker.machine.node.DockerNode;
 import org.eclipse.che.plugin.docker.machine.node.WorkspaceFolderPathProvider;
 import org.slf4j.Logger;
@@ -121,6 +124,14 @@ public class DockerInstanceProvider implements InstanceProvider {
                                   @Named("machine.docker.pull_image") boolean doForcePullOnBuild)
             throws IOException {
 
+        if (SystemInfo.isWindows()) {
+            allMachinesSystemVolumes = escapePaths(allMachinesSystemVolumes);
+            systemVolumesForDevMachine = escapePaths(systemVolumesForDevMachine);
+        }
+
+        allMachinesSystemVolumes = filterEmptyAndNullableValues(allMachinesSystemVolumes);
+        systemVolumesForDevMachine = filterEmptyAndNullableValues(systemVolumesForDevMachine);
+
         this.docker = docker;
         this.dockerMachineFactory = dockerMachineFactory;
         this.dockerInstanceStopDetector = dockerInstanceStopDetector;
@@ -130,6 +141,9 @@ public class DockerInstanceProvider implements InstanceProvider {
 
         this.systemVolumesForDevMachine = Sets.newHashSetWithExpectedSize(allMachinesSystemVolumes.size()
                                                                           + systemVolumesForDevMachine.size());
+        this.systemVolumesForDevMachine.addAll(allMachinesSystemVolumes);
+        this.systemVolumesForDevMachine.addAll(systemVolumesForDevMachine);
+
         this.systemVolumesForMachine = allMachinesSystemVolumes;
         this.portsToExposeOnDevMachine = Maps.newHashMapWithExpectedSize(allMachineServers.size() + devMachineServers.size());
         this.portsToExposeOnMachine = Maps.newHashMapWithExpectedSize(allMachineServers.size());
@@ -152,13 +166,10 @@ public class DockerInstanceProvider implements InstanceProvider {
             devMachineContainerLabels.put("che:server:" + serverConf.getPort() + ":protocol", serverConf.getProtocol());
         }
 
-        this.systemVolumesForDevMachine.addAll(SystemInfo.isWindows() ? escapePaths(allMachinesSystemVolumes) : allMachinesSystemVolumes);
-        this.systemVolumesForDevMachine.addAll(
-                SystemInfo.isWindows() ? escapePaths(systemVolumesForDevMachine) : systemVolumesForDevMachine);
-
         commonEnvVariables = new String[0];
         devMachineEnvVariables = new String[] {API_ENDPOINT_URL_VARIABLE + '=' + apiEndpoint,
-                                               DockerInstanceMetadata.PROJECTS_ROOT_VARIABLE + '=' + projectFolderPath};
+                                               DockerInstanceMetadata.PROJECTS_ROOT_VARIABLE + '=' + projectFolderPath,
+                                               CheBootstrap.CHE_LOCAL_CONF_DIR + '=' + DockerExtConfBindingProvider.EXT_CHE_LOCAL_CONF_DIR};
 
         // always add the docker host
         String dockerHost = CHE_HOST.concat(":").concat(docker.getDockerHostIp());
@@ -169,6 +180,14 @@ public class DockerInstanceProvider implements InstanceProvider {
         }
     }
 
+    /**
+     * Returns set that contains all non empty and non nullable values from specified set
+     */
+    protected Set<String> filterEmptyAndNullableValues(Set<String> paths) {
+        return paths.stream()
+                    .filter(path -> !Strings.isNullOrEmpty(path))
+                    .collect(Collectors.toSet());
+    }
 
     /**
      * Escape paths for Windows system with boot@docker according to rules given here :
