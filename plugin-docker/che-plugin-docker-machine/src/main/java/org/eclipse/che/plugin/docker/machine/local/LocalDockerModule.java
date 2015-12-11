@@ -11,21 +11,24 @@
 package org.eclipse.che.plugin.docker.machine.local;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
 import org.eclipse.che.api.core.util.SystemInfo;
 import org.eclipse.che.api.machine.server.MachineService;
-import org.eclipse.che.api.machine.server.dao.SnapshotDao;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.plugin.docker.machine.DockerInstance;
 import org.eclipse.che.plugin.docker.machine.DockerInstanceProvider;
 import org.eclipse.che.plugin.docker.machine.DockerMachineFactory;
+import org.eclipse.che.plugin.docker.machine.local.node.DevMachineVolumesProvider;
 import org.eclipse.che.plugin.docker.machine.node.DockerNode;
 import org.eclipse.che.plugin.docker.machine.DockerProcess;
+
+import java.util.Set;
 
 /**
  * The Module for Local Docker components
@@ -61,6 +64,9 @@ public class LocalDockerModule extends AbstractModule {
             bind(String.class).annotatedWith(Names.named("host.projects.root"))
                               .toProvider(org.eclipse.che.plugin.docker.machine.ext.HostProjectsFolderProviderUnix.class);
         }
+
+        bind(new TypeLiteral<Set<String>>() {}).annotatedWith(Names.named("machine.docker.dev_machine.machine_volumes_all"))
+                                               .toProvider(DevMachineVolumesProvider.class);
 
         bind(org.eclipse.che.plugin.docker.machine.node.WorkspaceFolderPathProvider.class)
                 .to(org.eclipse.che.plugin.docker.machine.local.node.LocalWorkspaceFolderPathProvider.class);

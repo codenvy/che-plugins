@@ -114,8 +114,8 @@ public class DockerInstanceProvider implements InstanceProvider {
                                   DockerInstanceStopDetector dockerInstanceStopDetector,
                                   @Named("machine.docker.dev_machine.machine_servers") Set<ServerConf> devMachineServers,
                                   @Named("machine.docker.machine_servers") Set<ServerConf> allMachineServers,
-                                  @Named("machine.docker.dev_machine.machine_volumes") Set<String> systemVolumesForDevMachine,
-                                  @Named("machine.docker.machine_volumes") Set<String> allMachinesSystemVolumes,
+                                  @Named("machine.docker.dev_machine.machine_volumes_all") Set<String> systemVolumesForDevMachine,
+                                  @Named("machine.docker.machine_volumes") Set<String> machinesSystemVolumes,
                                   @Nullable @Named("machine.docker.machine_extra_hosts") String machineExtraHosts,
                                   @Named("machine.docker.che_api.endpoint") String apiEndpoint,
                                   WorkspaceFolderPathProvider workspaceFolderPathProvider,
@@ -124,7 +124,7 @@ public class DockerInstanceProvider implements InstanceProvider {
             throws IOException {
 
         if (SystemInfo.isWindows()) {
-            allMachinesSystemVolumes = escapePaths(allMachinesSystemVolumes);
+            machinesSystemVolumes = escapePaths(machinesSystemVolumes);
             systemVolumesForDevMachine = escapePaths(systemVolumesForDevMachine);
         }
 
@@ -135,12 +135,12 @@ public class DockerInstanceProvider implements InstanceProvider {
         this.doForcePullOnBuild = doForcePullOnBuild;
         this.supportedRecipeTypes = Collections.singleton("Dockerfile");
 
-        this.systemVolumesForDevMachine = Sets.newHashSetWithExpectedSize(allMachinesSystemVolumes.size()
+        this.systemVolumesForDevMachine = Sets.newHashSetWithExpectedSize(machinesSystemVolumes.size()
                                                                           + systemVolumesForDevMachine.size());
-        this.systemVolumesForDevMachine.addAll(allMachinesSystemVolumes);
+        this.systemVolumesForDevMachine.addAll(machinesSystemVolumes);
         this.systemVolumesForDevMachine.addAll(systemVolumesForDevMachine);
 
-        this.systemVolumesForMachine = allMachinesSystemVolumes;
+        this.systemVolumesForMachine = machinesSystemVolumes;
         this.portsToExposeOnDevMachine = Maps.newHashMapWithExpectedSize(allMachineServers.size() + devMachineServers.size());
         this.portsToExposeOnMachine = Maps.newHashMapWithExpectedSize(allMachineServers.size());
         this.devMachineContainerLabels = Maps.newHashMapWithExpectedSize(2 * allMachineServers.size() + 2 * devMachineServers.size());
