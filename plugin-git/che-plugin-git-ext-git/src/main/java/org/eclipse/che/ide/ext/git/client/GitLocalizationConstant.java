@@ -61,6 +61,9 @@ public interface GitLocalizationConstant extends Messages {
     @Key("button.merge")
     String buttonMerge();
 
+    @Key("button.compare")
+    String buttonCompare();
+
     @Key("console.tooltip.clear")
     String buttonClear();
 
@@ -397,6 +400,20 @@ public interface GitLocalizationConstant extends Messages {
     // Create
     @Key("view.create.title")
     String createTitle();
+
+    // Compare
+    @Key("view.compare.title")
+    String compareTitle();
+
+    @Key("view.compare.message.identical.content.title")
+    String compareMessageIdenticalContemtTitle();
+
+    @Key("view.compare.message.identical.content.text")
+    String compareMessageIdenticalContemtText();
+
+    // ChangeList
+    @Key("view.change.list.title")
+    String changeListTitle();
 
     // Fetch
     @Key("view.fetch.title")

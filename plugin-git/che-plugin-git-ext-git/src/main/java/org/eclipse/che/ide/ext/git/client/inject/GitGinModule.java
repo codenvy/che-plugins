@@ -25,6 +25,8 @@ import org.eclipse.che.ide.ext.git.client.branch.BranchView;
 import org.eclipse.che.ide.ext.git.client.branch.BranchViewImpl;
 import org.eclipse.che.ide.ext.git.client.commit.CommitView;
 import org.eclipse.che.ide.ext.git.client.commit.CommitViewImpl;
+import org.eclipse.che.ide.ext.git.client.compare.changedList.ChangedListView;
+import org.eclipse.che.ide.ext.git.client.compare.changedList.ChangedListViewImpl;
 import org.eclipse.che.ide.ext.git.client.fetch.FetchView;
 import org.eclipse.che.ide.ext.git.client.fetch.FetchViewImpl;
 import org.eclipse.che.ide.ext.git.client.history.HistoryView;
@@ -65,6 +67,7 @@ public class GitGinModule extends AbstractGinModule {
         bind(ResetToCommitView.class).to(ResetToCommitViewImpl.class).in(Singleton.class);
         bind(RemoveFromIndexView.class).to(RemoveFromIndexViewImpl.class).in(Singleton.class);
         bind(CommitView.class).to(CommitViewImpl.class).in(Singleton.class);
+        bind(ChangedListView.class).to(ChangedListViewImpl.class).in(Singleton.class);
         bind(BranchView.class).to(BranchViewImpl.class).in(Singleton.class);
         bind(MergeView.class).to(MergeViewImpl.class).in(Singleton.class);
         bind(ResetFilesView.class).to(ResetFilesViewImpl.class).in(Singleton.class);

@@ -15,12 +15,14 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
+import org.eclipse.che.ide.api.action.IdeActions;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.ext.git.client.action.AddToIndexAction;
 import org.eclipse.che.ide.ext.git.client.action.CheckoutReferenceAction;
 import org.eclipse.che.ide.ext.git.client.action.CommitAction;
+import org.eclipse.che.ide.ext.git.client.action.CompareWithLatestRepositoryAction;
 import org.eclipse.che.ide.ext.git.client.action.DeleteRepositoryAction;
 import org.eclipse.che.ide.ext.git.client.action.FetchAction;
 import org.eclipse.che.ide.ext.git.client.action.HistoryAction;
@@ -48,10 +50,10 @@ import static org.eclipse.che.ide.api.constraints.Anchor.BEFORE;
 @Singleton
 @Extension(title = "Git", version = "3.0.0")
 public class GitExtension {
-    public static final String GIT_GROUP_MAIN_MENU        = "Git";
-    public static final String REPOSITORY_GROUP_MAIN_MENU = "GitRepositoryGroup";
-    public static final String COMMAND_GROUP_MAIN_MENU    = "GitCommandGroup";
-    public static final String HISTORY_GROUP_MAIN_MENU    = "GitHistoryGroup";
+    public static final String GIT_GROUP_MAIN_MENU           = "Git";
+    public static final String REPOSITORY_GROUP_MAIN_MENU    = "GitRepositoryGroup";
+    public static final String COMMAND_GROUP_MAIN_MENU       = "GitCommandGroup";
+    public static final String HISTORY_GROUP_MAIN_MENU       = "GitHistoryGroup";
 
     @Inject
     public GitExtension(GitResources resources,
@@ -74,6 +76,7 @@ public class GitExtension {
                         PullAction pullAction,
                         GitLocalizationConstant constant,
                         HistoryAction historyAction,
+                        CompareWithLatestRepositoryAction compareAction,
                         AppContext appContext) {
 
         resources.gitCSS().ensureInjected();
@@ -106,6 +109,9 @@ public class GitExtension {
 
         actionManager.registerAction("gitAddToIndex", addToIndexAction);
         commandGroup.add(addToIndexAction);
+        DefaultActionGroup compareGroup = new DefaultActionGroup("compare", true, actionManager);
+        actionManager.registerAction("gitCompareGroup", compareGroup);
+        commandGroup.add(compareGroup);
         actionManager.registerAction("gitResetToCommit", resetToCommitAction);
         commandGroup.add(resetToCommitAction);
         actionManager.registerAction("gitRemoveFromIndexCommit", removeFromIndexAction);
@@ -143,5 +149,8 @@ public class GitExtension {
         remoteGroup.add(pullAction);
         actionManager.registerAction("gitRemote", showRemoteAction);
         remoteGroup.add(showRemoteAction);
+
+        actionManager.registerAction("gitCompare", compareAction);
+        compareGroup.add(compareAction);
     }
 }
