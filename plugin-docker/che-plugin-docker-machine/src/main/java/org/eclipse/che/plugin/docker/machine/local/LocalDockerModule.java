@@ -18,9 +18,7 @@ import com.google.inject.name.Names;
 import org.eclipse.che.api.machine.server.MachineService;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
-import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.plugin.docker.machine.DockerInstance;
-import org.eclipse.che.plugin.docker.machine.DockerInstanceProvider;
 import org.eclipse.che.plugin.docker.machine.DockerMachineFactory;
 import org.eclipse.che.plugin.docker.machine.node.DockerNode;
 import org.eclipse.che.plugin.docker.machine.DockerProcess;
@@ -45,8 +43,6 @@ public class LocalDockerModule extends AbstractModule {
                         .implement(DockerNode.class, LocalDockerNode.class)
                         .build(DockerMachineFactory.class));
 
-        Multibinder.newSetBinder(binder(), InstanceProvider.class).addBinding().to(DockerInstanceProvider.class);
-
         bind(String.class).annotatedWith(Names.named("host.projects.root"))
                           .toProvider(org.eclipse.che.plugin.docker.machine.local.provider.HostProjectFolderProvider.class);
 
@@ -62,9 +58,6 @@ public class LocalDockerModule extends AbstractModule {
         debMachineEnvVars.addBinding()
                          .toProvider(org.eclipse.che.plugin.docker.machine.local.provider.DockerApiHostEnvVariableProvider.class);
 
-        Multibinder<String> allMachinesEnvVars = Multibinder.newSetBinder(binder(),
-                                                                          String.class,
-                                                                          Names.named("machine.docker.machine_env"))
-                                                            .permitDuplicates();
+        install(new org.eclipse.che.plugin.docker.machine.DockerMachineModule());
     }
 }
