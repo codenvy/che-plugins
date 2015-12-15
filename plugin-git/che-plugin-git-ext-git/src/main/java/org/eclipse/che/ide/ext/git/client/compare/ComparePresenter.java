@@ -21,7 +21,7 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.StringUnmarshaller;
 
 /**
- * Presenter for compearing current files with files from specified working tree
+ * Presenter for comparing current files with files from specified revision or branch
  * 
  * @author Igor Vinokur
  */
@@ -49,7 +49,7 @@ public class ComparePresenter implements CompareView.ActionDelegate {
     }
 
     /**
-     * Show dialog.
+     * Show compare window.
      */
     public void show(final String file, final String state, final String revision) {        
         if (state.contains("A")) {
@@ -60,7 +60,7 @@ public class ComparePresenter implements CompareView.ActionDelegate {
                             @Override
                             protected void onSuccess(final String oldContent) {
                                 view.setTitle(file);
-                                view.show(oldContent, "", revision, file.substring(file.lastIndexOf("/")));
+                                view.show(oldContent, "", revision, file);
                             }
 
                             @Override
@@ -85,6 +85,12 @@ public class ComparePresenter implements CompareView.ActionDelegate {
         
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void onCloseButtonClicked() {
+        view.hide();
+    }
+
     private void showCompare(final String item, final String oldContent, final String revision) {
         String fullItemPath = appContext.getCurrentProject().getRootProject().getName() + "/" + item;
 
@@ -101,11 +107,5 @@ public class ComparePresenter implements CompareView.ActionDelegate {
                                               notificationManager.showError(exception.getMessage());
                                           }
                                       });
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onCloseButtonClicked() {
-        view.hide();
     }
 }

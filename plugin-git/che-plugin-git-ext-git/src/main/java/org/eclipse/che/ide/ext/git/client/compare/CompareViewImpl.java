@@ -31,6 +31,8 @@ import org.eclipse.che.ide.orion.compare.FileOptions;
 import org.eclipse.che.ide.ui.window.Window;
 
 /**
+ * Implementation of {@link CompareView}
+ *
  * @author Igor Vinokur
  */
 @Singleton

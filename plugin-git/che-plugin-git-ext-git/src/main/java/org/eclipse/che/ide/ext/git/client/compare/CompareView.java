@@ -21,28 +21,29 @@ import org.eclipse.che.ide.api.mvp.View;
  */
 @ImplementedBy(CompareViewImpl.class)
 interface CompareView extends View<CompareView.ActionDelegate> {
+
     /**
      * Set a title of the window.
      *
-     * @param title the name of the compare window
+     * @param title text that will be as a title in window
      */
     void setTitle(String title);
 
-    /** Hide compare panel. */
+    /** Hide compare window. */
     void hide();
 
     /**
-     * Show compare panel with specified contents.
-     * 
-     * @param oldContent content from specified working tree
-     * 
-     * @param newContent content of current file
-     * 
-     * @param revision revision or branch which is getting part in comparing
-     * 
-     * @param fileName the name of the changed file
+     * Show compare window with specified contents.
+     *
+     * @param oldContent
+     *         content from specified revision or branch
+     * @param newContent
+     *         content of current file
+     * @param revision
+     *         revision or branch which is getting part in comparing
+     * @param fileName
+     *         the name of the changed file
      */
-
     void show(String oldContent, String newContent, String revision, String fileName);
 
     interface ActionDelegate {
