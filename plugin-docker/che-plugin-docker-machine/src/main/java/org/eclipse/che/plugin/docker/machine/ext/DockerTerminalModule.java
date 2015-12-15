@@ -14,7 +14,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
-import org.eclipse.che.api.core.util.SystemInfo;
 import org.eclipse.che.plugin.docker.machine.ServerConf;
 
 /**
@@ -40,10 +39,6 @@ public class DockerTerminalModule extends AbstractModule {
 
         Multibinder<String> volumesMultibinder =
                 Multibinder.newSetBinder(binder(), String.class, Names.named("machine.docker.machine_volumes"));
-        if (SystemInfo.isWindows()) {
-            volumesMultibinder.addBinding().toProvider(TerminalServerBindingProviderWinOS.class);
-        } else {
-            volumesMultibinder.addBinding().toProvider(TerminalServerBindingProviderUnix.class);
-        }
+        volumesMultibinder.addBinding().toProvider(org.eclipse.che.plugin.docker.machine.ext.provider.TerminalVolumeProvider.class);
     }
 }

@@ -63,7 +63,9 @@ import static org.eclipse.che.ide.extension.machine.client.perspective.terminal.
  */
 @Singleton
 public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPanelView.ActionDelegate, HasView {
-
+    
+    private static final String DEFAULT_TERMINAL_NAME          = "Terminal";
+    
     private final DialogFactory               dialogFactory;
     private final NotificationManager         notificationManager;
     private final MachineLocalizationConstant localizationConstant;
@@ -103,6 +105,7 @@ public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPan
 
         this.fetchMachines();
         this.view.setDelegate(this);
+        this.view.setTitle(localizationConstant.viewConsolesTitle());
 
         eventBus.addHandler(DevMachineStateEvent.TYPE, new DevMachineStateHandler() {
             @Override
@@ -363,8 +366,12 @@ public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPan
     }
 
     private String getUniqueTerminalName(ProcessTreeNode machineNode) {
-        String terminalName;
-        int counter = 1;
+        String terminalName = DEFAULT_TERMINAL_NAME;
+        if (!isTerminalNameExist(machineNode, terminalName)) {
+            return DEFAULT_TERMINAL_NAME;
+        }
+        
+        int counter = 2;
         do {
             terminalName = localizationConstant.viewProcessesTerminalNodeTitle(String.valueOf(counter));
             counter++;

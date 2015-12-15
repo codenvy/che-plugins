@@ -8,12 +8,14 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.ext;
+
+package org.eclipse.che.plugin.docker.machine.ext.provider;
 
 import org.eclipse.che.api.core.util.SystemInfo;
 import org.eclipse.che.inject.CheBootstrap;
 
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import java.io.File;
 
 /**
@@ -24,6 +26,7 @@ import java.io.File;
  *
  * @author Sergii Leschenko
  */
+@Singleton
 public class DockerExtConfBindingProvider implements Provider<String> {
     public static final  String EXT_CHE_LOCAL_CONF_DIR = "/mnt/che/conf";
     private static final String CONTAINER_TARGET       = ":" + EXT_CHE_LOCAL_CONF_DIR + ":ro";

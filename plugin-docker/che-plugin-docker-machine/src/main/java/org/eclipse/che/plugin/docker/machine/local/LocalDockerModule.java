@@ -15,9 +15,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
-import org.eclipse.che.api.core.util.SystemInfo;
 import org.eclipse.che.api.machine.server.MachineService;
-import org.eclipse.che.api.machine.server.dao.SnapshotDao;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
 import org.eclipse.che.api.machine.server.spi.InstanceProvider;
@@ -33,18 +31,13 @@ import org.eclipse.che.plugin.docker.machine.DockerProcess;
  * directory containing workspace projects tree
  *
  * @author gazarenkov
+ * @author Alexander Garagatyi
  */
 public class LocalDockerModule extends AbstractModule {
 
     @Override
     protected void configure() {
         bind(MachineService.class);
-
-        Multibinder<String> exposedPortsMultibinder =
-                Multibinder.newSetBinder(binder(), String.class, Names.named("machine.docker.system_exposed_ports"));
-
-        Multibinder<String> volumesMultibinder =
-                Multibinder.newSetBinder(binder(), String.class, Names.named("machine.docker.system_volumes"));
 
         install(new FactoryModuleBuilder()
                         .implement(Instance.class, DockerInstance.class)
@@ -54,17 +47,24 @@ public class LocalDockerModule extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), InstanceProvider.class).addBinding().to(DockerInstanceProvider.class);
 
-        if (SystemInfo.isWindows()) {
-            bind(String.class).annotatedWith(Names.named("host.projects.root"))
-                              .toProvider(org.eclipse.che.plugin.docker.machine.ext.HostProjectsFolderProviderWinOS.class);
-        } else {
-            bind(String.class).annotatedWith(Names.named("host.projects.root"))
-                              .toProvider(org.eclipse.che.plugin.docker.machine.ext.HostProjectsFolderProviderUnix.class);
-        }
+        bind(String.class).annotatedWith(Names.named("host.projects.root"))
+                          .toProvider(org.eclipse.che.plugin.docker.machine.local.provider.HostProjectFolderProvider.class);
 
         bind(org.eclipse.che.plugin.docker.machine.node.WorkspaceFolderPathProvider.class)
-                .to(org.eclipse.che.plugin.docker.machine.local.node.LocalWorkspaceFolderPathProvider.class);
+                .to(org.eclipse.che.plugin.docker.machine.local.node.provider.LocalWorkspaceFolderPathProvider.class);
 
         bind(org.eclipse.che.plugin.docker.client.DockerRegistryChecker.class).asEagerSingleton();
+
+        Multibinder<String> debMachineEnvVars = Multibinder.newSetBinder(binder(),
+                                                                         String.class,
+                                                                         Names.named("machine.docker.dev_machine.machine_env"))
+                                                           .permitDuplicates();
+        debMachineEnvVars.addBinding()
+                         .toProvider(org.eclipse.che.plugin.docker.machine.local.provider.DockerApiHostEnvVariableProvider.class);
+
+        Multibinder<String> allMachinesEnvVars = Multibinder.newSetBinder(binder(),
+                                                                          String.class,
+                                                                          Names.named("machine.docker.machine_env"))
+                                                            .permitDuplicates();
     }
 }

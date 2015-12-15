@@ -8,21 +8,26 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.ext;
+package org.eclipse.che.plugin.docker.machine.ext.provider;
 
-import com.google.inject.Provider;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
- * Provide path to the project folder on hosted machine under windows
- * MUST be locate in "user.home" directory in case limitation windows+docker
+ * Provides volumes configuration of machine for local storage
  *
- * @author Vitalii Parfonov
+ * @author Alexander Garagatyi
  */
-public class HostProjectsFolderProviderWinOS implements Provider<String> {
-
+@Singleton
+public class LocalStorageDockerVolumePathProvider implements Provider<String> {
+    @Inject
+    @Named("local.storage.path")
+    private String localStoragePath;
 
     @Override
     public String get() {
-        return System.getProperty("user.home") + "\\che\\projects";
+        return localStoragePath + ":/local-storage";
     }
 }

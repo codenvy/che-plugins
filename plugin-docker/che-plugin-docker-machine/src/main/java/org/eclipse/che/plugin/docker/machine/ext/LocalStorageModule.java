@@ -25,6 +25,7 @@ public class LocalStorageModule extends AbstractModule {
     protected void configure() {
         Multibinder<String> volumesMultibinder =
                 Multibinder.newSetBinder(binder(), String.class, Names.named("machine.docker.dev_machine.machine_volumes"));
-        volumesMultibinder.addBinding().toProvider(LocalStorageDockerVolumePathProvider.class);
+        volumesMultibinder.addBinding()
+                          .toProvider(org.eclipse.che.plugin.docker.machine.ext.provider.LocalStorageDockerVolumePathProvider.class);
     }
 }

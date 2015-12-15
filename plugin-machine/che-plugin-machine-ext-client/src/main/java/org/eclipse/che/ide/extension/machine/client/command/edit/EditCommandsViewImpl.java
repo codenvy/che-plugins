@@ -248,7 +248,7 @@ public class EditCommandsViewImpl extends Window implements EditCommandsView {
         textElement.setInnerText(currentCommandType != null ? currentCommandType.getDisplayName() : commandId);
 
         SpanElement buttonElement = Document.get().createSpanElement();
-        buttonElement.appendChild(this.commandResources.addCommandButton().getSvg().getElement());
+        buttonElement.appendChild(commandResources.addCommandButton().getSvg().getElement());
         categoryHeaderElement.appendChild(buttonElement);
 
         Event.sinkEvents(buttonElement, Event.ONCLICK);

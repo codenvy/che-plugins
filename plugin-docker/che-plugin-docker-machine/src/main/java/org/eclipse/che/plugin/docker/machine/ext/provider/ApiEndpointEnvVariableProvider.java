@@ -8,20 +8,29 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.ext;
 
+package org.eclipse.che.plugin.docker.machine.ext.provider;
+
+import org.eclipse.che.plugin.docker.machine.DockerInstanceMetadata;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
- * Provides volumes configuration of machine for terminal in Windows hosts
- * MUST be locate in "user.home" directory in case limitation windows+docker
+ * Add env variable to docker dev-machine with url of Che API
  *
- * @author Vitalii Parfonov
+ * @author Alexander Garagatyi
  */
-public class TerminalServerBindingProviderWinOS implements Provider<String> {
+@Singleton
+public class ApiEndpointEnvVariableProvider implements Provider<String> {
+    @Inject
+    @Named("machine.docker.che_api.endpoint")
+    private String apiEndpoint;
 
     @Override
     public String get() {
-        return System.getProperty("user.home") + "\\AppData\\Local\\che\\terminal" + ":/mnt/che/terminal";
+        return DockerInstanceMetadata.API_ENDPOINT_URL_VARIABLE + '=' + apiEndpoint;
     }
 }

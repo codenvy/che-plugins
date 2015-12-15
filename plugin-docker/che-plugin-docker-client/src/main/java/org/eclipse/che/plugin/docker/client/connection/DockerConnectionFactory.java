@@ -46,7 +46,7 @@ public class DockerConnectionFactory {
     }
 
     public DockerConnection openConnection(URI dockerDaemonUri) {
-        if (DockerConnector.isUnixSocketUri(dockerDaemonUri)) {
+        if (DockerConnectorConfiguration.isUnixSocketUri(dockerDaemonUri)) {
             return new UnixSocketConnection(dockerDaemonUri.getPath());
         } else {
             return new TcpConnection(dockerDaemonUri, dockerCertificates, connectionTimeoutMs, connectionReadTimeoutMs);

@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Collections.emptyMap;
-import static org.eclipse.che.plugin.docker.client.DockerConnector.DEFAULT_DOCKER_MACHINE_CERTS_DIR;
-import static org.eclipse.che.plugin.docker.client.DockerConnector.DEFAULT_DOCKER_MACHINE_URI;
 import static org.eclipse.che.plugin.docker.client.DockerConnectorConfiguration.BRIDGE_LINUX_INTERFACE_NAME;
 import static org.eclipse.che.plugin.docker.client.DockerConnectorConfiguration.DEFAULT_DOCKER_MACHINE_DOCKER_HOST_IP;
 import static org.eclipse.che.plugin.docker.client.DockerConnectorConfiguration.DEFAULT_LINUX_DOCKER_HOST_IP;
@@ -35,7 +33,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
 
 /**
  * Tests of the docker connector configuration
@@ -45,15 +42,86 @@ import static org.testng.Assert.assertNull;
 public class DockerConnectorConfigurationTest {
 
     /**
-     * On Linux, no Docker Machine so expect direct connection
+     * On Linux, if Docker Machine properties are not defined, then unix socket should be used
      */
     @Test
-    public void testDockerOnLinux() {
+    public void testDockerOnLinuxIfDockerMachinePropertiesUndefined() {
         URI uri = DockerConnectorConfiguration.dockerDaemonUri(true, emptyMap());
-        assertEquals(DockerConnector.UNIX_SOCKET_URI, uri);
+        assertEquals(DockerConnectorConfiguration.UNIX_SOCKET_URI, uri);
+    }
 
-        String path = DockerConnectorConfiguration.dockerMachineCertsDirectoryPath(true, emptyMap());
-        assertNull(path, "On Linux, there is no need of certificates");
+    /**
+     * On Linux, if Docker Machine properties are defined, it should use them
+     * TLS enabled
+     */
+    @Test
+    public void testDockerUriOnLinuxSecure() throws Exception {
+
+        Map<String, String> env = new HashMap<>();
+        env.put(DockerConnectorConfiguration.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2376");
+        env.put(DockerConnectorConfiguration.DOCKER_TLS_VERIFY_PROPERTY, "1");
+
+        URI uri = DockerConnectorConfiguration.dockerDaemonUri(true, env);
+        assertEquals(uri, new URI("https://192.168.59.104:2376"));
+    }
+
+    /**
+     * On Linux, if Docker Machine properties are defined, it should use them
+     * TLS disable
+     */
+    @Test
+    public void testDockerUriOnLinuxNonSecure() throws Exception {
+
+        Map<String, String> env = new HashMap<>();
+        env.put(DockerConnectorConfiguration.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2375");
+
+        URI uri = DockerConnectorConfiguration.dockerDaemonUri(true, env);
+        assertEquals(uri, new URI("http://192.168.59.104:2375"));
+    }
+
+    /**
+     * On Linux, if Docker Machine properties are defined, it should use them
+     * TLS disable
+     */
+    @Test
+    public void testDockerUriOnLinuxInvalidProperties() throws Exception {
+
+        Map<String, String> env = new HashMap<>();
+        env.put(DockerConnectorConfiguration.DOCKER_HOST_PROPERTY, "this is an invalid host");
+
+        URI uri = DockerConnectorConfiguration.dockerDaemonUri(true, env);
+        assertEquals(uri, DockerConnectorConfiguration.DEFAULT_DOCKER_MACHINE_URI);
+
+    }
+
+    @Test
+    public void testPathToDockerCertificatesIfDockerMachinePropertiesAreSet() throws Exception {
+
+        File tmpDirectory = Files.createTempDir();
+        tmpDirectory.deleteOnExit();
+
+        Map<String, String> env = new HashMap<>();
+        env.put(DockerConnectorConfiguration.DOCKER_CERT_PATH_PROPERTY, tmpDirectory.getAbsolutePath());
+
+        String path = DockerConnectorConfiguration.dockerMachineCertsDirectoryPath(env);
+        assertEquals(path, tmpDirectory.getAbsolutePath());
+    }
+
+    @Test
+    public void testPathToDockerCertificatesIfDockerMachinePropertiesAreNotSet() throws Exception {
+
+        String path = DockerConnectorConfiguration.dockerMachineCertsDirectoryPath(emptyMap());
+        assertEquals(path, DockerConnectorConfiguration.DEFAULT_DOCKER_MACHINE_CERTS_DIR);
+    }
+
+    @Test
+    public void testPathToDockerCertificatesIfDockerMachinePropertiesAreInvalid() throws Exception {
+
+        Map<String, String> env = new HashMap<>();
+        env.put(DockerConnectorConfiguration.DOCKER_CERT_PATH_PROPERTY, "invalid");
+
+        String path = DockerConnectorConfiguration.dockerMachineCertsDirectoryPath(env);
+        assertEquals(path, DockerConnectorConfiguration.DEFAULT_DOCKER_MACHINE_CERTS_DIR);
     }
 
     /**
@@ -63,19 +131,12 @@ public class DockerConnectorConfigurationTest {
     @Test
     public void testDockerUriOnNonLinuxSecure() throws Exception {
 
-        File tmpDirectory = Files.createTempDir();
-        tmpDirectory.deleteOnExit();
-
         Map<String, String> env = new HashMap<>();
-        env.put(DockerConnector.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2376");
-        env.put(DockerConnector.DOCKER_TLS_VERIFY_PROPERTY, "1");
-        env.put(DockerConnector.DOCKER_CERT_PATH_PROPERTY, tmpDirectory.getAbsolutePath());
+        env.put(DockerConnectorConfiguration.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2376");
+        env.put(DockerConnectorConfiguration.DOCKER_TLS_VERIFY_PROPERTY, "1");
 
         URI uri = DockerConnectorConfiguration.dockerDaemonUri(false, env);
         assertEquals(uri, new URI("https://192.168.59.104:2376"));
-
-        String path = DockerConnectorConfiguration.dockerMachineCertsDirectoryPath(false, env);
-        assertEquals(path, tmpDirectory.getAbsolutePath());
 
     }
 
@@ -86,18 +147,11 @@ public class DockerConnectorConfigurationTest {
     @Test
     public void testDockerUriOnNonLinuxNonSecure() throws Exception {
 
-        File tmpDirectory = Files.createTempDir();
-        tmpDirectory.deleteOnExit();
-
         Map<String, String> env = new HashMap<>();
-        env.put(DockerConnector.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2375");
-        env.put(DockerConnector.DOCKER_CERT_PATH_PROPERTY, tmpDirectory.getAbsolutePath());
+        env.put(DockerConnectorConfiguration.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2375");
 
         URI uri = DockerConnectorConfiguration.dockerDaemonUri(false, env);
         assertEquals(uri, new URI("http://192.168.59.104:2375"));
-
-        String path = DockerConnectorConfiguration.dockerMachineCertsDirectoryPath(false, env);
-        assertEquals(path, tmpDirectory.getAbsolutePath());
 
     }
 
@@ -109,37 +163,24 @@ public class DockerConnectorConfigurationTest {
     @Test
     public void testDockerUriOnNonLinuxInvalidProperties() throws Exception {
 
-        File tmpDirectory = Files.createTempDir();
-        tmpDirectory.deleteOnExit();
-
         Map<String, String> env = new HashMap<>();
-        env.put(DockerConnector.DOCKER_HOST_PROPERTY, "this is an invalid host");
-        env.put(DockerConnector.DOCKER_CERT_PATH_PROPERTY, "invalid");
+        env.put(DockerConnectorConfiguration.DOCKER_HOST_PROPERTY, "this is an invalid host");
 
         URI uri = DockerConnectorConfiguration.dockerDaemonUri(false, env);
-        assertEquals(uri, DEFAULT_DOCKER_MACHINE_URI);
-
-        String path = DockerConnectorConfiguration.dockerMachineCertsDirectoryPath(false, env);
-        assertEquals(path, DEFAULT_DOCKER_MACHINE_CERTS_DIR);
+        assertEquals(uri, DockerConnectorConfiguration.DEFAULT_DOCKER_MACHINE_URI);
 
     }
 
 
     /**
-     * On non-Linux, if Docker Machine properties are defined, it should use them
+     * On non-Linux, if Docker Machine properties are not defined, it should use them
      * TLS disable
      */
     @Test
     public void testDockerUriOnNonLinuxMissingProperties() throws Exception {
 
-        File tmpDirectory = Files.createTempDir();
-        tmpDirectory.deleteOnExit();
-
         URI uri = DockerConnectorConfiguration.dockerDaemonUri(false, emptyMap());
-        assertEquals(uri, DEFAULT_DOCKER_MACHINE_URI);
-
-        String path = DockerConnectorConfiguration.dockerMachineCertsDirectoryPath(false, emptyMap());
-        assertEquals(path, DEFAULT_DOCKER_MACHINE_CERTS_DIR);
+        assertEquals(uri, DockerConnectorConfiguration.DEFAULT_DOCKER_MACHINE_URI);
 
     }
 
@@ -147,7 +188,7 @@ public class DockerConnectorConfigurationTest {
      * Check if docker host ip from container is DEFAULT_LINUX_DOCKER_HOST_IP when bridge is not defined
      */
     @Test
-    public void testLinuxDefaultDockerHostWithoutBrige() throws Exception {
+    public void testLinuxDefaultDockerHostWithoutBridge() throws Exception {
         Map<String, String> env = new HashMap<>();
         NetworkFinder networkFinder = Mockito.mock(NetworkFinder.class);
         doReturn(Optional.empty()).when(networkFinder).getIPAddress(BRIDGE_LINUX_INTERFACE_NAME);
@@ -207,7 +248,7 @@ public class DockerConnectorConfigurationTest {
         doReturn(Optional.of(inetAddress)).when(networkFinder).getMatchingInetAddress(anyString());
         DockerConnectorConfiguration dockerConnectorConfiguration = new DockerConnectorConfiguration(null, null, null, networkFinder);
 
-        Map<String, String> env = Collections.singletonMap(DockerConnector.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2375");
+        Map<String, String> env = Collections.singletonMap(DockerConnectorConfiguration.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2375");
 
         String ip = dockerConnectorConfiguration.getDockerHostIp(false, env);
         assertEquals(ip, myCustomIpAddress);
@@ -226,7 +267,7 @@ public class DockerConnectorConfigurationTest {
         doReturn(Optional.empty()).when(networkFinder).getMatchingInetAddress(anyString());
         DockerConnectorConfiguration dockerConnectorConfiguration = new DockerConnectorConfiguration(null, null, null, networkFinder);
 
-        Map<String, String> env = Collections.singletonMap(DockerConnector.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2375");
+        Map<String, String> env = Collections.singletonMap(DockerConnectorConfiguration.DOCKER_HOST_PROPERTY, "tcp://192.168.59.104:2375");
 
         String ip = dockerConnectorConfiguration.getDockerHostIp(false, env);
         assertEquals(ip, DEFAULT_DOCKER_MACHINE_DOCKER_HOST_IP);

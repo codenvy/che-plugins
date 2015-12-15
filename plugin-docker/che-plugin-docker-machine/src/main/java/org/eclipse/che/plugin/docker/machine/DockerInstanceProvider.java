@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
@@ -31,8 +32,8 @@ import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.lang.IoUtil;
 import org.eclipse.che.commons.lang.NameGenerator;
-import org.eclipse.che.inject.CheBootstrap;
 import org.eclipse.che.plugin.docker.client.DockerConnector;
+import org.eclipse.che.plugin.docker.client.DockerConnectorConfiguration;
 import org.eclipse.che.plugin.docker.client.DockerFileException;
 import org.eclipse.che.plugin.docker.client.Dockerfile;
 import org.eclipse.che.plugin.docker.client.DockerfileParser;
@@ -40,7 +41,6 @@ import org.eclipse.che.plugin.docker.client.ProgressLineFormatterImpl;
 import org.eclipse.che.plugin.docker.client.ProgressMonitor;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.eclipse.che.plugin.docker.client.json.HostConfig;
-import org.eclipse.che.plugin.docker.machine.ext.DockerExtConfBindingProvider;
 import org.eclipse.che.plugin.docker.machine.node.DockerNode;
 import org.eclipse.che.plugin.docker.machine.node.WorkspaceFolderPathProvider;
 import org.slf4j.Logger;
@@ -54,6 +54,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,27 +70,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * @author Alexander Garagatyi
  */
 public class DockerInstanceProvider implements InstanceProvider {
-
     private static final Logger LOG = LoggerFactory.getLogger(DockerInstanceProvider.class);
-
-    public static final String API_ENDPOINT_URL_VARIABLE = "CHE_API_ENDPOINT";
-
-    /**
-     * Default HOSTNAME that will be added in all docker containers that are started.
-     * This host will container the Docker host's ip reachable inside the container.
-     */
-    public static final String CHE_HOST = "che-host";
-
-    /**
-     * Environment variable that will be setup in developer machine
-     * will contain ID of a workspace for which this machine has been created
-     */
-    public static final String CHE_WORKSPACE_ID = "CHE_WORKSPACE_ID";
-
-    /**
-     * Environment variable that will be setup in developer machine and contains user token.
-     */
-    public static final String USER_TOKEN = "USER_TOKEN";
 
     private final DockerConnector                  docker;
     private final DockerInstanceStopDetector       dockerInstanceStopDetector;
@@ -98,35 +79,32 @@ public class DockerInstanceProvider implements InstanceProvider {
     private final Set<String>                      supportedRecipeTypes;
     private final DockerMachineFactory             dockerMachineFactory;
     private final Map<String, String>              devMachineContainerLabels;
-    private final Map<String, String>              machineContainerLabels;
-    private final Map<String, Map<String, String>> portsToExposeOnDevMachine;
-    private final Map<String, Map<String, String>> portsToExposeOnMachine;
-    private final Set<String>                      systemVolumesForDevMachine;
-    private final Set<String>                      systemVolumesForMachine;
+    private final Map<String, String>              commonMachineContainerLabels;
+    private final Map<String, Map<String, String>> devMachinePortsToExpose;
+    private final Map<String, Map<String, String>> commonMachinePortsToExpose;
+    private final String[]                         devMachineSystemVolumes;
+    private final String[]                         commonMachineSystemVolumes;
     private final String[]                         devMachineEnvVariables;
-    private final String[]                         commonEnvVariables;
-    private final String[]                         machineExtraHosts;
+    private final String[]                         commonMachineEnvVariables;
+    private final String[]                         allMachinesExtraHosts;
     private final String                           projectFolderPath;
 
     @Inject
     public DockerInstanceProvider(DockerConnector docker,
+                                  DockerConnectorConfiguration dockerConnectorConfiguration,
                                   DockerMachineFactory dockerMachineFactory,
                                   DockerInstanceStopDetector dockerInstanceStopDetector,
                                   @Named("machine.docker.dev_machine.machine_servers") Set<ServerConf> devMachineServers,
-                                  @Named("machine.docker.machine_servers") Set<ServerConf> allMachineServers,
-                                  @Named("machine.docker.dev_machine.machine_volumes") Set<String> systemVolumesForDevMachine,
+                                  @Named("machine.docker.machine_servers") Set<ServerConf> allMachinesServers,
+                                  @Named("machine.docker.dev_machine.machine_volumes") Set<String> devMachineSystemVolumes,
                                   @Named("machine.docker.machine_volumes") Set<String> allMachinesSystemVolumes,
-                                  @Nullable @Named("machine.docker.machine_extra_hosts") String machineExtraHosts,
-                                  @Named("machine.docker.che_api.endpoint") String apiEndpoint,
+                                  @Nullable @Named("machine.docker.machine_extra_hosts") String allMachinesExtraHosts,
                                   WorkspaceFolderPathProvider workspaceFolderPathProvider,
                                   @Named("che.projects.root") String projectFolderPath,
-                                  @Named("machine.docker.pull_image") boolean doForcePullOnBuild)
+                                  @Named("machine.docker.pull_image") boolean doForcePullOnBuild,
+                                  @Named("machine.docker.dev_machine.machine_env") Set<String> devMachineEnvVariables,
+                                  @Named("machine.docker.machine_env") Set<String> allMachinesEnvVariables)
             throws IOException {
-
-        if (SystemInfo.isWindows()) {
-            allMachinesSystemVolumes = escapePaths(allMachinesSystemVolumes);
-            systemVolumesForDevMachine = escapePaths(systemVolumesForDevMachine);
-        }
 
         this.docker = docker;
         this.dockerMachineFactory = dockerMachineFactory;
@@ -134,45 +112,52 @@ public class DockerInstanceProvider implements InstanceProvider {
         this.workspaceFolderPathProvider = workspaceFolderPathProvider;
         this.doForcePullOnBuild = doForcePullOnBuild;
         this.supportedRecipeTypes = Collections.singleton("Dockerfile");
-
-        this.systemVolumesForDevMachine = Sets.newHashSetWithExpectedSize(allMachinesSystemVolumes.size()
-                                                                          + systemVolumesForDevMachine.size());
-        this.systemVolumesForDevMachine.addAll(allMachinesSystemVolumes);
-        this.systemVolumesForDevMachine.addAll(systemVolumesForDevMachine);
-
-        this.systemVolumesForMachine = allMachinesSystemVolumes;
-        this.portsToExposeOnDevMachine = Maps.newHashMapWithExpectedSize(allMachineServers.size() + devMachineServers.size());
-        this.portsToExposeOnMachine = Maps.newHashMapWithExpectedSize(allMachineServers.size());
-        this.devMachineContainerLabels = Maps.newHashMapWithExpectedSize(2 * allMachineServers.size() + 2 * devMachineServers.size());
-        this.machineContainerLabels = Maps.newHashMapWithExpectedSize(2 * allMachineServers.size());
         this.projectFolderPath = projectFolderPath;
 
+        if (SystemInfo.isWindows()) {
+            allMachinesSystemVolumes = escapePaths(allMachinesSystemVolumes);
+            devMachineSystemVolumes = escapePaths(devMachineSystemVolumes);
+        }
+        this.commonMachineSystemVolumes = allMachinesSystemVolumes.toArray(new String[allMachinesEnvVariables.size()]);
+        final Set<String> devMachineVolumes = Sets.newHashSetWithExpectedSize(allMachinesSystemVolumes.size()
+                                                                              + devMachineSystemVolumes.size());
+        devMachineVolumes.addAll(allMachinesSystemVolumes);
+        devMachineVolumes.addAll(devMachineSystemVolumes);
+        this.devMachineSystemVolumes = devMachineVolumes.toArray(new String[devMachineVolumes.size()]);
+
+        this.devMachinePortsToExpose = Maps.newHashMapWithExpectedSize(allMachinesServers.size() + devMachineServers.size());
+        this.commonMachinePortsToExpose = Maps.newHashMapWithExpectedSize(allMachinesServers.size());
+        this.devMachineContainerLabels = Maps.newHashMapWithExpectedSize(2 * allMachinesServers.size() + 2 * devMachineServers.size());
+        this.commonMachineContainerLabels = Maps.newHashMapWithExpectedSize(2 * allMachinesServers.size());
         for (ServerConf serverConf : devMachineServers) {
-            portsToExposeOnDevMachine.put(serverConf.getPort(), Collections.<String, String>emptyMap());
+            devMachinePortsToExpose.put(serverConf.getPort(), Collections.<String, String>emptyMap());
             devMachineContainerLabels.put("che:server:" + serverConf.getPort() + ":ref", serverConf.getRef());
             devMachineContainerLabels.put("che:server:" + serverConf.getPort() + ":protocol", serverConf.getProtocol());
         }
-
-        for (ServerConf serverConf : allMachineServers) {
-            portsToExposeOnMachine.put(serverConf.getPort(), Collections.<String, String>emptyMap());
-            portsToExposeOnDevMachine.put(serverConf.getPort(), Collections.<String, String>emptyMap());
-            machineContainerLabels.put("che:server:" + serverConf.getPort() + ":ref", serverConf.getRef());
+        for (ServerConf serverConf : allMachinesServers) {
+            commonMachinePortsToExpose.put(serverConf.getPort(), Collections.<String, String>emptyMap());
+            devMachinePortsToExpose.put(serverConf.getPort(), Collections.<String, String>emptyMap());
+            commonMachineContainerLabels.put("che:server:" + serverConf.getPort() + ":ref", serverConf.getRef());
             devMachineContainerLabels.put("che:server:" + serverConf.getPort() + ":ref", serverConf.getRef());
-            machineContainerLabels.put("che:server:" + serverConf.getPort() + ":protocol", serverConf.getProtocol());
+            commonMachineContainerLabels.put("che:server:" + serverConf.getPort() + ":protocol", serverConf.getProtocol());
             devMachineContainerLabels.put("che:server:" + serverConf.getPort() + ":protocol", serverConf.getProtocol());
         }
 
-        commonEnvVariables = new String[0];
-        devMachineEnvVariables = new String[] {API_ENDPOINT_URL_VARIABLE + '=' + apiEndpoint,
-                                               DockerInstanceMetadata.PROJECTS_ROOT_VARIABLE + '=' + projectFolderPath,
-                                               CheBootstrap.CHE_LOCAL_CONF_DIR + '=' + DockerExtConfBindingProvider.EXT_CHE_LOCAL_CONF_DIR};
+        allMachinesEnvVariables = filterEmptyAndNullValues(allMachinesEnvVariables);
+        devMachineEnvVariables = filterEmptyAndNullValues(devMachineEnvVariables);
+        this.commonMachineEnvVariables = allMachinesEnvVariables.toArray(new String[allMachinesEnvVariables.size()]);
+        final HashSet<String> envVariablesForDevMachine = Sets.newHashSetWithExpectedSize(allMachinesEnvVariables.size() +
+                                                                                          devMachineEnvVariables.size());
+        envVariablesForDevMachine.addAll(allMachinesEnvVariables);
+        envVariablesForDevMachine.addAll(devMachineEnvVariables);
+        this.devMachineEnvVariables = envVariablesForDevMachine.toArray(new String[envVariablesForDevMachine.size()]);
 
         // always add the docker host
-        String dockerHost = CHE_HOST.concat(":").concat(docker.getDockerHostIp());
-        if (isNullOrEmpty(machineExtraHosts)) {
-            this.machineExtraHosts = new String[] {dockerHost};
+        String dockerHost = DockerInstanceMetadata.CHE_HOST.concat(":").concat(dockerConnectorConfiguration.getDockerHostIp());
+        if (isNullOrEmpty(allMachinesExtraHosts)) {
+            this.allMachinesExtraHosts = new String[] {dockerHost};
         } else {
-            this.machineExtraHosts = ObjectArrays.concat(machineExtraHosts.split(","), dockerHost);
+            this.allMachinesExtraHosts = ObjectArrays.concat(allMachinesExtraHosts.split(","), dockerHost);
         }
     }
 
@@ -301,6 +286,7 @@ public class DockerInstanceProvider implements InstanceProvider {
             final File dockerfileFile = new File(workDir, "Dockerfile");
             dockerfile.writeDockerfile(dockerfileFile);
             final List<File> files = new LinkedList<>();
+            //noinspection ConstantConditions
             Collections.addAll(files, workDir.listFiles());
             final ProgressLineFormatterImpl progressLineFormatter = new ProgressLineFormatterImpl();
             final ProgressMonitor progressMonitor = currentProgressStatus -> {
@@ -393,33 +379,31 @@ public class DockerInstanceProvider implements InstanceProvider {
         try {
             final Map<String, String> labels;
             final Map<String, Map<String, String>> portsToExpose;
-            final Set<String> volumes;
+            final String[] volumes;
             final String[] env;
             if (machineState.isDev()) {
                 labels = devMachineContainerLabels;
-                portsToExpose = portsToExposeOnDevMachine;
+                portsToExpose = devMachinePortsToExpose;
 
-                // 1 extra element that contains workspace FS folder will be added further
-                volumes = Sets.newHashSetWithExpectedSize(systemVolumesForDevMachine.size() + 1);
-                volumes.addAll(systemVolumesForDevMachine);
-                String[] vars = {CHE_WORKSPACE_ID + '=' + machineState.getWorkspaceId(),
-                                 USER_TOKEN + '=' + EnvironmentContext.getCurrent().getUser().getToken()};
-                env = ObjectArrays.concat(devMachineEnvVariables, vars, String.class);
-
-                // add workspace FS folder to volumes
                 final String projectFolderVolume = String.format("%s:%s",
                                                                  workspaceFolderPathProvider.getPath(machineState.getWorkspaceId()),
                                                                  projectFolderPath);
-                volumes.add(SystemInfo.isWindows() ? escapePath(projectFolderVolume) : projectFolderVolume);
+                volumes = ObjectArrays.concat(devMachineSystemVolumes,
+                                              SystemInfo.isWindows() ? escapePath(projectFolderVolume) : projectFolderVolume);
+
+                String[] vars = {DockerInstanceMetadata.CHE_WORKSPACE_ID + '=' + machineState.getWorkspaceId(),
+                                 DockerInstanceMetadata.USER_TOKEN + '=' + EnvironmentContext.getCurrent().getUser().getToken()};
+                env = ObjectArrays.concat(devMachineEnvVariables, vars, String.class);
+
             } else {
-                labels = machineContainerLabels;
-                portsToExpose = portsToExposeOnMachine;
-                volumes = systemVolumesForMachine;
-                env = commonEnvVariables;
+                labels = commonMachineContainerLabels;
+                portsToExpose = commonMachinePortsToExpose;
+                volumes = commonMachineSystemVolumes;
+                env = commonMachineEnvVariables;
             }
 
-            final HostConfig hostConfig = new HostConfig().withBinds(volumes.toArray(new String[volumes.size()]))
-                                                          .withExtraHosts(machineExtraHosts)
+            final HostConfig hostConfig = new HostConfig().withBinds(volumes)
+                                                          .withExtraHosts(allMachinesExtraHosts)
                                                           .withPublishAllPorts(true)
                                                           .withMemorySwap(-1)
                                                           .withMemory((long)machineState.getLimits().getMemory() * 1024 * 1024);
@@ -455,5 +439,14 @@ public class DockerInstanceProvider implements InstanceProvider {
 
         // removing all not allowed characters + generating random name suffix
         return NameGenerator.generate(containerName.replaceAll("[^a-zA-Z0-9_-]+", ""), 5);
+    }
+
+    /**
+     * Returns set that contains all non empty and non nullable values from specified set
+     */
+    protected Set<String> filterEmptyAndNullValues(Set<String> paths) {
+        return paths.stream()
+                    .filter(path -> !Strings.isNullOrEmpty(path))
+                    .collect(Collectors.toSet());
     }
 }

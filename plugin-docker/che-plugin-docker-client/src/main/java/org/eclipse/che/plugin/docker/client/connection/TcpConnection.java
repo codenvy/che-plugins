@@ -62,6 +62,8 @@ public class TcpConnection extends DockerConnection {
             ((HttpsURLConnection)connection).setSSLSocketFactory(certificates.getSslContext().getSocketFactory());
         }
         connection.setRequestMethod(method);
+        // needed to fix bug https://github.com/docker/docker/issues/12845
+        connection.setRequestProperty("Connection", "close");
         for (Pair<String, ?> header : headers) {
             connection.setRequestProperty(header.first, String.valueOf(header.second));
         }

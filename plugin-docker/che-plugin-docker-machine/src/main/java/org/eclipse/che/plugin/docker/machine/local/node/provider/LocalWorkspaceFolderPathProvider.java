@@ -8,7 +8,8 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.local.node;
+
+package org.eclipse.che.plugin.docker.machine.local.node.provider;
 
 import com.google.inject.assistedinject.Assisted;
 

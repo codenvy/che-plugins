@@ -8,29 +8,34 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.ext;
+package org.eclipse.che.plugin.docker.machine.ext.provider;
+
+import org.eclipse.che.api.core.util.SystemInfo;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
  * Provides volumes configuration of machine for terminal
  *
+ * <p>On Windows MUST be locate in "user.home" directory in case limitation windows+docker.
+ *
  * @author Alexander Garagatyi
  */
-public class TerminalServerBindingProviderUnix implements Provider<String> {
-    private final String terminalArchivePath;
-
+@Singleton
+public class TerminalVolumeProvider implements Provider<String> {
     @Inject
-    public TerminalServerBindingProviderUnix(@Named("machine.server.terminal.archive") String terminalArchivePath) {
-        this.terminalArchivePath = terminalArchivePath;
-    }
+    @Named("machine.server.terminal.archive")
+    private String terminalArchivePath;
 
-    // :ro removed because of bug in a docker 1.6:L
-    //TODO add :ro when bug is fixed or rework terminal binding mechanism to provide copy of the terminal files to each machine
     @Override
     public String get() {
-        return terminalArchivePath + ":/mnt/che/terminal";
+        if (SystemInfo.isWindows()) {
+            return System.getProperty("user.home") + "\\AppData\\Local\\che\\terminal" + ":/mnt/che/terminal:ro";
+        } else {
+            return terminalArchivePath + ":/mnt/che/terminal:ro";
+        }
     }
 }

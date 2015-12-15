@@ -37,7 +37,8 @@ public class LocalDockerNode implements DockerNode {
 
     @Inject
     public LocalDockerNode(@Assisted("workspace") String workspaceId,
-                           WorkspaceFolderPathProvider workspaceFolderNodePathProvider) throws IOException {
+                           WorkspaceFolderPathProvider workspaceFolderNodePathProvider,
+                           DockerConnectorConfiguration dockerConnectorConfiguration) throws IOException {
 
         Path workspaceFolderPath = Paths.get(workspaceFolderNodePathProvider.getPath(workspaceId));
         if (Files.notExists(workspaceFolderPath)) {
@@ -48,7 +49,7 @@ public class LocalDockerNode implements DockerNode {
         }
         workspaceFolder = workspaceFolderPath.toAbsolutePath().toString();
 
-        host = DockerConnectorConfiguration.getExpectedLocalHost();
+        host = dockerConnectorConfiguration.getDockerHost();
     }
 
     @Override

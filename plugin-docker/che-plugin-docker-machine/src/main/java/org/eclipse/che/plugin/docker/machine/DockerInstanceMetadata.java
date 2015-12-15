@@ -32,7 +32,32 @@ import java.util.regex.Pattern;
  * @author Alexander Garagatyi
  */
 public class DockerInstanceMetadata implements MachineMetadata {
-    protected static final String  PROJECTS_ROOT_VARIABLE = "CHE_PROJECTS_ROOT";
+    /**
+     * Env variable that points to root folder of projects in dev machine
+     */
+    public static final String PROJECTS_ROOT_VARIABLE = "CHE_PROJECTS_ROOT";
+
+    /**
+     * Env variable for dev machine that contains url of Che API
+     */
+    public static final String API_ENDPOINT_URL_VARIABLE = "CHE_API_ENDPOINT";
+
+    /**
+     * Environment variable that will be setup in developer machine will contain ID of a workspace for which this machine has been created
+     */
+    public static final String CHE_WORKSPACE_ID = "CHE_WORKSPACE_ID";
+
+    /**
+     * Default HOSTNAME that will be added in all docker containers that are started. This host will container the Docker host's ip
+     * reachable inside the container.
+     */
+    public static final String CHE_HOST = "che-host";
+
+    /**
+     * Environment variable that will be setup in developer machine and contains user token.
+     */
+    public static final String USER_TOKEN = "USER_TOKEN";
+
     protected static final Pattern SERVICE_LABEL_PATTERN  =
             Pattern.compile("che:server:(?<port>[0-9]+(/tcp|/udp)?):(?<servprop>ref|protocol)");
 

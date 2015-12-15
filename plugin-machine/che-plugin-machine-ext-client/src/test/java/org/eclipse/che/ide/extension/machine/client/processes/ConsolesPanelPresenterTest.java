@@ -345,7 +345,7 @@ public class ConsolesPanelPresenterTest {
     public void shouldReturnTitle() throws Exception {
         presenter.getTitle();
 
-        verify(localizationConstant).viewConsolesTitle();
+        verify(localizationConstant, times(2)).viewConsolesTitle();
     }
 
     @Test

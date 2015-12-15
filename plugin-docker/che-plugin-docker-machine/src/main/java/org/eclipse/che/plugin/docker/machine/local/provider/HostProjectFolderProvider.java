@@ -8,27 +8,36 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.ext;
+package org.eclipse.che.plugin.docker.machine.local.provider;
+
+import org.eclipse.che.api.core.util.SystemInfo;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
- * Provides volumes configuration of machine for local storage
+ * Provide path to the project folder on hosted machine
  *
+ * <p>On Unix managed by vfs.local.fs_root_dir property.<br>
+ * On Windows MUST be locate in "user.home" directory in case limitation windows+docker
+ *
+ * @author Vitalii Parfonov
  * @author Alexander Garagatyi
  */
-public class LocalStorageDockerVolumePathProvider implements Provider<String> {
-    private final String localStoragePath;
-
+@Singleton
+public class HostProjectFolderProvider implements Provider<String> {
     @Inject
-    public LocalStorageDockerVolumePathProvider(@Named("local.storage.path") String localStoragePath) {
-        this.localStoragePath = localStoragePath;
-    }
+    @Named("vfs.local.fs_root_dir")
+    private String projectsFolder;
 
     @Override
     public String get() {
-        return localStoragePath + ":/local-storage";
+        if (SystemInfo.isWindows()) {
+            return System.getProperty("user.home") + "\\che\\projects";
+        } else {
+            return projectsFolder;
+        }
     }
 }

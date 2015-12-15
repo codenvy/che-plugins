@@ -75,8 +75,7 @@ public class DockerProcessTest {
         if ("unix".equals(dockerConnectorConfiguration.getDockerDaemonUri().getScheme())) {
             // access through unix socket - reconfigure to use tcp
             dockerConnectorConfiguration = new DockerConnectorConfiguration(new URI("http://localhost:2375"),
-                                                                            this.dockerConnectorConfiguration
-                                                                                    .getDockerCertificatesDirectoryPath(),
+                                                                            null,
                                                                             new InitialAuthConfig(),
                                                                             new DefaultNetworkFinder());
             docker = new DockerConnector(dockerConnectorConfiguration,

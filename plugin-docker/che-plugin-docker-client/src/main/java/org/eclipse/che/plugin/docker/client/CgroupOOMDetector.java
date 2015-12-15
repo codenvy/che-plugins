@@ -88,7 +88,7 @@ public class CgroupOOMDetector implements DockerOOMDetector {
 
     private boolean needStartOOMDetector(String container) {
         if (! oomDetectors.containsKey(container)) {
-            if (DockerConnector.isUnixSocketUri(dockerDaemonUri)) {
+            if (DockerConnectorConfiguration.isUnixSocketUri(dockerDaemonUri)) {
                 return true;
             }
             if (SystemInfo.isLinux()) {

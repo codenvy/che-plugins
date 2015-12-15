@@ -8,29 +8,36 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.ext;
+package org.eclipse.che.plugin.docker.machine.ext.provider;
+
+import org.eclipse.che.api.core.util.SystemInfo;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
  * Reads path to extensions server archive to mount it to docker machine
  *
+ * <p>On Windows hosts MUST be locate in "user.home" directory in case limitation windows+docker.
+ *
+ * @author Vitalii Parfonov
  * @author Alexander Garagatyi
  */
-public class DockerExtServerBindingProviderUnix implements Provider<String> {
-    private final String extServerArchivePath;
-
+@Singleton
+public class ExtServerVolumeProvider implements Provider<String> {
     @Inject
-    public DockerExtServerBindingProviderUnix(@Named("machine.server.ext.archive") String extServerArchivePath) {
-        this.extServerArchivePath = extServerArchivePath;
-    }
+    @Named("machine.server.ext.archive")
+    private String extServerArchivePath;
 
-    // :ro removed because of bug in a docker 1.6:L
-    //TODO add :ro when bug is fixed or rework ext server binding mechanism to provide copy of the ext server zip to each machine
     @Override
     public String get() {
-        return extServerArchivePath + ":/mnt/che/ext-server.zip";
+        if (SystemInfo.isWindows()) {
+            String extServerArchivePath = System.getProperty("user.home") + "\\AppData\\Local\\che\\ext-server.zip";
+            return extServerArchivePath + ":/mnt/che/ext-server.zip:ro";
+        } else {
+            return extServerArchivePath + ":/mnt/che/ext-server.zip:ro";
+        }
     }
 }

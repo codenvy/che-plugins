@@ -18,8 +18,7 @@
     <ui:style>
         .label {
             width: 60px;
-            float: left;
-            font-weight: bold;
+            float: left;            
         }
 
         .noMargin {

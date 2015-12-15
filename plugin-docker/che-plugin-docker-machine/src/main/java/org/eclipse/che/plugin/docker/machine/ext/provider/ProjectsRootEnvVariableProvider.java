@@ -8,20 +8,28 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.ext;
+package org.eclipse.che.plugin.docker.machine.ext.provider;
 
+import org.eclipse.che.plugin.docker.machine.DockerInstanceMetadata;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
- * Reads path to extensions server archive to mount it to docker machine
- * on Windows hosts MUST be locate in "user.home" directory in case limitation windows+docker
+ * Add env variable to docker dev-machine with path to root folder of projects
  *
- * @author Vitalii Parfonov
+ * @author Alexander Garagatyi
  */
-public class DockerExtServerBindingProviderWinOS implements Provider<String> {
+@Singleton
+public class ProjectsRootEnvVariableProvider implements Provider<String> {
+    @Inject
+    @Named("che.projects.root")
+    private String projectFolderPath;
 
+    @Override
     public String get() {
-        String extServerArchivePath = System.getProperty("user.home") + "\\AppData\\Local\\che\\ext-server.zip";
-        return extServerArchivePath + ":/mnt/che/ext-server.zip";
+        return DockerInstanceMetadata.PROJECTS_ROOT_VARIABLE + '=' + projectFolderPath;
     }
 }

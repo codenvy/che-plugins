@@ -24,23 +24,18 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.eclipse.che.plugin.docker.client.DockerConnector.DEFAULT_DOCKER_MACHINE_CERTS_DIR;
-import static org.eclipse.che.plugin.docker.client.DockerConnector.DEFAULT_DOCKER_MACHINE_URI;
-import static org.eclipse.che.plugin.docker.client.DockerConnector.DOCKER_CERT_PATH_PROPERTY;
-import static org.eclipse.che.plugin.docker.client.DockerConnector.DOCKER_HOST_PROPERTY;
-import static org.eclipse.che.plugin.docker.client.DockerConnector.DOCKER_TLS_VERIFY_PROPERTY;
-import static org.eclipse.che.plugin.docker.client.DockerConnector.UNIX_SOCKET_URI;
+import static java.io.File.separatorChar;
 
 /**
  * @author Alexander Garagatyi
  * @author Florent Benoit
  */
 public class DockerConnectorConfiguration {
-
     /**
      * Docker bridge name on Linux.
      */
@@ -65,6 +60,39 @@ public class DockerConnectorConfiguration {
      * Pattern allowing to get every IPv4 digit.
      */
     protected static final Pattern IPV4_ADDRESS_PATTERN = Pattern.compile("(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");
+
+    public static final String UNIX_SOCKET_SCHEME = "unix";
+    public static final String UNIX_SOCKET_PATH   = "/var/run/docker.sock";
+    public static final URI    UNIX_SOCKET_URI    = URI.create(UNIX_SOCKET_SCHEME + "://" + UNIX_SOCKET_PATH);
+
+    /**
+     * System variable used to define location of certificates.
+     */
+    public static final String DOCKER_CERT_PATH_PROPERTY = "DOCKER_CERT_PATH";
+
+    /**
+     * System variable used to define if TLS is used or not.
+     */
+    public static final String DOCKER_TLS_VERIFY_PROPERTY = "DOCKER_TLS_VERIFY";
+
+    /**
+     * System variable used to define host of docker.
+     */
+    public static final String DOCKER_HOST_PROPERTY = "DOCKER_HOST";
+
+    /**
+     * Default URL of docker when using Docker Machine.
+     */
+    public static final URI DEFAULT_DOCKER_MACHINE_URI = URI.create("https://192.168.99.100:2376");
+
+    /**
+     * Default of Docker Machine certificates (machine named default)
+     */
+    public static final String DEFAULT_DOCKER_MACHINE_CERTS_DIR = System.getProperty("user.home")
+                                                                  + separatorChar + ".docker"
+                                                                  + separatorChar + "machine"
+                                                                  + separatorChar + "machines"
+                                                                  + separatorChar + "default";
 
 
     private static final Logger LOG = LoggerFactory.getLogger(DockerConnectorConfiguration.class);
@@ -102,13 +130,67 @@ public class DockerConnectorConfiguration {
         this.networkFinder = networkFinder;
     }
 
-    public static String getExpectedLocalHost() {
-        return SystemInfo.isLinux() ? "localhost" : dockerDaemonUri().getHost();
+    /**
+     * Tests URI to check if it is URI of UNIX socket
+     *
+     * @throws NullPointerException if argument is null
+     */
+    public static boolean isUnixSocketUri(@NotNull  URI uri) {
+        Objects.requireNonNull(uri, "Required non-null uri");
+        return UNIX_SOCKET_SCHEME.equals(uri.getScheme());
+    }
+
+    /**
+     * Gets host (or IP) of server where docker is deployed
+     *
+     * <p>Helps build URI to ports exposed in containers
+     */
+    public String getDockerHost() {
+        return isUnixSocketUri(dockerDaemonUri) ? "localhost" : dockerDaemonUri.getHost();
+    }
+
+    /**
+     * Gets the Docker host ip address. This is host that can be reached from a docker container.
+     *
+     * @return docker host IP address
+     * @see <a href="https://docs.docker.com/articles/networking/">Docker Networking</a>
+     */
+    public String getDockerHostIp() {
+        return getDockerHostIp(SystemInfo.isLinux(), System.getenv());
+    }
+
+    /**
+     * Gets URI of docker API used in client of Docker API
+     *
+     * @see DockerConnector
+     */
+    public URI getDockerDaemonUri() {
+        return dockerDaemonUri;
+    }
+
+    /**
+     * Gets docker registries authentication configuration set in Che configuration properties
+     */
+    public InitialAuthConfig getAuthConfigs() {
+        return authConfigs;
+    }
+
+    /**
+     * Gets certificates for connection to encrypted docker API
+     *
+     * @return Docker certificates to create encrypted connection to docker API
+     * or null if connection is not encrypted or certificates path wasn't configured properly
+     */
+    public DockerCertificates getDockerCertificates() {
+        if (dockerCertificatesDirectoryPath == null || !getDockerDaemonUri().getScheme().equals("https")) {
+            return null;
+        }
+        final File dockerCertificatesDirectory = new File(dockerCertificatesDirectoryPath);
+        return dockerCertificatesDirectory.isDirectory() ? DockerCertificates.loadFromDirectory(dockerCertificatesDirectory) : null;
     }
 
     private static URI dockerDaemonUri() {
         return dockerDaemonUri(SystemInfo.isLinux(), System.getenv());
-
     }
 
     /**
@@ -122,10 +204,6 @@ public class DockerConnectorConfiguration {
      * @return URI to connect to docker
      */
     protected static URI dockerDaemonUri(final boolean isLinux, @NotNull final Map<String, String> env) {
-        if (isLinux) {
-            return UNIX_SOCKET_URI;
-        }
-
         // check if have docker variables
         String host = env.get(DOCKER_HOST_PROPERTY);
         if (host != null) {
@@ -151,14 +229,12 @@ public class DockerConnectorConfiguration {
                                         DOCKER_TLS_VERIFY_PROPERTY), e);
                 // unable to use given property, fallback to default URL
                 return DEFAULT_DOCKER_MACHINE_URI;
-
             }
+        } else if (isLinux) {
+            return UNIX_SOCKET_URI;
+        } else {
+            return DEFAULT_DOCKER_MACHINE_URI;
         }
-        return DEFAULT_DOCKER_MACHINE_URI;
-    }
-
-    public String getDockerHostIp() {
-        return getDockerHostIp(SystemInfo.isLinux(), System.getenv());
     }
 
     /**
@@ -203,23 +279,20 @@ public class DockerConnectorConfiguration {
     }
 
     private static String dockerMachineCertsDirectoryPath() {
-        return dockerMachineCertsDirectoryPath(SystemInfo.isLinux(), System.getenv());
+        return dockerMachineCertsDirectoryPath(System.getenv());
     }
 
     /**
      * Provides the location of certificates used to connect on docker.
      * It may use extra environment to help to build this path
      *
-     * @param isLinux
-     *         if System is running on Linux
      * @param env
      *         should contain System environment
      * @return local path of the docker certificates
+     * @throws NullPointerException if argument is null
      */
-    protected static String dockerMachineCertsDirectoryPath(boolean isLinux, @NotNull Map<String, String> env) {
-        if (isLinux) {
-            return null;
-        }
+    protected static String dockerMachineCertsDirectoryPath(@NotNull Map<String, String> env) {
+        Objects.requireNonNull(env, "Required non-null env variables");
         // check if have boot2docker variables
         String certPath = env.get(DOCKER_CERT_PATH_PROPERTY);
 
@@ -233,28 +306,5 @@ public class DockerConnectorConfiguration {
         }
         // return default value
         return DEFAULT_DOCKER_MACHINE_CERTS_DIR;
-    }
-
-    public URI getDockerDaemonUri() {
-        return dockerDaemonUri;
-    }
-
-    public InitialAuthConfig getAuthConfigs() {
-        return authConfigs;
-    }
-
-    /**
-     * For testing purposes
-     */
-    public String getDockerCertificatesDirectoryPath() {
-        return dockerCertificatesDirectoryPath;
-    }
-
-    public DockerCertificates getDockerCertificates() {
-        if (dockerCertificatesDirectoryPath == null || !getDockerDaemonUri().getScheme().equals("https")) {
-            return null;
-        }
-        final File dockerCertificatesDirectory = new File(dockerCertificatesDirectoryPath);
-        return dockerCertificatesDirectory.isDirectory() ? DockerCertificates.loadFromDirectory(dockerCertificatesDirectory) : null;
     }
 }
