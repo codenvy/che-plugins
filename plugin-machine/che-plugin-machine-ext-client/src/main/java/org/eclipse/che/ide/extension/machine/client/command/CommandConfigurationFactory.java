@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
  *
  * @param <T>
  *         type of the command configuration which this factory produces
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public abstract class CommandConfigurationFactory<T extends CommandConfiguration> {
 

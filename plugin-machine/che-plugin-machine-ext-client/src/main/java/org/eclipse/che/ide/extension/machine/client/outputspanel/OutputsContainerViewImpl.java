@@ -34,7 +34,7 @@ import org.vectomatic.dom.svg.ui.SVGImage;
 /**
  * Implementation of {@link OutputsContainerView}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class OutputsContainerViewImpl extends BaseView<OutputsContainerView.ActionDelegate> implements OutputsContainerView {

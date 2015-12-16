@@ -36,7 +36,7 @@ import java.util.zip.ZipFile;
 /**
  * {@link ApplicationServer} implementation to deploy application to Apache Tomcat servlet container.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Eugene Voevodin
  */
 public abstract class AbstractTomcatServer implements ApplicationServer {

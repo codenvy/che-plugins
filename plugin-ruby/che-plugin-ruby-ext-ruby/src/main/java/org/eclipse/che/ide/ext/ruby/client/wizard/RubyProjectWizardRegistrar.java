@@ -27,7 +27,7 @@ import static org.eclipse.che.ide.ext.ruby.shared.ProjectAttributes.RUBY_ID;
 /**
  * Provides information for registering Ruby project type into project wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class RubyProjectWizardRegistrar implements ProjectWizardRegistrar {
     private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;

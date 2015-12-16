@@ -67,7 +67,7 @@ import static org.eclipse.che.ide.extension.machine.client.perspective.MachinePe
 /**
  * Manager for machine operations.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class MachineManagerImpl implements MachineManager {

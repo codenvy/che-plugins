@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * GWT code server abstract implementation.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public abstract class AbstractCodeServer implements CodeServer {
     private static final String ADD_SOURCES_PROFILE_ID          = "customExtensionSources";

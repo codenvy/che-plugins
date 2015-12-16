@@ -27,7 +27,7 @@ import java.util.LinkedList;
 /**
  * Arbitrary command type.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class CustomCommandType implements CommandType {

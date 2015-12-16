@@ -34,7 +34,7 @@ import static java.nio.file.Files.exists;
 /**
  * A smattering of useful methods to work with the Maven POM.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author andrew00x
  * @author Eugene Voevodin
  */

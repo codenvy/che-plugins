@@ -62,7 +62,7 @@ import static com.google.gwt.event.dom.client.KeyCodes.KEY_UP;
 /**
  * The implementation of {@link CreateMachineView}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class CreateMachineViewImpl extends Window implements CreateMachineView {

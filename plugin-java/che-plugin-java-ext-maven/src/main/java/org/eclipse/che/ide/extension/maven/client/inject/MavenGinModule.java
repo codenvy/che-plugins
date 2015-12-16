@@ -27,7 +27,7 @@ import org.eclipse.che.ide.extension.maven.client.wizard.MavenProjectWizardRegis
  * GIN module for Maven extension.
  *
  * @author Andrey Plotnikov
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @ExtensionGinModule
 public class MavenGinModule extends AbstractGinModule {

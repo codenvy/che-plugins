@@ -19,7 +19,7 @@ import java.util.zip.ZipFile;
 /**
  * Application server to deploy a web app.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface ApplicationServer {
 

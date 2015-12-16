@@ -21,7 +21,7 @@ import org.eclipse.che.commons.annotation.Nullable;
 /**
  * Factory that helps to create nodes for {@link AntProjectTreeStructure}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @see JavaNodeFactory
  */
 public interface AntNodeFactory extends JavaNodeFactory {

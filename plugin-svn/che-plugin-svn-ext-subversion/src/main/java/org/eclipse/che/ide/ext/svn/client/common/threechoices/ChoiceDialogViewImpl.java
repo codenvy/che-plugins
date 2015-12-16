@@ -26,7 +26,7 @@ import com.google.inject.Inject;
  * Implementation of the choice dialog view.
  * 
  * @author Mickaël Leduque
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class ChoiceDialogViewImpl extends Window implements ChoiceDialogView {
 

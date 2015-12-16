@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 import static org.eclipse.che.ide.ext.tutorials.shared.Constants.TUTORIAL_ID;
 import static org.eclipse.che.ide.ext.tutorials.shared.Constants.TUTORIAL_NAME;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public class TutorialProjectType extends ProjectType {
 
     @Inject

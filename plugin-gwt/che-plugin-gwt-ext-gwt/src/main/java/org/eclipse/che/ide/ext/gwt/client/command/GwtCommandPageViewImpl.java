@@ -26,7 +26,7 @@ import org.eclipse.che.ide.ext.gwt.client.GwtLocalizationConstants;
 /**
  * The implementation of {@link GwtCommandPageView}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class GwtCommandPageViewImpl implements GwtCommandPageView {
 

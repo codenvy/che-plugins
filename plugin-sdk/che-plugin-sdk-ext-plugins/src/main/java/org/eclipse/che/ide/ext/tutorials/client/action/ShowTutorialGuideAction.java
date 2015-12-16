@@ -25,7 +25,7 @@ import com.google.inject.Singleton;
 /**
  * Action to open a tutorial guide.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class ShowTutorialGuideAction extends Action {

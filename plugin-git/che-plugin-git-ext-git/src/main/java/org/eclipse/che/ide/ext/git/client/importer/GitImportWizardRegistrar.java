@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Provides information for registering GIT importer into import wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class GitImportWizardRegistrar implements ImportWizardRegistrar {
     private final static String ID = "git";

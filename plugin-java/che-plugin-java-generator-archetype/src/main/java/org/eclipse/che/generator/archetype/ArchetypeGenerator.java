@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Generates projects with maven-archetype-plugin.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class ArchetypeGenerator {

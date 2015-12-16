@@ -16,7 +16,7 @@ import java.util.Objects;
 /**
  * Abstract command which can be configured and executed in machine.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public abstract class CommandConfiguration {
 

@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Implementation of {@link NewJavaSourceFileView}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class NewJavaSourceFileViewImpl extends Window implements NewJavaSourceFileView {
     final Button btnOk;

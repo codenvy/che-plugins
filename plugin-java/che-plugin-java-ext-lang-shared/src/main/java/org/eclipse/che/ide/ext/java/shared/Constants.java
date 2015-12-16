@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.shared;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public interface Constants {
     // project categories
     final String JAVA_CATEGORY    = "Java";

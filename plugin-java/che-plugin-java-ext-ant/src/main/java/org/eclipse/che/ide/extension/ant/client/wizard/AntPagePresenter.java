@@ -36,7 +36,7 @@ import static org.eclipse.che.ide.extension.ant.shared.AntAttributes.ANT_ID;
  * Wizard page for Ant project.
  *
  * @author Vladyslav Zhukovskii
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class AntPagePresenter extends AbstractWizardPage<ImportProject> implements AntPageView.ActionDelegate {
 

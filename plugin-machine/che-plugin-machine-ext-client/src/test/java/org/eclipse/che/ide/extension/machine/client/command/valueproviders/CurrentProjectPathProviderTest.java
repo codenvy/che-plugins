@@ -38,7 +38,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 @RunWith(MockitoJUnitRunner.class)
 public class CurrentProjectPathProviderTest {
 

@@ -23,7 +23,7 @@ import com.google.web.bindery.event.shared.EventBus;
  * Controls a tutorial page state: shows or hides it.
  * Automatically shows a tutorial page when project opening and closes page when project closing.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class GuidePageController {

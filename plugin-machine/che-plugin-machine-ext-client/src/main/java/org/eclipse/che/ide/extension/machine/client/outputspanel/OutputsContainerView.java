@@ -18,7 +18,7 @@ import org.eclipse.che.ide.api.parts.base.BaseActionDelegate;
 /**
  * View of {@link OutputsContainerPresenter}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface OutputsContainerView extends View<OutputsContainerView.ActionDelegate> {
 

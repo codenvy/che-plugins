@@ -16,7 +16,7 @@ import org.eclipse.che.ide.extension.machine.client.command.CommandConfiguration
 /**
  * Describes requirements for the console for command output.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface OutputConsole extends Presenter {
 

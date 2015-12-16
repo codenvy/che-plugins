@@ -27,7 +27,7 @@ import static org.eclipse.che.ide.ext.go.shared.ProjectAttributes.GO_ID;
 /**
  * Provides information for registering Go project type into project wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class GoProjectWizardRegistrar implements ProjectWizardRegistrar {
     private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;

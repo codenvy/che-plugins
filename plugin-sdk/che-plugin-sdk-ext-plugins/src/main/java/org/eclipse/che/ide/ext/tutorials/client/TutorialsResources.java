@@ -19,8 +19,7 @@ import org.vectomatic.dom.svg.ui.SVGResource;
 /**
  * Client resources.
  *
- * @author <a href="mailto:azatsarynnyy@codenvy.com">Artem Zatsarynnyy</a>
- * @version $Id: TutorialsResources.java Sep 13, 2013 12:37:19 PM azatsarynnyy $
+ * @author Artem Zatsarynnyi
  */
 public interface TutorialsResources extends ClientBundle {
     interface TutorialsCss extends CssResource {

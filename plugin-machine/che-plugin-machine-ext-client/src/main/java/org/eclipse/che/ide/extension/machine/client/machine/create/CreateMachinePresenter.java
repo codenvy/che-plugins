@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Presenter for creating machine.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class CreateMachinePresenter implements CreateMachineView.ActionDelegate {

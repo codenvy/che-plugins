@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Represents GWT command.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class GwtCommandConfiguration extends CommandConfiguration {
 

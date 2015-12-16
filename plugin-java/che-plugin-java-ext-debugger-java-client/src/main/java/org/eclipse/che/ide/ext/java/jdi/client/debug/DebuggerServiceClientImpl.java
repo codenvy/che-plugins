@@ -37,7 +37,7 @@ import static org.eclipse.che.ide.rest.HTTPHeader.CONTENTTYPE;
  * The implementation of {@link DebuggerServiceClient}.
  *
  * @author Vitaly Parfonov
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class DebuggerServiceClientImpl implements DebuggerServiceClient {

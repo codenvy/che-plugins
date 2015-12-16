@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * The view of {@link NewJavaSourceFilePresenter}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface NewJavaSourceFileView extends View<NewJavaSourceFileView.ActionDelegate> {
 

@@ -26,7 +26,7 @@ import com.google.inject.Inject;
  * The footer show on choice dialogs.
  * 
  * @author Mickaël Leduque
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class ChoiceDialogFooter extends Composite {
 

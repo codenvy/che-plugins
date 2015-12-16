@@ -18,7 +18,7 @@ import org.eclipse.che.ide.extension.maven.server.projecttype.MavenProjectType;
 import static org.eclipse.che.ide.ext.gwt.shared.Constants.GWT_PROJECT_TYPE_ID;
 import static org.eclipse.che.ide.ext.gwt.shared.Constants.GWT_PROJECT_TYPE_NAME;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public class GwtProjectType extends AbstractProjectType {
 
     @Inject

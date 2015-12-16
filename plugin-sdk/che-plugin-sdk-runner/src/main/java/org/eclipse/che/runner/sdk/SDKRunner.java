@@ -52,7 +52,7 @@ import java.util.zip.ZipFile;
 /**
  * Runner implementation to run Codenvy extensions by deploying it to application server.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Eugene Voevodin
  */
 @Singleton

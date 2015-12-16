@@ -29,7 +29,7 @@ import java.util.List;
 import static org.eclipse.che.api.core.model.machine.MachineStatus.RUNNING;
 import static org.eclipse.che.api.core.model.machine.MachineStatus.CREATING;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 @Singleton
 public class MachineComponent implements Component {
 

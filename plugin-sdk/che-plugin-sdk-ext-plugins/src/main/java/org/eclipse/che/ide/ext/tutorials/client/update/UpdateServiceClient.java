@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Client for service for updating launched Codenvy Extension on SDK runner.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Valeriy Svydenko
  */
 public interface UpdateServiceClient {

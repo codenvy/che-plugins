@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
  *
  * @param <T>
  *         type of the command configuration which this page should edit
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface CommandConfigurationPage<T extends CommandConfiguration> extends Presenter {
 

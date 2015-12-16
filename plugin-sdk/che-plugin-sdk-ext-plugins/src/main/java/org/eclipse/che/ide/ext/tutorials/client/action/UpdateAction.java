@@ -29,7 +29,7 @@ import static org.eclipse.che.ide.ext.runner.client.models.Runner.Status.RUNNING
 /**
  * Action to update Codenvy Extension project on SDK runner.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Valeriy Svydenko
  */
 @Singleton

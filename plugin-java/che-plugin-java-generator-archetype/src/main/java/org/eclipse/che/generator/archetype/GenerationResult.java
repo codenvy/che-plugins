@@ -15,7 +15,7 @@ import java.io.File;
 /**
  * Represents result of a project generating.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 class GenerationResult {
     private final boolean success;

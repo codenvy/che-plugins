@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Generates Ant-project structure.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class AntProjectGenerator implements CreateProjectHandler {
 

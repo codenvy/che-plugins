@@ -17,7 +17,7 @@ import org.eclipse.che.ide.api.mvp.View;
 /**
  * The view of {@link GwtCommandPagePresenter}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @ImplementedBy(GwtCommandPageViewImpl.class)
 public interface GwtCommandPageView extends View<GwtCommandPageView.ActionDelegate> {

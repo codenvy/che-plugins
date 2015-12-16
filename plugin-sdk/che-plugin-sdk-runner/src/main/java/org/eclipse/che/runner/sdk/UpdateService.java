@@ -19,7 +19,7 @@ import javax.ws.rs.PathParam;
 /**
  * Service to update server-side code of launched Codenvy Extension.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Path("runner-sdk")
 public class UpdateService {

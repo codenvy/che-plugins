@@ -37,7 +37,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * GWT code server process.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public abstract class CodeServerProcess implements ProjectEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(CodeServer.class);

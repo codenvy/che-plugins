@@ -53,7 +53,7 @@ import java.util.Map;
  * The class contains business logic to control displaying of machines on special view.
  *
  * @author Dmitry Shnurenko
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class MachinePanelPresenter extends BasePresenter implements MachinePanelView.ActionDelegate,

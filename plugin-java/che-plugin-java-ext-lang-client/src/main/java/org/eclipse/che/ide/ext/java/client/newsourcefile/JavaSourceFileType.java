@@ -13,7 +13,7 @@ package org.eclipse.che.ide.ext.java.client.newsourcefile;
 /**
  * Type of Java source file.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 enum JavaSourceFileType {
     CLASS("Class"),

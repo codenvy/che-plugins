@@ -52,7 +52,7 @@ import static org.eclipse.che.ide.api.action.IdeActions.GROUP_FILE_NEW;
 /**
  * Maven extension entry point.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 @Extension(title = "Maven", version = "3.0.0")

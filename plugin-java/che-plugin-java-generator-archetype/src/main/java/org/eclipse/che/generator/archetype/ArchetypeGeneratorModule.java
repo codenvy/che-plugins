@@ -12,7 +12,7 @@ package org.eclipse.che.generator.archetype;
 
 import com.google.inject.AbstractModule;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public class ArchetypeGeneratorModule extends AbstractModule {
     @Override
     protected void configure() {

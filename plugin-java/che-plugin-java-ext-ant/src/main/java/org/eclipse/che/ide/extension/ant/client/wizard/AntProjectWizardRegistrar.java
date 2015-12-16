@@ -28,7 +28,7 @@ import static org.eclipse.che.ide.ext.java.shared.Constants.JAVA_CATEGORY;
 /**
  * Provides information for registering Ant project type into project wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class AntProjectWizardRegistrar implements ProjectWizardRegistrar {
     private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;

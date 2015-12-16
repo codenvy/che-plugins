@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * The view interface for the choice dialog component.
  * 
  * @author Mickaël Leduque
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface ChoiceDialogView {
 

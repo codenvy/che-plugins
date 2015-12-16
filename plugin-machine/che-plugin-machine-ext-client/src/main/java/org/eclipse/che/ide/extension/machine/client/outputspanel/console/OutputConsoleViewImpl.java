@@ -29,7 +29,7 @@ import com.google.inject.Inject;
 /**
  * View for {@link OutputConsole}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class OutputConsoleViewImpl extends Composite implements OutputConsoleView {
 

@@ -32,7 +32,7 @@ import static org.eclipse.che.ide.ext.tutorials.client.TutorialsExtension.DEFAUL
 /**
  * Displays a page that contains a tutorial guide.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class GuidePage extends AbstractPartPresenter {

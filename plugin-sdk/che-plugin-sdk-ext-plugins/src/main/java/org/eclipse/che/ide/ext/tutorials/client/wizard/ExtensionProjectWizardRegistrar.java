@@ -27,7 +27,7 @@ import static org.eclipse.che.ide.Constants.CODENVY_PLUGIN_ID;
 /**
  * Provides information for registering AngularJS project type into project wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class ExtensionProjectWizardRegistrar implements ProjectWizardRegistrar {
     private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;

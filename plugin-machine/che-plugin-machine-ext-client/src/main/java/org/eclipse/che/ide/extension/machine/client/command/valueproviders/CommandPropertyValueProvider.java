@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
  * <p>
  * Actual value will be substituted before sending a command for execution to the server.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface CommandPropertyValueProvider {
 

@@ -13,7 +13,7 @@ package org.eclipse.che.runner.sdk;
 import org.eclipse.che.api.runner.RunnerException;
 
 /**
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface ApplicationUpdater {
     /** Updates an application. */

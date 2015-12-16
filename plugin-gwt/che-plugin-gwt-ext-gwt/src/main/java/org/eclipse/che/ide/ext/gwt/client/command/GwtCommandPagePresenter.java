@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Page allows to configure GWT command parameters.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class GwtCommandPagePresenter implements GwtCommandPageView.ActionDelegate, CommandConfigurationPage<GwtCommandConfiguration> {

@@ -28,7 +28,7 @@ import java.util.ArrayList;
 /**
  * Unmarshaller for deserializing debugger event list, which is received over WebSocket connection.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class DebuggerEventListUnmarshallerWS implements Unmarshallable<DebuggerEventList> {
     private DtoFactory        dtoFactory;

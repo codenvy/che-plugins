@@ -56,7 +56,7 @@ import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.VERSION
 /**
  * Generates Maven project using maven-archetype-plugin.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class ArchetypeGenerationStrategy implements GeneratorStrategy {

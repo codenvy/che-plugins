@@ -28,7 +28,7 @@ import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspect
 /**
  * Action for editing commands.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class EditCommandsAction extends AbstractPerspectiveAction {

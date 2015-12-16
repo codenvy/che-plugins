@@ -18,7 +18,7 @@ import org.eclipse.che.ide.api.parts.base.BaseActionDelegate;
 /**
  * View of {@link MachineConsolePresenter}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface MachineConsoleView extends View<MachineConsoleView.ActionDelegate> {
 

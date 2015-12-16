@@ -34,7 +34,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Manager for command operations.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class CommandManager {

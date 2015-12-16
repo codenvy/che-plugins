@@ -27,7 +27,7 @@ import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.MAVEN_I
 /**
  * Provides information for registering Maven project type into project wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class MavenProjectWizardRegistrar implements ProjectWizardRegistrar {
     private final List<Provider<? extends WizardPage<ProjectConfigDto>>> wizardPages;

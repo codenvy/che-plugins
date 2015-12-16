@@ -23,7 +23,7 @@ import com.google.inject.assistedinject.AssistedInject;
  * {@link ChoiceDialog} implementation.
  * 
  * @author Mickaël Leduque
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class ChoiceDialogPresenter implements ChoiceDialog, ChoiceDialogView.ActionDelegate {
 

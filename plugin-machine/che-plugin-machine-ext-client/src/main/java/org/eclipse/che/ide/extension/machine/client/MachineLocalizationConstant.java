@@ -15,7 +15,7 @@ import com.google.gwt.i18n.client.Messages;
 /**
  * I18n constants for the Machine extension.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface MachineLocalizationConstant extends Messages {
 

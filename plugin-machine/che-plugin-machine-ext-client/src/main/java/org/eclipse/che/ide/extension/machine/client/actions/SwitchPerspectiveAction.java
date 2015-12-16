@@ -31,7 +31,7 @@ import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspect
 /**
  * Action for switching Project/Machine perspectives.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class SwitchPerspectiveAction extends Action implements CustomComponentAction {

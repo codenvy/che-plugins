@@ -38,7 +38,7 @@ import java.nio.file.Files;
 /**
  * Provides access to the {@link ArchetypeGenerator} through HTTP.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Path("/generator-archetype")
 public class ArchetypeGeneratorService {

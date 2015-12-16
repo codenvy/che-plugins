@@ -45,7 +45,7 @@ import static org.eclipse.che.api.machine.gwt.client.MachineManager.MachineOpera
 /**
  * Notifies about changing machine state.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 class MachineStatusNotifier {

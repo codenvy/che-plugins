@@ -26,7 +26,7 @@ import org.eclipse.che.ide.util.dom.Elements;
  *
  * TODO temporary moved here, will be removed after resolving IDEX-3045
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Vlad Zhukovskyi
  */
 public class ProjectTreeNodeRenderer implements NodeRenderer<TreeNode<?>> {

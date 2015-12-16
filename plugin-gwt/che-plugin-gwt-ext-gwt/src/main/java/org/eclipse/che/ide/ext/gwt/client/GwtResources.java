@@ -18,7 +18,7 @@ import org.vectomatic.dom.svg.ui.SVGResource;
 /**
  * Client resources.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface GwtResources extends ClientBundle {
 

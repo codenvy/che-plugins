@@ -32,7 +32,7 @@ import org.eclipse.che.ide.api.parts.base.BaseView;
 /**
  * Implementation of {@link MachineConsoleView}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class MachineConsoleViewImpl extends BaseView<MachineConsoleView.ActionDelegate> implements MachineConsoleView {

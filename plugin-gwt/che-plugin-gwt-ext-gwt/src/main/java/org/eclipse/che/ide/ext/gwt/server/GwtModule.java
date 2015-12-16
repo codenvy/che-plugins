@@ -16,7 +16,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.eclipse.che.api.core.model.project.type.ProjectType;
 import org.eclipse.che.inject.DynaModule;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 @DynaModule
 public class GwtModule extends AbstractModule {
 

@@ -31,7 +31,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Provides current project's path.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Vlad Zhukovskyi
  */
 @Singleton

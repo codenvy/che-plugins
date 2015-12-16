@@ -62,7 +62,7 @@ import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspect
 /**
  * Action that allows user to select command from list of all commands.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class SelectCommandComboBoxReady extends AbstractPerspectiveAction implements CustomComponentAction,

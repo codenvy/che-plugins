@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 /**
  * Testing {@link org.eclipse.che.ide.ext.java.jdi.client.debug.expression.EvaluateExpressionPresenter} functionality.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class EvaluateExpressionTest extends BaseTest {
     private static final String EXPRESSION        = "expression";

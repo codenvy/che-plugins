@@ -27,7 +27,7 @@ import static org.eclipse.che.ide.ext.tutorials.shared.Constants.TUTORIAL_ID;
 /**
  * Provides information for registering AngularJS project type into project wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class TutorialProjectWizardRegistrar implements ProjectWizardRegistrar {
     private final List<Provider<? extends WizardPage<ImportProject>>> wizardPages;

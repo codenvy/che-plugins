@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Factory for {@link CustomCommandConfiguration} instances.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class CustomCommandConfigurationFactory extends CommandConfigurationFactory<CustomCommandConfiguration> {
 

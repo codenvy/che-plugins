@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * Implementation for {@link CommandPropertyValueProviderRegistry}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class CommandPropertyValueProviderRegistryImpl implements CommandPropertyValueProviderRegistry {
 

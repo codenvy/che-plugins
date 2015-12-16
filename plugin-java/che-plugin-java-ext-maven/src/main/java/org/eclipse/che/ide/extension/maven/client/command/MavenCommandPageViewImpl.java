@@ -26,7 +26,7 @@ import org.eclipse.che.ide.extension.maven.client.MavenLocalizationConstant;
 /**
  * The implementation of {@link MavenCommandPageView}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class MavenCommandPageViewImpl implements MavenCommandPageView {
 

@@ -47,7 +47,7 @@ import org.eclipse.che.ide.settings.common.SettingsPagePresenter;
 
 /**
  * @author Evgen Vidolob
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @ExtensionGinModule
 public class JavaGinModule extends AbstractGinModule {

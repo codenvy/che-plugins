@@ -68,7 +68,7 @@ import static org.eclipse.che.commons.json.JsonHelper.toJson;
  * connection errors. Instance of Debugger is not thread-safe.
  *
  * @author andrew00x
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Valeriy Svydenko
  */
 public class Debugger implements EventsHandler {

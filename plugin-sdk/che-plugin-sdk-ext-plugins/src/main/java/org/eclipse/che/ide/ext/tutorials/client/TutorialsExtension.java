@@ -29,7 +29,7 @@ import static org.eclipse.che.ide.api.action.IdeActions.GROUP_WINDOW;
 /**
  * Entry point for an extension that adds support to work with tutorial projects.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 @Extension(title = "Codenvy tutorial projects", version = "3.0.0")

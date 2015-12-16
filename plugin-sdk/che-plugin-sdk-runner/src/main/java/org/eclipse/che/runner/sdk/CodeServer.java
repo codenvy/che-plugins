@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * GWT code server.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Alexander Andrienko
  */
 public interface CodeServer {

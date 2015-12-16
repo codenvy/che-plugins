@@ -29,7 +29,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Provides dev-machine's host name.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class DevMachineHostNameProvider implements CommandPropertyValueProvider, MachineStateHandler {

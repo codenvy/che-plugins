@@ -15,7 +15,7 @@ import com.google.gwt.i18n.client.Messages;
 /**
  * Represents the localization constants contained in resource bundle: 'MavenLocalizationConstant.properties'.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Dmitry Shnurenko
  */
 public interface MavenLocalizationConstant extends Messages {

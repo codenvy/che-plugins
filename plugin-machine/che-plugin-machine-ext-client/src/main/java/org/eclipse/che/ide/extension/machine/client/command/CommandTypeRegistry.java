@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Registry for command types.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class CommandTypeRegistry {

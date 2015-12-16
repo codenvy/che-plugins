@@ -28,7 +28,7 @@ import java.util.LinkedList;
 /**
  * Maven command type.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class MavenCommandType implements CommandType {

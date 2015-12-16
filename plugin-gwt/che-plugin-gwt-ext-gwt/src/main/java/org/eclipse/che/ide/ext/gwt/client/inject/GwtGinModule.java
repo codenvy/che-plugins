@@ -22,7 +22,7 @@ import org.eclipse.che.ide.extension.machine.client.command.CommandType;
 /**
  * GIN module for Che GWT extension.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @ExtensionGinModule
 public class GwtGinModule extends AbstractGinModule {

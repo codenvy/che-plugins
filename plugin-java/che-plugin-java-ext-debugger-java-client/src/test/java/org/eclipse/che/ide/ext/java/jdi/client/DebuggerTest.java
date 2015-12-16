@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
 /**
  * Testing {@link DebuggerPresenter} functionality.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Valeriy Svydenko
  */
 public class DebuggerTest extends BaseTest {

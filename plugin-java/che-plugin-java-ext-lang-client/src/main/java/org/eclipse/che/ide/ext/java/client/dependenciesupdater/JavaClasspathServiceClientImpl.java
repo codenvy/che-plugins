@@ -38,7 +38,7 @@ import static org.eclipse.che.ide.rest.HTTPHeader.CONTENTTYPE;
 /**
  * Implementation of {@link JavaClasspathServiceClient}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class JavaClasspathServiceClientImpl implements JavaClasspathServiceClient {

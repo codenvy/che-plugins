@@ -41,7 +41,7 @@ import static org.eclipse.che.ide.ext.java.shared.dto.ClassPathBuilderResult.Sta
 /**
  * Updates dependencies for Maven project.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Vladyslav Zhukovskii
  */
 @Singleton

@@ -17,7 +17,7 @@ import org.eclipse.che.ide.api.mvp.View;
 /**
  * The view of {@link CustomPagePresenter}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @ImplementedBy(CustomPageViewImpl.class)
 public interface CustomPageView extends View<CustomPageView.ActionDelegate> {

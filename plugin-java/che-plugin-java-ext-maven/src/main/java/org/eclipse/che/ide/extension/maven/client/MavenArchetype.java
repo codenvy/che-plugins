@@ -16,7 +16,7 @@ import org.eclipse.che.commons.annotation.Nullable;
 /**
  * Describes the Maven archetype.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class MavenArchetype {
     private final String groupId;

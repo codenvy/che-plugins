@@ -17,7 +17,7 @@ import org.eclipse.che.api.machine.shared.dto.MachineStateDto;
 /**
  * Event that describes the fact that machine state has been changed.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class MachineStateEvent extends GwtEvent<MachineStateHandler> {
 

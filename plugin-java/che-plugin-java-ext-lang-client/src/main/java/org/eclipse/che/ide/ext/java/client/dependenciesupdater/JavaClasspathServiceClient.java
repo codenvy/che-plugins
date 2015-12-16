@@ -16,7 +16,7 @@ import org.eclipse.che.ide.websocket.rest.RequestCallback;
 /**
  * Client for Java classpath service.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface JavaClasspathServiceClient {
 

@@ -64,7 +64,7 @@ import static org.eclipse.che.ide.extension.machine.client.perspective.MachinePe
 /**
  * GIN module for Machine extension.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Dmitry Shnurenko
  * @author Valeriy Svydenko
  */

@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * The view of {@link EditCommandsPresenter}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface EditCommandsView extends View<EditCommandsView.ActionDelegate> {
 

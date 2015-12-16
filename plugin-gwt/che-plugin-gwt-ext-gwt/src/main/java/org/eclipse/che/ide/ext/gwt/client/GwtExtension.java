@@ -18,7 +18,7 @@ import org.eclipse.che.ide.api.extension.Extension;
 /**
  * Entry point for an extension that adds support to work with GWT projects.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 @Extension(title = "GWT", version = "1.0.0")

@@ -17,7 +17,7 @@ import org.eclipse.che.inject.DynaModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 @DynaModule
 public class CodenvyPluginsModule extends AbstractModule {
     @Override

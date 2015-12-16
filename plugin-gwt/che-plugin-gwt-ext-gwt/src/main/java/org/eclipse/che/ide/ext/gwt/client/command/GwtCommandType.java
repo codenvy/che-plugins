@@ -29,7 +29,7 @@ import java.util.LinkedList;
 /**
  * GWT command type.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class GwtCommandType implements CommandType {

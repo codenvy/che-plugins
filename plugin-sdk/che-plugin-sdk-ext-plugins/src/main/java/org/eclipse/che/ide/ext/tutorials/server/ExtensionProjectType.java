@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 import static org.eclipse.che.ide.Constants.CODENVY_PLUGIN_ID;
 import static org.eclipse.che.ide.Constants.EXLIPSE_CHE_PLUGIN_NAME;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public class ExtensionProjectType extends ProjectType {
 
     @Inject

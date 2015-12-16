@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Action to create new Java source file.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class NewJavaSourceFileAction extends ProjectAction {

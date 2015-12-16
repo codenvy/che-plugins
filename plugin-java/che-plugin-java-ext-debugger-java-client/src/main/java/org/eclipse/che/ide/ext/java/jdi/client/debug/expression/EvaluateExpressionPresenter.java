@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Presenter for evaluating an expression.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class EvaluateExpressionPresenter implements EvaluateExpressionView.ActionDelegate {

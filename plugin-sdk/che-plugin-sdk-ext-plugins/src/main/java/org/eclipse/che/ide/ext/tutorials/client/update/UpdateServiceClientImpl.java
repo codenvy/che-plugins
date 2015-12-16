@@ -24,7 +24,7 @@ import javax.validation.constraints.NotNull;
 import static com.google.gwt.http.client.RequestBuilder.POST;
 
 /**
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Valeriy Svydenko
  */
 @Singleton

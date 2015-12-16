@@ -15,7 +15,7 @@ import com.google.gwt.i18n.client.Messages;
 /**
  * Localized constants contained in 'GwtLocalizationConstants.properties'.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface GwtLocalizationConstants extends Messages {
 

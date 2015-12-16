@@ -32,7 +32,7 @@ import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspect
  * Action for creating Maven module.
  *
  * @author Evgen Vidolob
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class CreateMavenModuleAction extends AbstractPerspectiveAction {

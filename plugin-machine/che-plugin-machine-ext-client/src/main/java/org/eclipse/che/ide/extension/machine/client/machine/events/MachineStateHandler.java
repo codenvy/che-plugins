@@ -15,7 +15,7 @@ import com.google.gwt.event.shared.EventHandler;
 /**
  * A handler for handling {@link MachineStateEvent}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface MachineStateHandler extends EventHandler {
 

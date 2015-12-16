@@ -36,7 +36,7 @@ import static org.eclipse.che.ide.api.action.IdeActions.GROUP_MAIN_MENU;
  * Extension allows debug Java web applications.
  *
  * @author Andrey Plotnikov
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Valeriy Svydenko
  * @author Anatoliy Bazko
  */

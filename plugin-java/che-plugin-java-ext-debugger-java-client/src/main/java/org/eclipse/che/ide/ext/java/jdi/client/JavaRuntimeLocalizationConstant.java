@@ -13,7 +13,7 @@ package org.eclipse.che.ide.ext.java.jdi.client;
 /**
  * Interface to represent the messages contained in resource bundle: 'JavaRuntimeLocalizationConstant.properties'.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface JavaRuntimeLocalizationConstant extends com.google.gwt.i18n.client.Messages {
     /* Actions */

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.gwt.shared;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public interface Constants {
     String GWT_PROJECT_TYPE_ID   = "gwt";
     String GWT_PROJECT_TYPE_NAME = "GWT";

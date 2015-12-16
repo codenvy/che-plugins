@@ -16,7 +16,7 @@ import com.google.gwt.i18n.client.Messages;
  * Localization constants. Interface to represent the constants defined in resource bundle:
  * 'WebLocalizationConstant.properties'.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface WebLocalizationConstant extends Messages {
     /* Actions */

@@ -18,7 +18,7 @@ import java.util.Collection;
 /**
  * The type of a command.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface CommandType {
 

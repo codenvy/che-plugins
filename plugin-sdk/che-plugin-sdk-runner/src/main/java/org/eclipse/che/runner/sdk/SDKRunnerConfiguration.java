@@ -16,7 +16,7 @@ import org.eclipse.che.api.runner.internal.RunnerConfiguration;
 /**
  * Configuration of Codenvy extensions runner.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class SDKRunnerConfiguration extends RunnerConfiguration {
     private final String server;

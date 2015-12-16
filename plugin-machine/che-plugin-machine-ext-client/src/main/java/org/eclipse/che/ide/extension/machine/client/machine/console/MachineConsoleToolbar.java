@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 /**
  * Used to bind machine console toolbar.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD, ElementType.TYPE})

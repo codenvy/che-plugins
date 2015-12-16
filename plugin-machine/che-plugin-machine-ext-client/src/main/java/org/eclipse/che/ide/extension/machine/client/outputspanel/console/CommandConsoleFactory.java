@@ -14,7 +14,7 @@ import com.google.inject.name.Named;
 
 import org.eclipse.che.ide.extension.machine.client.command.CommandConfiguration;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public interface CommandConsoleFactory {
 
     /** Create the instance of {@link CommandOutputConsole} for the given {@code commandConfiguration}. */

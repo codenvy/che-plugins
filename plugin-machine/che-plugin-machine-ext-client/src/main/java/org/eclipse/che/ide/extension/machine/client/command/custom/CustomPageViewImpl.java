@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * The implementation of {@link CustomPageView}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class CustomPageViewImpl implements CustomPageView {
 

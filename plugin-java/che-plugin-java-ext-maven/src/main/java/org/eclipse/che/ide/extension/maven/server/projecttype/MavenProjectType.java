@@ -21,7 +21,7 @@ import javax.inject.Singleton;
 /**
  * @author Evgen Vidolob
  * @author Dmitry Shnurenko
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class MavenProjectType extends AbstractProjectType {

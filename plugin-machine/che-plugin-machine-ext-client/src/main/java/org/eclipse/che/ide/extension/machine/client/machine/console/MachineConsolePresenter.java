@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Machine console.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class MachineConsolePresenter extends BasePresenter implements MachineConsoleView.ActionDelegate, HasView {

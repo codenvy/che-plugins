@@ -59,7 +59,7 @@ import java.util.Map;
 /**
  * The implementation of {@link EditCommandsView}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Oleksii Orel
  */
 @Singleton

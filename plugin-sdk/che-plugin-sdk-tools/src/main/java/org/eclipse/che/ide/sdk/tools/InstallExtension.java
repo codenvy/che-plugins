@@ -40,7 +40,7 @@ import java.util.zip.ZipFile;
  * <p/>
  * - add collected info in IDE.gwt.xml and pom.xml.
  *
- * @author <a href="mailto:azatsarynnyy@codenvy.com">Artem Zatsarynnyy</a>
+ * @author Artem Zatsarynnyi
  */
 public class InstallExtension {
     public static final String IDE_GWT_XML_FILE_NAME       = "IDE.gwt.xml";

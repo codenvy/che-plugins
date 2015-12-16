@@ -17,7 +17,7 @@ import org.eclipse.che.ide.api.mvp.View;
 /**
  * The view of {@link MavenCommandPagePresenter}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @ImplementedBy(MavenCommandPageViewImpl.class)
 public interface MavenCommandPageView extends View<MavenCommandPageView.ActionDelegate> {

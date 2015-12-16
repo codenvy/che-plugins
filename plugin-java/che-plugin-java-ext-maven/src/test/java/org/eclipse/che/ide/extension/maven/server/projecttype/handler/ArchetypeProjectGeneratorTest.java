@@ -26,7 +26,7 @@
 //
 //import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.ARCHETYPE_GENERATION_STRATEGY;
 //
-///** @author Artem Zatsarynnyy */
+///** @author Artem Zatsarynnyi */
 //@RunWith(MockitoJUnitRunner.class)
 //public class ArchetypeProjectGeneratorTest {
 //

@@ -31,7 +31,7 @@ import static org.eclipse.che.ide.api.notification.Notification.Type.ERROR;
 /**
  * Presenter for changing variables value.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class ChangeValuePresenter implements ChangeValueView.ActionDelegate {

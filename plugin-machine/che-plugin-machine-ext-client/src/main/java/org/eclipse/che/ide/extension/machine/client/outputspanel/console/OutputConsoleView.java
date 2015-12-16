@@ -15,7 +15,7 @@ import org.eclipse.che.ide.api.mvp.View;
 /**
  * View for {@link OutputConsole}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface OutputConsoleView extends View<OutputConsoleView.ActionDelegate> {
 

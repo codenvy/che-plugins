@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 /**
  * Testing {@link ChangeValuePresenter} functionality.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class ChangeVariableValueTest extends BaseTest {
     private static final String VAR_VALUE   = "var_value";

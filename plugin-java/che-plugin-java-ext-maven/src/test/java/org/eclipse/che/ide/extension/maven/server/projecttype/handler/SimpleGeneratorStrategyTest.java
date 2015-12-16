@@ -59,7 +59,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public class SimpleGeneratorStrategyTest {
     private static final String workspace = "my_ws";
 

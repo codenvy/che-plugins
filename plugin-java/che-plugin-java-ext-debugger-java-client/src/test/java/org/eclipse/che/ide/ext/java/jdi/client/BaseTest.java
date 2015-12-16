@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 /**
  * Base test for java debugger extension.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @RunWith(MockitoJUnitRunner.class)
 public abstract class BaseTest {

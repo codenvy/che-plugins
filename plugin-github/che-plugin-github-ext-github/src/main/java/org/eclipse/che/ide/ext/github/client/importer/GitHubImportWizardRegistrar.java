@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Provides information for registering GitHub importer into import wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class GitHubImportWizardRegistrar implements ImportWizardRegistrar {
     private final static String ID = "github";

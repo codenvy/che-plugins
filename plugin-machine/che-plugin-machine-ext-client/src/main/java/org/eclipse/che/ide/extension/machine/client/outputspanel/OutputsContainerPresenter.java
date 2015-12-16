@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Container for the output consoles.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class OutputsContainerPresenter extends BasePresenter implements OutputsContainerView.ActionDelegate,

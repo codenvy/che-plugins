@@ -15,7 +15,7 @@ import org.eclipse.che.dto.shared.DTO;
 /**
  * DTO for project generating task.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @DTO
 public interface GenerationTaskDescriptor {

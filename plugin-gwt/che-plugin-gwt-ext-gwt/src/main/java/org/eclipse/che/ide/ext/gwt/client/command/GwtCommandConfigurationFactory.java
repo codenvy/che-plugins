@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Factory for {@link GwtCommandConfiguration} instances.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class GwtCommandConfigurationFactory extends CommandConfigurationFactory<GwtCommandConfiguration> {
 

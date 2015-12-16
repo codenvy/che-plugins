@@ -16,7 +16,7 @@ import org.eclipse.che.ide.runtime.Status;
 /**
  * A collection of methods for Java-specific things.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class JavaUtils {
     private JavaUtils() {

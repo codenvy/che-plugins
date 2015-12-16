@@ -21,7 +21,7 @@ import java.util.List;
  *
  * TODO temporary moved here, will be removed after resolving IDEX-3045
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class ProjectTreeNodeDataAdapter implements NodeDataAdapter<TreeNode<?>> {
 

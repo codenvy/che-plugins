@@ -54,7 +54,7 @@ import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.VERSION
 
 /**
  * @author Evgen Vidolob
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class MavenPagePresenter extends AbstractWizardPage<ProjectConfigDto> implements MavenPageView.ActionDelegate {
 

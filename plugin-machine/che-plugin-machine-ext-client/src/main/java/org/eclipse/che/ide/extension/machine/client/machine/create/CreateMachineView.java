@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * The view of {@link CreateMachinePresenter}.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public interface CreateMachineView extends View<CreateMachineView.ActionDelegate> {
 

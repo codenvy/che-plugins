@@ -52,7 +52,7 @@ import java.util.Map;
 /**
  * Presenter for managing commands.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Oleksii Orel
  */
 @Singleton

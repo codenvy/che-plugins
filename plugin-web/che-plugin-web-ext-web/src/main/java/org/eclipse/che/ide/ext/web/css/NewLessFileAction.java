@@ -18,7 +18,7 @@ import com.google.inject.Singleton;
 /**
  * Action to create new Less file.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class NewLessFileAction extends AbstractNewResourceAction {

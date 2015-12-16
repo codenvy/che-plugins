@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Factory for {@link MavenCommandConfiguration} instances.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class MavenCommandConfigurationFactory extends CommandConfigurationFactory<MavenCommandConfiguration> {
 

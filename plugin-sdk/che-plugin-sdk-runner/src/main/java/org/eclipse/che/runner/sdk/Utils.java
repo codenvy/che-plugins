@@ -36,7 +36,7 @@ import java.util.zip.ZipFile;
 /**
  * A smattering of useful methods.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 class Utils {
     private static DownloadPlugin downloadPlugin = new HttpDownloadPlugin();

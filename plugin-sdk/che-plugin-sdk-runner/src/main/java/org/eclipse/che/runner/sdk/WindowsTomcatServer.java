@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * {@link ApplicationServer} implementation to deploy application to Apache Tomcat servlet container on os Windows.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Eugene Voevodin
  * @author Alexander Andrienko
  */

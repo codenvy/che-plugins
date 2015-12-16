@@ -28,7 +28,7 @@ import static org.eclipse.che.ide.ext.java.shared.Constants.JAVA_CATEGORY;
 /**
  * Provides information for registering GWT project type into project wizard.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class GwtProjectWizardRegistrar implements ProjectWizardRegistrar {
     private final List<Provider<? extends WizardPage<ProjectConfigDto>>> wizardPages;

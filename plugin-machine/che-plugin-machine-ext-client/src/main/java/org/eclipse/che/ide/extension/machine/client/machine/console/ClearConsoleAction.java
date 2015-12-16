@@ -23,7 +23,7 @@ import org.eclipse.che.ide.extension.machine.client.MachineResources;
 /**
  * Action to clear Machine console.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class ClearConsoleAction extends Action {

@@ -142,17 +142,18 @@ public class WorkspaceRoot extends Container implements IWorkspaceRoot {
                                                               ServerException {
         List<? extends ProjectConfig> modules = manager.getProjectModules(rootProject);
 
+
         for (ProjectConfig module : modules) {
             addModules(projects, module);
         }
     }
 
     private void addModules(List<IProject> projects, ProjectConfig moduleConfig) {
+        Project mp = new Project(new Path(moduleConfig.getPath()), workspace);
+        projects.add(mp);
         for (ProjectConfig module : moduleConfig.getModules()) {
             Project project = new Project(new Path(module.getPath()), workspace);
-
             projects.add(project);
-
             addModules(projects, module);
         }
     }

@@ -32,7 +32,7 @@ import org.eclipse.che.ide.websocket.rest.Unmarshallable;
 /**
  * Console for command output.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class CommandOutputConsole implements OutputConsole, OutputConsoleView.ActionDelegate {
 

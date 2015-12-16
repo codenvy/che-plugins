@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * DTO that describes Maven archetype to use for project generation.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @DTO
 public interface MavenArchetype {

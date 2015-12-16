@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Represents Maven command.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class MavenCommandConfiguration extends CommandConfiguration {
 

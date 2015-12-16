@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * Unix GWT code server.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @author Alexander Andrienko
  */
 @Singleton

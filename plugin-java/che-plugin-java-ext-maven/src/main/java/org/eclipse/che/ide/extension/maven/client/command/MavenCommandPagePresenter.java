@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Page allows to configure Maven command parameters.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class MavenCommandPagePresenter implements MavenCommandPageView.ActionDelegate, CommandConfigurationPage<MavenCommandConfiguration> {

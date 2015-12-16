@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Action to create new Java package.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class NewPackageAction extends AbstractNewResourceAction {

@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Represents command that is defined by arbitrary command line.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class CustomCommandConfiguration extends CommandConfiguration {
 

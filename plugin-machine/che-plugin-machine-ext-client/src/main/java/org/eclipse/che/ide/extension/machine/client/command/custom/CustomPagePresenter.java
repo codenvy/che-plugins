@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Page allows to edit arbitrary command.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class CustomPagePresenter implements CustomPageView.ActionDelegate, CommandConfigurationPage<CustomCommandConfiguration> {

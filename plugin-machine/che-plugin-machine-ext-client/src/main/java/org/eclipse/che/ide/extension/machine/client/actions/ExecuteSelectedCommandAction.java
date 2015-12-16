@@ -28,7 +28,7 @@ import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspect
 /**
  * Action to execute command which is selected in drop-down list.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class ExecuteSelectedCommandAction extends AbstractPerspectiveAction {

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.tutorials.shared;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public interface Constants {
     // project type ids
     final String TUTORIAL_ID   = "codenvy_tutorial";

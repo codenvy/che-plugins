@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Registry for {@link CommandPropertyValueProvider}s.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  * @see CommandPropertyValueProvider
  */
 public interface CommandPropertyValueProviderRegistry {

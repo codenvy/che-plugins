@@ -51,7 +51,7 @@ import static org.eclipse.che.ide.ext.java.client.newsourcefile.JavaSourceFileTy
 /**
  * Presenter for creating Java source file.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @Singleton
 public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionDelegate {

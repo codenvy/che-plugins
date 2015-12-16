@@ -36,7 +36,7 @@ import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.VERSION
 /**
  * Generates simple Maven project.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 public class SimpleGeneratorStrategy implements GeneratorStrategy {
 

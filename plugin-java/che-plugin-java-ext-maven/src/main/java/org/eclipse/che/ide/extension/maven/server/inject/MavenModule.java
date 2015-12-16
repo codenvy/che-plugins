@@ -31,7 +31,7 @@ import org.eclipse.che.ide.extension.maven.server.projecttype.handler.MavenProje
 import org.eclipse.che.ide.extension.maven.server.projecttype.handler.ProjectHasBecomeMaven;
 import org.eclipse.che.ide.extension.maven.server.projecttype.handler.RemoveMavenModuleHandler;
 
-/** @author Artem Zatsarynnyy */
+/** @author Artem Zatsarynnyi */
 public class MavenModule extends AbstractModule {
     @Override
     protected void configure() {

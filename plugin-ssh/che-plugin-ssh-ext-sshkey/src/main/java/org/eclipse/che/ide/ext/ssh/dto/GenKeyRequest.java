@@ -16,7 +16,7 @@ import org.eclipse.che.dto.shared.DTO;
 /**
  * Interface describe a request for generate a SSH-key.
  *
- * @author Artem Zatsarynnyy
+ * @author Artem Zatsarynnyi
  */
 @DTO
 public interface GenKeyRequest {
