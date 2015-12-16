@@ -50,11 +50,15 @@ public class ComparePresenter implements CompareView.ActionDelegate {
 
     /**
      * Show compare window.
+     *
+     * @param file file name with its full path
+     * @param state state of the file
+     * @param revision hash of revision or branch
      */
-    public void show(final String file, final String state, final String revision) {        
-        if (state.contains("A")) {
+    public void show(final String file, final String state, final String revision) {
+        if (state.startsWith("A")) {
             showCompare(file, "", revision);
-        } else if (state.contains("D")) {
+        } else if (state.startsWith("D")) {
             gitService.show(appContext.getCurrentProject().getRootProject(), file, revision,
                         new AsyncRequestCallback<String>(new StringUnmarshaller()) {
                             @Override
@@ -91,15 +95,15 @@ public class ComparePresenter implements CompareView.ActionDelegate {
         view.hide();
     }
 
-    private void showCompare(final String item, final String oldContent, final String revision) {
-        String fullItemPath = appContext.getCurrentProject().getRootProject().getName() + "/" + item;
+    private void showCompare(final String file, final String oldContent, final String revision) {
+        String fullItemPath = appContext.getCurrentProject().getRootProject().getName() + "/" + file;
 
         projectService.getFileContent(fullItemPath,
                                       new AsyncRequestCallback<String>(new StringUnmarshaller()) {
                                           @Override
                                           protected void onSuccess(final String newContent) {
-                                              view.setTitle(item);
-                                              view.show(oldContent, newContent, revision, item.substring(item.lastIndexOf("/")));
+                                              view.setTitle(file);
+                                              view.show(oldContent, newContent, revision, file);
                                           }
 
                                           @Override

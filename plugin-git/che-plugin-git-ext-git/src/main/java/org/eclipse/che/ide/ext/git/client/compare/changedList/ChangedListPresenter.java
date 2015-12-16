@@ -13,11 +13,12 @@ package org.eclipse.che.ide.ext.git.client.compare.changedList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.ide.api.project.node.Node;
 import org.eclipse.che.ide.ext.git.client.compare.ComparePresenter;
 
 import javax.validation.constraints.NotNull;
 
-import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Presenter for displaying list of changed files.
@@ -33,7 +34,6 @@ public class ChangedListPresenter implements ChangedListView.ActionDelegate {
     private String state;
     private String revision;
 
-    /** Create presenter. */
     @Inject
     public ChangedListPresenter(ChangedListView view,
                                 ComparePresenter comparePresenter) {
@@ -42,10 +42,16 @@ public class ChangedListPresenter implements ChangedListView.ActionDelegate {
         this.view.setDelegate(this);
     }
 
-    /** Open dialog. */
-    public void show(String[] changedFiles, String revision) {
+    /**
+     * Show window with changed files list
+     *
+     * @param changedFiles Map with files and their state
+     * @param revision hash of revision or branch
+     */
+    public void show(Map<String, String> changedFiles, String revision) {
         view.showDialog();
-        view.setChanges(Arrays.asList(changedFiles));
+        view.setChanges(changedFiles);
+        view.setEnableCompareButton(false);
         this.revision = revision;
     }
 
@@ -63,15 +69,15 @@ public class ChangedListPresenter implements ChangedListView.ActionDelegate {
     
     /** {@inheritDoc} */
     @Override
-    public void onFileSelected(@NotNull String item) {
+    public void onNodeSelected(@NotNull Node node) {
         view.setEnableCompareButton(true);
-        this.file = item.substring(2);
-        this.state = item.substring(0, 2);
+        this.file = node.getName();
+        this.state = ((ChangedNode)node).getState();
     }
     
     /** {@inheritDoc} */
     @Override
-    public void onFileUnselected() {
+    public void onNodeUnselected() {
         view.setEnableCompareButton(false);
     }
 }

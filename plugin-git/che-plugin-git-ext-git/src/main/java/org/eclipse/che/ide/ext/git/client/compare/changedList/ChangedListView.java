@@ -11,9 +11,11 @@
 package org.eclipse.che.ide.ext.git.client.compare.changedList;
 
 import org.eclipse.che.ide.api.mvp.View;
+import org.eclipse.che.ide.api.project.node.Node;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The view of {@link ChangedListPresenter}.
@@ -30,22 +32,22 @@ public interface ChangedListView extends View<ChangedListView.ActionDelegate> {
         void onCompareClicked();
 
         /**
-         * Performs any action in response to the user having select file.
+         * Performs any action in response to the user having select node.
          *
-         * @param file selected file
+         * @param node selected node
          */
-        void onFileSelected(@NotNull String file);
+        void onNodeSelected(@NotNull Node node);
 
-        /** Performs any action in response to the user do not have any selected branch. */
-        void onFileUnselected();
+        /** Performs any action in response to the user do not have any selected node. */
+        void onNodeUnselected();
     }
 
     /**
      * Set changed files.
      *
-     * @param files list of changed files
+     * @param files Map of changed files with their state
      */
-    void setChanges(@NotNull List<String> files);
+    void setChanges(@NotNull Map<String, String> files);
 
     /** Close dialog. */
     void close();

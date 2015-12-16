@@ -36,7 +36,7 @@ import org.eclipse.che.ide.ui.window.Window;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of {@link ChangedListView}.
@@ -50,19 +50,18 @@ public class ChangedListViewImpl extends Window implements ChangedListView {
 
     private static BranchViewImplUiBinder ourUiBinder = GWT.create(BranchViewImplUiBinder.class);
 
-    Button btnClose;
-    Button btnCompare;
     @UiField
     ScrollPanel branchesPanel;
     @UiField(provided = true)
-    final         GitResources            res;
+    final GitResources            res;
     @UiField(provided = true)
-    final         GitLocalizationConstant locale;
-    private       ActionDelegate          delegate;
+    final GitLocalizationConstant locale;
 
-    private Tree tree;
+    private ActionDelegate delegate;
+    private Tree           tree;
+    private Button         btnClose;
+    private Button         btnCompare;
 
-    /** Create presenter. */
     @Inject
     protected ChangedListViewImpl(GitResources resources,
                                   GitLocalizationConstant locale,
@@ -86,42 +85,19 @@ public class ChangedListViewImpl extends Window implements ChangedListView {
                 }
             }
         });
-
         TreeNodeLoader nodeLoader = new TreeNodeLoader(Collections.<NodeInterceptor>emptySet());
-
         tree = new Tree(nodeStorage, nodeLoader);
-        this.branchesPanel.add(tree);
-
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.Mode.SINGLE);
-
         tree.getSelectionModel().addSelectionChangedHandler(new SelectionChangedEvent.SelectionChangedHandler() {
             @Override
             public void onSelectionChanged(SelectionChangedEvent event) {
                 if (!event.getSelection().isEmpty()) {
-                    delegate.onFileSelected(event.getSelection().get(0).getName());
+                    delegate.onNodeSelected(event.getSelection().get(0));
                 }
             }
         });
-
+        this.branchesPanel.add(tree);
         createButtons();
-    }
-
-    private void createButtons() {
-        btnClose = createButton(locale.buttonClose(), "git-compare-btn-close", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                delegate.onCloseClicked();
-            }
-        });
-        addButtonToFooter(btnClose);
-
-        btnCompare = createButton(locale.buttonCompare(), "git-compare-btn-compare", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                delegate.onCompareClicked();
-            }
-        });
-        addButtonToFooter(btnCompare);
     }
 
     /** {@inheritDoc} */
@@ -132,16 +108,20 @@ public class ChangedListViewImpl extends Window implements ChangedListView {
 
     /** {@inheritDoc} */
     @Override
-    public void setChanges(@NotNull List<String> items) {
+    public void setChanges(@NotNull Map<String, String> files) {
         tree.getNodeStorage().clear();
 
-        for (String item : items) {
-            tree.getNodeStorage().add(new ChangedNode(item) {
+        for (String item : files.keySet()) {
+            tree.getNodeStorage().add(new ChangedNode(item, files.get(item)) {
                 @Override
                 public void actionPerformed() {
                     delegate.onCompareClicked();
                 }
             });
+        }
+
+        if (this.tree.getSelectionModel().getSelectedNodes() == null) {
+            delegate.onNodeUnselected();
         }
     }
 
@@ -161,5 +141,23 @@ public class ChangedListViewImpl extends Window implements ChangedListView {
     @Override
     public void setEnableCompareButton(boolean enabled) {
         btnCompare.setEnabled(enabled);
+    }
+
+    private void createButtons() {
+        btnClose = createButton(locale.buttonClose(), "git-compare-btn-close", new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                delegate.onCloseClicked();
+            }
+        });
+        addButtonToFooter(btnClose);
+
+        btnCompare = createButton(locale.buttonCompare(), "git-compare-btn-compare", new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                delegate.onCompareClicked();
+            }
+        });
+        addButtonToFooter(btnCompare);
     }
 }

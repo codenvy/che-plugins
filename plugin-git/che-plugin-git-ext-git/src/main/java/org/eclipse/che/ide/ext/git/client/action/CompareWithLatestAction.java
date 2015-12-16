@@ -20,7 +20,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.compare.ComparePresenter;
 import org.eclipse.che.ide.ext.git.client.compare.changedList.ChangedListPresenter;
@@ -106,7 +105,11 @@ public class CompareWithLatestAction extends GitAction {
                                     if (changedFiles.length == 1) {
                                         comparePresenter.show(changedFiles[0].substring(2), changedFiles[0].substring(0, 1), REVISION);
                                     } else {
-                                        changedListPresenter.show(changedFiles, REVISION);
+                                        Map<String, String> items = new HashMap<>();
+                                        for (String item : changedFiles) {
+                                            items.put(item.substring(2, item.length()), item.substring(0, 1));
+                                        }
+                                        changedListPresenter.show(items, REVISION);
                                     }
                                 }
                             }

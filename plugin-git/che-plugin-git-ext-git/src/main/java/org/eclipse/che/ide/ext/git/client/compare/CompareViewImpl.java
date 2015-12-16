@@ -80,9 +80,9 @@ final class CompareViewImpl extends Window implements CompareView {
 
     /** {@inheritDoc} */
     @Override
-    public void show(String oldContent, String newContent, String revision, String fileName) {
+    public void show(String oldContent, String newContent, String revision, String file) {
         comparePanel.clear();
-        compare = null;        
+        compare = null;
 
         super.show();
         
@@ -95,9 +95,9 @@ final class CompareViewImpl extends Window implements CompareView {
         oldFile.setReadOnly(true);
 
         newFile.setContent(newContent);
-        newFile.setName(fileName);
+        newFile.setName(file);
         oldFile.setContent(oldContent);
-        oldFile.setName(fileName);
+        oldFile.setName(file);
 
         CompareConfig compareConfig = compareFactory.createCompareConfig();
         compareConfig.setNewFile(newFile);

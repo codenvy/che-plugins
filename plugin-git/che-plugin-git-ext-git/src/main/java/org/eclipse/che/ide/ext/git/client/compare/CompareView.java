@@ -23,7 +23,7 @@ import org.eclipse.che.ide.api.mvp.View;
 interface CompareView extends View<CompareView.ActionDelegate> {
 
     /**
-     * Set a title of the window.
+     * Set a title for the window.
      *
      * @param title text that will be as a title in window
      */
@@ -41,10 +41,10 @@ interface CompareView extends View<CompareView.ActionDelegate> {
      *         content of current file
      * @param revision
      *         revision or branch which is getting part in comparing
-     * @param fileName
-     *         the name of the changed file
+     * @param file
+     *         changed file name with its full path
      */
-    void show(String oldContent, String newContent, String revision, String fileName);
+    void show(String oldContent, String newContent, String revision, String file);
 
     interface ActionDelegate {
         /** Performs some actions in response to user's clicking on the 'Close' button. */
