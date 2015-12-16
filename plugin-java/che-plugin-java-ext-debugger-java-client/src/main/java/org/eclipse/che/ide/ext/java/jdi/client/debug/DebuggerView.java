@@ -74,7 +74,7 @@ public interface DebuggerView extends View<DebuggerView.ActionDelegate> {
      * @param location
      *         information about the execution point
      */
-    public void setExecutionPoint(boolean absentInformation, @NotNull Location location);
+    void setExecutionPoint(boolean absentInformation, @NotNull Location location);
 
     /**
      * Sets variables.
@@ -165,7 +165,7 @@ public interface DebuggerView extends View<DebuggerView.ActionDelegate> {
      * @param state
      *         the new state of button
      */
-    public boolean setButtonState(@NotNull ToggleButton button, boolean state);
+    boolean setButtonState(@NotNull ToggleButton button, boolean state);
 
     /**
      * Sets whether Change value button is enabled.

@@ -17,21 +17,32 @@ import org.eclipse.che.commons.annotation.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /** @author Evgen Vidolob */
 @Singleton
-public class FqnResolverFactory {
-    private Map<String, FqnResolver> resolvers;
+public class FqnResolverFactory implements FqnResolverObservable {
+    private final List<FqnResolverObserver> listeners;
+    private final Map<String, FqnResolver>  resolvers;
 
     /** Create factory. */
     @Inject
     protected FqnResolverFactory() {
         this.resolvers = new HashMap<>();
+        this.listeners = new LinkedList<>();
     }
 
     public void addResolver(@NotNull String mimeType, @NotNull FqnResolver resolver) {
         resolvers.put(mimeType, resolver);
+        onFqnResolverAdded(resolver);
+    }
+
+    private void onFqnResolverAdded(@NotNull FqnResolver resolver) {
+        for (FqnResolverObserver fqnResolverObserver : listeners) {
+            fqnResolverObserver.onFqnResolverAdded(resolver);
+        }
     }
 
     @Nullable
@@ -39,7 +50,19 @@ public class FqnResolverFactory {
         return resolvers.get(mimeType);
     }
 
-    public boolean isResolverExist(@NotNull String mimeType) {
-        return resolvers.containsKey(mimeType);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addFqnResolverObserver(FqnResolverObserver fqnResolverObserver) {
+        listeners.add(fqnResolverObserver);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeFqnResolverObserver(FqnResolverObserver fqnResolverObserver) {
+        listeners.remove(fqnResolverObserver);
     }
 }

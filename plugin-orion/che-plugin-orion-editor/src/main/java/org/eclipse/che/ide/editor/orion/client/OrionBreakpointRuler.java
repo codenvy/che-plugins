@@ -74,15 +74,16 @@ public class OrionBreakpointRuler implements Gutter {
                     int linesAdded = parameter.addedLineCount();
                     int linesRemoved = parameter.removedLineCount();
                     int fromLine = editorOverlay.getModel().getLineAtOffset(parameter.start());
+                    String line = editorOverlay.getModel().getLine(fromLine);
 
-                    if (linesAdded > 0 || linesRemoved > 0) {
+                    if (linesAdded > 0 || linesRemoved > 0 || line.trim().isEmpty()) {
                         removeAnnotations(getAnnotationsFrom(fromLine));
                         lineCallback.onLineNumberingChange(fromLine, linesRemoved, linesAdded);
                     }
                 }
             };
 
-            this.editorOverlay.getModel().addEventListener("Changing", modelChangingEventHandler, false);
+            this.editorOverlay.getModel().addEventListener("Changed", modelChangingEventHandler, false);
         }
     }
 
