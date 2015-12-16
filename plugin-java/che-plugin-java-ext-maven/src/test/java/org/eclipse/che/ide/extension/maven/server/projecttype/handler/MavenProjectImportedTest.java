@@ -28,6 +28,7 @@ import org.eclipse.che.api.project.server.handlers.ProjectHandler;
 import org.eclipse.che.api.project.server.handlers.ProjectHandlerRegistry;
 import org.eclipse.che.api.project.server.type.AbstractProjectType;
 import org.eclipse.che.api.project.server.type.ProjectTypeRegistry;
+import org.eclipse.che.api.vfs.server.SystemPathsFilter;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemRegistry;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemUser;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemUserContext;
@@ -149,7 +150,7 @@ public class MavenProjectImportedTest {
                     public VirtualFileSystemUser getVirtualFileSystemUser() {
                         return new VirtualFileSystemUser(vfsUser, vfsUserGroups);
                     }
-                }, virtualFileSystemRegistry);
+                }, virtualFileSystemRegistry, SystemPathsFilter.ANY);
         virtualFileSystemRegistry.registerProvider(workspace, memoryFileSystemProvider);
 
 

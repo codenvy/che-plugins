@@ -98,7 +98,7 @@ public class DockerInstance extends AbstractInstance {
                 containerInfo = docker.inspectContainer(container);
             }
 
-            return new DockerInstanceMetadata(containerInfo, node);
+            return dockerMachineFactory.createMetadata(containerInfo, node.getHost());
         } catch (IOException e) {
             LOG.error(e.getLocalizedMessage(), e);
             return null;

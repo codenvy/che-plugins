@@ -10,16 +10,27 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.svn.utils;
 
+import com.google.common.base.Joiner;
+import com.google.common.io.Files;
+
 import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.core.util.LineConsumerFactory;
 import org.eclipse.che.api.user.server.dao.Profile;
 import org.eclipse.che.api.user.server.dao.UserProfileDao;
+import org.eclipse.che.api.vfs.server.SystemPathsFilter;
 import org.eclipse.che.api.vfs.server.VirtualFileSystem;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemRegistry;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.user.UserImpl;
 import org.eclipse.che.dto.server.DtoFactory;
+import org.eclipse.che.ide.ext.svn.server.SubversionApi;
+import org.eclipse.che.ide.ext.svn.server.SubversionException;
+import org.eclipse.che.ide.ext.svn.server.credentials.CredentialsException;
+import org.eclipse.che.ide.ext.svn.server.credentials.CredentialsProvider;
+import org.eclipse.che.ide.ext.svn.server.repository.RepositoryUrlProvider;
+import org.eclipse.che.ide.ext.svn.server.upstream.CommandLineResult;
+import org.eclipse.che.ide.ext.svn.server.upstream.UpstreamUtils;
 import org.eclipse.che.ide.ext.svn.shared.AddRequest;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputResponse;
 import org.eclipse.che.ide.ext.svn.shared.CLIOutputWithRevisionResponse;
@@ -29,17 +40,6 @@ import org.eclipse.che.ide.ext.svn.shared.Depth;
 import org.eclipse.che.ide.ext.svn.shared.PropertySetRequest;
 import org.eclipse.che.vfs.impl.fs.LocalFileSystemProvider;
 import org.eclipse.che.vfs.impl.fs.WorkspaceHashLocalFSMountStrategy;
-
-import com.google.common.base.Joiner;
-import com.google.common.io.Files;
-
-import org.eclipse.che.ide.ext.svn.server.SubversionApi;
-import org.eclipse.che.ide.ext.svn.server.SubversionException;
-import org.eclipse.che.ide.ext.svn.server.credentials.CredentialsException;
-import org.eclipse.che.ide.ext.svn.server.credentials.CredentialsProvider;
-import org.eclipse.che.ide.ext.svn.server.repository.RepositoryUrlProvider;
-import org.eclipse.che.ide.ext.svn.server.upstream.CommandLineResult;
-import org.eclipse.che.ide.ext.svn.server.upstream.UpstreamUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -188,7 +188,7 @@ public class TestUtils {
         final VirtualFileSystemRegistry registry = new VirtualFileSystemRegistry();
         final WorkspaceHashLocalFSMountStrategy mountStrategy = new WorkspaceHashLocalFSMountStrategy(fsRoot, fsRoot);
         final LocalFileSystemProvider vfsProvider = new LocalFileSystemProvider("my_vfs", mountStrategy,
-                                                                                new EventService(), null, registry);
+                                                                                new EventService(), null, SystemPathsFilter.ANY, registry);
 
         registry.registerProvider("my_vfs", vfsProvider);
 

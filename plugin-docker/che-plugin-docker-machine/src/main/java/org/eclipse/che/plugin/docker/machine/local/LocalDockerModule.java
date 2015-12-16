@@ -19,7 +19,6 @@ import org.eclipse.che.api.machine.server.MachineService;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
 import org.eclipse.che.plugin.docker.machine.DockerInstance;
-import org.eclipse.che.plugin.docker.machine.DockerMachineFactory;
 import org.eclipse.che.plugin.docker.machine.node.DockerNode;
 import org.eclipse.che.plugin.docker.machine.DockerProcess;
 
@@ -41,7 +40,9 @@ public class LocalDockerModule extends AbstractModule {
                         .implement(Instance.class, DockerInstance.class)
                         .implement(InstanceProcess.class, DockerProcess.class)
                         .implement(DockerNode.class, LocalDockerNode.class)
-                        .build(DockerMachineFactory.class));
+                        .implement(org.eclipse.che.plugin.docker.machine.DockerInstanceMetadata.class,
+                                   org.eclipse.che.plugin.docker.machine.local.LocalDockerInstanceMetadata.class)
+                        .build(org.eclipse.che.plugin.docker.machine.DockerMachineFactory.class));
 
         bind(String.class).annotatedWith(Names.named("host.projects.root"))
                           .toProvider(org.eclipse.che.plugin.docker.machine.local.provider.HostProjectFolderProvider.class);

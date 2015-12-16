@@ -10,13 +10,15 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
+import com.google.inject.assistedinject.Assisted;
+
 import org.eclipse.che.api.core.model.machine.MachineMetadata;
 import org.eclipse.che.api.core.model.machine.Server;
 import org.eclipse.che.api.machine.server.model.impl.ServerImpl;
 import org.eclipse.che.plugin.docker.client.json.ContainerInfo;
 import org.eclipse.che.plugin.docker.client.json.PortBinding;
-import org.eclipse.che.plugin.docker.machine.node.DockerNode;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -62,11 +64,12 @@ public class DockerInstanceMetadata implements MachineMetadata {
             Pattern.compile("che:server:(?<port>[0-9]+(/tcp|/udp)?):(?<servprop>ref|protocol)");
 
     private final ContainerInfo info;
-    private final DockerNode    node;
+    private final String        containerHost;
 
-    public DockerInstanceMetadata(ContainerInfo containerInfo, DockerNode node) {
+    @Inject
+    public DockerInstanceMetadata(@Assisted  ContainerInfo containerInfo, @Assisted String containerHost) {
         this.info = containerInfo;
-        this.node = node;
+        this.containerHost = containerHost;
     }
 
     @Override
@@ -181,7 +184,7 @@ public class DockerInstanceMetadata implements MachineMetadata {
     @Override
     public Map<String, Server> getServers() {
         return addDefaultReferenceForServersWithoutReference(
-                addRefAndUrlToServerFromImageLabels(getServersWithFilledPorts(node.getHost(),
+                addRefAndUrlToServerFromImageLabels(getServersWithFilledPorts(containerHost,
                                                                               info.getNetworkSettings().getPorts()),
                                                     info.getConfig().getLabels()));
     }

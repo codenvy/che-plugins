@@ -29,6 +29,7 @@ import org.eclipse.che.api.project.server.handlers.ProjectHandlerRegistry;
 import org.eclipse.che.api.project.server.type.AttributeValue;
 import org.eclipse.che.api.project.server.type.ProjectTypeRegistry;
 import org.eclipse.che.api.project.shared.dto.SourceEstimation;
+import org.eclipse.che.api.vfs.server.SystemPathsFilter;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemRegistry;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.commons.env.EnvironmentContext;
@@ -76,7 +77,7 @@ public class DummyProjectManager implements ProjectManager {
             public File getMountPath() throws ServerException {
                 return new File(workspacePath);
             }
-        }, eventService, null, null);
+        }, eventService, null, SystemPathsFilter.ANY, null);
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.eclipse.che.api.project.server.handlers.ProjectHandlerRegistry;
 import org.eclipse.che.api.project.server.type.AbstractProjectType;
 import org.eclipse.che.api.project.server.type.ProjectTypeRegistry;
 import org.eclipse.che.api.vfs.server.ContentStream;
+import org.eclipse.che.api.vfs.server.SystemPathsFilter;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemRegistry;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemUser;
 import org.eclipse.che.api.vfs.server.VirtualFileSystemUserContext;
@@ -94,7 +95,7 @@ public class AddMavenModuleHandlerTest {
                     public VirtualFileSystemUser getVirtualFileSystemUser() {
                         return new VirtualFileSystemUser(vfsUser, vfsUserGroups);
                     }
-                }, vfsRegistry);
+                }, vfsRegistry, SystemPathsFilter.ANY);
         vfsRegistry.registerProvider(workspace, memoryFileSystemProvider);
 
         Set<ProjectType> projTypes = new HashSet<>();
