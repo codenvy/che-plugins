@@ -43,7 +43,7 @@ public class ChangedListPresenter implements ChangedListView.ActionDelegate {
     }
 
     /**
-     * Show window with changed files list
+     * Show window with changed files list.
      *
      * @param changedFiles Map with files and their state
      * @param revision hash of revision or branch

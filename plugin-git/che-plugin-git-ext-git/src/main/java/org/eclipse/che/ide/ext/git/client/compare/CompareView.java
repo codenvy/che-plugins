@@ -25,7 +25,7 @@ interface CompareView extends View<CompareView.ActionDelegate> {
     /**
      * Set a title for the window.
      *
-     * @param title text that will be as a title in window
+     * @param title text that will be as a title in the window
      */
     void setTitle(String title);
 

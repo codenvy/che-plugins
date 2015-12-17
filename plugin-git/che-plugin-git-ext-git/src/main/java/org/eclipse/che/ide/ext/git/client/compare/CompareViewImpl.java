@@ -31,7 +31,7 @@ import org.eclipse.che.ide.orion.compare.FileOptions;
 import org.eclipse.che.ide.ui.window.Window;
 
 /**
- * Implementation of {@link CompareView}
+ * Implementation of {@link CompareView}.
  *
  * @author Igor Vinokur
  */
@@ -44,13 +44,14 @@ final class CompareViewImpl extends Window implements CompareView {
     private static final PreviewViewImplUiBinder UI_BINDER = GWT.create(PreviewViewImplUiBinder.class);
 
     @UiField
-    SimplePanel   comparePanel;
+    SimplePanel comparePanel;
     @UiField
-    Label         revision;
-    
+    Label       revision;
+
     private ActionDelegate delegate;
     private CompareWidget  compare;
     private ThemeAgent     themeAgent;
+
     private final CompareFactory compareFactory;
 
     @Inject

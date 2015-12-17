@@ -21,7 +21,7 @@ import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.StringUnmarshaller;
 
 /**
- * Presenter for comparing current files with files from specified revision or branch
+ * Presenter for comparing current files with files from specified revision or branch.
  * 
  * @author Igor Vinokur
  */

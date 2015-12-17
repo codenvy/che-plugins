@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Node Element used for setting it to TreeNodeStorage and viewing items
+ * Node Element used for setting it to TreeNodeStorage and viewing changed files.
  *
  * @author Igor Vinokur
  */
@@ -35,7 +35,7 @@ public class ChangedNode extends AbstractTreeNode implements HasPresentation, Ha
     private NodePresentation nodePresentation;
 
     /**
-     * Create instance of ChangedNode
+     * Create instance of ChangedNode.
      *
      * @param name name of the file that represents this node with its full path
      * @param state state of the file that represents this node
