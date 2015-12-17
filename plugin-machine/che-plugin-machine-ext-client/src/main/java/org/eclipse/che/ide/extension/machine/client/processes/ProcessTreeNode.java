@@ -17,8 +17,10 @@ import org.eclipse.che.api.machine.shared.dto.MachineDto;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.extension.machine.client.command.CommandConfiguration;
 import org.eclipse.che.ide.ui.tree.TreeNodeElement;
+import org.eclipse.che.ide.util.UUID;
 
 import javax.validation.constraints.NotNull;
+
 import java.util.Collection;
 
 /**
@@ -63,11 +65,11 @@ public class ProcessTreeNode {
                 break;
             case COMMAND_NODE:
                 String name = ((CommandConfiguration)data).getName();
-                id = name;
+                id = name + UUID.uuid();
                 displayName = name;
                 break;
             case TERMINAL_NODE:
-                id = (String)data;
+                id = (String)data + UUID.uuid();
                 displayName = (String)data;
                 break;
             default:

@@ -72,8 +72,8 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
     private final MachineTreeNode                       rootNode;
     private final List<MachineTreeNode>                 machineNodes;
     private final AppContext                            appContext;
-    private MachineStateDto                             selectedMachineState;
-    private boolean                                     isMachineRunning;
+    private       MachineStateDto                       selectedMachineState;
+    private       boolean                               isMachineRunning;
 
     @Inject
     public MachinePanelPresenter(MachinePanelView view,
@@ -187,7 +187,10 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
             public void apply(PromiseError error) throws OperationException {
                 isMachineRunning = false;
 
-                appliance.showStub(locale.unavailableMachineStarting(selectedMachineState.getName()));
+                // we show the loader for dev machine so this message isn't necessary for dev machine
+                if (!selectedMachineState.isDev()) {
+                    appliance.showStub(locale.unavailableMachineStarting(selectedMachineState.getName()));
+                }
             }
         });
     }

@@ -63,9 +63,9 @@ import static org.eclipse.che.ide.extension.machine.client.perspective.terminal.
  */
 @Singleton
 public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPanelView.ActionDelegate, HasView {
-    
-    private static final String DEFAULT_TERMINAL_NAME          = "Terminal";
-    
+
+    private static final String DEFAULT_TERMINAL_NAME = "Terminal";
+
     private final DialogFactory               dialogFactory;
     private final NotificationManager         notificationManager;
     private final MachineLocalizationConstant localizationConstant;
@@ -197,23 +197,19 @@ public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPan
             return;
         }
 
-        final String commandId = configuration.getName();
-        if (commandConsoles.containsKey(commandId)) {
+        String commandId;
+        ProcessTreeNode processTreeNode = getProcessTreeNodeByName(configuration.getName(), machineTreeNode);
+        if (processTreeNode != null && isCommandStopped(processTreeNode.getId())) {
+            commandId = processTreeNode.getId();
             view.hideProcessOutput(commandId);
+            updateCommandOutput(commandId, outputConsole);
         } else {
-            final ProcessTreeNode commandNode = new ProcessTreeNode(COMMAND_NODE, machineTreeNode, configuration, null);
+            ProcessTreeNode commandNode = new ProcessTreeNode(COMMAND_NODE, machineTreeNode, configuration, null);
+            commandId = commandNode.getId();
             view.addProcessNode(commandNode);
             addChildToMachineNode(commandNode, machineTreeNode);
+            updateCommandOutput(commandId, outputConsole);
         }
-
-        commandConsoles.put(commandId, outputConsole);
-        outputConsole.go(new AcceptsOneWidget() {
-            @Override
-            public void setWidget(IsWidget widget) {
-                view.addProcessWidget(commandId, widget);
-                view.selectNode(view.getNodeById(commandId));
-            }
-        });
     }
 
     /**
@@ -243,7 +239,7 @@ public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPan
                 final ProcessTreeNode terminalNode = new ProcessTreeNode(TERMINAL_NODE, machineTreeNode, terminalName, null);
                 addChildToMachineNode(terminalNode, machineTreeNode);
 
-                final String terminalId =  terminalNode.getId();
+                final String terminalId = terminalNode.getId();
                 terminals.put(terminalId, newTerminal);
                 view.addProcessWidget(terminalId, terminalWidget);
                 view.addProcessNode(terminalNode);
@@ -370,7 +366,7 @@ public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPan
         if (!isTerminalNameExist(machineNode, terminalName)) {
             return DEFAULT_TERMINAL_NAME;
         }
-        
+
         int counter = 2;
         do {
             terminalName = localizationConstant.viewProcessesTerminalNodeTitle(String.valueOf(counter));
@@ -386,5 +382,29 @@ public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPan
             }
         }
         return false;
+    }
+
+    private ProcessTreeNode getProcessTreeNodeByName(String processName, ProcessTreeNode machineTreeNode) {
+        for (ProcessTreeNode processTreeNode : machineTreeNode.getChildren()) {
+            if (processTreeNode.getName().equals(processName)) {
+                return processTreeNode;
+            }
+        }
+        return null;
+    }
+
+    private boolean isCommandStopped(String commandId) {
+        return commandConsoles.containsKey(commandId) && commandConsoles.get(commandId).isFinished();
+    }
+
+    private void updateCommandOutput(@NotNull final String commandId, @NotNull OutputConsole outputConsole) {
+        commandConsoles.put(commandId, outputConsole);
+        outputConsole.go(new AcceptsOneWidget() {
+            @Override
+            public void setWidget(IsWidget widget) {
+                view.addProcessWidget(commandId, widget);
+                view.selectNode(view.getNodeById(commandId));
+            }
+        });
     }
 }

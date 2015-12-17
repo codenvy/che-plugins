@@ -23,6 +23,7 @@ import org.eclipse.che.ide.ext.java.client.dependenciesupdater.DependenciesUpdat
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 
+import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.MAVEN_ID;
 import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspective.PROJECT_PERSPECTIVE_ID;
 
 /**
@@ -57,7 +58,7 @@ public class UpdateDependencyAction extends AbstractPerspectiveAction {
     /** {@inheritDoc} */
     @Override
     public void updateInPerspective(@NotNull ActionEvent event) {
-        //TODO only maven
-        event.getPresentation().setEnabledAndVisible(true);
+        event.getPresentation().setEnabledAndVisible(appContext.getCurrentProject() != null &&
+                                                     MAVEN_ID.equals(appContext.getCurrentProject().getProjectConfig().getType()));
     }
 }
