@@ -10,20 +10,45 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.command.valueproviders;
 
-import com.google.gwt.user.client.Window;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
+
+import org.eclipse.che.api.machine.gwt.client.MachineServiceClient;
+import org.eclipse.che.api.machine.shared.dto.MachineDto;
+import org.eclipse.che.api.machine.shared.dto.MachineStateDto;
+import org.eclipse.che.api.machine.shared.dto.ServerDto;
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.api.promises.client.PromiseError;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.extension.machine.client.machine.events.MachineStateEvent;
+import org.eclipse.che.ide.extension.machine.client.machine.events.MachineStateHandler;
 
 /**
- * Provide current window host name.
+ * Provides current machine host name/ip taken from servers configuration.
  *
- * Need for IDEX-3924 as intermediate solution.
- *
- * @author Vlad Zhukovskiy
+ * @author Vlad Zhukovskyi
  */
 @Singleton
-public class MachineHostNameProvider implements CommandPropertyValueProvider {
+public class MachineHostNameProvider implements CommandPropertyValueProvider, MachineStateHandler {
 
     public static final String KEY = "${machine.hostname}";
+
+    private final AppContext           appContext;
+    private final MachineServiceClient machineServiceClient;
+
+    private String value;
+
+    @Inject
+    public MachineHostNameProvider(EventBus eventBus, AppContext appContext, MachineServiceClient machineServiceClient) {
+        this.appContext = appContext;
+        this.machineServiceClient = machineServiceClient;
+        this.value = "";
+
+        eventBus.addHandler(MachineStateEvent.TYPE, this);
+        updateValue();
+    }
 
     @Override
     public String getKey() {
@@ -32,6 +57,59 @@ public class MachineHostNameProvider implements CommandPropertyValueProvider {
 
     @Override
     public String getValue() {
-        return Window.Location.getHostName();
+        return value;
+    }
+
+    @Override
+    public void onMachineRunning(MachineStateEvent event) {
+        final MachineStateDto machineState = event.getMachineState();
+        if (machineState.isDev()) {
+            machineServiceClient.getMachine(machineState.getId()).then(new Operation<MachineDto>() {
+                @Override
+                public void apply(MachineDto machine) throws OperationException {
+                    value = getHostName(machine);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onMachineDestroyed(MachineStateEvent event) {
+        final MachineStateDto machineState = event.getMachineState();
+        if (machineState.isDev()) {
+            value = "";
+        }
+    }
+
+    private void updateValue() {
+        final String devMachineId = appContext.getDevMachineId();
+        if (devMachineId == null) {
+            return;
+        }
+
+        machineServiceClient.getMachine(devMachineId).then(new Operation<MachineDto>() {
+            @Override
+            public void apply(MachineDto machine) throws OperationException {
+                value = getHostName(machine);
+            }
+        }).catchError(new Operation<PromiseError>() {
+            @Override
+            public void apply(PromiseError arg) throws OperationException {
+                value = "";
+            }
+        });
+    }
+
+    private String getHostName(MachineDto machine) {
+        for (ServerDto server : machine.getMetadata().getServers().values()) {
+            String[] addressParts = server.getAddress().split(":");
+            if (addressParts.length != 2) {
+                continue;
+            }
+
+            return addressParts[0];
+        }
+
+        return  "";
     }
 }
