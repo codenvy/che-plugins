@@ -39,7 +39,6 @@ import java.util.List;
 
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.che.api.promises.client.js.Promises.resolve;
 import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAIL;
 
@@ -95,8 +94,8 @@ public class RefactoringUpdater {
             return;
         }
 
-        final List<ChangeInfo> changesExceptUpdates = newArrayList(filter(changes, not(UPDATE_ONLY)));
-        final List<ChangeInfo> updateChangesOnly = newArrayList(filter(changes, UPDATE_ONLY));
+        final Iterable<ChangeInfo> changesExceptUpdates = filter(changes, not(UPDATE_ONLY));
+        final Iterable<ChangeInfo> updateChangesOnly = filter(changes, UPDATE_ONLY);
 
         Promise<Void> promise = resolve(null);
         promise = proceedGeneralChanges(promise, changesExceptUpdates.iterator(), refactoringInfo);
