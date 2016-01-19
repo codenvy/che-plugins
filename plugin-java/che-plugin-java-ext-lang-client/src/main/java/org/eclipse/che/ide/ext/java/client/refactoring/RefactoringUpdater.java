@@ -138,8 +138,8 @@ public class RefactoringUpdater {
         final ChangeInfo changeInfo = iterator.next();
 
         //iterate over opened files in editor and find those file that matches ours
-        final FileReferenceNode editorFile = getOpenedFileOrNull(isNullOrEmpty(changeInfo.getOldPath()) ? changeInfo.getOldPath()
-                                                                                                        : changeInfo.getPath());
+        final FileReferenceNode editorFile = getOpenedFileOrNull(!isNullOrEmpty(changeInfo.getOldPath()) ? changeInfo.getOldPath()
+                                                                                                         : changeInfo.getPath());
 
         //if no one file were found, than it means that we shouldn't update anything
         if (editorFile == null) {
