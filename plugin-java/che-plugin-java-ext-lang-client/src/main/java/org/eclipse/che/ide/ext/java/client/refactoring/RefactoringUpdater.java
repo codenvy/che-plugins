@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.google.common.base.Predicates.not;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Iterables.filter;
 import static org.eclipse.che.api.promises.client.js.Promises.resolve;
 import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAIL;
@@ -86,10 +87,6 @@ public class RefactoringUpdater {
      *         applied changes
      */
     public void updateAfterRefactoring(RefactorInfo refactoringInfo, List<ChangeInfo> changes) {
-        if (refactoringInfo == null) {
-            return;
-        }
-
         if (changes == null || changes.isEmpty()) {
             return;
         }
@@ -141,7 +138,8 @@ public class RefactoringUpdater {
         final ChangeInfo changeInfo = iterator.next();
 
         //iterate over opened files in editor and find those file that matches ours
-        final FileReferenceNode editorFile = getOpenedFileOrNull(changeInfo.getOldPath());
+        final FileReferenceNode editorFile = getOpenedFileOrNull(isNullOrEmpty(changeInfo.getOldPath()) ? changeInfo.getOldPath()
+                                                                                                        : changeInfo.getPath());
 
         //if no one file were found, than it means that we shouldn't update anything
         if (editorFile == null) {
