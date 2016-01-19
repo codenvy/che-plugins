@@ -10,37 +10,37 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.refactoring;
 
-import com.google.common.base.Strings;
+import com.google.common.base.Predicate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
-import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
-import org.eclipse.che.api.promises.client.js.Promises;
-import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.node.HasStorablePath.StorablePath;
 import org.eclipse.che.ide.api.project.node.Node;
+import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
+import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.ChangeInfo;
-import org.eclipse.che.ide.jseditor.client.texteditor.TextEditor;
 import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.project.node.FileReferenceNode;
-import org.eclipse.che.ide.rest.AsyncRequestCallback;
 
 import java.util.Iterator;
 import java.util.List;
 
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
+import static org.eclipse.che.api.promises.client.js.Promises.resolve;
 import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAIL;
 
 /**
@@ -48,6 +48,7 @@ import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAI
  * It is needed for refreshing the project tree, updating content of the opening editors.
  *
  * @author Valeriy Svydenko
+ * @author Vlad Zhukovskyi
  */
 @Singleton
 public class RefactoringUpdater {
@@ -56,163 +57,208 @@ public class RefactoringUpdater {
     private final ProjectExplorerPresenter projectExplorer;
     private final JavaLocalizationConstant locale;
     private final NotificationManager      notificationManager;
-    private final ProjectServiceClient     projectServiceClient;
-    private final AppContext               appContext;
+
+    private Predicate<ChangeInfo> UPDATE_ONLY = new Predicate<ChangeInfo>() {
+        @Override
+        public boolean apply(ChangeInfo input) {
+            return ChangeInfo.ChangeName.UPDATE.equals(input.getName());
+        }
+    };
 
     @Inject
     public RefactoringUpdater(EditorAgent editorAgent,
                               EventBus eventBus,
                               NotificationManager notificationManager,
-                              AppContext appContext,
-                              ProjectServiceClient projectServiceClient,
                               ProjectExplorerPresenter projectExplorer,
                               JavaLocalizationConstant locale) {
         this.editorAgent = editorAgent;
         this.notificationManager = notificationManager;
-        this.projectServiceClient = projectServiceClient;
         this.eventBus = eventBus;
         this.projectExplorer = projectExplorer;
         this.locale = locale;
-        this.appContext = appContext;
     }
 
     /**
-     * Updates all open editors which have changes and refreshes the project tree.
+     * Iterates over each refactoring change and according to change type performs specific update operation.
+     * i.e. for {@code ChangeName#UPDATE} updates only opened editors, for {@code ChangeName#MOVE or ChangeName#RENAME_COMPILATION_UNIT}
+     * updates only new paths and opened editors, for {@code ChangeName#RENAME_PACKAGE} reloads package structure and restore expansion.
      *
      * @param changes
      *         applied changes
      */
     public void updateAfterRefactoring(RefactorInfo refactoringInfo, List<ChangeInfo> changes) {
-        removeSelectedNodes(refactoringInfo);
-        Promise<Void> promise = Promises.resolve(null);
-        processChanges(promise, editorAgent.getOpenedEditors().values().iterator(), changes).then(setActiveEditorFocus());
-    }
-
-    private void removeSelectedNodes(RefactorInfo refactoringInfo) {
-        if (refactoringInfo == null || refactoringInfo.getSelectedItems() == null) {
+        if (refactoringInfo == null) {
             return;
         }
-        for (Object operatedItem : refactoringInfo.getSelectedItems()) {
-            if (operatedItem instanceof Node) {
-                projectExplorer.removeNode((Node)operatedItem, false);
-            }
+
+        if (changes == null || changes.isEmpty()) {
+            return;
         }
+
+        final List<ChangeInfo> changesExceptUpdates = newArrayList(filter(changes, not(UPDATE_ONLY)));
+        final List<ChangeInfo> updateChangesOnly = newArrayList(filter(changes, UPDATE_ONLY));
+
+        Promise<Void> promise = resolve(null);
+        promise = proceedGeneralChanges(promise, changesExceptUpdates.iterator(), refactoringInfo);
+        proceedUpdateChanges(promise, updateChangesOnly.iterator());
     }
 
-    private Promise<Void> processChanges(Promise<Void> promise, Iterator<EditorPartPresenter> iterator, List<ChangeInfo> changes) {
+    /** Iterate over changes except update changes. Refresh tree according to change type. */
+    private Promise<Void> proceedGeneralChanges(Promise<Void> promise, Iterator<ChangeInfo> iterator, final RefactorInfo refactorInfo) {
         if (!iterator.hasNext()) {
             return promise;
         }
 
-        final EditorPartPresenter editor = iterator.next();
-        final ChangeInfo change = getActiveChange(changes, editor);
+        final ChangeInfo changeInfo = iterator.next();
 
-        if (change == null) {
-            return processChanges(promise, iterator, changes);
+        if (changeInfo == null) {
+            return proceedGeneralChanges(promise, iterator, refactorInfo);
         }
 
-        changes.remove(change);
+        final Promise<Void> derivedPromise;
 
-        Promise<Void> derivedPromise;
-
-        switch (change.getName()) {
-            case RENAME_COMPILATION_UNIT:
+        switch (changeInfo.getName()) {
             case MOVE:
-                derivedPromise = prepareMovePromise(promise, editor, change);
+            case RENAME_COMPILATION_UNIT:
+                removeNodeFor(changeInfo, refactorInfo.getSelectedItems());
+                derivedPromise = promise.thenPromise(proceedRefactoringMove(changeInfo));
                 break;
-            case UPDATE:
-                derivedPromise = prepareUpdatePromise(promise, editor, change);
+            case RENAME_PACKAGE:
+                derivedPromise = promise.thenPromise(proceedRefactoringRenamePackage(changeInfo, refactorInfo));
                 break;
             default:
-                return processChanges(promise, iterator, changes);
+                return proceedGeneralChanges(promise, iterator, refactorInfo);
         }
 
-        return processChanges(derivedPromise, iterator, changes);
+        return proceedGeneralChanges(derivedPromise, iterator, refactorInfo);
     }
 
-    private Promise<Void> prepareUpdatePromise(Promise<Void> promise, final EditorPartPresenter editor, final ChangeInfo change) {
-        return promise.thenPromise(new Function<Void, Promise<Void>>() {
+    /** Iterate over changes that has UPDATE mode. In this case we try to update opened editors only. */
+    private Promise<Void> proceedUpdateChanges(Promise<Void> promise, Iterator<ChangeInfo> iterator) {
+        if (!iterator.hasNext()) {
+            return promise;
+        }
+
+        final ChangeInfo changeInfo = iterator.next();
+
+        //iterate over opened files in editor and find those file that matches ours
+        final FileReferenceNode editorFile = getOpenedFileOrNull(changeInfo.getOldPath());
+
+        //if no one file were found, than it means that we shouldn't update anything
+        if (editorFile == null) {
+            return proceedUpdateChanges(promise, iterator);
+        }
+
+        final Promise<Void> derivedPromise = promise.thenPromise(new Function<Void, Promise<Void>>() {
             @Override
             public Promise<Void> apply(Void arg) throws FunctionException {
+                return projectExplorer.getNodeByPath(new StorablePath(changeInfo.getPath()), true, false)
+                                      .thenPromise(updateEditorContent(editorFile))
+                                      .catchError(onNodeNotFound());
 
-                if (!Strings.isNullOrEmpty(change.getOldPath())) {
-                    return doUpdate(editor, change);
-                }
-
-                projectServiceClient.getItem(appContext.getWorkspace().getId(), change.getPath(), new AsyncRequestCallback<ItemReference>() {
-                    @Override
-                    protected void onSuccess(ItemReference result) {
-                        eventBus.fireEvent(new FileContentUpdateEvent(change.getPath()));
-                    }
-
-                    @Override
-                    protected void onFailure(Throwable exception) {
-                        //do nothing
-                    }
-                });
-
-                return Promises.resolve(null);
             }
         });
+
+        return proceedUpdateChanges(derivedPromise, iterator);
     }
 
-    private Promise<Void> prepareMovePromise(Promise<Void> promise, final EditorPartPresenter editor, final ChangeInfo change) {
-        return promise.thenPromise(new Function<Void, Promise<Void>>() {
-            @Override
-            public Promise<Void> apply(Void ignored) throws FunctionException {
-                return doUpdate(editor, change);
-            }
-        });
-    }
-
-    private ChangeInfo getActiveChange(List<ChangeInfo> changes, EditorPartPresenter openEditor) {
-        for (ChangeInfo change : changes) {
-            String fPath = openEditor.getEditorInput().getFile().getPath();
-            if (change.getOldPath().equals(fPath) || change.getPath().equals(fPath)) {
-                return change;
+    /** Iterates over opened editors and fetch file with specified path or returns null. */
+    private FileReferenceNode getOpenedFileOrNull(String path) {
+        VirtualFile vFile = null;
+        for (EditorPartPresenter editor : editorAgent.getOpenedEditors().values()) {
+            if (editor.getEditorInput().getFile().getPath().equals(path)) {
+                vFile = editor.getEditorInput().getFile();
+                break;
             }
         }
-        return null;
+
+        if (vFile == null || !(vFile instanceof FileReferenceNode)) {
+            return null;
+        }
+
+        return (FileReferenceNode)vFile;
     }
 
-    private Promise<Void> doUpdate(EditorPartPresenter editor, final ChangeInfo change) {
-        return projectExplorer.getNodeByPath(new StorablePath(change.getPath()), true, false)
-                              .thenPromise(updateEditorInput(editor, change))
-                              .catchError(onNodeNotFound());
-    }
-
-    private Operation<Void> setActiveEditorFocus() {
-        return new Operation<Void>() {
-            @Override
-            public void apply(Void arg) throws OperationException {
-                projectExplorer.reloadChildren();
-                EditorPartPresenter activeEditor = editorAgent.getActiveEditor();
-                if (activeEditor instanceof TextEditor) {
-                    ((TextEditor)activeEditor).setFocus();
-                }
-            }
-        };
-    }
-
-    private Function<Node, Promise<Void>> updateEditorInput(EditorPartPresenter editor, final ChangeInfo change) {
-        final FileReferenceNode file = (FileReferenceNode)editor.getEditorInput().getFile();
+    /** Takes input file, provide into ones new data object and notifies editors to re-read file content. */
+    private Function<Node, Promise<Void>> updateEditorContent(final FileReferenceNode editorFileToUpdate) {
         return new Function<Node, Promise<Void>>() {
             @Override
             public Promise<Void> apply(Node node) throws FunctionException {
-                if (!(node instanceof FileReferenceNode)) {
-                    return Promises.resolve(null);
+                //here we consume node and if it is file node than we set data from one file into other
+                if (node instanceof FileReferenceNode) {
+                    setFileDataObject((FileReferenceNode)node, editorFileToUpdate);
                 }
 
-                file.setData(((FileReferenceNode)node).getData());
-                file.setParent(node.getParent());
-                editorAgent.updateEditorNode(change.getOldPath(), file);
-                eventBus.fireEvent(new FileContentUpdateEvent(change.getPath()));
-
-                return Promises.resolve(null);
+                return resolve(null);
             }
         };
     }
 
+    /** Set data object from one file into other and notify editor to re-read file content if such opened. */
+    private void setFileDataObject(FileReferenceNode from, FileReferenceNode to) {
+        if (from == null || to == null) {
+            return;
+        }
+
+        String tempPath = to.getPath();
+        to.setData(from.getData());
+        to.setParent(from.getParent());
+        editorAgent.updateEditorNode(tempPath, to);
+        eventBus.fireEvent(new FileContentUpdateEvent(from.getPath()));
+    }
+
+    /** Removes from Project Tree node which matches old path from Refactoring change info object. */
+    private void removeNodeFor(ChangeInfo changeInfo, List<?> proceedItems) {
+        for (Object proceedItem : proceedItems) {
+            if (proceedItem instanceof FileReferenceNode
+                && ((FileReferenceNode)proceedItem).getStorablePath().equals(changeInfo.getOldPath())) {
+                projectExplorer.removeNode((FileReferenceNode)proceedItem, false);
+            }
+        }
+    }
+
+    /** Find node by new path and notify editors to re-read files if need. */
+    private Function<Void, Promise<Void>> proceedRefactoringMove(final ChangeInfo changeInfo) {
+        return new Function<Void, Promise<Void>>() {
+            @Override
+            public Promise<Void> apply(Void arg) throws FunctionException {
+                FileReferenceNode editorFileToUpdate = getOpenedFileOrNull(changeInfo.getOldPath());
+
+                return projectExplorer.getNodeByPath(new StorablePath(changeInfo.getPath()), true, false)
+                                      .thenPromise(updateEditorContent(editorFileToUpdate))
+                                      .catchError(onNodeNotFound());
+            }
+        };
+    }
+
+    /** Find new package node and restore expansion if need. */
+    private Function<Void, Promise<Void>> proceedRefactoringRenamePackage(final ChangeInfo changeInfo, final RefactorInfo refactorInfo) {
+        return new Function<Void, Promise<Void>>() {
+            @Override
+            public Promise<Void> apply(Void arg) throws FunctionException {
+                //according to Rename package action it can be enabled if we have only one selected Package in selection agent
+                Object refItem = refactorInfo.getSelectedItems().get(0);
+                final boolean wasPackageExpanded = refItem instanceof PackageNode && projectExplorer.isExpanded((Node)refItem);
+
+                return projectExplorer.getNodeByPath(new StorablePath(changeInfo.getPath()), true, false)
+                                      .thenPromise(new Function<Node, Promise<Void>>() {
+                                          @Override
+                                          public Promise<Void> apply(Node node) throws FunctionException {
+                                              //restore expand state
+                                              if (wasPackageExpanded) {
+                                                  projectExplorer.setExpanded(node, true);
+                                              }
+
+                                              return resolve(null);
+                                          }
+                                      })
+                                      .catchError(onNodeNotFound());
+
+            }
+        };
+    }
+
+    /** Simply notify user in any failed cases. */
     private Operation<PromiseError> onNodeNotFound() {
         return new Operation<PromiseError>() {
             @Override
