@@ -204,6 +204,7 @@ public class RenamePresenterTest {
         when(changeCreationResult.getStatus()).thenReturn(refactoringStatus);
 
         renamePresenter = new RenamePresenter(view,
+                                              eventBus,
                                               similarNamesConfigurationPresenter,
                                               locale,
                                               editorAgent,

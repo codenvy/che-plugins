@@ -13,6 +13,7 @@ package org.eclipse.che.ide.ext.java.client.newsourcefile;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
@@ -24,6 +25,7 @@ import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.event.CreateFileNodeEvent;
 import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.project.node.HasStorablePath.StorablePath;
 import org.eclipse.che.ide.api.project.node.Node;
@@ -63,16 +65,19 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
     private final ProjectServiceClient     projectServiceClient;
     private final DtoUnmarshallerFactory   dtoUnmarshaller;
     private final List<JavaSourceFileType> sourceFileTypes;
+    private final EventBus                 eventBus;
     private final DialogFactory            dialogFactory;
     private final String                   workspaceId;
 
     @Inject
-    public NewJavaSourceFilePresenter(NewJavaSourceFileView view,
+    public NewJavaSourceFilePresenter(EventBus eventBus,
+                                      NewJavaSourceFileView view,
                                       ProjectExplorerPresenter projectExplorer,
                                       AppContext appContext,
                                       ProjectServiceClient projectServiceClient,
                                       DtoUnmarshallerFactory dtoUnmarshaller,
                                       DialogFactory dialogFactory) {
+        this.eventBus = eventBus;
         this.dialogFactory = dialogFactory;
         sourceFileTypes = Arrays.asList(CLASS, INTERFACE, ENUM, ANNOTATION);
         this.view = view;
@@ -211,6 +216,7 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
                                .thenPromise(navigateToNode())
                                .then(selectNode())
                                .then(openNode())
+                               .then(fireEvent())
                                .catchError(onFailedFileCreation());
     }
 
@@ -325,6 +331,19 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
             public Node apply(Node node) throws FunctionException {
                 if (node instanceof FileReferenceNode) {
                     ((FileReferenceNode)node).actionPerformed();
+                }
+
+                return node;
+            }
+        };
+    }
+
+    protected Function<Node, Node> fireEvent() {
+        return new Function<Node, Node>() {
+            @Override
+            public Node apply(Node node) throws FunctionException {
+                if (node instanceof FileReferenceNode) {
+                    eventBus.fireEvent(new CreateFileNodeEvent((FileReferenceNode)node));
                 }
 
                 return node;

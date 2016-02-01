@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.java.client.refactoring.move.wizard;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
@@ -23,6 +24,7 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
+import org.eclipse.che.ide.ext.java.client.event.RefactoringProvidedEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification.Status;
 import org.eclipse.che.ide.api.project.node.HasStorablePath;
@@ -65,6 +67,7 @@ import static org.eclipse.che.ide.ext.java.shared.dto.refactoring.RefactoringSta
  */
 @Singleton
 public class MovePresenter implements MoveView.ActionDelegate {
+    private final EventBus                 eventBus;
     private final MoveView                 view;
     private final RefactoringUpdater       refactoringUpdater;
     private final EditorAgent              editorAgent;
@@ -80,7 +83,8 @@ public class MovePresenter implements MoveView.ActionDelegate {
     private String       refactoringSessionId;
 
     @Inject
-    public MovePresenter(MoveView view,
+    public MovePresenter(EventBus eventBus,
+                         MoveView view,
                          RefactoringUpdater refactoringUpdater,
                          AppContext appContext,
                          EditorAgent editorAgent,
@@ -90,6 +94,7 @@ public class MovePresenter implements MoveView.ActionDelegate {
                          DtoFactory dtoFactory,
                          JavaLocalizationConstant locale,
                          NotificationManager notificationManager) {
+        this.eventBus = eventBus;
         this.view = view;
         this.refactoringUpdater = refactoringUpdater;
         this.editorAgent = editorAgent;
@@ -241,6 +246,7 @@ public class MovePresenter implements MoveView.ActionDelegate {
                             if (arg.getSeverity() == OK) {
                                 view.hide();
                                 refactoringUpdater.updateAfterRefactoring(refactorInfo, arg.getChanges());
+                                eventBus.fireEvent(new RefactoringProvidedEvent(arg.getChanges()));
                             } else {
                                 view.showErrorMessage(arg);
                             }

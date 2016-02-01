@@ -530,6 +530,28 @@ public interface GitLocalizationConstant extends Messages {
     @Key("view.pull.local.branches.title")
     String pullLocalBranches();
 
+    // Add to Index
+    @Key("newFile.add.to.index.dialog.title")
+    String newFileAddToIndexDialogTitle();
+
+    @Key("newFile.add.to.index.dialog.text")
+    String newFileAddToIndexDialogText(String file);
+
+    @Key("newFile.add.to.index.notification")
+    String newFileAddToIndexNotification(String file);
+
+    @Key("delete.add.to.Index.dialog.title")
+    String deleteAddToIndexDialogTitle();
+
+    @Key("delete.add.to.index.dialog.text")
+    String deleteAddToIndexDialogText();
+
+    @Key("delete.add.to.index.dialog.notification")
+    String deleteAddToIndexDialogNotification();
+
+    @Key("refactoring.add.to.index.dialog.notification")
+    String refactoringAddToIndexDialogNotification();
+
     // Merge
     @Key("view.merge.title")
     String mergeTitle();

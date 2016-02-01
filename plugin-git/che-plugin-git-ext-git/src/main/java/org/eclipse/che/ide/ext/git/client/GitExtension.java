@@ -12,7 +12,9 @@ package org.eclipse.che.ide.ext.git.client;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -20,6 +22,7 @@ import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.api.keybinding.KeyBindingAgent;
 import org.eclipse.che.ide.api.keybinding.KeyBuilder;
+import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.ext.git.client.action.AddToIndexAction;
 import org.eclipse.che.ide.ext.git.client.action.CheckoutReferenceAction;
 import org.eclipse.che.ide.ext.git.client.action.CommitAction;
@@ -40,6 +43,8 @@ import org.eclipse.che.ide.ext.git.client.action.ShowGitUrlAction;
 import org.eclipse.che.ide.ext.git.client.action.ShowMergeAction;
 import org.eclipse.che.ide.ext.git.client.action.ShowRemoteAction;
 import org.eclipse.che.ide.ext.git.client.action.ShowStatusAction;
+import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
+import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_HELP;
 import static org.eclipse.che.ide.api.action.IdeActions.GROUP_MAIN_MENU;
@@ -61,6 +66,11 @@ public class GitExtension {
     @Inject
     public GitExtension(GitResources resources,
                         ActionManager actionManager,
+                        DialogFactory dialogFactory,
+                        NotificationManager notificationManager,
+                        EventBus eventBus,
+                        DtoUnmarshallerFactory unmarshallerFactory,
+                        GitServiceClient gitServiceClient,
                         InitRepositoryAction initAction,
                         DeleteRepositoryAction deleteAction,
                         AddToIndexAction addToIndexAction,
@@ -84,6 +94,8 @@ public class GitExtension {
                         CompareWithRevisionAction compareWithRevisionAction,
                         KeyBindingAgent keyBinding,
                         AppContext appContext) {
+
+        new AddToIndexManager(appContext, dialogFactory, unmarshallerFactory, eventBus, constant, gitServiceClient, notificationManager);
 
         resources.gitCSS().ensureInjected();
 

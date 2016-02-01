@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.java.client.refactoring.move.wizard;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.Operation;
@@ -78,6 +79,8 @@ public class MovePresenterTest {
     public static final String PROJECT_PATH = "projectPAth";
 
     // constructor params
+    @Mock
+    private EventBus                 eventBus;
     @Mock
     private MoveView                 moveView;
     @Mock
@@ -193,7 +196,8 @@ public class MovePresenterTest {
         when(changeCreationResultPromise.then(Matchers.<Operation<ChangeCreationResult>>anyObject()))
                 .thenReturn(changeCreationResultPromise);
 
-        presenter = new MovePresenter(moveView,
+        presenter = new MovePresenter(eventBus,
+                                      moveView,
                                       refactoringUpdater,
                                       appContext,
                                       editorAgent,
