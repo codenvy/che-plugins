@@ -95,7 +95,7 @@ public class GitExtension {
                         KeyBindingAgent keyBinding,
                         AppContext appContext) {
 
-        new AddToIndexManager(appContext, dialogFactory, unmarshallerFactory, eventBus, constant, gitServiceClient, notificationManager);
+        new AddToIndexHandler(appContext, dialogFactory, unmarshallerFactory, eventBus, constant, gitServiceClient, notificationManager);
 
         resources.gitCSS().ensureInjected();
 

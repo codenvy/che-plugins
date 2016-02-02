@@ -16,12 +16,12 @@ import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.git.shared.Status;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.event.CreateFileNodeEvent;
-import org.eclipse.che.ide.event.CreateFileNodeEventHandler;
-import org.eclipse.che.ide.event.DeleteNodesEvent;
-import org.eclipse.che.ide.event.DeleteNodesEventHandler;
-import org.eclipse.che.ide.event.RenameNodeEvent;
-import org.eclipse.che.ide.event.RenameNodeEventHandler;
+import org.eclipse.che.ide.event.FileNodeCreatedEvent;
+import org.eclipse.che.ide.event.FileNodeCreatedEventHandler;
+import org.eclipse.che.ide.event.NodesDeletedEvent;
+import org.eclipse.che.ide.event.NodesDeletedEventHandler;
+import org.eclipse.che.ide.event.NodeRenamedEvent;
+import org.eclipse.che.ide.event.NodeRenamedEventHandler;
 import org.eclipse.che.ide.api.notification.Notification;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification;
@@ -51,8 +51,8 @@ import static org.eclipse.che.ide.api.notification.StatusNotification.Status.SUC
 /**
  * @author Igor Vinokur
  */
-public class AddToIndexManager implements CreateFileNodeEventHandler, RefactoringProvidedEventHandler, DeleteNodesEventHandler,
-                                          RenameNodeEventHandler {
+public class AddToIndexHandler implements FileNodeCreatedEventHandler, RefactoringProvidedEventHandler, NodesDeletedEventHandler,
+                                          NodeRenamedEventHandler {
     private final AppContext              appContext;
     private final DialogFactory           dialogFactory;
     private final DtoUnmarshallerFactory  unmarshallerFactory;
@@ -63,7 +63,7 @@ public class AddToIndexManager implements CreateFileNodeEventHandler, Refactorin
     private final static String YES_BUTTON = "Yes";
     private final static String NO_BUTTON = "No";
 
-    public AddToIndexManager(AppContext appContext,
+    public AddToIndexHandler(AppContext appContext,
                              DialogFactory dialogFactory,
                              DtoUnmarshallerFactory unmarshallerFactory,
                              EventBus eventBus,
@@ -77,18 +77,18 @@ public class AddToIndexManager implements CreateFileNodeEventHandler, Refactorin
         this.gitService = gitService;
         this.notificationManager = notificationManager;
 
-        eventBus.addHandler(CreateFileNodeEvent.TYPE, this);
+        eventBus.addHandler(FileNodeCreatedEvent.TYPE, this);
         eventBus.addHandler(RefactoringProvidedEvent.TYPE, this);
-        eventBus.addHandler(DeleteNodesEvent.TYPE, this);
-        eventBus.addHandler(RenameNodeEvent.TYPE, this);
+        eventBus.addHandler(NodesDeletedEvent.TYPE, this);
+        eventBus.addHandler(NodeRenamedEvent.TYPE, this);
     }
 
     @Override
-    public void onFileNodeCreated(CreateFileNodeEvent event) {
+    public void onFileNodeCreated(FileNodeCreatedEvent event) {
         if (!isUnderGit()) {
             return;
         }
-        final String pathName = normalizePath(event.getItem().getPath());
+        final String pathName = normalizePath(event.getCreatedNode().getPath());
         final String fileName = pathName.substring(pathName.lastIndexOf("/") + 1);
         ConfirmCallback confirmCallback = new ConfirmCallback() {
             @Override
@@ -117,7 +117,7 @@ public class AddToIndexManager implements CreateFileNodeEventHandler, Refactorin
     }
 
     @Override
-    public void onNodesDeleted(final DeleteNodesEvent event) {
+    public void onNodesDeleted(final NodesDeletedEvent event) {
         if (!isUnderGit()) {
             return;
         }
@@ -211,7 +211,7 @@ public class AddToIndexManager implements CreateFileNodeEventHandler, Refactorin
     }
 
     @Override
-        public void onNodeRenamed(final RenameNodeEvent event) {
+        public void onNodeRenamed(final NodeRenamedEvent event) {
         if (!isUnderGit()) {
             return;
         }

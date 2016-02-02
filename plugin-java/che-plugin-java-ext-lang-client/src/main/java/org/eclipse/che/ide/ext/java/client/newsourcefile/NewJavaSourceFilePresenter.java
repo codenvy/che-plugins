@@ -25,7 +25,7 @@ import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.event.CreateFileNodeEvent;
+import org.eclipse.che.ide.event.FileNodeCreatedEvent;
 import org.eclipse.che.ide.api.project.node.HasStorablePath;
 import org.eclipse.che.ide.api.project.node.HasStorablePath.StorablePath;
 import org.eclipse.che.ide.api.project.node.Node;
@@ -343,7 +343,7 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
             @Override
             public Node apply(Node node) throws FunctionException {
                 if (node instanceof FileReferenceNode) {
-                    eventBus.fireEvent(new CreateFileNodeEvent((FileReferenceNode)node));
+                    eventBus.fireEvent(new FileNodeCreatedEvent((FileReferenceNode)node));
                 }
 
                 return node;
