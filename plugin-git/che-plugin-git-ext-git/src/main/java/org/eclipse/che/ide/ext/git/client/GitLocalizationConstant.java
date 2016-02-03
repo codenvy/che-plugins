@@ -64,6 +64,12 @@ public interface GitLocalizationConstant extends Messages {
     @Key("button.compare")
     String buttonCompare();
 
+    @Key("button.yes")
+    String buttonYes();
+
+    @Key("button.no")
+    String buttonNo();
+
     @Key("console.tooltip.clear")
     String buttonClear();
 

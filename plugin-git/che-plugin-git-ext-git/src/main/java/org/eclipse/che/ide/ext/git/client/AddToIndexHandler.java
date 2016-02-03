@@ -47,6 +47,7 @@ import java.util.Map;
 
 import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAIL;
 import static org.eclipse.che.ide.api.notification.StatusNotification.Status.SUCCESS;
+import static org.eclipse.che.api.git.GitProjectType.VCS_PROVIDER_NAME;
 
 /**
  * @author Igor Vinokur
@@ -59,9 +60,6 @@ public class AddToIndexHandler implements FileNodeCreatedEventHandler, Refactori
     private final GitLocalizationConstant locale;
     private final GitServiceClient        gitService;
     private final NotificationManager     notificationManager;
-
-    private final static String YES_BUTTON = "Yes";
-    private final static String NO_BUTTON = "No";
 
     public AddToIndexHandler(AppContext appContext,
                              DialogFactory dialogFactory,
@@ -110,8 +108,8 @@ public class AddToIndexHandler implements FileNodeCreatedEventHandler, Refactori
         };
         dialogFactory.createConfirmDialog(locale.newFileAddToIndexDialogTitle(),
                                           locale.newFileAddToIndexDialogText(fileName),
-                                          YES_BUTTON,
-                                          NO_BUTTON,
+                                          locale.buttonYes(),
+                                          locale.buttonNo(),
                                           confirmCallback,
                                           cancelCallback).show();
     }
@@ -154,8 +152,8 @@ public class AddToIndexHandler implements FileNodeCreatedEventHandler, Refactori
                 };
                 dialogFactory.createConfirmDialog(locale.deleteAddToIndexDialogTitle(),
                                                   locale.deleteAddToIndexDialogText(),
-                                                  YES_BUTTON,
-                                                  NO_BUTTON,
+                                                  locale.buttonYes(),
+                                                  locale.buttonNo(),
                                                   confirmCallback,
                                                   cancelCallback).show();
             }
@@ -313,6 +311,6 @@ public class AddToIndexHandler implements FileNodeCreatedEventHandler, Refactori
         //TODO rework checking for git mixin when IDEX-3725 will be fixed
         final ProjectConfigDto project = appContext.getCurrentProject().getRootProject();
         Map<String, List<String>> attributes = project.getAttributes();
-        return attributes.containsKey("vcs.provider.name") && attributes.get("vcs.provider.name").contains("git");
+        return attributes.containsKey(VCS_PROVIDER_NAME) && attributes.get(VCS_PROVIDER_NAME).contains("git");
     }
 }
