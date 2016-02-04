@@ -661,4 +661,22 @@ public interface GitLocalizationConstant extends Messages {
 
     @Key("merge.failed")
     String mergeFailed();
+
+    @Key("git.checkout.without.creation")
+    String gitCheckoutWithoutCreation(String branchName);
+
+    @Key("git.checkout.with.creation")
+    String gitCheckoutWithCreation(String branchName, String startPoint);
+
+    @Key("git.checkout.with.default.creation")
+    String gitCheckoutWithCreationFromDefault(String branchName);
+
+    @Key("git.checkout.error")
+    String gitCheckoutError(String branchName, String startPoint);
+
+    @Key("git.checkout.without.params")
+    String gitCheckoutImpossibleWithoutParams();
+
+    @Key("git.checkout.parameter.required")
+    String gitCheckoutParameterRequired(String parameter);
 }

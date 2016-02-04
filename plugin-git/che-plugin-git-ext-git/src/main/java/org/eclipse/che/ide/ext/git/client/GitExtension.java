@@ -28,6 +28,7 @@ import org.eclipse.che.ide.ext.git.client.action.CompareWithLatestAction;
 import org.eclipse.che.ide.ext.git.client.action.CompareWithRevisionAction;
 import org.eclipse.che.ide.ext.git.client.action.DeleteRepositoryAction;
 import org.eclipse.che.ide.ext.git.client.action.FetchAction;
+import org.eclipse.che.ide.ext.git.client.action.GitCheckoutAction;
 import org.eclipse.che.ide.ext.git.client.action.HistoryAction;
 import org.eclipse.che.ide.ext.git.client.action.InitRepositoryAction;
 import org.eclipse.che.ide.ext.git.client.action.PullAction;
@@ -68,6 +69,7 @@ public class GitExtension {
                         RemoveFromIndexAction removeFromIndexAction,
                         CommitAction commitAction,
                         CheckoutReferenceAction checkoutReferenceAction,
+                        GitCheckoutAction gitCheckoutAction,
                         ShowBranchesAction showBranchesAction,
                         ShowMergeAction showMergeAction,
                         ResetFilesAction resetFilesAction,
@@ -140,6 +142,9 @@ public class GitExtension {
         historyGroup.add(historyAction);
         actionManager.registerAction("gitStatus", showStatusAction);
         historyGroup.add(showStatusAction);
+
+        // This action is necessary for the factory in particular JIRA-plugin
+        actionManager.registerAction("gitCheckout", gitCheckoutAction);
 
         if (!appContext.getWorkspace().isTemporary()) {
             actionManager.registerAction("gitUrl", showGitUrlAction);
