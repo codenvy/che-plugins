@@ -22,12 +22,12 @@ import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.core.Component;
+import org.eclipse.che.ide.api.component.Component;
 
 import java.util.List;
 
-import static org.eclipse.che.api.core.model.machine.MachineStatus.RUNNING;
 import static org.eclipse.che.api.core.model.machine.MachineStatus.CREATING;
+import static org.eclipse.che.api.core.model.machine.MachineStatus.RUNNING;
 
 /** @author Artem Zatsarynnyi */
 @Singleton

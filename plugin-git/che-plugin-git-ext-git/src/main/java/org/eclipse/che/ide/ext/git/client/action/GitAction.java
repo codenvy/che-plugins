@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.git.client.action;
 
-import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.ide.api.action.AbstractPerspectiveAction;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -20,7 +19,7 @@ import org.vectomatic.dom.svg.ui.SVGResource;
 
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 
 import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspective.PROJECT_PERSPECTIVE_ID;
 
@@ -53,7 +52,7 @@ public abstract class GitAction extends AbstractPerspectiveAction {
                      SVGResource svgIcon,
                      AppContext appContext,
                      ProjectExplorerPresenter projectExplorer) {
-        super(Arrays.asList(PROJECT_PERSPECTIVE_ID), text, description, null, svgIcon);
+        super(Collections.singletonList(PROJECT_PERSPECTIVE_ID), text, description, null, svgIcon);
         this.appContext = appContext;
         this.projectExplorer = projectExplorer;
     }
@@ -72,17 +71,26 @@ public abstract class GitAction extends AbstractPerspectiveAction {
     }
 
     protected boolean isGitRepository() {
-        boolean isGitRepository = false;
-
-        if (getActiveProject() != null) {
-            ProjectConfigDto rootProjectDescriptor = getActiveProject().getRootProject();
-            List<String> listVcsProvider = rootProjectDescriptor.getAttributes().get("vcs.provider.name");
-
-            if (listVcsProvider != null && (!listVcsProvider.isEmpty()) && listVcsProvider.contains("git")) {
-                isGitRepository = true;
-            }
+        if (appContext.getActiveProject() == null) {
+            return false;
+        } else {
+            return appContext.getActiveProject().isTypeOf("git");
         }
-        return isGitRepository;
+
+//        boolean isGitRepository = false;
+//
+//        if (getActiveProject() != null) {
+//            ProjectConfigDto rootProjectDescriptor = getActiveProject().getRootProject();
+//
+//
+//            List<String> listVcsProvider = rootProjectDescriptor.getAttributes().get("vcs.provider.name");
+//
+//            if (listVcsProvider != null && (!listVcsProvider.isEmpty()) && listVcsProvider.contains("git")) {
+//                isGitRepository = true;
+//            }
+//
+//        }
+//        return isGitRepository;
     }
 
     protected CurrentProject getActiveProject() {

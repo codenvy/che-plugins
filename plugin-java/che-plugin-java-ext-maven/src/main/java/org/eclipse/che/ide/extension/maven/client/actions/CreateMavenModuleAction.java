@@ -18,7 +18,7 @@ import org.eclipse.che.ide.api.action.AbstractPerspectiveAction;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.Presentation;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.project.ProjectImpl;
 import org.eclipse.che.ide.extension.maven.client.MavenLocalizationConstant;
 import org.eclipse.che.ide.extension.maven.client.MavenResources;
 import org.eclipse.che.ide.extension.maven.client.module.CreateMavenModulePresenter;
@@ -69,13 +69,21 @@ public class CreateMavenModuleAction extends AbstractPerspectiveAction {
     @Override
     public void updateInPerspective(@NotNull ActionEvent event) {
         final Presentation presentation = event.getPresentation();
-        final CurrentProject currentProject = appContext.getCurrentProject();
-        if (currentProject == null) {
+//        final CurrentProject currentProject = appContext.getCurrentProject();
+//        if (currentProject == null) {
+//            presentation.setEnabledAndVisible(false);
+//            return;
+//        }
+
+//        presentation.setVisible(MavenAttributes.MAVEN_ID.equals(currentProject.getRootProject().getType()));
+//        presentation.setEnabled("pom".equals(currentProject.getAttributeValue(MavenAttributes.PACKAGING)));
+        ProjectImpl activeProject = appContext.getActiveProject();
+        if(activeProject != null) {
+            presentation.setVisible(activeProject.isTypeOf(MavenAttributes.MAVEN_ID));
+            presentation.setEnabled(activeProject.isAttrEqual(MavenAttributes.PACKAGING, "pom"));
+        } else {
             presentation.setEnabledAndVisible(false);
-            return;
         }
 
-        presentation.setVisible(MavenAttributes.MAVEN_ID.equals(currentProject.getRootProject().getType()));
-        presentation.setEnabled("pom".equals(currentProject.getAttributeValue(MavenAttributes.PACKAGING)));
     }
 }

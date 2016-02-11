@@ -44,7 +44,6 @@ import org.eclipse.che.ide.extension.machine.client.command.custom.CustomCommand
 import org.eclipse.che.ide.extension.machine.client.command.valueproviders.ServerPortProvider;
 import org.eclipse.che.ide.extension.machine.client.machine.console.ClearConsoleAction;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsoleToolbar;
-import org.eclipse.che.ide.extension.machine.client.machine.extserver.ProjectApiComponentInitializer;
 import org.eclipse.che.ide.extension.machine.client.outputspanel.OutputsContainerPresenter;
 import org.eclipse.che.ide.extension.machine.client.processes.ConsolesPanelPresenter;
 import org.eclipse.che.ide.ui.toolbar.ToolbarPresenter;
@@ -79,8 +78,6 @@ public class MachineExtension {
                             final EventBus eventBus,
                             final WorkspaceAgent workspaceAgent,
                             final ConsolesPanelPresenter consolesPanelPresenter,
-                            //projectApiComponentInitializer has handler which will work at the right time
-                            final ProjectApiComponentInitializer projectApiComponentInitializer,
                             final ServerPortProvider machinePortProvider,
                             final OutputsContainerPresenter outputsContainerPresenter,
                             final PerspectiveManager perspectiveManager,

@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
  */
 public class MavenProjectImportedTest {
 
-    private static final String workspace   = "my_ws";
+    private static final String workspace    = "my_ws";
     private static final String API_ENDPOINT = "http://localhost:8080/che/api";
 
     private String pomJar =
@@ -155,11 +155,11 @@ public class MavenProjectImportedTest {
                 new MemoryFileSystemProvider(workspace,
                                              eventService,
                                              new VirtualFileSystemUserContext() {
-                    @Override
-                    public VirtualFileSystemUser getVirtualFileSystemUser() {
-                        return new VirtualFileSystemUser(vfsUser, vfsUserGroups);
-                    }
-                },
+                                                 @Override
+                                                 public VirtualFileSystemUser getVirtualFileSystemUser() {
+                                                     return new VirtualFileSystemUser(vfsUser, vfsUserGroups);
+                                                 }
+                                             },
                                              virtualFileSystemRegistry,
                                              SystemPathsFilter.ANY);
         virtualFileSystemRegistry.registerProvider(workspace, memoryFileSystemProvider);

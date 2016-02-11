@@ -58,7 +58,10 @@ public class UpdateDependencyAction extends AbstractPerspectiveAction {
     /** {@inheritDoc} */
     @Override
     public void updateInPerspective(@NotNull ActionEvent event) {
-        event.getPresentation().setEnabledAndVisible(appContext.getCurrentProject() != null &&
-                                                     MAVEN_ID.equals(appContext.getCurrentProject().getProjectConfig().getType()));
+//        event.getPresentation().setEnabledAndVisible(appContext.getCurrentProject() != null &&
+//                                                     MAVEN_ID.equals(appContext.getCurrentProject().getProjectConfig().getType()));
+
+        event.getPresentation().setEnabledAndVisible(appContext.getActiveProject() != null &&
+                appContext.getActiveProject().isTypeOf(MAVEN_ID));
     }
 }
