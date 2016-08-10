@@ -12,7 +12,7 @@ package org.eclipse.che.ide.ext.github.server.rest;
 
 import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.ServerException;
-import org.eclipse.che.api.git.GitException;
+import org.eclipse.che.api.git.exception.GitException;;
 import org.eclipse.che.ide.ext.github.server.GitHubDTOFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubFactory;
 import org.eclipse.che.ide.ext.github.server.GitHubKeyUploader;

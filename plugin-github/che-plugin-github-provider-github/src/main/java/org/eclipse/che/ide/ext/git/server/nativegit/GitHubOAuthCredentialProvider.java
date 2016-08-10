@@ -11,7 +11,7 @@
 package org.eclipse.che.ide.ext.git.server.nativegit;
 
 import org.eclipse.che.api.auth.shared.dto.OAuthToken;
-import org.eclipse.che.api.git.GitException;
+import org.eclipse.che.api.git.exception.GitException;;
 import org.eclipse.che.api.git.shared.GitUser;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.dto.server.DtoFactory;
