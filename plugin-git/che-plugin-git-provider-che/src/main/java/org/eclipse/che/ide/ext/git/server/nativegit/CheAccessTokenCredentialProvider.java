@@ -12,7 +12,7 @@ package org.eclipse.che.ide.ext.git.server.nativegit;
 
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.git.CredentialsProvider;
-import org.eclipse.che.api.git.GitException;
+import org.eclipse.che.api.git.exception.GitException;;
 import org.eclipse.che.api.git.UserCredential;
 import org.eclipse.che.api.git.shared.GitUser;
 import org.eclipse.che.api.user.server.dao.PreferenceDao;
