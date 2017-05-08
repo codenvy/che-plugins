@@ -12,6 +12,7 @@ package org.eclipse.che.ide.ext.java.client.refactoring.rename.wizard;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
@@ -22,6 +23,7 @@ import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
+import org.eclipse.che.ide.ext.java.client.event.RefactoringProvidedEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
@@ -65,6 +67,7 @@ import static org.eclipse.che.ide.ext.java.shared.dto.refactoring.RefactoringSta
 @Singleton
 public class RenamePresenter implements ActionDelegate {
     private final RenameView                         view;
+    private final EventBus                           eventBus;
     private final SimilarNamesConfigurationPresenter similarNamesConfigurationPresenter;
     private final JavaLocalizationConstant           locale;
     private final RefactoringUpdater                 refactoringUpdater;
@@ -81,6 +84,7 @@ public class RenamePresenter implements ActionDelegate {
 
     @Inject
     public RenamePresenter(RenameView view,
+                           EventBus eventBus,
                            SimilarNamesConfigurationPresenter similarNamesConfigurationPresenter,
                            JavaLocalizationConstant locale,
                            EditorAgent editorAgent,
@@ -92,6 +96,7 @@ public class RenamePresenter implements ActionDelegate {
                            DtoFactory dtoFactory,
                            DialogFactory dialogFactory) {
         this.view = view;
+        this.eventBus = eventBus;
         this.similarNamesConfigurationPresenter = similarNamesConfigurationPresenter;
         this.locale = locale;
         this.refactoringUpdater = refactoringUpdater;
@@ -332,6 +337,7 @@ public class RenamePresenter implements ActionDelegate {
                 if (arg.getSeverity() == OK) {
                     view.hide();
                     refactoringUpdater.updateAfterRefactoring(refactorInfo, arg.getChanges());
+                    eventBus.fireEvent(new RefactoringProvidedEvent(arg.getChanges()));
                 } else {
                     view.showErrorMessage(arg);
                 }
